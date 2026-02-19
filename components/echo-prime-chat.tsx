@@ -15,7 +15,6 @@ interface ChatMessage {
 const CLOSER_API = 'https://billymc-api.bmcii1976.workers.dev';
 const EPT_API = 'https://ept-api.bmcii1976.workers.dev';
 
-// Detect page context for smart routing
 function getPageContext(pathname: string): { service: string; label: string; api: string; endpoint: string } {
   if (pathname.startsWith('/closer')) {
     const sub = pathname.replace('/closer', '').replace('/', '');
@@ -34,7 +33,6 @@ function getPageContext(pathname: string): { service: string; label: string; api
   };
 }
 
-// Simple emotion detection from response text
 function detectEmotion(text: string): string {
   const lower = text.toLowerCase();
   if (/\b(great|excellent|perfect|awesome|nice|congrat|well done|impressive)\b/.test(lower)) return 'positive';
@@ -60,22 +58,22 @@ export default function EchoPrimeChat() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [emotion, setEmotion] = useState('neutral');
+  const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [ttsPlaying, setTtsPlaying] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const ctx = getPageContext(pathname);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Focus input when opened
   useEffect(() => {
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 150);
   }, [isOpen]);
 
-  // Welcome message on first open
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       const welcome = ctx.service === 'ai-closer'
@@ -91,12 +89,68 @@ export default function EchoPrimeChat() {
     }
   }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Initialize audio element
+  useEffect(() => {
+    audioRef.current = new Audio();
+    audioRef.current.addEventListener('ended', () => setTtsPlaying(false));
+    audioRef.current.addEventListener('error', () => setTtsPlaying(false));
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.removeEventListener('ended', () => setTtsPlaying(false));
+        audioRef.current.removeEventListener('error', () => setTtsPlaying(false));
+      }
+    };
+  }, []);
+
   const getToken = useCallback(async (): Promise<string | null> => {
     try {
       const { auth } = await import('../lib/firebase');
       return auth.currentUser ? await auth.currentUser.getIdToken() : null;
     } catch {
       return null;
+    }
+  }, []);
+
+  const playTTS = useCallback(async (text: string, em: string) => {
+    if (!ttsEnabled || !audioRef.current) return;
+
+    try {
+      const token = await getToken();
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch(`${EPT_API}/api/tts`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ text, emotion: em }),
+      });
+
+      if (!res.ok) return;
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      // Stop any currently playing audio
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+
+      audioRef.current.src = url;
+      setTtsPlaying(true);
+      await audioRef.current.play();
+
+      // Clean up blob URL after playback
+      audioRef.current.addEventListener('ended', () => URL.revokeObjectURL(url), { once: true });
+    } catch {
+      setTtsPlaying(false);
+    }
+  }, [ttsEnabled, getToken]);
+
+  const stopTTS = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setTtsPlaying(false);
     }
   }, []);
 
@@ -146,6 +200,9 @@ export default function EchoPrimeChat() {
         emotion: em,
       };
       setMessages(prev => [...prev, assistantMsg]);
+
+      // Auto-play TTS for the response
+      playTTS(reply, em);
     } catch (err: any) {
       setMessages(prev => [...prev, {
         id: `e_${Date.now()}`,
@@ -158,7 +215,7 @@ export default function EchoPrimeChat() {
     } finally {
       setLoading(false);
     }
-  }, [input, loading, ctx, pathname, getToken]);
+  }, [input, loading, ctx, pathname, getToken, playTTS]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -170,9 +227,9 @@ export default function EchoPrimeChat() {
   const clearChat = () => {
     setMessages([]);
     setEmotion('neutral');
+    stopTTS();
   };
 
-  // Orb glow color based on emotion
   const orbColor = EMOTION_COLORS[emotion] || 'var(--ept-accent)';
 
   return (
@@ -204,6 +261,15 @@ export default function EchoPrimeChat() {
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        ) : ttsPlaying ? (
+          /* Animated sound wave icon when TTS is playing */
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+            <path d="M12 6v12" style={{ animation: 'soundWave 0.6s ease-in-out infinite alternate' }} />
+            <path d="M8 9v6" style={{ animation: 'soundWave 0.6s ease-in-out 0.1s infinite alternate' }} />
+            <path d="M16 9v6" style={{ animation: 'soundWave 0.6s ease-in-out 0.2s infinite alternate' }} />
+            <path d="M4 11v2" style={{ animation: 'soundWave 0.6s ease-in-out 0.3s infinite alternate' }} />
+            <path d="M20 11v2" style={{ animation: 'soundWave 0.6s ease-in-out 0.15s infinite alternate' }} />
           </svg>
         ) : (
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -246,7 +312,6 @@ export default function EchoPrimeChat() {
             background: `linear-gradient(135deg, var(--ept-surface), var(--ept-card-bg))`,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              {/* Mini orb */}
               <div style={{
                 width: 32,
                 height: 32,
@@ -260,11 +325,47 @@ export default function EchoPrimeChat() {
                   Echo Prime
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--ept-text-muted)', lineHeight: 1.2 }}>
-                  {ctx.label} {loading && '— thinking...'}
+                  {ctx.label} {loading && '— thinking...'} {ttsPlaying && '— speaking...'}
                 </div>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 6 }}>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              {/* TTS Toggle */}
+              <button
+                onClick={() => { setTtsEnabled(!ttsEnabled); if (ttsPlaying) stopTTS(); }}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+                  color: ttsEnabled ? 'var(--ept-accent)' : 'var(--ept-text-muted)',
+                  fontSize: 11, transition: 'color 0.2s',
+                }}
+                title={ttsEnabled ? 'Mute voice' : 'Enable voice'}
+              >
+                {ttsEnabled ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <line x1="23" y1="9" x2="17" y2="15" />
+                    <line x1="17" y1="9" x2="23" y2="15" />
+                  </svg>
+                )}
+              </button>
+              {/* Stop TTS */}
+              {ttsPlaying && (
+                <button onClick={stopTTS} style={{
+                  background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+                  color: '#ef4444', fontSize: 11,
+                }} title="Stop speaking">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="6" width="12" height="12" rx="2" />
+                  </svg>
+                </button>
+              )}
+              {/* Clear Chat */}
               <button onClick={clearChat} style={{
                 background: 'none', border: 'none', cursor: 'pointer', padding: 4,
                 color: 'var(--ept-text-muted)', fontSize: 11,
@@ -308,16 +409,35 @@ export default function EchoPrimeChat() {
                 }}>
                   {msg.content}
                 </div>
-                {msg.emotion && msg.role === 'assistant' && msg.emotion !== 'neutral' && (
-                  <span style={{
-                    fontSize: 10,
-                    color: EMOTION_COLORS[msg.emotion] || 'var(--ept-text-muted)',
-                    marginTop: 2,
-                    paddingLeft: 4,
-                    textTransform: 'capitalize',
-                  }}>
-                    {msg.emotion}
-                  </span>
+                {msg.role === 'assistant' && (
+                  <div style={{ display: 'flex', gap: 6, marginTop: 3, paddingLeft: 4, alignItems: 'center' }}>
+                    {msg.emotion && msg.emotion !== 'neutral' && (
+                      <span style={{
+                        fontSize: 10,
+                        color: EMOTION_COLORS[msg.emotion] || 'var(--ept-text-muted)',
+                        textTransform: 'capitalize',
+                      }}>
+                        {msg.emotion}
+                      </span>
+                    )}
+                    {/* Replay TTS button */}
+                    {ttsEnabled && msg.id !== 'welcome' && (
+                      <button
+                        onClick={() => playTTS(msg.content, msg.emotion || 'neutral')}
+                        style={{
+                          background: 'none', border: 'none', cursor: 'pointer', padding: 2,
+                          color: 'var(--ept-text-muted)', opacity: 0.6, transition: 'opacity 0.2s',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                        onMouseLeave={e => (e.currentTarget.style.opacity = '0.6')}
+                        title="Replay voice"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             ))}
@@ -328,9 +448,9 @@ export default function EchoPrimeChat() {
                 padding: '10px 14px',
                 alignSelf: 'flex-start',
               }}>
-                <span className="shimmer" style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--ept-accent)', opacity: 0.6, animation: 'pulse 1.2s ease-in-out infinite' }} />
-                <span className="shimmer" style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--ept-accent)', opacity: 0.6, animation: 'pulse 1.2s ease-in-out 0.2s infinite' }} />
-                <span className="shimmer" style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--ept-accent)', opacity: 0.6, animation: 'pulse 1.2s ease-in-out 0.4s infinite' }} />
+                <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--ept-accent)', opacity: 0.6, animation: 'pulse 1.2s ease-in-out infinite' }} />
+                <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--ept-accent)', opacity: 0.6, animation: 'pulse 1.2s ease-in-out 0.2s infinite' }} />
+                <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--ept-accent)', opacity: 0.6, animation: 'pulse 1.2s ease-in-out 0.4s infinite' }} />
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -439,6 +559,10 @@ export default function EchoPrimeChat() {
         @keyframes pulse {
           0%, 100% { opacity: 0.3; transform: scale(0.8); }
           50% { opacity: 1; transform: scale(1.1); }
+        }
+        @keyframes soundWave {
+          0% { transform: scaleY(0.4); }
+          100% { transform: scaleY(1.2); }
         }
       `}</style>
     </>
