@@ -45,7 +45,7 @@ export default function SignupPage() {
     setSubmitting(true);
     try {
       await signUpWithEmail(email, password);
-      router.push('/dashboard');
+      router.push('/services');
     } catch (err: any) {
       const code = err?.code || '';
       if (code === 'auth/email-already-in-use') {
@@ -89,7 +89,7 @@ export default function SignupPage() {
     setSubmitting(true);
     try {
       const u = await verifySmsCode(smsCode);
-      if (u) router.push('/dashboard');
+      if (u) router.push('/services');
     } catch (err: any) {
       const code = err?.code || '';
       if (code === 'auth/invalid-verification-code') {
@@ -106,7 +106,7 @@ export default function SignupPage() {
     setError('');
     try {
       const u = await signInWithGoogle();
-      if (u) router.push('/dashboard');
+      if (u) router.push('/services');
     } catch {
       setError('Google sign-in failed.');
     }
@@ -116,7 +116,7 @@ export default function SignupPage() {
     setError('');
     try {
       const u = await signInWithApple();
-      if (u) router.push('/dashboard');
+      if (u) router.push('/services');
     } catch {
       setError('Apple sign-in failed.');
     }
@@ -252,7 +252,10 @@ export default function SignupPage() {
           )}
 
           <p className="text-xs text-center mt-4" style={{ color: 'var(--ept-text-muted)' }}>
-            By creating an account, you agree to our Terms of Service and Privacy Policy.
+            By creating an account, you agree to our{' '}
+            <Link href="/legal/terms" className="underline" style={{ color: 'var(--ept-accent)' }}>Terms of Service</Link>
+            {' '}and{' '}
+            <Link href="/legal/privacy" className="underline" style={{ color: 'var(--ept-accent)' }}>Privacy Policy</Link>.
           </p>
         </div>
 

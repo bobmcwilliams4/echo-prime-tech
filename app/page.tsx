@@ -376,10 +376,14 @@ export default function HomePage() {
       <footer className="border-t py-12 px-6 transition-colors" style={{ borderColor: 'var(--ept-border)' }}>
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={400} height={260} className="w-[200px] md:w-[280px] h-auto opacity-80 transition-opacity duration-500" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} />
-          <div className="flex items-center gap-6 text-xs font-medium" style={{ color: 'var(--ept-text-muted)' }}>
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-6 text-xs font-medium" style={{ color: 'var(--ept-text-muted)' }}>
             <span>Midland, Texas</span>
             <span className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--ept-text-muted)', opacity: 0.3 }} />
             <a href="mailto:contact@echo-op.com" className="hover:opacity-80 transition-opacity">contact@echo-op.com</a>
+            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--ept-text-muted)', opacity: 0.3 }} />
+            <Link href="/legal/privacy" className="hover:opacity-80 transition-opacity">Privacy Policy</Link>
+            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--ept-text-muted)', opacity: 0.3 }} />
+            <Link href="/legal/terms" className="hover:opacity-80 transition-opacity">Terms of Service</Link>
             <span className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--ept-text-muted)', opacity: 0.3 }} />
             <span>&copy; {new Date().getFullYear()} Echo Prime Technologies</span>
           </div>
