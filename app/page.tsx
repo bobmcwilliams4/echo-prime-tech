@@ -97,8 +97,8 @@ export default function HomePage() {
     <div className="min-h-screen transition-colors duration-600" style={{ backgroundColor: 'var(--ept-bg)' }}>
       {/* ─── Navigation ─── */}
       <nav className="fixed top-0 w-full z-50 backdrop-blur-2xl border-b transition-colors duration-500" style={{ backgroundColor: 'var(--ept-nav-bg)', borderColor: 'var(--ept-border)' }}>
-        <div className="max-w-6xl mx-auto px-6 h-24 flex items-center justify-between">
-          <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={480} height={80} className="h-16 md:h-20 w-auto transition-opacity duration-500" priority />
+        <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+          <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={600} height={400} className="w-[240px] md:w-[340px] h-auto transition-opacity duration-500" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority />
           <div className="hidden md:flex items-center gap-8">
             {['Capabilities', 'Approach', 'Industries', 'Contact'].map(s => (
               <a key={s} href={`#${s.toLowerCase()}`} className="text-sm font-medium transition-colors hover:opacity-100" style={{ color: 'var(--ept-text-secondary)' }}>{s}</a>
@@ -309,7 +309,7 @@ export default function HomePage() {
       {/* ─── Footer ─── */}
       <footer className="border-t py-12 px-6 transition-colors" style={{ borderColor: 'var(--ept-border)' }}>
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={360} height={60} className="h-14 w-auto opacity-70 transition-opacity duration-500" />
+          <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={400} height={260} className="w-[200px] md:w-[280px] h-auto opacity-80 transition-opacity duration-500" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} />
           <div className="flex items-center gap-6 text-xs font-medium" style={{ color: 'var(--ept-text-muted)' }}>
             <span>Midland, Texas</span>
             <span className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--ept-text-muted)', opacity: 0.3 }} />
