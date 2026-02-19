@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../lib/auth-context';
+import { SmokeDivider } from '../components/ParticleBackground';
 
 function useAutoTheme() {
   const [isDark, setIsDark] = useState(false);
@@ -223,7 +224,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="accent-line shimmer" />
+      <SmokeDivider />
 
       {/* ─── Capabilities ─── */}
       <section id="capabilities" className="py-28 px-6" ref={capSection.ref}>
@@ -260,7 +261,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="accent-line shimmer" />
+      <SmokeDivider flip />
 
       {/* ─── Approach (replaces Technology — no secret sauce) ─── */}
       <section id="approach" className="py-28 px-6 mesh-bg" ref={diffSection.ref}>
@@ -308,7 +309,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="accent-line shimmer" />
+      <SmokeDivider />
 
       {/* ─── Industries ─── */}
       <section id="industries" className="py-28 px-6" ref={indSection.ref}>
@@ -338,7 +339,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="accent-line shimmer" />
+      <SmokeDivider flip />
 
       {/* ─── CTA ─── */}
       <section id="contact" className="py-32 px-6 mesh-bg relative" ref={ctaSection.ref}>

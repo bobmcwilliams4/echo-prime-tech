@@ -181,3 +181,86 @@ body {
   background-size: 200% 100%;
   animation: shimmer 3s ease-in-out infinite;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   PARTICLE BACKGROUND — Stars, Wisps, Matrix Rain, Smoke
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Star layers (night: visible, day: very subtle) */
+.ept-stars { transition: opacity 0.6s ease; }
+.dark .ept-stars { opacity: 1; }
+:root .ept-stars { opacity: 0.25; }
+
+.ept-star {
+  box-shadow: 0 0 var(--star-glow, 3px) rgba(20,184,166, calc(var(--star-opacity, 0.5) * 0.4));
+  transition: opacity 0.6s ease;
+}
+.dark .ept-star {
+  background: rgba(20,184,166, var(--star-opacity, 0.5));
+}
+:root .ept-star {
+  background: rgba(13,115,119, calc(var(--star-opacity, 0.5) * 0.3));
+}
+
+/* Nebula wisps (night: teal/gold glow, day: invisible) */
+.ept-wisp {
+  transition: opacity 0.6s ease;
+  opacity: 0;
+}
+.dark .ept-wisp {
+  background: radial-gradient(circle, rgba(20,184,166,0.06) 0%, rgba(201,169,78,0.03) 50%, transparent 70%);
+  opacity: 1;
+}
+
+/* Matrix rain columns */
+.ept-matrix-col { color: var(--ept-accent); opacity: 0.7; }
+.dark .ept-matrix-col { color: rgba(20,184,166,0.6); }
+
+/* Smoke divider paths */
+.ept-smoke-path { fill: var(--ept-accent); opacity: 0.08; }
+.dark .ept-smoke-path { fill: rgba(20,184,166,0.12); }
+.ept-smoke-path-2 { fill: rgba(201,169,78,0.06); }
+.dark .ept-smoke-path-2 { fill: rgba(201,169,78,0.08); }
+.ept-smoke-layer { position: absolute; inset: 0; }
+
+/* ─── Star parallax drift (3 layers) ─── */
+@keyframes ept-star-drift-0 {
+  0% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(6px) translateY(-4px); }
+  100% { transform: translateX(0) translateY(0); }
+}
+@keyframes ept-star-drift-1 {
+  0% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(-8px) translateY(5px); }
+  100% { transform: translateX(0) translateY(0); }
+}
+@keyframes ept-star-drift-2 {
+  0% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(10px) translateY(-7px); }
+  100% { transform: translateX(0) translateY(0); }
+}
+
+/* ─── Star twinkle ─── */
+@keyframes ept-twinkle {
+  0%, 100% { opacity: var(--star-opacity, 0.5); transform: scale(1); }
+  50% { opacity: calc(var(--star-opacity, 0.5) * 0.3); transform: scale(0.7); }
+}
+
+/* ─── Nebula wisp pulse ─── */
+@keyframes ept-wisp-pulse {
+  0% { transform: scale(1) translate(0, 0); opacity: 0.4; }
+  50% { transform: scale(1.15) translate(10px, -8px); opacity: 0.7; }
+  100% { transform: scale(1) translate(0, 0); opacity: 0.4; }
+}
+
+/* ─── Matrix rain fall ─── */
+@keyframes ept-matrix-fall {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(calc(100vh + 100%)); }
+}
+
+/* ─── Smoke drift ─── */
+@keyframes ept-smoke-drift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}

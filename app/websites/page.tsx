@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
 
 const TEMPLATES = [
@@ -30,6 +31,7 @@ const FEATURES = [
 
 export default function WebsitesPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -84,9 +86,20 @@ export default function WebsitesPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             {TEMPLATES.map((t, i) => (
-              <div key={i} className="card-hover rounded-xl border overflow-hidden" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-                <div className="h-40 flex items-center justify-center" style={{ backgroundColor: 'var(--ept-bg)' }}>
+              <button
+                key={i}
+                onClick={() => {
+                  if (!user) { router.push('/signup'); return; }
+                  router.push(`/websites/builder?template=${encodeURIComponent(t.name)}`);
+                }}
+                className="card-hover rounded-xl border overflow-hidden text-left transition-all hover:border-[var(--ept-accent)]"
+                style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}
+              >
+                <div className="h-40 flex items-center justify-center relative group" style={{ backgroundColor: 'var(--ept-bg)' }}>
                   <span className="text-4xl opacity-20">◇</span>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
+                    <span className="px-4 py-2 rounded-lg text-sm font-semibold text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>Use Template</span>
+                  </div>
                 </div>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-1">
@@ -95,7 +108,7 @@ export default function WebsitesPage() {
                   </div>
                   <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{t.preview}</p>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
