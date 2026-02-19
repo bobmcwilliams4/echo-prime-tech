@@ -1,22 +1,29 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { signInWithGoogle, signInWithApple, signInWithEmail, resetPassword } from '../../lib/firebase';
+import { signInWithGoogle, signInWithApple, signInWithEmail, resetPassword, setupRecaptcha, sendSmsCode, verifySmsCode } from '../../lib/firebase';
 import { useAuth } from '../../lib/auth-context';
+
+type AuthTab = 'email' | 'phone';
 
 export default function LoginPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const [tab, setTab] = useState<AuthTab>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [smsCode, setSmsCode] = useState('');
+  const [smsSent, setSmsSent] = useState(false);
   const [error, setError] = useState('');
   const [resetSent, setResetSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const recaptchaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const h = new Date().getHours();
@@ -43,6 +50,48 @@ export default function LoginPage() {
         setError('Too many attempts. Try again later.');
       } else {
         setError('Sign in failed. Please try again.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSendSms = async () => {
+    setError('');
+    if (!phone || phone.length < 10) { setError('Enter a valid phone number with country code (e.g. +1...)'); return; }
+    const formatted = phone.startsWith('+') ? phone : `+1${phone.replace(/\D/g, '')}`;
+    setSubmitting(true);
+    try {
+      const verifier = setupRecaptcha('recaptcha-container');
+      await sendSmsCode(formatted, verifier);
+      setSmsSent(true);
+    } catch (err: any) {
+      const code = err?.code || '';
+      if (code === 'auth/invalid-phone-number') {
+        setError('Invalid phone number. Include country code (e.g. +1...)');
+      } else if (code === 'auth/too-many-requests') {
+        setError('Too many attempts. Try again later.');
+      } else {
+        setError('Failed to send SMS. Please try again.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleVerifySms = async () => {
+    setError('');
+    if (!smsCode || smsCode.length < 6) { setError('Enter the 6-digit code.'); return; }
+    setSubmitting(true);
+    try {
+      const u = await verifySmsCode(smsCode);
+      if (u) router.push('/dashboard');
+    } catch (err: any) {
+      const code = err?.code || '';
+      if (code === 'auth/invalid-verification-code') {
+        setError('Invalid code. Please try again.');
+      } else {
+        setError('Verification failed. Please try again.');
       }
     } finally {
       setSubmitting(false);
@@ -90,14 +139,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <Link href="/" className="flex justify-center mb-10">
-          <Image
-            src={isDark ? '/logo-night.png' : '/logo-day.png'}
-            alt="Echo Prime Technologies"
-            width={400} height={260}
-            className="w-[200px] md:w-[260px] h-auto"
-            style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }}
-            priority
-          />
+          <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={400} height={260} className="w-[200px] md:w-[260px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority />
         </Link>
 
         {/* Card */}
@@ -124,48 +166,121 @@ export default function LoginPage() {
             <div className="flex-1 h-px" style={{ backgroundColor: 'var(--ept-border)' }} />
           </div>
 
+          {/* Tabs */}
+          <div className="flex rounded-xl overflow-hidden mb-6 border" style={{ borderColor: 'var(--ept-border)' }}>
+            {(['email', 'phone'] as AuthTab[]).map(t => (
+              <button
+                key={t}
+                onClick={() => { setTab(t); setError(''); setSmsSent(false); }}
+                className="flex-1 py-2.5 text-sm font-semibold transition-all"
+                style={{
+                  backgroundColor: tab === t ? 'var(--ept-accent)' : 'var(--ept-surface)',
+                  color: tab === t ? '#fff' : 'var(--ept-text-muted)',
+                }}
+              >
+                {t === 'email' ? 'Email' : 'Phone'}
+              </button>
+            ))}
+          </div>
+
           {/* Email form */}
-          <form onSubmit={handleEmail} className="flex flex-col gap-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--ept-text-muted)' }}>Email</label>
-              <input
-                type="email" value={email} onChange={e => setEmail(e.target.value)} required
-                className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-colors focus:ring-2"
-                style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
-                placeholder="you@company.com"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--ept-text-muted)' }}>Password</label>
-              <div className="relative">
+          {tab === 'email' && (
+            <form onSubmit={handleEmail} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--ept-text-muted)' }}>Email</label>
                 <input
-                  type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required
-                  className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-colors focus:ring-2 pr-12"
+                  type="email" value={email} onChange={e => setEmail(e.target.value)} required
+                  className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-colors"
                   style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
-                  placeholder="Enter your password"
+                  placeholder="you@company.com"
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium" style={{ color: 'var(--ept-text-muted)' }}>
-                  {showPassword ? 'Hide' : 'Show'}
-                </button>
               </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--ept-text-muted)' }}>Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required
+                    className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-colors pr-12"
+                    style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
+                    placeholder="Enter your password"
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium" style={{ color: 'var(--ept-text-muted)' }}>
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+              </div>
+
+              {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+              {resetSent && <p className="text-sm text-center" style={{ color: 'var(--ept-accent)' }}>Password reset email sent.</p>}
+
+              <button type="submit" disabled={submitting} className="w-full py-3.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-50" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+                {submitting ? 'Signing in...' : 'Sign In'}
+              </button>
+
+              <button type="button" onClick={handleReset} className="w-full text-center text-xs font-medium hover:underline" style={{ color: 'var(--ept-text-muted)' }}>
+                Forgot your password?
+              </button>
+            </form>
+          )}
+
+          {/* Phone form */}
+          {tab === 'phone' && (
+            <div className="flex flex-col gap-4">
+              {!smsSent ? (
+                <>
+                  <div>
+                    <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--ept-text-muted)' }}>Phone Number</label>
+                    <input
+                      type="tel" value={phone} onChange={e => setPhone(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-colors"
+                      style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
+                      placeholder="+1 (555) 123-4567"
+                    />
+                    <p className="text-xs mt-1.5" style={{ color: 'var(--ept-text-muted)' }}>Include country code. US numbers default to +1.</p>
+                  </div>
+
+                  {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+
+                  <button onClick={handleSendSms} disabled={submitting} className="w-full py-3.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-50" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+                    {submitting ? 'Sending...' : 'Send Verification Code'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="text-center mb-2">
+                    <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>
+                      Code sent to <span className="font-semibold" style={{ color: 'var(--ept-text)' }}>{phone.startsWith('+') ? phone : `+1${phone.replace(/\D/g, '')}`}</span>
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--ept-text-muted)' }}>Verification Code</label>
+                    <input
+                      type="text" value={smsCode} onChange={e => setSmsCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-colors text-center font-mono text-lg tracking-[0.5em]"
+                      style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
+                      placeholder="000000"
+                      maxLength={6}
+                      autoFocus
+                    />
+                  </div>
+
+                  {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+
+                  <button onClick={handleVerifySms} disabled={submitting} className="w-full py-3.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-50" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+                    {submitting ? 'Verifying...' : 'Verify & Sign In'}
+                  </button>
+
+                  <button onClick={() => { setSmsSent(false); setSmsCode(''); setError(''); }} className="w-full text-center text-xs font-medium hover:underline" style={{ color: 'var(--ept-text-muted)' }}>
+                    Use a different number
+                  </button>
+                </>
+              )}
             </div>
-
-            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
-            {resetSent && <p className="text-sm text-center" style={{ color: 'var(--ept-accent)' }}>Password reset email sent.</p>}
-
-            <button
-              type="submit" disabled={submitting}
-              className="w-full py-3.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-50"
-              style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
-            >
-              {submitting ? 'Signing in...' : 'Sign In'}
-            </button>
-          </form>
-
-          <button onClick={handleReset} className="w-full text-center text-xs font-medium mt-4 hover:underline" style={{ color: 'var(--ept-text-muted)' }}>
-            Forgot your password?
-          </button>
+          )}
         </div>
+
+        {/* Recaptcha container (invisible) */}
+        <div id="recaptcha-container" ref={recaptchaRef} />
 
         {/* Sign up link */}
         <p className="text-center text-sm mt-6" style={{ color: 'var(--ept-text-muted)' }}>

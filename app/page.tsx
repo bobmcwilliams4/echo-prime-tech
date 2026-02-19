@@ -101,6 +101,20 @@ const CAPABILITIES = [
     statLabel: 'AES Encryption',
     icon: '⬟',
   },
+  {
+    title: 'Website Creation',
+    description: 'Cutting-edge web applications built with Next.js 15, React 19, and serverless edge architecture. Auto-adaptive themes, real-time data dashboards, sub-second page loads, and zero-downtime deployments — every site is a living system, not a static page.',
+    stat: '<1s',
+    statLabel: 'Page Load Time',
+    icon: '◉',
+  },
+  {
+    title: 'AI Sales Agent',
+    description: 'Autonomous AI closers that work 24/7 — real-time voice conversations under 2 seconds, STT-to-LLM-to-TTS pipeline, state-machine script engine, CRM with full lead pipeline, infinite memory across every interaction, multi-channel outreach, live cost tracking, and sentiment analysis. White-label ready, multi-tenant SaaS. Zero local hardware required.',
+    stat: '24/7',
+    statLabel: 'Always Closing',
+    icon: '⬣',
+  },
 ];
 
 const FALLBACK_INDUSTRIES = [

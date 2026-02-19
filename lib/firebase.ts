@@ -9,6 +9,9 @@ import {
   getRedirectResult,
   GoogleAuthProvider,
   OAuthProvider,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  ConfirmationResult,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   sendPasswordResetEmail,
@@ -55,6 +58,7 @@ function detectProvider(user: User): string {
     'google.com': 'google',
     'apple.com': 'apple',
     'password': 'email',
+    'phone': 'phone',
   };
   return map[providerId] || providerId;
 }
@@ -125,6 +129,31 @@ export async function signUpWithEmail(email: string, password: string): Promise<
 export async function resetPassword(email: string): Promise<void> {
   const { auth } = initFirebase();
   await sendPasswordResetEmail(auth, email);
+}
+
+// Phone/SMS Auth
+let confirmationResult: ConfirmationResult | null = null;
+let recaptchaVerifierInstance: RecaptchaVerifier | null = null;
+
+export function setupRecaptcha(elementId: string): RecaptchaVerifier {
+  const { auth } = initFirebase();
+  if (recaptchaVerifierInstance) {
+    recaptchaVerifierInstance.clear();
+  }
+  recaptchaVerifierInstance = new RecaptchaVerifier(auth, elementId, { size: 'invisible' });
+  return recaptchaVerifierInstance;
+}
+
+export async function sendSmsCode(phoneNumber: string, recaptchaVerifier: RecaptchaVerifier): Promise<boolean> {
+  const { auth } = initFirebase();
+  confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+  return true;
+}
+
+export async function verifySmsCode(code: string): Promise<EPTUser | null> {
+  if (!confirmationResult) throw new Error('No SMS verification in progress');
+  const result = await confirmationResult.confirm(code);
+  return toEPTUser(result.user);
 }
 
 export async function handleRedirectResult(): Promise<EPTUser | null> {
