@@ -304,14 +304,22 @@ Inbound/Outbound Call
 
 ---
 
-## Missing Secrets (MUST be configured before voice works)
+## Secrets (all configured on billymc-voice Worker)
 
-| Secret | Status | How to Set |
-|--------|--------|------------|
-| `TWILIO_PHONE_NUMBER` | NOT SET | `npx wrangler secret put TWILIO_PHONE_NUMBER --name billymc-voice` |
-| `DEEPGRAM_API_KEY` | NOT SET | `npx wrangler secret put DEEPGRAM_API_KEY --name billymc-voice` |
+| Secret | Status |
+|--------|--------|
+| `TWILIO_PHONE_NUMBER` | SET (+1 432 Midland TX) |
+| `TWILIO_ACCOUNT_SID` | SET |
+| `TWILIO_AUTH_TOKEN` | SET |
+| `DEEPGRAM_API_KEY` | SET |
+| `ELEVENLABS_API_KEY` | SET |
+| `AZURE_API_KEY` | SET (GPT-4.1 eastus) |
+| `AZURE_PRIME_KEY` | SET (GPT-5.2-chat eastus2) |
+| `CARTESIA_API_KEY` | SET |
+| `CARTESIA_VOICE_ID` | SET |
+| `OPENAI_API_KEY` | SET |
 
-All other secrets (Azure, ElevenLabs, Twilio SID/Auth) are configured.
+All 10 secrets configured. Voice pipeline is fully operational.
 
 ---
 

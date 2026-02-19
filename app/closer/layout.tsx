@@ -29,12 +29,21 @@ export default function CloserLayout({ children }: { children: React.ReactNode }
   const [isDark, setIsDark] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Initialize dark mode from time, allow manual toggle
   useEffect(() => {
     const h = new Date().getHours();
-    const dark = h < 6 || h >= 18;
+    const saved = localStorage.getItem('ept-theme');
+    const dark = saved ? saved === 'dark' : (h < 6 || h >= 18);
     setIsDark(dark);
     document.documentElement.classList.toggle('dark', dark);
   }, []);
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('ept-theme', next ? 'dark' : 'light');
+  };
 
   useEffect(() => {
     if (!loading && !user) router.push('/login');
@@ -68,24 +77,48 @@ export default function CloserLayout({ children }: { children: React.ReactNode }
           backgroundColor: 'var(--ept-card-bg)',
         }}
       >
-        {/* Logo */}
+        {/* Logo — symbol version in sidebar */}
         <div className="flex items-center justify-center border-b" style={{ height: 64, borderColor: 'var(--ept-border)' }}>
-          <Link href="/">
+          <Link href="/" title="Back to Dashboard">
             <img
-              src={isDark ? '/logo-night.png' : '/logo-day.png'}
+              src={isDark ? '/logo-sym-night.png' : '/logo-sym-day.png'}
               alt="EPT"
               style={{
-                height: sidebarOpen ? 36 : 28,
+                height: sidebarOpen ? 40 : 32,
                 width: 'auto',
-                mixBlendMode: isDark ? 'screen' : 'multiply',
                 transition: 'height 0.2s ease',
               }}
             />
           </Link>
         </div>
 
+        {/* Back to Main Dashboard */}
+        <Link
+          href="/dashboard"
+          title={!sidebarOpen ? 'Back to Dashboard' : undefined}
+          className="flex items-center gap-3 mx-2 mt-2 mb-1 rounded-xl text-sm transition-all duration-150"
+          style={{
+            padding: '8px 12px',
+            color: 'var(--ept-text-muted)',
+            backgroundColor: 'transparent',
+          }}
+        >
+          <svg className="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span
+            className="truncate transition-all duration-200 whitespace-nowrap"
+            style={{ opacity: sidebarOpen ? 1 : 0, width: sidebarOpen ? 'auto' : 0, overflow: 'hidden', fontSize: 12 }}
+          >
+            Main Dashboard
+          </span>
+        </Link>
+
+        {/* Divider */}
+        <div className="mx-3 my-1" style={{ height: 1, backgroundColor: 'var(--ept-border)' }} />
+
         {/* Nav */}
-        <nav className="flex-1 py-3 overflow-y-auto overflow-x-hidden">
+        <nav className="flex-1 py-1 overflow-y-auto overflow-x-hidden">
           {NAV_ITEMS.map((item) => {
             const active = item.exact ? pathname === item.href : pathname.startsWith(item.href) && item.href !== '/closer';
             return (
@@ -123,9 +156,9 @@ export default function CloserLayout({ children }: { children: React.ReactNode }
           ) : (
             <div className="flex justify-center">
               <img
-                src={isDark ? '/logo-night.png' : '/logo-day.png'}
+                src={isDark ? '/logo-sym-night.png' : '/logo-sym-day.png'}
                 alt="EPT"
-                style={{ height: 18, width: 'auto', opacity: 0.4, mixBlendMode: isDark ? 'screen' : 'multiply' }}
+                style={{ height: 18, width: 'auto', opacity: 0.4 }}
               />
             </div>
           )}
@@ -140,6 +173,15 @@ export default function CloserLayout({ children }: { children: React.ReactNode }
           style={{ height: 64, borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}
         >
           <div className="flex items-center gap-4">
+            {/* Full logo in header */}
+            <Link href="/">
+              <img
+                src={isDark ? '/logo-night.png' : '/logo-day.png'}
+                alt="Echo Prime Technologies"
+                style={{ height: 32, width: 'auto' }}
+              />
+            </Link>
+            <div style={{ width: 1, height: 24, backgroundColor: 'var(--ept-border)' }} />
             <h1 className="text-xs font-semibold uppercase tracking-[0.15em]" style={{ color: 'var(--ept-text-muted)' }}>
               AI Sales Agent
             </h1>
@@ -153,6 +195,24 @@ export default function CloserLayout({ children }: { children: React.ReactNode }
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Day/Night Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center justify-center w-8 h-8 rounded-lg border transition-all hover:opacity-70"
+              style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-surface)' }}
+              title={isDark ? 'Switch to Day Mode' : 'Switch to Night Mode'}
+            >
+              {isDark ? (
+                <svg className="w-4 h-4" fill="none" stroke="var(--ept-accent)" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="var(--ept-accent)" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                </svg>
+              )}
+            </button>
+
             <span className="text-[11px] font-mono" style={{ color: 'var(--ept-text-muted)' }}>{user.email}</span>
             {user.photoURL ? (
               <img src={user.photoURL} alt="" className="w-7 h-7 rounded-lg border" style={{ borderColor: 'var(--ept-border)' }} />
