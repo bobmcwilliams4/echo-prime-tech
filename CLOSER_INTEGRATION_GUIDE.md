@@ -1,9 +1,39 @@
 # AI Sales Agent — Integration Guide for Echo Prime Technologies Website
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-02-19
 **Website:** https://echo-ept.com
 **Support:** bob@echo-op.com | customerservice@echo-op.com
+
+---
+
+## Source Code & Deployment
+
+| Item | Location |
+|------|----------|
+| **GitHub Repo** | `https://github.com/bobmcwilliams4/echo-prime-tech.git` |
+| **Local Source** | `O:\ECHO_OMEGA_PRIME\WEBSITES\echo-prime-tech\` |
+| **Branch** | `main` |
+| **Auto-Deploy** | Push to `main` → Vercel builds and deploys automatically |
+| **Backend API** | `https://ept-api.bmcii1976.workers.dev` (Cloudflare Worker) |
+| **Backend Source** | `O:\ECHO_OMEGA_PRIME\WORKERS\ept-api\` |
+
+### How to Deploy Changes
+
+```bash
+cd O:\ECHO_OMEGA_PRIME\WEBSITES\echo-prime-tech
+git add .
+git commit -m "description of changes"
+git push origin main
+# Vercel auto-deploys within ~60 seconds
+```
+
+### How to Deploy Backend API Changes
+
+```bash
+cd O:\ECHO_OMEGA_PRIME\WORKERS\ept-api
+npx wrangler deploy
+```
 
 ---
 
