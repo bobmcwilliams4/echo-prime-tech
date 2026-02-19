@@ -15,6 +15,34 @@ function useAutoTheme() {
   return { isDark, toggle: () => setIsDark(d => !d) };
 }
 
+interface LiveStats {
+  engines: string;
+  categories: string;
+  doctrines: string;
+  industries: string[];
+}
+
+function useLiveStats(): LiveStats {
+  const [stats, setStats] = useState<LiveStats>({ engines: '800+', categories: '59', doctrines: '32K+', industries: [] });
+  useEffect(() => {
+    fetch('https://echo-engine-runtime.bmcii1976.workers.dev/public-stats')
+      .then(r => r.json())
+      .then((d: { total_engines?: number; total_categories?: number; total_doctrines?: number; categories?: { name: string; engines: number }[] }) => {
+        const e = d.total_engines || 0;
+        const c = d.total_categories || 0;
+        const doc = d.total_doctrines || 0;
+        setStats({
+          engines: e >= 1000 ? `${(e / 1000).toFixed(1).replace(/\.0$/, '')}K+` : `${e}+`,
+          categories: String(c),
+          doctrines: doc >= 1000 ? `${(doc / 1000).toFixed(1).replace(/\.0$/, '')}K+` : `${doc}+`,
+          industries: (d.categories || []).filter((cat: { name: string; engines: number }) => cat.engines >= 3).map((cat: { name: string }) => cat.name),
+        });
+      })
+      .catch(() => {});
+  }, []);
+  return stats;
+}
+
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -32,14 +60,14 @@ const CAPABILITIES = [
   {
     title: 'Intelligence Engines',
     description: 'Purpose-built AI reasoning systems with deep domain expertise. Each engine understands its vertical the way a senior analyst would — not a generic chatbot.',
-    stat: '1,100+',
+    statKey: 'engines' as const,
     statLabel: 'Engines Live',
     icon: '⬡',
   },
   {
     title: 'Autonomous Data Pipelines',
     description: 'Systems that find, extract, normalize, and deliver structured data from thousands of sources — running 24/7 without human intervention.',
-    stat: '59',
+    statKey: 'categories' as const,
     statLabel: 'Verticals',
     icon: '◈',
   },
@@ -53,7 +81,7 @@ const CAPABILITIES = [
   {
     title: 'Knowledge Systems',
     description: 'Proprietary knowledge graphs with tens of thousands of embedded reasoning blocks. Hybrid retrieval that combines precision search with semantic understanding.',
-    stat: '30K+',
+    statKey: 'doctrines' as const,
     statLabel: 'Knowledge Blocks',
     icon: '△',
   },
@@ -73,7 +101,7 @@ const CAPABILITIES = [
   },
 ];
 
-const INDUSTRIES = [
+const FALLBACK_INDUSTRIES = [
   'Oil & Gas', 'Legal', 'Tax & Accounting', 'Land & Title',
   'Cybersecurity', 'Finance', 'Healthcare', 'Construction',
   'Energy', 'Insurance', 'Government', 'Education',
@@ -88,6 +116,7 @@ const DIFFERENTIATORS = [
 
 export default function HomePage() {
   const { isDark, toggle } = useAutoTheme();
+  const live = useLiveStats();
   const capSection = useInView();
   const diffSection = useInView();
   const indSection = useInView();
@@ -135,7 +164,7 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-8 text-xl leading-relaxed max-w-xl animate-fade-up animate-fade-up-delay-2" style={{ color: 'var(--ept-text-secondary)' }}>
-              We build domain-specific intelligence engines for industries that can&apos;t afford to be wrong. Over 1,100 engines across 59 verticals. Production-grade. Always on.
+              We build domain-specific intelligence engines for industries that can&apos;t afford to be wrong. Over {live.engines} engines across {live.categories} verticals. Production-grade. Always on.
             </p>
 
             <div className="mt-12 flex flex-col sm:flex-row gap-4 animate-fade-up animate-fade-up-delay-3">
@@ -152,8 +181,8 @@ export default function HomePage() {
           {/* Stats strip */}
           <div className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-px rounded-2xl overflow-hidden glow-sm animate-fade-up animate-fade-up-delay-4" style={{ backgroundColor: 'var(--ept-border)' }}>
             {[
-              { value: '1,100+', label: 'Engines Deployed' },
-              { value: '59', label: 'Industry Verticals' },
+              { value: live.engines, label: 'Engines Deployed' },
+              { value: live.categories, label: 'Industry Verticals' },
               { value: '<50ms', label: 'Global Response' },
               { value: '99.9%', label: 'Uptime SLA' },
             ].map((s, i) => (
@@ -194,7 +223,7 @@ export default function HomePage() {
                 <h3 className="text-lg font-bold mb-3" style={{ color: 'var(--ept-text)' }}>{cap.title}</h3>
                 <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--ept-text-muted)' }}>{cap.description}</p>
                 <div className="flex items-baseline gap-2 pt-4 border-t" style={{ borderColor: 'var(--ept-border)' }}>
-                  <span className="text-2xl font-extrabold font-mono gradient-text">{cap.stat}</span>
+                  <span className="text-2xl font-extrabold font-mono gradient-text">{'statKey' in cap ? live[cap.statKey as keyof LiveStats] as string : cap.stat}</span>
                   <span className="text-xs uppercase tracking-wider font-medium" style={{ color: 'var(--ept-text-muted)' }}>{cap.statLabel}</span>
                 </div>
               </div>
@@ -262,11 +291,11 @@ export default function HomePage() {
               Built for your vertical.
             </h2>
             <p className="mt-5 text-lg leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
-              Every industry gets purpose-built engines with embedded domain expertise. Not one model fine-tuned twelve ways — twelve separate intelligence systems.
+              Every industry gets purpose-built engines with embedded domain expertise. Not one model fine-tuned {live.categories} ways — {live.categories} separate intelligence systems.
             </p>
           </div>
           <div className="flex flex-wrap gap-4">
-            {INDUSTRIES.map((industry, i) => (
+            {(live.industries.length > 0 ? live.industries : FALLBACK_INDUSTRIES).map((industry, i) => (
               <div
                 key={i}
                 className={`card-hover px-6 py-4 rounded-xl border text-sm font-medium cursor-default transition-all duration-500 ${indSection.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
