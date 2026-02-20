@@ -202,12 +202,32 @@ function computeConsensus(results: TrinityGradeResult[]): { grade: number; confi
 }
 
 const DEFECT_TYPES = [
-  { key: 'spine', label: 'Spine', icon: '📏', desc: 'Stress lines, roll, splits' },
-  { key: 'cover', label: 'Cover', icon: '📖', desc: 'Tears, creases, detachment' },
-  { key: 'pages', label: 'Pages', icon: '📄', desc: 'Yellowing, brittleness, foxing' },
-  { key: 'staples', label: 'Staples', icon: '📎', desc: 'Rust, migration, pop' },
-  { key: 'corners', label: 'Corners', icon: '📐', desc: 'Blunting, bending, chips' },
-  { key: 'edges', label: 'Edges', icon: '✂️', desc: 'Wear, chips, tears' },
+  { key: 'spine_stress', label: 'Spine Stress', icon: '📏', desc: 'Stress lines along spine', severity: 'minor' },
+  { key: 'spine_roll', label: 'Spine Roll', icon: '📏', desc: 'Spine curved from storage', severity: 'moderate' },
+  { key: 'spine_split', label: 'Spine Split', icon: '📏', desc: 'Split along spine', severity: 'major' },
+  { key: 'cover_tear', label: 'Cover Tear', icon: '📖', desc: 'Tears in cover material', severity: 'major' },
+  { key: 'cover_crease', label: 'Cover Crease', icon: '📖', desc: 'Creasing on cover', severity: 'moderate' },
+  { key: 'cover_detached', label: 'Cover Detached', icon: '📖', desc: 'Cover separated from staples', severity: 'severe' },
+  { key: 'page_yellowing', label: 'Page Yellowing', icon: '📄', desc: 'Yellowed/tanned pages', severity: 'minor' },
+  { key: 'page_brittle', label: 'Brittle Pages', icon: '📄', desc: 'Pages crack when bent', severity: 'major' },
+  { key: 'page_foxing', label: 'Foxing', icon: '📄', desc: 'Brown spots on pages', severity: 'moderate' },
+  { key: 'staple_rust', label: 'Staple Rust', icon: '📎', desc: 'Rust on staples', severity: 'moderate' },
+  { key: 'staple_migration', label: 'Staple Migration', icon: '📎', desc: 'Rust staining around staples', severity: 'moderate' },
+  { key: 'staple_pop', label: 'Staple Pop', icon: '📎', desc: 'Staple pulled through cover', severity: 'major' },
+  { key: 'corner_blunt', label: 'Corner Blunting', icon: '📐', desc: 'Rounded/blunted corners', severity: 'minor' },
+  { key: 'corner_bend', label: 'Corner Bend', icon: '📐', desc: 'Bent corners', severity: 'minor' },
+  { key: 'corner_chip', label: 'Corner Chip', icon: '📐', desc: 'Missing corner material', severity: 'moderate' },
+  { key: 'edge_wear', label: 'Edge Wear', icon: '✂️', desc: 'Wear along edges', severity: 'minor' },
+  { key: 'edge_tear', label: 'Edge Tear', icon: '✂️', desc: 'Tears along edges', severity: 'moderate' },
+  { key: 'color_fading', label: 'Color Fading', icon: '🎨', desc: 'Faded colors from sun exposure', severity: 'moderate' },
+  { key: 'color_break', label: 'Color Break', icon: '🎨', desc: 'Color flaking at stress points', severity: 'minor' },
+  { key: 'water_damage', label: 'Water Damage', icon: '💧', desc: 'Staining from water exposure', severity: 'major' },
+  { key: 'writing', label: 'Writing/Marks', icon: '✏️', desc: 'Writing, stamps, or marks', severity: 'moderate' },
+  { key: 'stains', label: 'Stains', icon: '🟤', desc: 'Food, liquid, or other stains', severity: 'moderate' },
+  { key: 'restoration', label: 'Restoration', icon: '🔧', desc: 'Amateur or professional restoration', severity: 'major' },
+  { key: 'fold_marks', label: 'Fold Marks', icon: '📁', desc: 'Evidence of folding', severity: 'major' },
+  { key: 'paper_loss', label: 'Paper Loss', icon: '📄', desc: 'Missing paper/material', severity: 'severe' },
+  { key: 'mold', label: 'Mold/Mildew', icon: '🦠', desc: 'Mold or mildew growth', severity: 'severe' },
 ];
 
 interface Comic {
@@ -223,18 +243,99 @@ interface Comic {
   defects: string[];
   consensus_confidence: number | null;
   graded_at: string | null;
+  era: string | null;
+  key_issue: boolean;
+  key_issue_reason: string | null;
+  writer: string | null;
+  cover_artist: string | null;
+  characters: string[];
+  buy_price: number | null;
+  buy_date: string | null;
+  buy_source: string | null;
+  sold_price: number | null;
+  sold_date: string | null;
+  cortex_uid: string | null;
 }
 
-const SAMPLE_COMICS: Comic[] = [
-  { id: 1, title: 'Amazing Spider-Man', issue: '#129', publisher: 'Marvel', year: 1974, grade: 8.5, estimated_value: 12500, image_url: null, status: 'graded', defects: ['spine_stress', 'corner_blunt'], consensus_confidence: 92, graded_at: '2026-02-19T10:30:00Z' },
-  { id: 2, title: 'X-Men', issue: '#1', publisher: 'Marvel', year: 1963, grade: 7.0, estimated_value: 48000, image_url: null, status: 'graded', defects: ['page_yellowing', 'spine_roll'], consensus_confidence: 88, graded_at: '2026-02-19T09:15:00Z' },
-  { id: 3, title: 'Batman', issue: '#404', publisher: 'DC', year: 1987, grade: 9.2, estimated_value: 350, image_url: null, status: 'graded', defects: [], consensus_confidence: 96, graded_at: '2026-02-19T08:00:00Z' },
-  { id: 4, title: 'Incredible Hulk', issue: '#181', publisher: 'Marvel', year: 1974, grade: 6.5, estimated_value: 8200, image_url: null, status: 'graded', defects: ['cover_crease', 'staple_rust'], consensus_confidence: 85, graded_at: '2026-02-18T16:00:00Z' },
-  { id: 5, title: 'Action Comics', issue: '#1', publisher: 'DC', year: 1938, grade: 4.0, estimated_value: 1250000, image_url: null, status: 'graded', defects: ['cover_detached', 'page_brittle', 'spine_split'], consensus_confidence: 91, graded_at: '2026-02-18T14:30:00Z' },
-  { id: 6, title: 'Detective Comics', issue: '#27', publisher: 'DC', year: 1939, grade: null, estimated_value: null, image_url: null, status: 'ungraded', defects: [], consensus_confidence: null, graded_at: null },
-  { id: 7, title: 'Fantastic Four', issue: '#1', publisher: 'Marvel', year: 1961, grade: null, estimated_value: null, image_url: null, status: 'ungraded', defects: [], consensus_confidence: null, graded_at: null },
-  { id: 8, title: 'Tales of Suspense', issue: '#39', publisher: 'Marvel', year: 1963, grade: null, estimated_value: null, image_url: null, status: 'pending_review', defects: ['corner_chip'], consensus_confidence: 72, graded_at: null },
-];
+async function loadCollectionFromCortex(): Promise<Comic[]> {
+  try {
+    const res = await fetch(`${MEMORY_CORTEX_URL}/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: '', memory_type: 'fact', limit: 500, min_strength: 0 }),
+    });
+    const data = await res.json();
+    const results = (data.results || []).filter((m: any) => m.source === 'collectibles-grading-app');
+    return results.map((m: any, idx: number) => {
+      const meta = typeof m.metadata === 'string' ? JSON.parse(m.metadata) : (m.metadata || {});
+      const grade = meta.consensus_grade ? parseFloat(meta.consensus_grade) : null;
+      const price = meta.consensus_price ? parseFloat(meta.consensus_price) : null;
+      return {
+        id: idx + 1,
+        title: meta.title || 'Unknown',
+        issue: `#${meta.issue_number || '?'}`,
+        publisher: meta.publisher || 'Unknown',
+        year: meta.publication_year ? parseInt(meta.publication_year) : 0,
+        grade,
+        estimated_value: price,
+        image_url: null,
+        status: (grade ? 'graded' : 'ungraded') as Comic['status'],
+        defects: [],
+        consensus_confidence: meta.grade_confidence ? parseFloat(meta.grade_confidence) : (grade ? 85 : null),
+        graded_at: m.created_at || null,
+        era: meta.era || null,
+        key_issue: !!meta.key_issue,
+        key_issue_reason: meta.key_issue_reason || null,
+        writer: meta.writer || null,
+        cover_artist: meta.cover_artist || null,
+        characters: [],
+        buy_price: null,
+        buy_date: null,
+        buy_source: null,
+        sold_price: null,
+        sold_date: null,
+        cortex_uid: m.uid || null,
+      } as Comic;
+    });
+  } catch (err) {
+    console.error('Failed to load collection from Memory Cortex:', err);
+    return [];
+  }
+}
+
+async function addComicToCortex(comic: Omit<Comic, 'id' | 'cortex_uid'>): Promise<string | null> {
+  try {
+    const content = `${comic.title} #${comic.issue.replace('#', '')} (${comic.publisher}, ${comic.year})${comic.grade ? ` - Grade: ${comic.grade} (${getGradeLabel(comic.grade)})` : ''}${comic.estimated_value ? ` - Value: $${comic.estimated_value}` : ''}${comic.era ? ` - Era: ${comic.era}` : ''}`;
+    const res = await fetch(`${MEMORY_CORTEX_URL}/store`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content,
+        memory_type: 'fact',
+        source: 'collectibles-grading-app',
+        tags: ['comic', 'collection', comic.publisher.toLowerCase().replace(/\s+/g, '-')],
+        strength: 2.0,
+        summary: `${comic.title} ${comic.issue} by ${comic.publisher} (${comic.year})`,
+        metadata: {
+          title: comic.title, issue_number: comic.issue.replace('#', ''), publisher: comic.publisher,
+          publication_year: comic.year, consensus_grade: comic.grade, grade_label: comic.grade ? getGradeLabel(comic.grade) : null,
+          grade_confidence: comic.consensus_confidence, consensus_price: comic.estimated_value,
+          era: comic.era, key_issue: comic.key_issue, key_issue_reason: comic.key_issue_reason,
+          writer: comic.writer, cover_artist: comic.cover_artist, grading_status: comic.status,
+        },
+      }),
+    });
+    const data = await res.json();
+    return data.memory?.uid || data.uid || null;
+  } catch { return null; }
+}
+
+async function deleteComicFromCortex(uid: string): Promise<boolean> {
+  try {
+    await fetch(`${MEMORY_CORTEX_URL}/memory/${uid}`, { method: 'DELETE' });
+    return true;
+  } catch { return false; }
+}
 
 const formatCurrency = (v: number) => v >= 1000000 ? `$${(v / 1000000).toFixed(1)}M` : v >= 1000 ? `$${(v / 1000).toFixed(1)}K` : `$${v}`;
 const formatDate = (d: string) => { const dt = new Date(d); return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); };
@@ -300,11 +401,14 @@ export default function GradingPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const [isDark, setIsDark] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'collection' | 'grade' | 'pricing' | 'settings'>('dashboard');
-  const [comics, setComics] = useState<Comic[]>(SAMPLE_COMICS);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'collection' | 'grade' | 'pricing' | 'analytics' | 'settings'>('dashboard');
+  const [comics, setComics] = useState<Comic[]>([]);
+  const [collectionLoading, setCollectionLoading] = useState(true);
   const [selectedComic, setSelectedComic] = useState<Comic | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [publisherFilter, setPublisherFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'title' | 'grade' | 'value' | 'year'>('title');
   const [isGrading, setIsGrading] = useState(false);
   const [gradingProgress, setGradingProgress] = useState(0);
   const [gradingStep, setGradingStep] = useState('');
@@ -313,14 +417,21 @@ export default function GradingPage() {
   const [swarmStatus, setSwarmStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [cortexStatus, setCortexStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [cortexStats, setCortexStats] = useState<{ total_memories: number; recent_24h: number } | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addForm, setAddForm] = useState({ title: '', issue: '', publisher: '', year: '', era: '', buy_price: '', buy_date: '', buy_source: '', key_issue: false, key_issue_reason: '', writer: '', cover_artist: '' });
+  const [showEditForm, setShowEditForm] = useState(false);
 
-  // Check Swarm Brain + Memory Cortex connection on mount
+  // Load collection from Memory Cortex on mount
   useEffect(() => {
     fetch(`${SWARM_BRAIN_URL}/health`).then(r => r.json()).then(d => setSwarmStatus(d.ok ? 'online' : 'offline')).catch(() => setSwarmStatus('offline'));
     fetch(`${MEMORY_CORTEX_URL}/status`).then(r => r.json()).then(d => {
       setCortexStatus(d.status === 'operational' ? 'online' : 'offline');
       setCortexStats({ total_memories: d.database?.total_memories || 0, recent_24h: d.database?.recent_24h || 0 });
     }).catch(() => setCortexStatus('offline'));
+    loadCollectionFromCortex().then(loaded => {
+      setComics(loaded);
+      setCollectionLoading(false);
+    }).catch(() => setCollectionLoading(false));
   }, []);
 
   useEffect(() => {
@@ -333,21 +444,99 @@ export default function GradingPage() {
     if (!loading && !user) router.push('/login');
   }, [user, loading, router]);
 
-  const filteredComics = useMemo(() => comics.filter(c => {
-    const matchSearch = !searchQuery || `${c.title} ${c.issue} ${c.publisher}`.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchStatus = statusFilter === 'all' || c.status === statusFilter;
-    return matchSearch && matchStatus;
-  }), [comics, searchQuery, statusFilter]);
+  const publishers = useMemo(() => {
+    const pubs: Record<string, number> = {};
+    comics.forEach(c => { pubs[c.publisher] = (pubs[c.publisher] || 0) + 1; });
+    return Object.entries(pubs).sort((a, b) => b[1] - a[1]);
+  }, [comics]);
 
-  const stats = useMemo(() => ({
-    total: comics.length,
-    graded: comics.filter(c => c.status === 'graded').length,
-    ungraded: comics.filter(c => c.status === 'ungraded').length,
-    pending: comics.filter(c => c.status === 'pending_review').length,
-    totalValue: comics.filter(c => c.estimated_value).reduce((s, c) => s + (c.estimated_value || 0), 0),
-    avgGrade: (() => { const g = comics.filter(c => c.grade !== null); return g.length ? g.reduce((s, c) => s + (c.grade || 0), 0) / g.length : 0; })(),
-    avgConfidence: (() => { const g = comics.filter(c => c.consensus_confidence !== null); return g.length ? g.reduce((s, c) => s + (c.consensus_confidence || 0), 0) / g.length : 0; })(),
-  }), [comics]);
+  const filteredComics = useMemo(() => {
+    let filtered = comics.filter(c => {
+      const matchSearch = !searchQuery || `${c.title} ${c.issue} ${c.publisher} ${c.era || ''} ${c.writer || ''} ${c.characters.join(' ')}`.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchStatus = statusFilter === 'all' || c.status === statusFilter;
+      const matchPublisher = publisherFilter === 'all' || c.publisher === publisherFilter;
+      return matchSearch && matchStatus && matchPublisher;
+    });
+    filtered.sort((a, b) => {
+      if (sortBy === 'title') return a.title.localeCompare(b.title);
+      if (sortBy === 'grade') return (b.grade || 0) - (a.grade || 0);
+      if (sortBy === 'value') return (b.estimated_value || 0) - (a.estimated_value || 0);
+      if (sortBy === 'year') return (a.year || 9999) - (b.year || 9999);
+      return 0;
+    });
+    return filtered;
+  }, [comics, searchQuery, statusFilter, publisherFilter, sortBy]);
+
+  const stats = useMemo(() => {
+    const graded = comics.filter(c => c.grade !== null);
+    const withValue = comics.filter(c => c.estimated_value);
+    const eras: Record<string, number> = {};
+    comics.forEach(c => { if (c.era) eras[c.era] = (eras[c.era] || 0) + 1; });
+    const totalBuyPrice = comics.reduce((s, c) => s + (c.buy_price || 0), 0);
+    const totalSoldPrice = comics.filter(c => c.sold_price).reduce((s, c) => s + (c.sold_price || 0), 0);
+    return {
+      total: comics.length,
+      graded: graded.length,
+      ungraded: comics.filter(c => c.status === 'ungraded').length,
+      pending: comics.filter(c => c.status === 'pending_review').length,
+      totalValue: withValue.reduce((s, c) => s + (c.estimated_value || 0), 0),
+      avgGrade: graded.length ? graded.reduce((s, c) => s + (c.grade || 0), 0) / graded.length : 0,
+      avgConfidence: (() => { const g = comics.filter(c => c.consensus_confidence !== null); return g.length ? g.reduce((s, c) => s + (c.consensus_confidence || 0), 0) / g.length : 0; })(),
+      highestGrade: graded.length ? Math.max(...graded.map(c => c.grade!)) : 0,
+      lowestGrade: graded.length ? Math.min(...graded.map(c => c.grade!)) : 0,
+      publisherCount: publishers.length,
+      eras,
+      keyIssues: comics.filter(c => c.key_issue).length,
+      totalInvested: totalBuyPrice,
+      totalSold: totalSoldPrice,
+      roi: totalBuyPrice > 0 ? ((totalSoldPrice - totalBuyPrice) / totalBuyPrice * 100) : 0,
+    };
+  }, [comics, publishers]);
+
+  const handleAddComic = useCallback(async () => {
+    if (!addForm.title || !addForm.issue || !addForm.publisher) return;
+    const newComic: Omit<Comic, 'id' | 'cortex_uid'> = {
+      title: addForm.title, issue: addForm.issue.startsWith('#') ? addForm.issue : `#${addForm.issue}`,
+      publisher: addForm.publisher, year: parseInt(addForm.year) || new Date().getFullYear(),
+      grade: null, estimated_value: null, image_url: null, status: 'ungraded', defects: [],
+      consensus_confidence: null, graded_at: null, era: addForm.era || null,
+      key_issue: addForm.key_issue, key_issue_reason: addForm.key_issue_reason || null,
+      writer: addForm.writer || null, cover_artist: addForm.cover_artist || null, characters: [],
+      buy_price: addForm.buy_price ? parseFloat(addForm.buy_price) : null,
+      buy_date: addForm.buy_date || null, buy_source: addForm.buy_source || null,
+      sold_price: null, sold_date: null,
+    };
+    const uid = await addComicToCortex(newComic);
+    setComics(prev => [...prev, { ...newComic, id: prev.length + 1, cortex_uid: uid }]);
+    setAddForm({ title: '', issue: '', publisher: '', year: '', era: '', buy_price: '', buy_date: '', buy_source: '', key_issue: false, key_issue_reason: '', writer: '', cover_artist: '' });
+    setShowAddForm(false);
+  }, [addForm]);
+
+  const handleDeleteComic = useCallback(async (comic: Comic) => {
+    if (comic.cortex_uid) await deleteComicFromCortex(comic.cortex_uid);
+    setComics(prev => prev.filter(c => c.id !== comic.id));
+    if (selectedComic?.id === comic.id) setSelectedComic(null);
+  }, [selectedComic]);
+
+  const exportCollection = useCallback((format: 'json' | 'csv') => {
+    let content: string, filename: string, mime: string;
+    if (format === 'json') {
+      content = JSON.stringify(comics, null, 2);
+      filename = `collection_${new Date().toISOString().slice(0, 10)}.json`;
+      mime = 'application/json';
+    } else {
+      const headers = 'Title,Issue,Publisher,Year,Grade,Label,Value,Confidence,Era,Status,Key Issue\n';
+      const rows = comics.map(c => `"${c.title}","${c.issue}","${c.publisher}",${c.year},${c.grade || ''},${c.grade ? getGradeLabel(c.grade) : ''},${c.estimated_value || ''},${c.consensus_confidence || ''},"${c.era || ''}",${c.status},${c.key_issue}`).join('\n');
+      content = headers + rows;
+      filename = `collection_${new Date().toISOString().slice(0, 10)}.csv`;
+      mime = 'text/csv';
+    }
+    const blob = new Blob([content], { type: mime });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }, [comics]);
 
   const gradeWithSwarmBrain = useCallback(async (comic: Comic) => {
     setIsGrading(true);
@@ -432,11 +621,20 @@ export default function GradingPage() {
     </div>
   );
 
+  if (collectionLoading) return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'var(--ept-accent)', borderTopColor: 'transparent' }} />
+      <p className="text-sm font-medium">Loading collection from Memory Cortex...</p>
+      <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Fetching {user.email}&apos;s graded collectibles</p>
+    </div>
+  );
+
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: '◈' },
     { id: 'collection', label: 'Collection', icon: '📦' },
     { id: 'grade', label: 'Grade', icon: '🎯' },
     { id: 'pricing', label: 'Pricing', icon: '💰' },
+    { id: 'analytics', label: 'Analytics', icon: '📊' },
     { id: 'settings', label: 'Settings', icon: '⚙️' },
   ] as const;
 
@@ -493,10 +691,10 @@ export default function GradingPage() {
             {/* Hero Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'Items Graded', value: String(stats.graded), sub: `of ${stats.total} total` },
-                { label: 'Collection Value', value: formatCurrency(stats.totalValue), sub: 'estimated market value' },
-                { label: 'Avg Grade', value: stats.avgGrade.toFixed(1), sub: getGradeLabel(stats.avgGrade) },
-                { label: 'AI Confidence', value: `${Math.round(stats.avgConfidence)}%`, sub: 'Trinity consensus' },
+                { label: 'Total Items', value: String(stats.total), sub: `${stats.graded} graded, ${stats.ungraded} ungraded` },
+                { label: 'Collection Value', value: formatCurrency(stats.totalValue), sub: `${stats.publisherCount} publishers` },
+                { label: 'Avg Grade', value: stats.avgGrade.toFixed(1), sub: `${getGradeLabel(stats.avgGrade)} (${stats.lowestGrade.toFixed(1)}-${stats.highestGrade.toFixed(1)} range)` },
+                { label: 'Key Issues', value: String(stats.keyIssues), sub: `${Object.keys(stats.eras).length} eras represented` },
               ].map((s, i) => (
                 <div key={s.label} className="rounded-xl p-5 card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
                   <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>{s.label}</p>
@@ -569,19 +767,102 @@ export default function GradingPage() {
         {/* ══════════════ COLLECTION ══════════════ */}
         {activeTab === 'collection' && (
           <div className="space-y-6 animate-fade-up">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-extrabold">Collection</h1>
+            <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-3">
-                <input type="text" placeholder="Search comics..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="px-4 py-2 rounded-lg text-sm focus:outline-none" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
-                <div className="flex gap-1">
-                  {['all', 'graded', 'ungraded', 'pending_review'].map(s => (
-                    <button key={s} onClick={() => setStatusFilter(s)} className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all" style={{ backgroundColor: statusFilter === s ? 'var(--ept-accent-glow)' : 'var(--ept-surface)', color: statusFilter === s ? 'var(--ept-accent)' : 'var(--ept-text-muted)', border: statusFilter === s ? '1px solid var(--ept-accent)' : '1px solid var(--ept-border)' }}>
-                      {s === 'all' ? 'All' : s === 'pending_review' ? 'Pending' : s.charAt(0).toUpperCase() + s.slice(1)}
-                    </button>
-                  ))}
-                </div>
+                <h1 className="text-2xl font-extrabold">Collection</h1>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent-glow)', color: 'var(--ept-accent)' }}>{filteredComics.length} of {comics.length}</span>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button onClick={() => setShowAddForm(true)} className="px-4 py-2 rounded-lg text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>+ Add Comic</button>
+                <button onClick={() => exportCollection('json')} className="px-3 py-2 rounded-lg text-xs font-medium" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text-muted)' }}>Export JSON</button>
+                <button onClick={() => exportCollection('csv')} className="px-3 py-2 rounded-lg text-xs font-medium" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text-muted)' }}>Export CSV</button>
               </div>
             </div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <input type="text" placeholder="Search title, publisher, era, writer..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="px-4 py-2 rounded-lg text-sm focus:outline-none flex-1 min-w-[200px]" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+              <select value={publisherFilter} onChange={e => setPublisherFilter(e.target.value)} className="px-3 py-2 rounded-lg text-xs" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }}>
+                <option value="all">All Publishers ({publishers.length})</option>
+                {publishers.map(([pub, count]) => <option key={pub} value={pub}>{pub} ({count})</option>)}
+              </select>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="px-3 py-2 rounded-lg text-xs" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }}>
+                <option value="title">Sort: Title</option>
+                <option value="grade">Sort: Grade</option>
+                <option value="value">Sort: Value</option>
+                <option value="year">Sort: Year</option>
+              </select>
+              <div className="flex gap-1">
+                {['all', 'graded', 'ungraded', 'pending_review'].map(s => (
+                  <button key={s} onClick={() => setStatusFilter(s)} className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all" style={{ backgroundColor: statusFilter === s ? 'var(--ept-accent-glow)' : 'var(--ept-surface)', color: statusFilter === s ? 'var(--ept-accent)' : 'var(--ept-text-muted)', border: statusFilter === s ? '1px solid var(--ept-accent)' : '1px solid var(--ept-border)' }}>
+                    {s === 'all' ? 'All' : s === 'pending_review' ? 'Pending' : s.charAt(0).toUpperCase() + s.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Add Comic Modal */}
+            {showAddForm && (
+              <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--ept-card-bg)', border: '2px solid var(--ept-accent)' }}>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-extrabold gradient-text">Add Comic to Collection</h2>
+                  <button onClick={() => setShowAddForm(false)} className="p-2 rounded-lg text-xs" style={{ backgroundColor: 'var(--ept-surface)' }}>Cancel</button>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="col-span-2">
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Title *</label>
+                    <input type="text" value={addForm.title} onChange={e => setAddForm(f => ({ ...f, title: e.target.value }))} placeholder="Amazing Spider-Man" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Issue # *</label>
+                    <input type="text" value={addForm.issue} onChange={e => setAddForm(f => ({ ...f, issue: e.target.value }))} placeholder="129" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Year</label>
+                    <input type="text" value={addForm.year} onChange={e => setAddForm(f => ({ ...f, year: e.target.value }))} placeholder="1974" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Publisher *</label>
+                    <input type="text" value={addForm.publisher} onChange={e => setAddForm(f => ({ ...f, publisher: e.target.value }))} placeholder="Marvel" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Era</label>
+                    <select value={addForm.era} onChange={e => setAddForm(f => ({ ...f, era: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }}>
+                      <option value="">Select era...</option>
+                      <option value="golden age">Golden Age (1938-1956)</option>
+                      <option value="silver age">Silver Age (1956-1970)</option>
+                      <option value="bronze age">Bronze Age (1970-1985)</option>
+                      <option value="copper age">Copper Age (1985-1991)</option>
+                      <option value="modern age">Modern Age (1991+)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Writer</label>
+                    <input type="text" value={addForm.writer} onChange={e => setAddForm(f => ({ ...f, writer: e.target.value }))} placeholder="Stan Lee" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Cover Artist</label>
+                    <input type="text" value={addForm.cover_artist} onChange={e => setAddForm(f => ({ ...f, cover_artist: e.target.value }))} placeholder="John Romita" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Buy Price ($)</label>
+                    <input type="text" value={addForm.buy_price} onChange={e => setAddForm(f => ({ ...f, buy_price: e.target.value }))} placeholder="25.00" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Buy Source</label>
+                    <input type="text" value={addForm.buy_source} onChange={e => setAddForm(f => ({ ...f, buy_source: e.target.value }))} placeholder="eBay, LCS, etc." className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                  </div>
+                  <div className="flex items-end gap-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={addForm.key_issue} onChange={e => setAddForm(f => ({ ...f, key_issue: e.target.checked }))} className="w-4 h-4 rounded" />
+                      <span className="text-xs font-semibold" style={{ color: 'var(--ept-text-muted)' }}>Key Issue</span>
+                    </label>
+                  </div>
+                </div>
+                <div className="flex justify-end mt-4 gap-2">
+                  <button onClick={() => setShowAddForm(false)} className="px-4 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-muted)' }}>Cancel</button>
+                  <button onClick={handleAddComic} className="px-6 py-2 rounded-lg text-sm font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Add to Collection</button>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredComics.map(c => (
@@ -589,11 +870,15 @@ export default function GradingPage() {
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <p className="font-bold">{c.title} {c.issue}</p>
-                      <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{c.publisher} &middot; {c.year}</p>
+                      <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{c.publisher} &middot; {c.year}{c.era ? ` \u00B7 ${c.era}` : ''}</p>
+                      {c.key_issue && <span className="inline-block mt-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase" style={{ backgroundColor: 'rgba(234,179,8,0.15)', color: '#eab308' }}>Key Issue</span>}
                     </div>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase" style={{ backgroundColor: c.status === 'graded' ? 'rgba(34,197,94,0.1)' : c.status === 'ungraded' ? 'var(--ept-surface)' : 'rgba(245,158,11,0.1)', color: c.status === 'graded' ? '#22c55e' : c.status === 'ungraded' ? 'var(--ept-text-muted)' : '#f59e0b' }}>
-                      {c.status.replace('_', ' ')}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase" style={{ backgroundColor: c.status === 'graded' ? 'rgba(34,197,94,0.1)' : c.status === 'ungraded' ? 'var(--ept-surface)' : 'rgba(245,158,11,0.1)', color: c.status === 'graded' ? '#22c55e' : c.status === 'ungraded' ? 'var(--ept-text-muted)' : '#f59e0b' }}>
+                        {c.status.replace('_', ' ')}
+                      </span>
+                      <button onClick={e => { e.stopPropagation(); handleDeleteComic(c); }} className="p-1 rounded text-[10px] opacity-40 hover:opacity-100 transition-opacity" style={{ color: '#ef4444' }} title="Delete">x</button>
+                    </div>
                   </div>
                   {c.grade !== null ? (
                     <div className="flex items-end justify-between">
@@ -905,6 +1190,113 @@ export default function GradingPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {/* ══════════════ ANALYTICS ══════════════ */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-8 animate-fade-up">
+            <h1 className="text-2xl font-extrabold">Collection Analytics</h1>
+
+            {/* Summary Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: 'Total Comics', value: String(stats.total), sub: `${stats.graded} graded` },
+                { label: 'Total Value', value: formatCurrency(stats.totalValue), sub: `avg ${stats.total ? formatCurrency(Math.round(stats.totalValue / stats.total)) : '$0'}/comic` },
+                { label: 'Grade Range', value: `${stats.lowestGrade.toFixed(1)}-${stats.highestGrade.toFixed(1)}`, sub: `avg ${stats.avgGrade.toFixed(1)} (${getGradeLabel(stats.avgGrade)})` },
+                { label: 'Publishers', value: String(stats.publisherCount), sub: `${Object.keys(stats.eras).length} eras` },
+              ].map(s => (
+                <div key={s.label} className="rounded-xl p-5" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
+                  <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>{s.label}</p>
+                  <p className="text-3xl font-extrabold mt-1 gradient-text">{s.value}</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--ept-text-muted)' }}>{s.sub}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Publisher Breakdown */}
+            <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
+              <p className="gradient-text font-bold text-xs tracking-widest uppercase mb-4">Publisher Breakdown</p>
+              <div className="space-y-2">
+                {publishers.slice(0, 15).map(([pub, count]) => {
+                  const pct = Math.round((count / stats.total) * 100);
+                  const pubComics = comics.filter(c => c.publisher === pub);
+                  const pubValue = pubComics.reduce((s, c) => s + (c.estimated_value || 0), 0);
+                  return (
+                    <div key={pub} className="flex items-center gap-3">
+                      <span className="text-xs font-semibold w-40 truncate">{pub}</span>
+                      <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--ept-accent), #8b5cf6)' }} />
+                      </div>
+                      <span className="text-xs font-mono w-16 text-right" style={{ color: 'var(--ept-text-muted)' }}>{count} ({pct}%)</span>
+                      <span className="text-xs font-mono w-20 text-right" style={{ color: 'var(--ept-accent)' }}>{pubValue > 0 ? formatCurrency(pubValue) : '-'}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Era Distribution + Grade Distribution side by side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
+                <p className="gradient-text font-bold text-xs tracking-widest uppercase mb-4">Era Distribution</p>
+                <div className="space-y-2">
+                  {Object.entries(stats.eras).sort((a, b) => b[1] - a[1]).map(([era, count]) => (
+                    <div key={era} className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                      <span className="text-sm font-semibold capitalize">{era}</span>
+                      <span className="text-xs font-mono font-bold" style={{ color: 'var(--ept-accent)' }}>{count} comics</span>
+                    </div>
+                  ))}
+                  {Object.keys(stats.eras).length === 0 && <p className="text-sm text-center py-4" style={{ color: 'var(--ept-text-muted)' }}>No era data available</p>}
+                </div>
+              </div>
+              <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
+                <p className="gradient-text font-bold text-xs tracking-widest uppercase mb-4">Grade Distribution</p>
+                <div className="space-y-2">
+                  {[
+                    { label: 'Near Mint+ (9.0-10.0)', min: 9.0, max: 10.0 },
+                    { label: 'Very Fine (7.0-8.5)', min: 7.0, max: 8.99 },
+                    { label: 'Fine (5.0-6.5)', min: 5.0, max: 6.99 },
+                    { label: 'Very Good (3.0-4.5)', min: 3.0, max: 4.99 },
+                    { label: 'Below VG (0.5-2.5)', min: 0, max: 2.99 },
+                  ].map(range => {
+                    const count = comics.filter(c => c.grade !== null && c.grade >= range.min && c.grade <= range.max).length;
+                    const pct = stats.graded > 0 ? Math.round((count / stats.graded) * 100) : 0;
+                    return (
+                      <div key={range.label} className="flex items-center gap-3">
+                        <span className="text-xs w-36 truncate">{range.label}</span>
+                        <div className="flex-1 h-4 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                          <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: getGradeColor((range.min + range.max) / 2) }} />
+                        </div>
+                        <span className="text-xs font-mono w-16 text-right" style={{ color: 'var(--ept-text-muted)' }}>{count} ({pct}%)</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Top Value Comics */}
+            <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
+              <p className="gradient-text font-bold text-xs tracking-widest uppercase mb-4">Top 10 Most Valuable</p>
+              <div className="divide-y" style={{ borderColor: 'var(--ept-border)' }}>
+                {comics.filter(c => c.estimated_value).sort((a, b) => (b.estimated_value || 0) - (a.estimated_value || 0)).slice(0, 10).map((c, i) => (
+                  <div key={c.id} className="flex items-center justify-between py-3">
+                    <div className="flex items-center gap-3">
+                      <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent-glow)', color: 'var(--ept-accent)' }}>{i + 1}</span>
+                      <div>
+                        <p className="font-semibold text-sm">{c.title} {c.issue}</p>
+                        <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{c.publisher} ({c.year}){c.era ? ` \u00B7 ${c.era}` : ''}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      {c.grade && <span className="text-sm font-mono font-bold" style={{ color: getGradeColor(c.grade) }}>{c.grade}</span>}
+                      <span className="font-bold gradient-text">{formatCurrency(c.estimated_value!)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
