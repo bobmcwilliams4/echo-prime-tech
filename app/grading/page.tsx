@@ -919,6 +919,10 @@ export default function GradingPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [addForm, setAddForm] = useState({ collectible_type: 'comic' as CollectibleType, title: '', issue: '', publisher: '', year: '', era: '', buy_price: '', buy_date: '', buy_source: '', key_issue: false, key_issue_reason: '', writer: '', cover_artist: '' });
   const [hoveredComic, setHoveredComic] = useState<number | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [showBulkImport, setShowBulkImport] = useState(false);
+  const [bulkImportText, setBulkImportText] = useState('');
   const [showEditForm, setShowEditForm] = useState(false);
 
   // v3.0 — Camera + Capture
@@ -1187,24 +1191,62 @@ export default function GradingPage() {
     if (fileInputRef.current) fileInputRef.current.click();
   }, [stopCamera]);
 
+  const autoCropImage = useCallback(async (blob: Blob): Promise<{ croppedBlob: Blob; b64: string; quality: number }> => {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width; canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { blobToBase64(blob).then(b64 => resolve({ croppedBlob: blob, b64, quality: 50 })); return; }
+        ctx.drawImage(img, 0, 0);
+        const detection = detectComicBorder(canvas);
+        if (detection.detected && detection.bounds) {
+          const { x, y, w, h } = detection.bounds;
+          const cropCanvas = document.createElement('canvas');
+          cropCanvas.width = 1200; cropCanvas.height = 1800;
+          const cropCtx = cropCanvas.getContext('2d');
+          if (cropCtx) cropCtx.drawImage(canvas, x, y, w, h, 0, 0, 1200, 1800);
+          const quality = computeQualityScore(cropCanvas);
+          cropCanvas.toBlob(async (croppedBlob) => {
+            if (!croppedBlob) { blobToBase64(blob).then(b64 => resolve({ croppedBlob: blob, b64, quality: 50 })); return; }
+            const b64 = await blobToBase64(croppedBlob);
+            resolve({ croppedBlob, b64, quality: quality.overall });
+          }, 'image/jpeg', 0.92);
+        } else {
+          // No border detected — use full image but still resize to standard dimensions
+          const resizeCanvas = document.createElement('canvas');
+          resizeCanvas.width = 1200; resizeCanvas.height = 1800;
+          const resizeCtx = resizeCanvas.getContext('2d');
+          if (resizeCtx) resizeCtx.drawImage(canvas, 0, 0, 1200, 1800);
+          const quality = computeQualityScore(resizeCanvas);
+          resizeCanvas.toBlob(async (resizedBlob) => {
+            const finalBlob = resizedBlob || blob;
+            const b64 = await blobToBase64(finalBlob);
+            resolve({ croppedBlob: finalBlob, b64, quality: quality.overall });
+          }, 'image/jpeg', 0.92);
+        }
+      };
+      img.src = URL.createObjectURL(blob);
+    });
+  }, []);
+
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     const file = files[0];
-    const blob = file as Blob;
-    const b64 = await blobToBase64(blob);
+    const { croppedBlob, b64, quality } = await autoCropImage(file);
     if (!captureWorkflow.frontBlob) {
       setFrontBase64(b64);
-      setCaptureWorkflow(prev => ({ ...prev, frontBlob: blob, side: 'back', step: 2, qualityScores: { ...prev.qualityScores, front: 80 } }));
-      // Reset for next pick
+      setCaptureWorkflow(prev => ({ ...prev, frontBlob: croppedBlob, side: 'back', step: 2, qualityScores: { ...prev.qualityScores, front: quality } }));
       if (fileInputRef.current) fileInputRef.current.value = '';
       if (fileInputRef.current) fileInputRef.current.click();
     } else if (!captureWorkflow.backBlob) {
       setBackBase64(b64);
-      setCaptureWorkflow(prev => ({ ...prev, backBlob: blob, side: 'issue_number', step: 3, qualityScores: { ...prev.qualityScores, back: 80 } }));
+      setCaptureWorkflow(prev => ({ ...prev, backBlob: croppedBlob, side: 'issue_number', step: 3, qualityScores: { ...prev.qualityScores, back: quality } }));
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
-  }, [captureWorkflow.frontBlob, captureWorkflow.backBlob]);
+  }, [captureWorkflow.frontBlob, captureWorkflow.backBlob, autoCropImage]);
 
   // v3.0 — Full 6-Step Grading Pipeline (25+ LLMs)
   const gradeWithFullPipeline = useCallback(async (comic: Comic) => {
@@ -1355,6 +1397,90 @@ export default function GradingPage() {
     }
     setBatchGrading(false);
   }, [comics, gradeWithFullPipeline]);
+
+  // Multi-select handlers
+  const toggleSelectComic = useCallback((id: number) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const toggleSelectAll = useCallback(() => {
+    if (selectedIds.size === filteredComics.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredComics.map(c => c.id)));
+    }
+  }, [filteredComics, selectedIds.size]);
+
+  const handleBulkDelete = useCallback(async () => {
+    if (selectedIds.size === 0) return;
+    const toDelete = comics.filter(c => selectedIds.has(c.id));
+    for (const comic of toDelete) {
+      if (comic.cortex_uid) await deleteComicFromCortex(comic.cortex_uid);
+    }
+    setComics(prev => prev.filter(c => !selectedIds.has(c.id)));
+    setSelectedIds(new Set());
+    setSelectionMode(false);
+    if (selectedComic && selectedIds.has(selectedComic.id)) setSelectedComic(null);
+  }, [selectedIds, comics, selectedComic]);
+
+  const handleBulkRegrade = useCallback(async () => {
+    if (selectedIds.size === 0) return;
+    const toGrade = comics.filter(c => selectedIds.has(c.id));
+    setBatchGrading(true);
+    setBatchProgress({ current: 0, total: toGrade.length, currentTitle: '', currentStep: '' });
+    for (let i = 0; i < toGrade.length; i++) {
+      setBatchProgress({ current: i + 1, total: toGrade.length, currentTitle: `${toGrade[i].title} ${toGrade[i].issue}`, currentStep: 'Starting pipeline...' });
+      await gradeWithFullPipeline(toGrade[i]);
+      await new Promise(r => setTimeout(r, 500));
+    }
+    setBatchGrading(false);
+    setSelectedIds(new Set());
+    setSelectionMode(false);
+  }, [selectedIds, comics, gradeWithFullPipeline]);
+
+  const handleBulkImport = useCallback(() => {
+    if (!bulkImportText.trim()) return;
+    const lines = bulkImportText.trim().split('\n').filter(l => l.trim());
+    const newComics: Comic[] = [];
+    const baseId = comics.length ? Math.max(...comics.map(c => c.id)) + 1 : 1;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      // Support formats: "Title #Issue, Publisher, Year" or "Title, Publisher, Year" or tab-separated
+      const parts = line.includes('\t') ? line.split('\t') : line.split(',').map(s => s.trim());
+      if (parts.length < 2) continue;
+      let title = parts[0].trim();
+      let issue = '';
+      // Extract issue from title if present (e.g. "Amazing Spider-Man #129")
+      const issueMatch = title.match(/\s*#(\d+[\w-]*)$/);
+      if (issueMatch) {
+        issue = `#${issueMatch[1]}`;
+        title = title.replace(/\s*#\d+[\w-]*$/, '');
+      }
+      const publisher = parts[1]?.trim() || 'Unknown';
+      const year = parseInt(parts[2]?.trim()) || new Date().getFullYear();
+      newComics.push({
+        id: baseId + i, collectible_type: addForm.collectible_type,
+        title, issue, publisher, year,
+        grade: null, estimated_value: null, image_url: null, status: 'ungraded', defects: [],
+        consensus_confidence: null, graded_at: null, era: null,
+        key_issue: false, key_issue_reason: null, writer: null, cover_artist: null, characters: [],
+        buy_price: null, buy_date: null, buy_source: null, sold_price: null, sold_date: null,
+        cortex_uid: null, front_r2_key: null, back_r2_key: null, issue_r2_key: null,
+        quality_score: null, bree_comment: null, bree_emotion: null,
+        tags: [], notes: null, vision_grades: null, research_notes: null,
+        engine_enrichment: null, debate_summary: null, trinity_decision: null,
+      });
+    }
+    if (newComics.length > 0) {
+      setComics(prev => [...prev, ...newComics]);
+      setBulkImportText('');
+      setShowBulkImport(false);
+    }
+  }, [bulkImportText, comics, addForm.collectible_type]);
 
   if (loading || !user) return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--ept-bg)' }}>
@@ -1515,6 +1641,10 @@ export default function GradingPage() {
               </div>
               <div className="flex items-center gap-2 flex-wrap">
                 <button onClick={() => setShowAddForm(true)} className="px-4 py-2 rounded-lg text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>+ Add Item</button>
+                <button onClick={() => setShowBulkImport(true)} className="px-4 py-2 rounded-lg text-xs font-bold" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-accent)', color: 'var(--ept-accent)' }}>+ Bulk Import</button>
+                <button onClick={() => { setSelectionMode(m => !m); setSelectedIds(new Set()); }} className="px-4 py-2 rounded-lg text-xs font-bold transition-all" style={{ backgroundColor: selectionMode ? '#f59e0b' : 'var(--ept-surface)', color: selectionMode ? '#fff' : 'var(--ept-text-muted)', border: selectionMode ? '1px solid #f59e0b' : '1px solid var(--ept-border)' }}>
+                  {selectionMode ? `Cancel Select` : `Select`}
+                </button>
                 {comics.filter(c => !c.grade).length > 0 && (
                   <button onClick={handleBatchGrade} disabled={batchGrading || isGrading} className="px-4 py-2 rounded-lg text-xs font-bold transition-all disabled:opacity-50" style={{ backgroundColor: '#8b5cf6', color: '#fff' }}>
                     {batchGrading ? `Grading ${batchProgress.current}/${batchProgress.total}...` : `Grade All (${comics.filter(c => !c.grade).length})`}
@@ -1524,6 +1654,28 @@ export default function GradingPage() {
                 <button onClick={() => exportCollection('csv')} className="px-3 py-2 rounded-lg text-xs font-medium" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text-muted)' }}>Export CSV</button>
               </div>
             </div>
+
+            {/* Bulk Action Bar — visible when items selected */}
+            {selectionMode && (
+              <div className="flex items-center gap-3 p-3 rounded-xl animate-fade-up" style={{ backgroundColor: 'rgba(245,158,11,0.08)', border: '1px solid #f59e0b' }}>
+                <button onClick={toggleSelectAll} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }}>
+                  {selectedIds.size === filteredComics.length ? 'Deselect All' : `Select All (${filteredComics.length})`}
+                </button>
+                <span className="text-xs font-bold" style={{ color: '#f59e0b' }}>{selectedIds.size} selected</span>
+                <div className="ml-auto flex gap-2">
+                  {selectedIds.size > 0 && (
+                    <>
+                      <button onClick={handleBulkRegrade} disabled={batchGrading || isGrading} className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50" style={{ backgroundColor: '#8b5cf6', color: '#fff' }}>
+                        Re-grade Selected ({selectedIds.size})
+                      </button>
+                      <button onClick={handleBulkDelete} className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all" style={{ backgroundColor: '#ef4444', color: '#fff' }}>
+                        Delete Selected ({selectedIds.size})
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Batch Grading Progress */}
             {batchGrading && (
@@ -1654,9 +1806,48 @@ export default function GradingPage() {
               </div>
             )}
 
+            {/* Bulk Import Modal */}
+            {showBulkImport && (
+              <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--ept-card-bg)', border: '2px solid var(--ept-accent)' }}>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-extrabold gradient-text">Bulk Import</h2>
+                  <button onClick={() => setShowBulkImport(false)} className="p-2 rounded-lg text-xs" style={{ backgroundColor: 'var(--ept-surface)' }}>Cancel</button>
+                </div>
+                <p className="text-xs mb-3" style={{ color: 'var(--ept-text-muted)' }}>
+                  Paste one item per line. Formats: <code className="px-1 py-0.5 rounded text-[10px]" style={{ backgroundColor: 'var(--ept-surface)' }}>Title #Issue, Publisher, Year</code> or <code className="px-1 py-0.5 rounded text-[10px]" style={{ backgroundColor: 'var(--ept-surface)' }}>Title, Publisher, Year</code> or tab-separated.
+                </p>
+                <div className="mb-3">
+                  <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Import as type:</label>
+                  <div className="flex gap-2 flex-wrap">
+                    {COLLECTIBLE_TYPES.slice(0, 10).map(ct => (
+                      <button key={ct.id} onClick={() => setAddForm(f => ({ ...f, collectible_type: ct.id }))} className="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all" style={{ backgroundColor: addForm.collectible_type === ct.id ? 'var(--ept-accent-glow)' : 'var(--ept-surface)', color: addForm.collectible_type === ct.id ? 'var(--ept-accent)' : 'var(--ept-text-muted)', border: addForm.collectible_type === ct.id ? '1px solid var(--ept-accent)' : '1px solid var(--ept-border)' }}>
+                        {ct.icon} {ct.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <textarea value={bulkImportText} onChange={e => setBulkImportText(e.target.value)} rows={8} placeholder={`Amazing Spider-Man #129, Marvel, 1974\nBatman #423, DC, 1988\nX-Men #1, Marvel, 1991\nMickey Mantle, Topps, 1952\nCharizard #4/102, Base Set, 1999`} className="w-full px-4 py-3 rounded-lg text-sm font-mono" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)', resize: 'vertical' }} />
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{bulkImportText.trim() ? bulkImportText.trim().split('\n').filter(l => l.trim()).length : 0} items detected</span>
+                  <div className="flex gap-2">
+                    <button onClick={() => setShowBulkImport(false)} className="px-4 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-muted)' }}>Cancel</button>
+                    <button onClick={handleBulkImport} className="px-6 py-2 rounded-lg text-sm font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Import All</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredComics.map(c => (
-                <div key={c.id} onClick={() => setComicDetailModal(c)} onContextMenu={e => { e.preventDefault(); setSelectedComic(selectedComic?.id === c.id ? null : c); }} onMouseEnter={() => setHoveredComic(c.id)} onMouseLeave={() => setHoveredComic(null)} className="relative rounded-xl overflow-hidden cursor-pointer card-hover transition-all" style={{ backgroundColor: 'var(--ept-card-bg)', border: selectedComic?.id === c.id ? '2px solid var(--ept-accent)' : '1px solid var(--ept-card-border)' }}>
+                <div key={c.id} onClick={() => selectionMode ? toggleSelectComic(c.id) : setComicDetailModal(c)} onContextMenu={e => { e.preventDefault(); setSelectedComic(selectedComic?.id === c.id ? null : c); }} onMouseEnter={() => setHoveredComic(c.id)} onMouseLeave={() => setHoveredComic(null)} className="relative rounded-xl overflow-hidden cursor-pointer card-hover transition-all" style={{ backgroundColor: 'var(--ept-card-bg)', border: selectedIds.has(c.id) ? '2px solid #f59e0b' : selectedComic?.id === c.id ? '2px solid var(--ept-accent)' : '1px solid var(--ept-card-border)' }}>
+                  {/* Selection Checkbox */}
+                  {selectionMode && (
+                    <div className="absolute top-3 left-3 z-20">
+                      <div onClick={e => { e.stopPropagation(); toggleSelectComic(c.id); }} className="w-6 h-6 rounded-md flex items-center justify-center cursor-pointer transition-all" style={{ backgroundColor: selectedIds.has(c.id) ? '#f59e0b' : 'var(--ept-surface)', border: selectedIds.has(c.id) ? '2px solid #f59e0b' : '2px solid var(--ept-border)' }}>
+                        {selectedIds.has(c.id) && <span className="text-white text-xs font-bold">&#10003;</span>}
+                      </div>
+                    </div>
+                  )}
                   {c.image_url && (
                     <div className="relative w-full" style={{ aspectRatio: '2/3', maxHeight: 220, overflow: 'hidden', backgroundColor: 'var(--ept-surface)' }}>
                       <img src={c.image_url} alt={`${c.title} ${c.issue}`} className="w-full h-full object-cover" loading="lazy" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
