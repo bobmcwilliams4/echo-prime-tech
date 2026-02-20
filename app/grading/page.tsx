@@ -1023,21 +1023,47 @@ export default function GradingPage() {
 
   // v3.0 — Camera controls
   const startCamera = useCallback(async (deviceId?: string) => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      alert('Camera not supported in this browser. Use Upload Images instead.');
+      return;
+    }
     setCaptureState('requesting');
+    setCaptureWorkflow(prev => ({ ...prev, side: 'front', step: 1, frontBlob: null, backBlob: null, issueBlob: null, frontR2Key: null, backR2Key: null, issueR2Key: null }));
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter(d => d.kind === 'videoinput');
       setCameraDevices(videoDevices);
       const camId = deviceId || selectedCamera;
-      const constraints: MediaStreamConstraints = {
-        video: { width: { ideal: 1920 }, height: { ideal: 1080 }, facingMode: { ideal: 'environment' }, ...(camId ? { deviceId: { exact: camId } } : {}) },
-      };
-      if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); }
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
+      // Try with specified device first, then fallback without facingMode
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1920 }, height: { ideal: 1080 }, ...(camId ? { deviceId: { exact: camId } } : { facingMode: { ideal: 'environment' } }) },
+        });
+      } catch {
+        // Fallback: just request any video
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      }
       streamRef.current = stream;
-      if (videoRef.current) { videoRef.current.srcObject = stream; await videoRef.current.play(); }
+      // Wait for React to render the video element, then attach stream
       setCaptureState('positioning');
-    } catch { setCaptureState('idle'); }
+      // Use requestAnimationFrame + retry to ensure videoRef is mounted
+      const attachStream = (retries = 0) => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play().catch(() => {});
+        } else if (retries < 20) {
+          requestAnimationFrame(() => attachStream(retries + 1));
+        }
+      };
+      // Give React one frame to render
+      requestAnimationFrame(() => attachStream(0));
+    } catch (err) {
+      console.error('Camera error:', err);
+      setCaptureState('idle');
+      alert('Could not access camera. Check permissions or use Upload Images.');
+    }
   }, [selectedCamera]);
 
   const stopCamera = useCallback(() => {
@@ -1101,7 +1127,32 @@ export default function GradingPage() {
     }
   }, [captureWorkflow.side, stopCamera]);
 
-  const skipToManualUpload = useCallback(() => { stopCamera(); setCaptureState('idle'); }, [stopCamera]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const skipToManualUpload = useCallback(() => {
+    stopCamera();
+    setCaptureState('idle');
+    // Trigger file picker
+    if (fileInputRef.current) fileInputRef.current.click();
+  }, [stopCamera]);
+
+  const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    const blob = file as Blob;
+    const b64 = await blobToBase64(blob);
+    if (!captureWorkflow.frontBlob) {
+      setFrontBase64(b64);
+      setCaptureWorkflow(prev => ({ ...prev, frontBlob: blob, side: 'back', step: 2, qualityScores: { ...prev.qualityScores, front: 80 } }));
+      // Reset for next pick
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (fileInputRef.current) fileInputRef.current.click();
+    } else if (!captureWorkflow.backBlob) {
+      setBackBase64(b64);
+      setCaptureWorkflow(prev => ({ ...prev, backBlob: blob, side: 'issue_number', step: 3, qualityScores: { ...prev.qualityScores, back: 80 } }));
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }, [captureWorkflow.frontBlob, captureWorkflow.backBlob]);
 
   // v3.0 — Full 6-Step Grading Pipeline (25+ LLMs)
   const gradeWithFullPipeline = useCallback(async (comic: Comic) => {
@@ -1676,6 +1727,7 @@ export default function GradingPage() {
         {/* ══════════════ GRADE ══════════════ */}
         {activeTab === 'grade' && (
           <div className="space-y-6 animate-fade-up">
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-extrabold">AI Grading Studio v3.0</h1>
