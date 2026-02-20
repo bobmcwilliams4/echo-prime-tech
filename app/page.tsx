@@ -4,19 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../lib/auth-context';
+import { useTheme } from '../lib/theme-context';
 import { SmokeDivider } from '../components/ParticleBackground';
-
-function useAutoTheme() {
-  const [isDark, setIsDark] = useState(false);
-  useEffect(() => {
-    const check = () => { const h = new Date().getHours(); setIsDark(h < 6 || h >= 18); };
-    check();
-    const i = setInterval(check, 60_000);
-    return () => clearInterval(i);
-  }, []);
-  useEffect(() => { document.documentElement.classList.toggle('dark', isDark); }, [isDark]);
-  return { isDark, toggle: () => setIsDark(d => !d) };
-}
 
 interface LiveStats {
   engines: string;
@@ -132,7 +121,7 @@ const DIFFERENTIATORS = [
 ];
 
 export default function HomePage() {
-  const { isDark, toggle } = useAutoTheme();
+  const { isDark, toggle } = useTheme();
   const { user } = useAuth();
   const live = useLiveStats();
   const capSection = useInView();

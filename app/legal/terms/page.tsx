@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTheme } from '../../../lib/theme-context';
 
 export default function TermsPage() {
-  const [isDark, setIsDark] = useState(false);
-  useEffect(() => { const h = new Date().getHours(); setIsDark(h < 6 || h >= 18); document.documentElement.classList.toggle('dark', h < 6 || h >= 18); }, []);
+  const { isDark } = useTheme();
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>

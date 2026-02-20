@@ -5,21 +5,16 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
+import { useTheme } from '../../lib/theme-context';
 import { getAdminAnalytics, getAdminUsers, AdminAnalytics, Service } from '../../lib/ept-api';
 
 export default function AdminPage() {
   const router = useRouter();
   const { user, loading, role, signOut } = useAuth();
+  const { isDark } = useTheme();
   const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
   const [users, setUsers] = useState<Array<{ uid: string; email: string; display_name: string; photo_url: string; role: string; created_at: string; last_login: string; subscribed_services: string | null }>>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'services' | 'settings'>('overview');
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const h = new Date().getHours();
-    setIsDark(h < 6 || h >= 18);
-    document.documentElement.classList.toggle('dark', h < 6 || h >= 18);
-  }, []);
 
   useEffect(() => {
     if (!loading && (!user || role !== 'owner')) router.push('/dashboard');

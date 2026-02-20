@@ -4,19 +4,14 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
+import { useTheme } from '../../lib/theme-context';
 import { getServices, Service } from '../../lib/ept-api';
 
 export default function PricingPage() {
   const { user } = useAuth();
+  const { isDark } = useTheme();
   const [services, setServices] = useState<Service[]>([]);
   const [activeService, setActiveService] = useState<string | null>(null);
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const h = new Date().getHours();
-    setIsDark(h < 6 || h >= 18);
-    document.documentElement.classList.toggle('dark', h < 6 || h >= 18);
-  }, []);
 
   useEffect(() => {
     getServices().then(d => { setServices(d.services); if (d.services.length > 0) setActiveService(d.services[0].id); }).catch(() => {});

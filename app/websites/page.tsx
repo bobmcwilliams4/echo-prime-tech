@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
+import { useTheme } from '../../lib/theme-context';
 
 const TEMPLATES = [
   { name: 'SaaS Landing', preview: 'Modern SaaS product page with hero, features, pricing, and CTA sections', category: 'Business' },
@@ -32,13 +33,7 @@ const FEATURES = [
 export default function WebsitesPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const h = new Date().getHours();
-    setIsDark(h < 6 || h >= 18);
-    document.documentElement.classList.toggle('dark', h < 6 || h >= 18);
-  }, []);
+  const { isDark } = useTheme();
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>

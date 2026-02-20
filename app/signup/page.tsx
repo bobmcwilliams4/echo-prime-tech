@@ -6,12 +6,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { signInWithGoogle, signInWithApple, signUpWithEmail, setupRecaptcha, sendSmsCode, verifySmsCode } from '../../lib/firebase';
 import { useAuth } from '../../lib/auth-context';
+import { useTheme } from '../../lib/theme-context';
 
 type AuthTab = 'email' | 'phone';
 
 export default function SignupPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const { isDark } = useTheme();
   const [tab, setTab] = useState<AuthTab>('email');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -24,14 +26,7 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isDark, setIsDark] = useState(false);
   const recaptchaRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const h = new Date().getHours();
-    setIsDark(h < 6 || h >= 18);
-    document.documentElement.classList.toggle('dark', h < 6 || h >= 18);
-  }, []);
 
   useEffect(() => {
     if (!loading && user) router.push('/dashboard');

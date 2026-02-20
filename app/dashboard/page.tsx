@@ -5,19 +5,14 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
+import { useTheme } from '../../lib/theme-context';
 import { getProfile, getServices, Service } from '../../lib/ept-api';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, loading, role, subscriptions, signOut } = useAuth();
+  const { isDark } = useTheme();
   const [services, setServices] = useState<Service[]>([]);
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const h = new Date().getHours();
-    setIsDark(h < 6 || h >= 18);
-    document.documentElement.classList.toggle('dark', h < 6 || h >= 18);
-  }, []);
 
   useEffect(() => {
     if (!loading && !user) router.push('/login');

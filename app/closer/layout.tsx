@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../../lib/auth-context';
+import { useTheme } from '../../lib/theme-context';
 
 const NAV_ITEMS = [
   { href: '/closer', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', label: 'Dashboard', exact: true },
@@ -26,24 +27,8 @@ export default function CloserLayout({ children }: { children: React.ReactNode }
   const router = useRouter();
   const pathname = usePathname();
   const { user, loading, signOut } = useAuth();
-  const [isDark, setIsDark] = useState(false);
+  const { isDark, toggle: toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // Initialize dark mode from time, allow manual toggle
-  useEffect(() => {
-    const h = new Date().getHours();
-    const saved = localStorage.getItem('ept-theme');
-    const dark = saved ? saved === 'dark' : (h < 6 || h >= 18);
-    setIsDark(dark);
-    document.documentElement.classList.toggle('dark', dark);
-  }, []);
-
-  const toggleTheme = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle('dark', next);
-    localStorage.setItem('ept-theme', next ? 'dark' : 'light');
-  };
 
   useEffect(() => {
     if (!loading && !user) router.push('/login');

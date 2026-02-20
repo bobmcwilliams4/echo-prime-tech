@@ -91,15 +91,16 @@ export default function EchoPrimeChat() {
 
   // Initialize audio element
   useEffect(() => {
-    audioRef.current = new Audio();
-    audioRef.current.addEventListener('ended', () => setTtsPlaying(false));
-    audioRef.current.addEventListener('error', () => setTtsPlaying(false));
+    const audio = new Audio();
+    const onEnded = () => setTtsPlaying(false);
+    const onError = () => setTtsPlaying(false);
+    audio.addEventListener('ended', onEnded);
+    audio.addEventListener('error', onError);
+    audioRef.current = audio;
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.removeEventListener('ended', () => setTtsPlaying(false));
-        audioRef.current.removeEventListener('error', () => setTtsPlaying(false));
-      }
+      audio.pause();
+      audio.removeEventListener('ended', onEnded);
+      audio.removeEventListener('error', onError);
     };
   }, []);
 

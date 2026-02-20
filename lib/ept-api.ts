@@ -20,6 +20,10 @@ async function fetchApi<T = unknown>(path: string, options: RequestInit = {}): P
       ...options.headers,
     },
   });
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(`API ${res.status}: ${text}`);
+  }
   return res.json() as Promise<T>;
 }
 
