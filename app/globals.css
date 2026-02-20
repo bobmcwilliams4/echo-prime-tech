@@ -162,6 +162,31 @@ body {
   background-clip: text;
 }
 
+/* ─── Range slider ─── */
+.accent-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--ept-accent);
+  cursor: pointer;
+  border: 2px solid var(--ept-bg);
+  box-shadow: 0 0 8px var(--ept-accent-glow);
+  transition: transform 0.15s ease;
+}
+.accent-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+.accent-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--ept-accent);
+  cursor: pointer;
+  border: 2px solid var(--ept-bg);
+}
+
 /* ─── Card hover lift ─── */
 .card-hover {
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
