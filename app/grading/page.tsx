@@ -782,11 +782,32 @@ function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
-function estimateValue(grade: number, year: number, keyIssue: boolean): number {
-  const baseValue = year < 1960 ? 20000 : year < 1970 ? 10000 : year < 1980 ? 3000 : year < 1990 ? 1000 : 300;
+function estimateValue(grade: number, year: number, keyIssue: boolean, issueNumber?: number): number {
+  // Base values by era — these are for COMMON, non-key issues at CGC 8.0
+  // Golden Age keys are worth millions, but common GA books are $50-500
+  const isLowNumber = (issueNumber || 999) <= 10;
+  let baseValue: number;
+  if (year < 1940)      baseValue = keyIssue ? 50000 : isLowNumber ? 2000 : 500;    // Early Golden Age
+  else if (year < 1956) baseValue = keyIssue ? 30000 : isLowNumber ? 1500 : 300;    // Golden Age
+  else if (year < 1970) baseValue = keyIssue ? 15000 : isLowNumber ? 800 : 150;     // Silver Age
+  else if (year < 1980) baseValue = keyIssue ? 5000 : isLowNumber ? 200 : 25;       // Bronze Age
+  else if (year < 1990) baseValue = keyIssue ? 2000 : isLowNumber ? 100 : 15;       // Copper Age
+  else if (year < 2000) baseValue = keyIssue ? 500 : 10;                             // Modern Age
+  else                  baseValue = keyIssue ? 200 : 8;                              // Contemporary
   const closest = Object.keys(GRADE_MULTIPLIERS).map(Number).reduce((a, b) => Math.abs(b - grade) < Math.abs(a - grade) ? b : a);
   const multiplier = GRADE_MULTIPLIERS[closest] || 0.5;
-  return Math.round(baseValue * multiplier * (keyIssue ? 3.0 : 1.0));
+  return Math.round(baseValue * multiplier);
+}
+
+// Sanity check: cap LLM-estimated values against reasonable era-based ceilings
+function sanityCheckValue(value: number, grade: number, year: number, keyIssue: boolean): number {
+  // Maximum reasonable values by era for non-verified key issues
+  const maxByEra = year < 1940 ? 5000000 : year < 1956 ? 2000000 : year < 1970 ? 500000 :
+    year < 1980 ? (keyIssue ? 100000 : 5000) : year < 1990 ? (keyIssue ? 50000 : 2000) :
+    year < 2000 ? (keyIssue ? 10000 : 500) : (keyIssue ? 5000 : 300);
+  if (value > maxByEra) return maxByEra;
+  if (value <= 0) return estimateValue(grade, year, keyIssue);
+  return value;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1183,7 +1204,8 @@ export default function GradingPage() {
     if (cached?.grade) {
       updateStep('cache', { status: 'complete', endTime: Date.now(), detail: `Found: CGC ${cached.grade}` });
       setGradingProgress(100); setGradingStep('Grade recalled from memory');
-      setComics(prev => prev.map(c => c.id === comic.id ? { ...c, grade: cached.grade, estimated_value: estimateValue(cached.grade, comic.year, comic.key_issue), status: 'graded' as const, consensus_confidence: cached.confidence || 85, graded_at: cached.graded_at || new Date().toISOString() } : c));
+      const cachedIssueNum = parseInt(comic.issue.replace(/[^0-9]/g, ''), 10) || 999;
+      setComics(prev => prev.map(c => c.id === comic.id ? { ...c, grade: cached.grade, estimated_value: estimateValue(cached.grade, comic.year, comic.key_issue, cachedIssueNum), status: 'graded' as const, consensus_confidence: cached.confidence || 85, graded_at: cached.graded_at || new Date().toISOString() } : c));
       setTimeout(() => { setIsGrading(false); setGradingProgress(0); setGradingStep(''); }, 1500);
       return;
     }
@@ -1253,8 +1275,11 @@ export default function GradingPage() {
     updateStep('value', { status: 'running', startTime: Date.now() });
     setGradingStep('Computing market value...'); setGradingProgress(88);
     const finalGrade = trinity.finalGrade;
-    const valueEstimate = enrichment.prb02?.value || estimateValue(finalGrade, comic.year, comic.key_issue || research.toLowerCase().includes('key issue'));
-    updateStep('value', { status: 'complete', endTime: Date.now(), detail: `$${valueEstimate}` });
+    const isKeyIssue = comic.key_issue || research.toLowerCase().includes('key issue') || research.toLowerCase().includes('first appearance');
+    const issueNum = parseInt(comic.issue.replace(/[^0-9]/g, ''), 10) || 999;
+    const rawValue = enrichment.prb02?.value || estimateValue(finalGrade, comic.year, isKeyIssue, issueNum);
+    const valueEstimate = sanityCheckValue(rawValue, finalGrade, comic.year, isKeyIssue);
+    updateStep('value', { status: 'complete', endTime: Date.now(), detail: `$${valueEstimate.toLocaleString()}` });
 
     // Step 8: Bree commentary
     updateStep('bree', { status: 'running', startTime: Date.now() });
