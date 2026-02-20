@@ -44,6 +44,33 @@ const VISION_MODELS = [
   { model: 'qwen/qwen-2.5-vl-72b', weight: 0.15, label: 'Qwen 2.5 VL', color: '#f59e0b' },
 ];
 
+const COLLECTIBLE_TYPES = [
+  { id: 'comic', label: 'Comic Books', icon: '📚', gradeScale: 'CGC 0.5-10.0' },
+  { id: 'baseball_card', label: 'Baseball Cards', icon: '⚾', gradeScale: 'PSA 1-10' },
+  { id: 'football_card', label: 'Football Cards', icon: '🏈', gradeScale: 'PSA 1-10' },
+  { id: 'basketball_card', label: 'Basketball Cards', icon: '🏀', gradeScale: 'PSA 1-10' },
+  { id: 'hockey_card', label: 'Hockey Cards', icon: '🏒', gradeScale: 'PSA 1-10' },
+  { id: 'trading_card', label: 'Trading Cards (Other)', icon: '🃏', gradeScale: 'PSA 1-10' },
+  { id: 'pokemon', label: 'Pokemon Cards', icon: '⚡', gradeScale: 'PSA 1-10 / CGC' },
+  { id: 'yugioh', label: 'Yu-Gi-Oh Cards', icon: '🎴', gradeScale: 'PSA 1-10 / CGC' },
+  { id: 'magic_mtg', label: 'Magic: The Gathering', icon: '🧙', gradeScale: 'PSA 1-10 / BGS' },
+  { id: 'action_figure', label: 'Action Figures', icon: '🦸', gradeScale: 'AFA U85-U100' },
+  { id: 'toy', label: 'Toys / Models', icon: '🧸', gradeScale: 'AFA / CAS' },
+  { id: 'gold_coin', label: 'Gold Coins', icon: '🪙', gradeScale: 'NGC/PCGS 1-70' },
+  { id: 'silver_coin', label: 'Silver Coins', icon: '🥈', gradeScale: 'NGC/PCGS 1-70' },
+  { id: 'coin', label: 'Coins (Other)', icon: '💰', gradeScale: 'NGC/PCGS 1-70' },
+  { id: 'stamp', label: 'Stamps', icon: '📮', gradeScale: 'PSE 1-100' },
+  { id: 'vinyl_record', label: 'Vinyl Records', icon: '🎵', gradeScale: 'Goldmine VG-M' },
+  { id: 'sports_memorabilia', label: 'Sports Memorabilia', icon: '🏆', gradeScale: 'PSA/JSA/Beckett' },
+  { id: 'video_game', label: 'Video Games', icon: '🎮', gradeScale: 'WATA/VGA 1-100' },
+  { id: 'other', label: 'Other Collectible', icon: '✨', gradeScale: 'Custom' },
+] as const;
+
+type CollectibleType = typeof COLLECTIBLE_TYPES[number]['id'];
+
+const getCollectibleIcon = (type: CollectibleType) => COLLECTIBLE_TYPES.find(t => t.id === type)?.icon || '📦';
+const getCollectibleLabel = (type: CollectibleType) => COLLECTIBLE_TYPES.find(t => t.id === type)?.label || 'Collectible';
+
 const GRADE_MULTIPLIERS: Record<number, number> = {
   10.0: 3.0, 9.9: 2.8, 9.8: 2.5, 9.6: 2.2, 9.4: 2.0, 9.2: 1.8, 9.0: 1.5, 8.5: 1.3, 8.0: 1.0,
   7.5: 0.85, 7.0: 0.7, 6.5: 0.6, 6.0: 0.5, 5.5: 0.4, 5.0: 0.35, 4.5: 0.3, 4.0: 0.25,
@@ -320,6 +347,7 @@ const DEFECT_TYPES = [
 
 interface Comic {
   id: number;
+  collectible_type: CollectibleType;
   title: string;
   issue: string;
   publisher: string;
@@ -396,6 +424,7 @@ async function loadCollectionFromCortex(): Promise<Comic[]> {
         writer: meta.writer || null,
         cover_artist: meta.cover_artist || null,
         characters: [],
+        collectible_type: (meta.collectible_type || 'comic') as CollectibleType,
         buy_price: null, buy_date: null, buy_source: null,
         sold_price: null, sold_date: null, cortex_uid: m.uid || null,
         front_r2_key: meta.front_r2_key || null, back_r2_key: meta.back_r2_key || null, issue_r2_key: meta.issue_r2_key || null,
@@ -888,7 +917,8 @@ export default function GradingPage() {
   const [cortexStatus, setCortexStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [cortexStats, setCortexStats] = useState<{ total_memories: number; recent_24h: number } | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [addForm, setAddForm] = useState({ title: '', issue: '', publisher: '', year: '', era: '', buy_price: '', buy_date: '', buy_source: '', key_issue: false, key_issue_reason: '', writer: '', cover_artist: '' });
+  const [addForm, setAddForm] = useState({ collectible_type: 'comic' as CollectibleType, title: '', issue: '', publisher: '', year: '', era: '', buy_price: '', buy_date: '', buy_source: '', key_issue: false, key_issue_reason: '', writer: '', cover_artist: '' });
+  const [hoveredComic, setHoveredComic] = useState<number | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
 
   // v3.0 — Camera + Capture
@@ -995,9 +1025,10 @@ export default function GradingPage() {
   }, [comics, publishers]);
 
   const handleAddComic = useCallback(async () => {
-    if (!addForm.title || !addForm.issue || !addForm.publisher) return;
+    if (!addForm.title || !addForm.publisher) return;
     const newComic: Omit<Comic, 'id' | 'cortex_uid'> = {
-      title: addForm.title, issue: addForm.issue.startsWith('#') ? addForm.issue : `#${addForm.issue}`,
+      collectible_type: addForm.collectible_type,
+      title: addForm.title, issue: addForm.issue ? (addForm.issue.startsWith('#') ? addForm.issue : `#${addForm.issue}`) : '',
       publisher: addForm.publisher, year: parseInt(addForm.year) || new Date().getFullYear(),
       grade: null, estimated_value: null, image_url: null, status: 'ungraded', defects: [],
       consensus_confidence: null, graded_at: null, era: addForm.era || null,
@@ -1012,7 +1043,7 @@ export default function GradingPage() {
     };
     const uid = await addComicToCortex(newComic);
     setComics(prev => [...prev, { ...newComic, id: prev.length + 1, cortex_uid: uid }]);
-    setAddForm({ title: '', issue: '', publisher: '', year: '', era: '', buy_price: '', buy_date: '', buy_source: '', key_issue: false, key_issue_reason: '', writer: '', cover_artist: '' });
+    setAddForm({ collectible_type: addForm.collectible_type, title: '', issue: '', publisher: '', year: '', era: '', buy_price: '', buy_date: '', buy_source: '', key_issue: false, key_issue_reason: '', writer: '', cover_artist: '' });
     setShowAddForm(false);
   }, [addForm]);
 
@@ -1177,9 +1208,11 @@ export default function GradingPage() {
 
   // v3.0 — Full 6-Step Grading Pipeline (25+ LLMs)
   const gradeWithFullPipeline = useCallback(async (comic: Comic) => {
+    setActiveTab('grade'); setComicDetailModal(null);
     setIsGrading(true); setGradingProgress(0); setTrinityResults([]); setDoctrineResults([]);
     setVisionResults([]); setResearchNotes(''); setEngineEnrichment(null);
     setDebateTranscript([]); setTrinityDecision(null); setBreeComment(null);
+    setSelectedComic(comic);
     const steps: PipelineStep[] = [
       { id: 'cache', label: 'Cache check', status: 'pending', startTime: null, endTime: null, detail: '' },
       { id: 'upload', label: 'Image processing + R2 upload', status: 'pending', startTime: null, endTime: null, detail: '' },
@@ -1400,9 +1433,9 @@ export default function GradingPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: 'Total Items', value: String(stats.total), sub: `${stats.graded} graded, ${stats.ungraded} ungraded` },
-                { label: 'Collection Value', value: formatCurrency(stats.totalValue), sub: `${stats.publisherCount} publishers` },
+                { label: 'Collection Value', value: formatCurrency(stats.totalValue), sub: `${stats.publisherCount} brands/publishers` },
                 { label: 'Avg Grade', value: stats.avgGrade.toFixed(1), sub: `${getGradeLabel(stats.avgGrade)} (${stats.lowestGrade.toFixed(1)}-${stats.highestGrade.toFixed(1)} range)` },
-                { label: 'Key Issues', value: String(stats.keyIssues), sub: `${Object.keys(stats.eras).length} eras represented` },
+                { label: 'Key / Rare', value: String(stats.keyIssues), sub: `${Object.keys(stats.eras).length} eras represented` },
               ].map((s, i) => (
                 <div key={s.label} className="rounded-xl p-5 card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
                   <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>{s.label}</p>
@@ -1455,7 +1488,7 @@ export default function GradingPage() {
                 {comics.filter(c => c.status === 'graded').slice(0, 5).map(c => (
                   <div key={c.id} className="px-5 py-3 flex items-center justify-between hover:bg-[var(--ept-surface-hover)] transition-colors cursor-pointer" onClick={() => { setSelectedComic(c); setActiveTab('collection'); }}>
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>📚</div>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>{getCollectibleIcon(c.collectible_type || 'comic')}</div>
                       <div>
                         <p className="font-semibold text-sm">{c.title} {c.issue}</p>
                         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{c.publisher} &middot; {c.year} {c.graded_at && `\u00B7 ${formatDate(c.graded_at)}`}</p>
@@ -1481,7 +1514,7 @@ export default function GradingPage() {
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent-glow)', color: 'var(--ept-accent)' }}>{filteredComics.length} of {comics.length}</span>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
-                <button onClick={() => setShowAddForm(true)} className="px-4 py-2 rounded-lg text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>+ Add Comic</button>
+                <button onClick={() => setShowAddForm(true)} className="px-4 py-2 rounded-lg text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>+ Add Item</button>
                 {comics.filter(c => !c.grade).length > 0 && (
                   <button onClick={handleBatchGrade} disabled={batchGrading || isGrading} className="px-4 py-2 rounded-lg text-xs font-bold transition-all disabled:opacity-50" style={{ backgroundColor: '#8b5cf6', color: '#fff' }}>
                     {batchGrading ? `Grading ${batchProgress.current}/${batchProgress.total}...` : `Grade All (${comics.filter(c => !c.grade).length})`}
@@ -1540,44 +1573,64 @@ export default function GradingPage() {
             {showAddForm && (
               <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--ept-card-bg)', border: '2px solid var(--ept-accent)' }}>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-extrabold gradient-text">Add Comic to Collection</h2>
+                  <h2 className="text-lg font-extrabold gradient-text">Add to Collection</h2>
                   <button onClick={() => setShowAddForm(false)} className="p-2 rounded-lg text-xs" style={{ backgroundColor: 'var(--ept-surface)' }}>Cancel</button>
+                </div>
+                {/* Collectible Type Selector */}
+                <div className="mb-4">
+                  <label className="block text-xs font-semibold mb-2" style={{ color: 'var(--ept-text-muted)' }}>What are you adding?</label>
+                  <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-2">
+                    {COLLECTIBLE_TYPES.map(ct => (
+                      <button key={ct.id} onClick={() => setAddForm(f => ({ ...f, collectible_type: ct.id }))} className="p-2 rounded-lg text-center transition-all" style={{ backgroundColor: addForm.collectible_type === ct.id ? 'var(--ept-accent-glow)' : 'var(--ept-surface)', border: addForm.collectible_type === ct.id ? '2px solid var(--ept-accent)' : '1px solid var(--ept-border)' }}>
+                        <span className="text-lg block">{ct.icon}</span>
+                        <span className="text-[9px] font-bold block mt-0.5 leading-tight" style={{ color: addForm.collectible_type === ct.id ? 'var(--ept-accent)' : 'var(--ept-text-muted)' }}>{ct.label}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div className="col-span-2">
-                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Title *</label>
-                    <input type="text" value={addForm.title} onChange={e => setAddForm(f => ({ ...f, title: e.target.value }))} placeholder="Amazing Spider-Man" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>
+                      {addForm.collectible_type === 'comic' ? 'Title *' : addForm.collectible_type.includes('card') || addForm.collectible_type === 'pokemon' || addForm.collectible_type === 'yugioh' || addForm.collectible_type === 'magic_mtg' ? 'Card Name *' : addForm.collectible_type.includes('coin') ? 'Coin Name *' : 'Item Name *'}
+                    </label>
+                    <input type="text" value={addForm.title} onChange={e => setAddForm(f => ({ ...f, title: e.target.value }))} placeholder={addForm.collectible_type === 'comic' ? 'Amazing Spider-Man' : addForm.collectible_type === 'baseball_card' ? 'Mickey Mantle' : addForm.collectible_type === 'pokemon' ? 'Charizard' : addForm.collectible_type === 'gold_coin' ? '1933 Double Eagle' : 'Item name'} className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Issue # *</label>
-                    <input type="text" value={addForm.issue} onChange={e => setAddForm(f => ({ ...f, issue: e.target.value }))} placeholder="129" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>
+                      {addForm.collectible_type === 'comic' ? 'Issue #' : addForm.collectible_type.includes('card') || addForm.collectible_type === 'pokemon' || addForm.collectible_type === 'yugioh' || addForm.collectible_type === 'magic_mtg' ? 'Card #' : addForm.collectible_type.includes('coin') ? 'Denomination' : 'ID / #'}
+                    </label>
+                    <input type="text" value={addForm.issue} onChange={e => setAddForm(f => ({ ...f, issue: e.target.value }))} placeholder={addForm.collectible_type === 'comic' ? '129' : addForm.collectible_type === 'baseball_card' ? '311' : addForm.collectible_type === 'pokemon' ? '4/102' : addForm.collectible_type === 'gold_coin' ? '$20' : '#'} className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Year</label>
-                    <input type="text" value={addForm.year} onChange={e => setAddForm(f => ({ ...f, year: e.target.value }))} placeholder="1974" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                    <input type="text" value={addForm.year} onChange={e => setAddForm(f => ({ ...f, year: e.target.value }))} placeholder={addForm.collectible_type.includes('coin') ? '1933' : '1974'} className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Publisher *</label>
-                    <input type="text" value={addForm.publisher} onChange={e => setAddForm(f => ({ ...f, publisher: e.target.value }))} placeholder="Marvel" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>
+                      {addForm.collectible_type === 'comic' ? 'Publisher *' : addForm.collectible_type.includes('card') || addForm.collectible_type === 'pokemon' || addForm.collectible_type === 'yugioh' || addForm.collectible_type === 'magic_mtg' ? 'Brand / Set *' : addForm.collectible_type.includes('coin') ? 'Mint *' : 'Manufacturer *'}
+                    </label>
+                    <input type="text" value={addForm.publisher} onChange={e => setAddForm(f => ({ ...f, publisher: e.target.value }))} placeholder={addForm.collectible_type === 'comic' ? 'Marvel' : addForm.collectible_type === 'baseball_card' ? 'Topps' : addForm.collectible_type === 'pokemon' ? 'Base Set' : addForm.collectible_type === 'gold_coin' ? 'US Mint' : 'Brand'} className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                  </div>
+                  {addForm.collectible_type === 'comic' && (
+                    <div>
+                      <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Era</label>
+                      <select value={addForm.era} onChange={e => setAddForm(f => ({ ...f, era: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }}>
+                        <option value="">Select era...</option>
+                        <option value="golden age">Golden Age (1938-1956)</option>
+                        <option value="silver age">Silver Age (1956-1970)</option>
+                        <option value="bronze age">Bronze Age (1970-1985)</option>
+                        <option value="copper age">Copper Age (1985-1991)</option>
+                        <option value="modern age">Modern Age (1991+)</option>
+                      </select>
+                    </div>
+                  )}
+                  <div>
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>{addForm.collectible_type === 'comic' ? 'Writer' : 'Creator / Designer'}</label>
+                    <input type="text" value={addForm.writer} onChange={e => setAddForm(f => ({ ...f, writer: e.target.value }))} placeholder={addForm.collectible_type === 'comic' ? 'Stan Lee' : 'Designer'} className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Era</label>
-                    <select value={addForm.era} onChange={e => setAddForm(f => ({ ...f, era: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }}>
-                      <option value="">Select era...</option>
-                      <option value="golden age">Golden Age (1938-1956)</option>
-                      <option value="silver age">Silver Age (1956-1970)</option>
-                      <option value="bronze age">Bronze Age (1970-1985)</option>
-                      <option value="copper age">Copper Age (1985-1991)</option>
-                      <option value="modern age">Modern Age (1991+)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Writer</label>
-                    <input type="text" value={addForm.writer} onChange={e => setAddForm(f => ({ ...f, writer: e.target.value }))} placeholder="Stan Lee" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Cover Artist</label>
-                    <input type="text" value={addForm.cover_artist} onChange={e => setAddForm(f => ({ ...f, cover_artist: e.target.value }))} placeholder="John Romita" className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                    <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>{addForm.collectible_type === 'comic' ? 'Cover Artist' : 'Artist / Variant'}</label>
+                    <input type="text" value={addForm.cover_artist} onChange={e => setAddForm(f => ({ ...f, cover_artist: e.target.value }))} placeholder={addForm.collectible_type === 'comic' ? 'John Romita' : 'Artist'} className="w-full px-3 py-2 rounded-lg text-sm" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>Buy Price ($)</label>
@@ -1590,7 +1643,7 @@ export default function GradingPage() {
                   <div className="flex items-end gap-2">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input type="checkbox" checked={addForm.key_issue} onChange={e => setAddForm(f => ({ ...f, key_issue: e.target.checked }))} className="w-4 h-4 rounded" />
-                      <span className="text-xs font-semibold" style={{ color: 'var(--ept-text-muted)' }}>Key Issue</span>
+                      <span className="text-xs font-semibold" style={{ color: 'var(--ept-text-muted)' }}>{addForm.collectible_type === 'comic' ? 'Key Issue' : 'Key / Rare'}</span>
                     </label>
                   </div>
                 </div>
@@ -1603,24 +1656,21 @@ export default function GradingPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredComics.map(c => (
-                <div key={c.id} onClick={() => setComicDetailModal(c)} onContextMenu={e => { e.preventDefault(); setSelectedComic(selectedComic?.id === c.id ? null : c); }} className="rounded-xl overflow-hidden cursor-pointer card-hover transition-all" style={{ backgroundColor: 'var(--ept-card-bg)', border: selectedComic?.id === c.id ? '2px solid var(--ept-accent)' : '1px solid var(--ept-card-border)' }}>
+                <div key={c.id} onClick={() => setComicDetailModal(c)} onContextMenu={e => { e.preventDefault(); setSelectedComic(selectedComic?.id === c.id ? null : c); }} onMouseEnter={() => setHoveredComic(c.id)} onMouseLeave={() => setHoveredComic(null)} className="relative rounded-xl overflow-hidden cursor-pointer card-hover transition-all" style={{ backgroundColor: 'var(--ept-card-bg)', border: selectedComic?.id === c.id ? '2px solid var(--ept-accent)' : '1px solid var(--ept-card-border)' }}>
                   {c.image_url && (
                     <div className="relative w-full" style={{ aspectRatio: '2/3', maxHeight: 220, overflow: 'hidden', backgroundColor: 'var(--ept-surface)' }}>
-                      <img
-                        src={c.image_url}
-                        alt={`${c.title} ${c.issue}`}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                      />
+                      <img src={c.image_url} alt={`${c.title} ${c.issue}`} className="w-full h-full object-cover" loading="lazy" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     </div>
                   )}
                   <div className="p-5">
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="font-bold">{c.title} {c.issue}</p>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm">{getCollectibleIcon(c.collectible_type || 'comic')}</span>
+                        <p className="font-bold">{c.title} {c.issue}</p>
+                      </div>
                       <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{c.publisher} &middot; {c.year}{c.era ? ` \u00B7 ${c.era}` : ''}</p>
-                      {c.key_issue && <span className="inline-block mt-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase" style={{ backgroundColor: 'rgba(234,179,8,0.15)', color: '#eab308' }}>Key Issue</span>}
+                      {c.key_issue && <span className="inline-block mt-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase" style={{ backgroundColor: 'rgba(234,179,8,0.15)', color: '#eab308' }}>Key{c.collectible_type === 'comic' ? ' Issue' : ' / Rare'}</span>}
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase" style={{ backgroundColor: c.status === 'graded' ? 'rgba(34,197,94,0.1)' : c.status === 'ungraded' ? 'var(--ept-surface)' : 'rgba(245,158,11,0.1)', color: c.status === 'graded' ? '#22c55e' : c.status === 'ungraded' ? 'var(--ept-text-muted)' : '#f59e0b' }}>
@@ -1654,6 +1704,52 @@ export default function GradingPage() {
                     </div>
                   )}
                   </div>
+                  {/* Hover Tooltip — Full Analytics */}
+                  {hoveredComic === c.id && c.grade !== null && (
+                    <div className="absolute left-0 right-0 bottom-full mb-2 z-40 pointer-events-none animate-fade-up" style={{ filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.5))' }}>
+                      <div className="mx-2 rounded-xl p-4 space-y-2" style={{ backgroundColor: 'var(--ept-bg)', border: '1px solid var(--ept-accent)' }}>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold" style={{ color: 'var(--ept-accent)' }}>{getCollectibleLabel(c.collectible_type || 'comic')}</span>
+                          <span className="text-xs font-mono" style={{ color: getGradeColor(c.grade!) }}>{c.grade} {getGradeLabel(c.grade!)}</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+                          {c.year && <div><span style={{ color: 'var(--ept-text-muted)' }}>Year:</span> <span className="font-semibold">{c.year}</span></div>}
+                          {c.era && <div><span style={{ color: 'var(--ept-text-muted)' }}>Era:</span> <span className="font-semibold capitalize">{c.era}</span></div>}
+                          {c.writer && <div><span style={{ color: 'var(--ept-text-muted)' }}>{c.collectible_type === 'comic' ? 'Writer' : 'Creator'}:</span> <span className="font-semibold">{c.writer}</span></div>}
+                          {c.cover_artist && <div><span style={{ color: 'var(--ept-text-muted)' }}>{c.collectible_type === 'comic' ? 'Artist' : 'Variant'}:</span> <span className="font-semibold">{c.cover_artist}</span></div>}
+                          {c.key_issue && c.key_issue_reason && <div className="col-span-2"><span style={{ color: '#eab308' }}>Key:</span> <span className="font-semibold">{c.key_issue_reason}</span></div>}
+                          {c.characters && c.characters.length > 0 && <div className="col-span-2"><span style={{ color: 'var(--ept-text-muted)' }}>Characters:</span> <span className="font-semibold">{c.characters.slice(0, 5).join(', ')}</span></div>}
+                          {c.estimated_value && <div><span style={{ color: 'var(--ept-text-muted)' }}>Value:</span> <span className="font-bold gradient-text">{formatCurrency(c.estimated_value)}</span></div>}
+                          {c.buy_price && <div><span style={{ color: 'var(--ept-text-muted)' }}>Paid:</span> <span className="font-semibold">{formatCurrency(c.buy_price)}</span></div>}
+                          {c.consensus_confidence && <div><span style={{ color: 'var(--ept-text-muted)' }}>Confidence:</span> <span className="font-semibold">{c.consensus_confidence}%</span></div>}
+                          {c.buy_source && <div><span style={{ color: 'var(--ept-text-muted)' }}>Source:</span> <span className="font-semibold">{c.buy_source}</span></div>}
+                        </div>
+                        {/* Vision model grades if available */}
+                        {c.vision_grades && Object.keys(c.vision_grades).length > 0 && (
+                          <div className="pt-1" style={{ borderTop: '1px solid var(--ept-border)' }}>
+                            <p className="text-[9px] font-bold uppercase mb-1" style={{ color: 'var(--ept-text-muted)' }}>Model Grades</p>
+                            <div className="flex gap-2 flex-wrap">
+                              {Object.entries(c.vision_grades).map(([model, grade]) => {
+                                const vm = VISION_MODELS.find(v => v.model === model);
+                                return <span key={model} className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: 'var(--ept-surface)', color: vm?.color || 'var(--ept-text)' }}>{vm?.label?.split(' ').pop() || model.split('/').pop()}: {(grade as number).toFixed(1)}</span>;
+                              })}
+                            </div>
+                          </div>
+                        )}
+                        {/* Trinity decision if available */}
+                        {c.trinity_decision && (
+                          <div className="flex gap-3 text-[9px] font-mono pt-1" style={{ borderTop: '1px solid var(--ept-border)' }}>
+                            <span style={{ color: '#8b5cf6' }}>SAGE: {(c.trinity_decision as TrinityDecision).sage.grade.toFixed(1)}</span>
+                            <span style={{ color: '#ec4899' }}>NYX: {(c.trinity_decision as TrinityDecision).nyx.grade.toFixed(1)}</span>
+                            <span style={{ color: '#f59e0b' }}>THORNE: {(c.trinity_decision as TrinityDecision).thorne.grade.toFixed(1)}</span>
+                          </div>
+                        )}
+                        {c.research_notes && (
+                          <p className="text-[9px] leading-tight pt-1 line-clamp-3" style={{ color: 'var(--ept-text-muted)', borderTop: '1px solid var(--ept-border)' }}>{c.research_notes.slice(0, 200)}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -1986,7 +2082,7 @@ export default function GradingPage() {
                 {comics.filter(c => c.status === 'ungraded' || c.status === 'pending_review').map(c => (
                   <div key={c.id} className="px-5 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl" style={{ backgroundColor: 'var(--ept-surface)' }}>📚</div>
+                      <div className="w-12 h-12 rounded-lg flex items-center justify-center text-xl" style={{ backgroundColor: 'var(--ept-surface)' }}>{getCollectibleIcon(c.collectible_type || 'comic')}</div>
                       <div>
                         <p className="font-semibold">{c.title} {c.issue}</p>
                         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{c.publisher} &middot; {c.year}</p>
@@ -2103,8 +2199,8 @@ export default function GradingPage() {
             {/* Summary Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'Total Comics', value: String(stats.total), sub: `${stats.graded} graded` },
-                { label: 'Total Value', value: formatCurrency(stats.totalValue), sub: `avg ${stats.total ? formatCurrency(Math.round(stats.totalValue / stats.total)) : '$0'}/comic` },
+                { label: 'Total Items', value: String(stats.total), sub: `${stats.graded} graded` },
+                { label: 'Total Value', value: formatCurrency(stats.totalValue), sub: `avg ${stats.total ? formatCurrency(Math.round(stats.totalValue / stats.total)) : '$0'}/item` },
                 { label: 'Grade Range', value: `${stats.lowestGrade.toFixed(1)}-${stats.highestGrade.toFixed(1)}`, sub: `avg ${stats.avgGrade.toFixed(1)} (${getGradeLabel(stats.avgGrade)})` },
                 { label: 'Publishers', value: String(stats.publisherCount), sub: `${Object.keys(stats.eras).length} eras` },
               ].map(s => (
@@ -2303,8 +2399,12 @@ export default function GradingPage() {
               {/* Header */}
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-2xl font-extrabold">{comicDetailModal.title} {comicDetailModal.issue}</h2>
-                  <p className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>{comicDetailModal.publisher} &middot; {comicDetailModal.year}{comicDetailModal.era ? ` \u00B7 ${comicDetailModal.era}` : ''}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{getCollectibleIcon(comicDetailModal.collectible_type || 'comic')}</span>
+                    <h2 className="text-2xl font-extrabold">{comicDetailModal.title} {comicDetailModal.issue}</h2>
+                  </div>
+                  <p className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>{getCollectibleLabel(comicDetailModal.collectible_type || 'comic')} &middot; {comicDetailModal.publisher} &middot; {comicDetailModal.year}{comicDetailModal.era ? ` \u00B7 ${comicDetailModal.era}` : ''}</p>
+                  {comicDetailModal.writer && <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{comicDetailModal.collectible_type === 'comic' ? 'Writer' : 'Creator'}: {comicDetailModal.writer}{comicDetailModal.cover_artist ? ` | ${comicDetailModal.collectible_type === 'comic' ? 'Artist' : 'Variant'}: ${comicDetailModal.cover_artist}` : ''}</p>}
                 </div>
                 <div className="flex items-center gap-3">
                   <button onClick={() => gradeWithFullPipeline(comicDetailModal)} disabled={isGrading} className="px-4 py-2 rounded-lg text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>{isGrading ? 'Re-grading...' : 'Re-grade'}</button>
