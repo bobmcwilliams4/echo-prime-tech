@@ -105,6 +105,14 @@ const CAPABILITIES = [
     statLabel: 'Always Closing',
     icon: '⬣',
   },
+  {
+    title: 'AI Collectibles Grading',
+    description: 'EPOCGS v3.0 — the most thorough AI grading pipeline in existence. Camera capture with auto border detection, 5-model vision ensemble, 50-agent research swarm, 4 doctrine engines (USPAP valuation, IP analysis, market data, historical context), adversarial debate hybrid, Trinity Council final grade, and Bree roast commentary with voice. Comics Price Guide API integrated.',
+    stat: '25+',
+    statLabel: 'LLMs Per Grade',
+    icon: '⬡',
+    link: '/grading',
+  },
 ];
 
 const FALLBACK_INDUSTRIES = [
@@ -229,23 +237,29 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {CAPABILITIES.map((cap, i) => (
-              <div
-                key={i}
-                className={`card-hover p-8 rounded-2xl border transition-all duration-700 ${capSection.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-                style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)', transitionDelay: `${i * 100}ms` }}
-              >
-                <div className="text-3xl mb-5 w-14 h-14 rounded-xl flex items-center justify-center font-light" style={{ backgroundColor: 'var(--ept-accent-glow)', color: 'var(--ept-accent)' }}>
-                  {cap.icon}
-                </div>
-                <h3 className="text-lg font-bold mb-3" style={{ color: 'var(--ept-text)' }}>{cap.title}</h3>
-                <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--ept-text-muted)' }}>{cap.description}</p>
-                <div className="flex items-baseline gap-2 pt-4 border-t" style={{ borderColor: 'var(--ept-border)' }}>
-                  <span className="text-2xl font-extrabold font-mono gradient-text">{'statKey' in cap ? live[cap.statKey as keyof LiveStats] as string : cap.stat}</span>
-                  <span className="text-xs uppercase tracking-wider font-medium" style={{ color: 'var(--ept-text-muted)' }}>{cap.statLabel}</span>
-                </div>
-              </div>
-            ))}
+            {CAPABILITIES.map((cap, i) => {
+              const inner = (
+                <>
+                  <div className="text-3xl mb-5 w-14 h-14 rounded-xl flex items-center justify-center font-light" style={{ backgroundColor: 'var(--ept-accent-glow)', color: 'var(--ept-accent)' }}>
+                    {cap.icon}
+                  </div>
+                  <h3 className="text-lg font-bold mb-3" style={{ color: 'var(--ept-text)' }}>{cap.title}</h3>
+                  <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--ept-text-muted)' }}>{cap.description}</p>
+                  <div className="flex items-baseline gap-2 pt-4 border-t" style={{ borderColor: 'var(--ept-border)' }}>
+                    <span className="text-2xl font-extrabold font-mono gradient-text">{'statKey' in cap ? live[cap.statKey as keyof LiveStats] as string : cap.stat}</span>
+                    <span className="text-xs uppercase tracking-wider font-medium" style={{ color: 'var(--ept-text-muted)' }}>{cap.statLabel}</span>
+                  </div>
+                  {'link' in cap && <div className="mt-3 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-accent)' }}>Try it live →</div>}
+                </>
+              );
+              const cls = `card-hover p-8 rounded-2xl border transition-all duration-700 block ${capSection.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`;
+              const sty = { backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)', transitionDelay: `${i * 100}ms` };
+              return 'link' in cap ? (
+                <Link key={i} href={(cap as any).link} className={cls} style={sty}>{inner}</Link>
+              ) : (
+                <div key={i} className={cls} style={sty}>{inner}</div>
+              );
+            })}
           </div>
         </div>
       </section>
