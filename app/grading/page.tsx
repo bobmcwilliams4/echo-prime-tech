@@ -135,7 +135,7 @@ async function storeGradeToMemory(comic: Comic, results: TrinityGradeResult[], c
         tags: ['grading', 'comic', comic.publisher.toLowerCase(), `grade_${consensusGrade}`],
         strength: 2.0 + (consensusConfidence / 100),
         summary: `${comic.title} ${comic.issue} graded CGC ${consensusGrade}`,
-        metadata: JSON.stringify({
+        metadata: {
           comic_title: comic.title,
           comic_issue: comic.issue,
           publisher: comic.publisher,
@@ -144,7 +144,7 @@ async function storeGradeToMemory(comic: Comic, results: TrinityGradeResult[], c
           confidence: consensusConfidence,
           trinity: results.map(r => ({ voice: r.voice, grade: r.grade, confidence: r.confidence, model: r.model_used })),
           graded_at: new Date().toISOString(),
-        }),
+        },
       }),
     });
   } catch { /* best effort */ }
@@ -362,7 +362,7 @@ export default function GradingPage() {
     if (cached && cached.grade) {
       setGradingStep('Found cached grade in Memory Cortex');
       setGradingProgress(100);
-      setComics(prev => prev.map(c => c.id === comic.id ? { ...c, grade: cached.grade, estimated_value: cached.value || Math.round(Math.random() * 50000 + 500), status: 'graded' as const, defects: cached.defects || [], consensus_confidence: cached.confidence || 85, graded_at: cached.graded_at || new Date().toISOString() } : c));
+      setComics(prev => prev.map(c => c.id === comic.id ? { ...c, grade: cached.grade, estimated_value: Math.round(Math.random() * 50000 + 500), status: 'graded' as const, defects: cached.defects || [], consensus_confidence: cached.confidence || 85, graded_at: cached.graded_at || new Date().toISOString() } : c));
       setTimeout(() => { setIsGrading(false); setGradingProgress(0); setGradingStep(''); }, 1500);
       return;
     }
