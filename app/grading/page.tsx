@@ -41,6 +41,7 @@ const AI_PROVIDERS = [
 
 const SWARM_BRAIN_URL = 'https://echo-swarm-brain.bmcii1976.workers.dev';
 const ENGINE_RUNTIME_URL = 'https://echo-engine-runtime.bmcii1976.workers.dev';
+const MEMORY_CORTEX_URL = 'https://echo-memory-cortex.bmcii1976.workers.dev';
 
 interface TrinityGradeResult {
   voice: string;
@@ -94,14 +95,14 @@ ANALYSIS: [2-3 sentence expert analysis]`;
     const gradeMatch = text.match(/GRADE:\s*([\d.]+)/i);
     const defectsMatch = text.match(/DEFECTS:\s*(.+?)(?:\n|$)/i);
     const confidenceMatch = text.match(/CONFIDENCE:\s*(\d+)/i);
-    const analysisMatch = text.match(/ANALYSIS:\s*(.+?)$/is);
+    const analysisMatch = text.match(/ANALYSIS:\s*(.+?)$/im);
 
     return {
       voice,
       grade: gradeMatch ? parseFloat(gradeMatch[1]) : null,
       analysis: analysisMatch ? analysisMatch[1].trim() : text.slice(0, 300),
       confidence: confidenceMatch ? parseInt(confidenceMatch[1]) : 70,
-      defects: defectsMatch ? defectsMatch[1].split(',').map(d => d.trim().toLowerCase().replace(/\s+/g, '_')).filter(Boolean) : [],
+      defects: defectsMatch ? defectsMatch[1].split(',').map((d: string) => d.trim().toLowerCase().replace(/\s+/g, '_')).filter(Boolean) : [],
       model_used: data.consultation?.model_used || voice,
       tokens_used: data.consultation?.tokens_used || 0,
     };
@@ -121,29 +122,55 @@ async function queryEngineRuntime(comic: Comic): Promise<EngineDoctrineResult[]>
 }
 
 async function storeGradeToMemory(comic: Comic, results: TrinityGradeResult[], consensusGrade: number, consensusConfidence: number) {
+  const trinityDetail = results.map(r => `${r.voice}=${r.grade ?? '?'} (${r.confidence}% via ${r.model_used})`).join(', ');
+  const content = `GRADE: ${comic.title} ${comic.issue} (${comic.publisher} ${comic.year}) — CGC ${consensusGrade} (${getGradeLabel(consensusGrade)}). Confidence: ${consensusConfidence}%. Trinity: ${trinityDetail}. Value: est. market. Defects: ${results.flatMap(r => r.defects).filter((d, i, a) => a.indexOf(d) === i).join(', ') || 'none'}.`;
   try {
-    await fetch(`${SWARM_BRAIN_URL}/memory/store`, {
+    await fetch(`${MEMORY_CORTEX_URL}/store`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        key: `grade_${comic.title.replace(/\s+/g, '_')}_${comic.issue.replace('#', '')}`,
-        value: {
-          comic: `${comic.title} ${comic.issue}`,
+        content,
+        memory_type: 'semantic',
+        source: 'collectibles_grading',
+        tags: ['grading', 'comic', comic.publisher.toLowerCase(), `grade_${consensusGrade}`],
+        strength: 2.0 + (consensusConfidence / 100),
+        summary: `${comic.title} ${comic.issue} graded CGC ${consensusGrade}`,
+        metadata: JSON.stringify({
+          comic_title: comic.title,
+          comic_issue: comic.issue,
+          publisher: comic.publisher,
+          year: comic.year,
           grade: consensusGrade,
           confidence: consensusConfidence,
-          trinity_results: results.map(r => ({ voice: r.voice, grade: r.grade, confidence: r.confidence, model: r.model_used })),
+          trinity: results.map(r => ({ voice: r.voice, grade: r.grade, confidence: r.confidence, model: r.model_used })),
           graded_at: new Date().toISOString(),
-        },
+        }),
       }),
     });
   } catch { /* best effort */ }
 }
 
-async function recallGradeFromMemory(comic: Comic) {
+async function recallGradeFromMemory(comic: Comic): Promise<{ grade: number; confidence: number; defects: string[]; graded_at: string } | null> {
   try {
-    const res = await fetch(`${SWARM_BRAIN_URL}/memory/recall/grade_${comic.title.replace(/\s+/g, '_')}_${comic.issue.replace('#', '')}`);
+    const res = await fetch(`${MEMORY_CORTEX_URL}/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `${comic.title} ${comic.issue} grade`,
+        memory_type: 'semantic',
+        limit: 1,
+        min_strength: 1.0,
+      }),
+    });
     const data = await res.json();
-    return data.ok ? data.value : null;
+    const results = data.results || [];
+    if (results.length === 0) return null;
+    const mem = results[0];
+    const meta = typeof mem.metadata === 'string' ? JSON.parse(mem.metadata) : mem.metadata;
+    if (meta?.grade && meta?.comic_title === comic.title && meta?.comic_issue === comic.issue) {
+      return { grade: meta.grade, confidence: meta.confidence || 80, defects: [], graded_at: meta.graded_at || mem.created_at };
+    }
+    return null;
   } catch { return null; }
 }
 
@@ -284,10 +311,16 @@ export default function GradingPage() {
   const [trinityResults, setTrinityResults] = useState<TrinityGradeResult[]>([]);
   const [doctrineResults, setDoctrineResults] = useState<EngineDoctrineResult[]>([]);
   const [swarmStatus, setSwarmStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [cortexStatus, setCortexStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [cortexStats, setCortexStats] = useState<{ total_memories: number; recent_24h: number } | null>(null);
 
-  // Check Swarm Brain connection on mount
+  // Check Swarm Brain + Memory Cortex connection on mount
   useEffect(() => {
     fetch(`${SWARM_BRAIN_URL}/health`).then(r => r.json()).then(d => setSwarmStatus(d.ok ? 'online' : 'offline')).catch(() => setSwarmStatus('offline'));
+    fetch(`${MEMORY_CORTEX_URL}/status`).then(r => r.json()).then(d => {
+      setCortexStatus(d.status === 'operational' ? 'online' : 'offline');
+      setCortexStats({ total_memories: d.database?.total_memories || 0, recent_24h: d.database?.recent_24h || 0 });
+    }).catch(() => setCortexStatus('offline'));
   }, []);
 
   useEffect(() => {
@@ -323,11 +356,11 @@ export default function GradingPage() {
     setDoctrineResults([]);
 
     // Step 1: Check memory cache
-    setGradingStep('Checking Swarm Brain memory cache...');
+    setGradingStep('Checking Memory Cortex for cached grade...');
     setGradingProgress(5);
     const cached = await recallGradeFromMemory(comic);
     if (cached && cached.grade) {
-      setGradingStep('Found cached grade in Swarm Brain memory');
+      setGradingStep('Found cached grade in Memory Cortex');
       setGradingProgress(100);
       setComics(prev => prev.map(c => c.id === comic.id ? { ...c, grade: cached.grade, estimated_value: cached.value || Math.round(Math.random() * 50000 + 500), status: 'graded' as const, defects: cached.defects || [], consensus_confidence: cached.confidence || 85, graded_at: cached.graded_at || new Date().toISOString() } : c));
       setTimeout(() => { setIsGrading(false); setGradingProgress(0); setGradingStep(''); }, 1500);
@@ -373,8 +406,8 @@ export default function GradingPage() {
       (1 + Math.random() * 0.3)
     );
 
-    // Step 8: Store to Swarm Brain memory
-    setGradingStep('Storing grade to Swarm Brain memory...');
+    // Step 8: Store to Memory Cortex (biological memory with decay + strength)
+    setGradingStep('Storing grade to Memory Cortex (strength 2.0+, semantic)...');
     setGradingProgress(96);
     await storeGradeToMemory(comic, allResults, consensus.grade, consensus.confidence);
 
@@ -437,18 +470,24 @@ export default function GradingPage() {
               <p className="text-sm mt-1" style={{ color: 'var(--ept-text-muted)' }}>Powered by Echo Swarm Brain Trinity &mdash; SAGE + NYX + THORNE</p>
             </div>
 
-            {/* Swarm Brain Connection */}
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
+            {/* System Connection Status */}
+            <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 rounded-xl" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
               <div className="flex items-center gap-2">
                 <div className={`w-2.5 h-2.5 rounded-full ${swarmStatus === 'online' ? 'bg-emerald-500 animate-pulse' : swarmStatus === 'offline' ? 'bg-red-500' : 'bg-yellow-500 animate-pulse'}`} />
                 <span className="text-xs font-bold" style={{ color: swarmStatus === 'online' ? '#22c55e' : swarmStatus === 'offline' ? '#ef4444' : '#f59e0b' }}>
-                  Swarm Brain {swarmStatus === 'online' ? 'ONLINE' : swarmStatus === 'offline' ? 'OFFLINE' : 'CHECKING'}
+                  Swarm Brain {swarmStatus === 'online' ? 'ONLINE' : swarmStatus === 'offline' ? 'OFFLINE' : '...'}
                 </span>
               </div>
               <div className="h-4 w-px" style={{ backgroundColor: 'var(--ept-border)' }} />
-              <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>362 LLM Models &middot; 8 Memory Pillars &middot; Trinity Consensus</span>
+              <div className="flex items-center gap-2">
+                <div className={`w-2.5 h-2.5 rounded-full ${cortexStatus === 'online' ? 'bg-emerald-500 animate-pulse' : cortexStatus === 'offline' ? 'bg-red-500' : 'bg-yellow-500 animate-pulse'}`} />
+                <span className="text-xs font-bold" style={{ color: cortexStatus === 'online' ? '#22c55e' : cortexStatus === 'offline' ? '#ef4444' : '#f59e0b' }}>
+                  Memory Cortex {cortexStatus === 'online' ? 'ONLINE' : cortexStatus === 'offline' ? 'OFFLINE' : '...'}
+                </span>
+                {cortexStats && <span className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>({cortexStats.total_memories} memories)</span>}
+              </div>
               <div className="h-4 w-px" style={{ backgroundColor: 'var(--ept-border)' }} />
-              <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Engine Runtime: PRB02 (Collectibles Valuation), FIN01 (Fair Value)</span>
+              <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Trinity AI &middot; Engine Runtime &middot; FTS5 Search &middot; 90-day Decay</span>
             </div>
 
             {/* Hero Stats */}
@@ -896,12 +935,23 @@ export default function GradingPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold">Swarm Brain Status</span>
-                  <span className="text-xs font-bold" style={{ color: swarmStatus === 'online' ? '#22c55e' : '#ef4444' }}>{swarmStatus === 'online' ? 'CONNECTED' : 'DISCONNECTED'}</span>
+              <div className="mt-4 space-y-2">
+                <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold">Swarm Brain (Trinity AI)</span>
+                    <span className="text-xs font-bold" style={{ color: swarmStatus === 'online' ? '#22c55e' : '#ef4444' }}>{swarmStatus === 'online' ? 'CONNECTED' : 'DISCONNECTED'}</span>
+                  </div>
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--ept-text-muted)' }}>echo-swarm-brain.bmcii1976.workers.dev &middot; 362 models &middot; Trinity consensus grading</p>
                 </div>
-                <p className="text-[10px] mt-1" style={{ color: 'var(--ept-text-muted)' }}>echo-swarm-brain.bmcii1976.workers.dev &middot; 362 models &middot; 8 memory pillars</p>
+                <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold">Memory Cortex (Biological Memory)</span>
+                    <span className="text-xs font-bold" style={{ color: cortexStatus === 'online' ? '#22c55e' : '#ef4444' }}>{cortexStatus === 'online' ? 'CONNECTED' : 'DISCONNECTED'}</span>
+                  </div>
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--ept-text-muted)' }}>
+                    echo-memory-cortex.bmcii1976.workers.dev &middot; D1+FTS5 &middot; 90-day decay &middot; {cortexStats?.total_memories ?? '?'} memories
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -934,7 +984,7 @@ export default function GradingPage() {
                   { label: 'AI Backend', value: 'Echo Swarm Brain v3.1 (Trinity: SAGE + NYX + THORNE)' },
                   { label: 'Models', value: 'Claude Opus 4.6, Grok 4, GPT-4o / o1' },
                   { label: 'Engine Runtime', value: '674 engines, 30K doctrines (PRB02, FIN01, ENT03)' },
-                  { label: 'Memory', value: '8-pillar Swarm Brain (short/long/episodic/semantic/procedural/emotional/crystal/quantum)' },
+                  { label: 'Memory', value: 'Memory Cortex (D1+FTS5, 90-day decay, auto-classification, strength-based recall)' },
                   { label: 'Pricing Sources', value: 'GoCollect, Heritage Auctions, eBay' },
                   { label: 'Platform', value: 'Echo Prime Technologies' },
                 ].map(r => (
