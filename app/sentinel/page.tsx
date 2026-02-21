@@ -32,6 +32,7 @@ import {
   isCommander,
   loadCortexStats,
   detectEmotion,
+  buildPersonalityDirective,
   PERSONALITY_PROFILES,
   PERSONALITY_VOICE_MAP,
   type TrinityDecision,
@@ -187,13 +188,13 @@ export default function SentinelPage() {
     }
   }, [user]);
 
-  // ── Voice playback via cloud TTS ──
-  const playVoice = useCallback(async (text: string, _voice: string) => {
+  // ── Voice playback via Echo Speak (tts.echo-op.com) ──
+  const playVoice = useCallback(async (text: string, voice: string) => {
     try {
       const res = await fetch('https://tts.echo-op.com/tts/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text.slice(0, 2000), voice_id: 'default', output_format: 'mp3' }),
+        body: JSON.stringify({ text: text.slice(0, 2000), voice_id: voice || 'default', output_format: 'mp3' }),
       });
       if (!res.ok) return;
       const blob = await res.blob();
@@ -258,7 +259,10 @@ export default function SentinelPage() {
         // Store swarm response to memory
         brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA [SWARM]: ${responseContent.slice(0, 500)}`, 6, ['sentinel', 'swarm', 'trinity']).catch(() => {});
       } else if (sentinelMode === 'echo_prime') {
-        // ── Echo Prime Mode: Personality + Memory ──
+        // ── Echo Prime Mode: Personality + Memory + Echo Talk Directive ──
+        // Build personality directive from Echo Talk engine
+        const personalityDirective = buildPersonalityDirective(activeProfile, emotion);
+
         // Inject memory context
         let memoryContext = '';
         try {
@@ -267,11 +271,14 @@ export default function SentinelPage() {
           if (cortexStats) setCortexStats({ ...cortexStats, contextInjected: true });
         } catch { /* proceed without memory */ }
 
-        // Use standard engine but tag the response with personality
-        const result = await queryEngine(
-          memoryContext ? `[CONTEXT: ${memoryContext.slice(0, 500)}]\n\n${text}` : text,
-          analysisMode
-        );
+        // Compose full query: personality + memory + user question
+        const fullQuery = [
+          personalityDirective,
+          memoryContext ? `[MEMORY CONTEXT: ${memoryContext.slice(0, 500)}]` : '',
+          text,
+        ].filter(Boolean).join('\n\n');
+
+        const result = await queryEngine(fullQuery, analysisMode);
 
         assistantMsg = {
           id: `a_${Date.now()}`, role: 'assistant', timestamp: Date.now(),

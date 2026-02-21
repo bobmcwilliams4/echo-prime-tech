@@ -320,6 +320,37 @@ export async function swarmHealth(): Promise<SwarmHealthResponse> {
   return fetchJson(`${SWARM_BRAIN_URL}/health`);
 }
 
+// ── Personality Directive Builder (Echo Talk Engine) ──
+
+export function buildPersonalityDirective(profile: PersonalityProfile, emotion?: DetectedEmotion): string {
+  const cognitive = [
+    profile.forwardThinking > 0.7 ? 'Forward Thinking: anticipate consequences, project outcomes.' : '',
+    profile.criticalThinking > 0.7 ? 'Critical Thinking: challenge assumptions, identify flaws.' : '',
+    profile.proactiveThinking > 0.7 ? 'Proactive Thinking: suggest next steps before asked.' : '',
+    profile.foresight > 0.7 ? 'Foresight: warn about downstream risks and second-order effects.' : '',
+    profile.creativityLevel > 0.7 ? 'Creative Thinking: lateral connections, unexpected analogies.' : '',
+    profile.empathyLevel > 0.7 ? 'Empathy: acknowledge feelings, validate before advising.' : '',
+  ].filter(Boolean).join(' ');
+
+  const emotionDirective = emotion && emotion.dominant !== 'neutral'
+    ? `\nUser emotion detected: ${emotion.dominant} (intensity: ${emotion.intensity.toFixed(1)}). ${
+        emotion.dominant === 'frustration' ? 'Acknowledge the difficulty, then solve.' :
+        emotion.dominant === 'fear' ? 'Reassure with facts, then address.' :
+        emotion.dominant === 'joy' ? 'Match their energy, build on it.' :
+        emotion.dominant === 'sadness' ? 'Be gentle, empathize first.' :
+        emotion.dominant === 'anger' ? 'Stay calm, validate the frustration, then redirect.' :
+        emotion.dominant === 'curiosity' ? 'Feed the curiosity, go deeper.' :
+        'Respond appropriately.'
+      }`
+    : '';
+
+  return `[PERSONALITY: ${profile.name} | Tone: ${profile.tone}]
+[Speaking Style: ${profile.speakingStyle}]
+[Traits: ${profile.traits.join(', ')}]
+[Cognitive Directives: ${cognitive}]${emotionDirective}
+[VARIATION PROTOCOL: Never repeat openers. Rotate transition words. Write for voice — no markdown, no bullet lists, no headers. Natural flowing speech.]`;
+}
+
 // ── Commander Detection ──
 
 const COMMANDER_EMAILS = ['bmcii1976@gmail.com', 'bob@echo-op.com', 'bobmcwilliams4@outlook.com'];
