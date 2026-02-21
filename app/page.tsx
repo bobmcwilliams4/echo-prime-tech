@@ -147,6 +147,7 @@ export default function HomePage() {
             {['Capabilities', 'Approach', 'Industries', 'Contact'].map(s => (
               <a key={s} href={`#${s.toLowerCase()}`} className="text-sm font-medium transition-colors hover:opacity-100" style={{ color: 'var(--ept-text-secondary)' }}>{s}</a>
             ))}
+            <Link href="/sentinel" className="text-sm font-semibold transition-colors" style={{ color: 'var(--ept-accent)' }}>Sentinel AI</Link>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={toggle} className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors text-sm" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-secondary)' }}>
