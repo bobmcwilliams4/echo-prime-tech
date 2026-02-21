@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
-import { getServices, Service } from '../../lib/ept-api';
+import { getServices, Service, createCheckout } from '../../lib/ept-api';
 import ReadAloudButton from '../../components/ReadAloudButton';
 
 export default function PricingPage() {
@@ -13,12 +13,25 @@ export default function PricingPage() {
   const { isDark } = useTheme();
   const [services, setServices] = useState<Service[]>([]);
   const [activeService, setActiveService] = useState<string | null>(null);
+  const [checkingOut, setCheckingOut] = useState<string | null>(null);
 
   useEffect(() => {
     getServices().then(d => { setServices(d.services); if (d.services.length > 0) setActiveService(d.services[0].id); }).catch(() => {});
   }, []);
 
   const current = services.find(s => s.id === activeService);
+
+  const handleCheckout = async (serviceId: string, tier: { tier: string; price: number | null; custom?: boolean }) => {
+    if (!user) { window.location.href = '/signup'; return; }
+    if (tier.custom || tier.price === null) { window.location.href = `mailto:bob@echo-op.com?subject=Enterprise%20${encodeURIComponent(serviceId)}%20Inquiry`; return; }
+    setCheckingOut(`${serviceId}-${tier.tier}`);
+    try {
+      const { url } = await createCheckout(serviceId, tier.tier);
+      window.location.href = url;
+    } catch {
+      setCheckingOut(null);
+    }
+  };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
@@ -92,13 +105,13 @@ export default function PricingPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href={user ? '/services' : '/signup'} className="block text-center py-3 rounded-lg font-semibold text-sm transition-all" style={{
+                  <button onClick={() => handleCheckout(current.id, tier)} disabled={checkingOut === `${current.id}-${tier.tier}`} className="w-full text-center py-3 rounded-lg font-semibold text-sm transition-all disabled:opacity-60" style={{
                     backgroundColor: tier.popular ? 'var(--ept-accent)' : 'transparent',
                     color: tier.popular ? '#fff' : 'var(--ept-accent)',
                     border: tier.popular ? 'none' : '1px solid var(--ept-accent)',
                   }}>
-                    {tier.custom ? 'Contact Sales' : 'Get Started'}
-                  </Link>
+                    {checkingOut === `${current.id}-${tier.tier}` ? 'Redirecting...' : tier.custom ? 'Contact Sales' : 'Get Started'}
+                  </button>
                 </div>
               ))}
             </div>
