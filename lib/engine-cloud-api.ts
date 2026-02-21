@@ -14,11 +14,16 @@ const API_URL = 'https://echo-engine-cloud.bmcii1976.workers.dev';
 
 export interface QueryResponse {
   analysis: string;
+  summary: string;
   confidence: string;
   mode: string;
   sources_cited: number;
   timestamp: string;
   determinism_hash: string;
+  report_id: string;
+  report_available: boolean;
+  domain: string;
+  domain_cost: number;
   usage: {
     remaining: number;
     cost: number;
@@ -200,7 +205,7 @@ export async function getProfile(): Promise<ProfileResponse> {
 }
 
 export async function createCheckout(
-  tier: 'starter' | 'growth' | 'enterprise',
+  tier: 'professional' | 'business' | 'enterprise',
   successUrl?: string,
   cancelUrl?: string
 ): Promise<CheckoutResponse> {
@@ -215,6 +220,22 @@ export async function openCustomerPortal(returnUrl?: string): Promise<PortalResp
     method: 'POST',
     body: JSON.stringify({ return_url: returnUrl }),
   });
+}
+
+// ── Reports ──
+
+export async function downloadReport(reportId: string): Promise<string> {
+  const key = getStoredApiKey();
+  const headers: Record<string, string> = {};
+  if (key) headers['X-API-Key'] = key;
+
+  const res = await fetch(`${API_URL}/api/reports/${reportId}`, { headers });
+  if (!res.ok) throw new Error('Report not found');
+  return res.text();
+}
+
+export async function listReports(): Promise<{ reports: { report_id: string; created: string; domain: string }[]; count: number }> {
+  return fetchEngine('/api/reports');
 }
 
 // ── Utility ──

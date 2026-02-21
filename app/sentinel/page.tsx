@@ -11,6 +11,7 @@ import {
   getProfile,
   createCheckout,
   openCustomerPortal,
+  downloadReport,
   isAuthenticated,
   getStoredApiKey,
   getStoredUserId,
@@ -33,6 +34,10 @@ interface Message {
   remaining?: number;
   hash?: string;
   duration?: number;
+  reportId?: string;
+  reportAvailable?: boolean;
+  domain?: string;
+  domainCost?: number;
 }
 
 // ── Main Component ──
@@ -110,7 +115,7 @@ export default function SentinelPage() {
       setMessages([{
         id: 'welcome',
         role: 'system',
-        content: 'Sentinel Intelligence Engine online. 932 engines across 65 domains. 35,331 doctrine blocks loaded. All responses are encrypted, sanitized, and signed.\n\nAsk anything — tax law, contract analysis, cybersecurity, drilling operations, reverse engineering, financial compliance, and 59 more verticals.',
+        content: 'Sentinel Intelligence Engine online. 932 engines. 35,331 doctrine blocks. Zero hallucination.\n\nThis AI is court-defensible — every response grounded in pre-compiled doctrine blocks with deterministic hashing. Encrypted at rest. Audit-ready.\n\nAsk anything — tax law, contract analysis, cybersecurity, drilling operations, financial compliance, medical intelligence, forensic analysis, and 58 more verticals.\n\nFull analysis is delivered as encrypted downloadable reports. Chat shows the summary.',
         timestamp: Date.now(),
       }]);
     }
@@ -155,13 +160,17 @@ export default function SentinelPage() {
       const assistantMsg: Message = {
         id: `a_${Date.now()}`,
         role: 'assistant',
-        content: result.analysis,
+        content: result.summary || result.analysis,
         timestamp: Date.now(),
         confidence: result.confidence,
         sources: result.sources_cited,
         cost: result.usage.cost,
         remaining: result.usage.remaining,
         hash: result.determinism_hash,
+        reportId: result.report_id,
+        reportAvailable: result.report_available,
+        domain: result.domain,
+        domainCost: result.domain_cost,
       };
       setMessages(prev => [...prev, assistantMsg]);
 
@@ -179,7 +188,9 @@ export default function SentinelPage() {
         ? 'API key expired or invalid. Please re-register.'
         : err.message === 'rate_limit_exceeded'
           ? 'Monthly query limit reached. Upgrade your plan for more queries.'
-          : `Error: ${err.message}`;
+          : err.message.includes('domain_restricted')
+            ? 'This domain requires a paid plan. Upgrade to access all 932 engines.'
+            : `Error: ${err.message}`;
 
       setMessages(prev => [...prev, {
         id: `e_${Date.now()}`,
@@ -469,14 +480,64 @@ export default function SentinelPage() {
                         border: '1px solid #1e293b',
                       }}>
                         {msg.content}
+                        {msg.reportAvailable && msg.reportId && (
+                          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #1e293b' }}>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const report = await downloadReport(msg.reportId!);
+                                  const blob = new Blob([report], { type: 'text/markdown' });
+                                  const url = URL.createObjectURL(blob);
+                                  const a = document.createElement('a');
+                                  a.href = url;
+                                  a.download = `report-${msg.reportId}.md`;
+                                  a.click();
+                                  URL.revokeObjectURL(url);
+                                } catch {
+                                  alert('Report download failed. Please try again.');
+                                }
+                              }}
+                              style={{
+                                padding: '8px 16px',
+                                borderRadius: 8,
+                                border: '1px solid #6366f1',
+                                backgroundColor: '#6366f110',
+                                color: '#818cf8',
+                                cursor: 'pointer',
+                                fontSize: 12,
+                                fontWeight: 600,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 6,
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                              </svg>
+                              Download Full Report — {msg.reportId}
+                            </button>
+                          </div>
+                        )}
                       </div>
                       {/* Metadata bar */}
-                      <div style={{ display: 'flex', gap: 16, marginTop: 6, fontSize: 11, color: '#475569' }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 6, fontSize: 11, color: '#475569' }}>
+                        {msg.domain && msg.domain !== 'GENERAL' && msg.domain !== 'LLM_FALLBACK' && (
+                          <span style={{
+                            padding: '2px 8px',
+                            borderRadius: 4,
+                            backgroundColor: '#1e293b',
+                            color: '#94a3b8',
+                          }}>
+                            {msg.domain.replace(/_/g, ' ')}
+                          </span>
+                        )}
                         {msg.sources !== undefined && msg.sources > 0 && (
                           <span>{msg.sources} sources cited</span>
                         )}
-                        {msg.cost !== undefined && (
-                          <span>${msg.cost.toFixed(4)} cost</span>
+                        {msg.domainCost !== undefined && msg.domainCost > 0 && (
+                          <span>${msg.domainCost.toFixed(2)}/query</span>
                         )}
                         {msg.remaining !== undefined && (
                           <span>{msg.remaining} queries left</span>
@@ -588,7 +649,7 @@ export default function SentinelPage() {
             ) : (
               <div style={{ textAlign: 'center', padding: '20px 0' }}>
                 <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 12 }}>
-                  Get started with 50 free queries per month. No credit card required.
+                  Try 3 free queries. Court-defensible AI intelligence. No credit card required.
                 </p>
                 {user?.email ? (
                   <button
@@ -657,8 +718,11 @@ export default function SentinelPage() {
             <h2 style={{ fontSize: 24, fontWeight: 700, color: '#f1f5f9', marginBottom: 8 }}>
               {profile?.tier === 'free' ? 'Upgrade Your Plan' : 'Manage Your Plan'}
             </h2>
-            <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24 }}>
-              Access 932 intelligence engines across 65 domains. All plans include encrypted analysis, audit trails, and deterministic hashing.
+            <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 8 }}>
+              The only AI that cannot hallucinate. Doctrine-hardened. Court-defensible. Replaces $300–500/hour professionals.
+            </p>
+            <p style={{ fontSize: 12, color: '#64748b', marginBottom: 24 }}>
+              932 engines across 65 domains. 35,331 pre-compiled doctrine blocks. AES-256-GCM encrypted. Deterministic audit trails.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
               {pricingTiers.map(tier => {
@@ -733,7 +797,7 @@ export default function SentinelPage() {
                             setUpgrading(tierKey);
                             try {
                               const { checkout_url } = await createCheckout(
-                                tierKey as 'starter' | 'growth' | 'enterprise'
+                                tierKey as 'professional' | 'business' | 'enterprise'
                               );
                               window.location.href = checkout_url;
                             } catch (err: any) {
