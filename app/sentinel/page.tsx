@@ -234,16 +234,29 @@ export default function SentinelPage() {
       let assistantMsg: Message;
 
       if (sentinelMode === 'swarm') {
-        // ── Swarm Mode: Trinity Council ──
-        const decision = await trinityDecide(text);
+        // ── Swarm Mode: Trinity Council + Memory ──
+        let memoryContext = '';
+        try {
+          const ctx = await brainGetContext(SENTINEL_INSTANCE, text);
+          if (ctx.context_window) memoryContext = ctx.context_window;
+          if (cortexStats) setCortexStats({ ...cortexStats, contextInjected: true });
+        } catch { /* proceed without memory */ }
+
+        const queryWithContext = memoryContext ? `[MEMORY CONTEXT: ${memoryContext.slice(0, 500)}]\n\n${text}` : text;
+        const decision = await trinityDecide(queryWithContext);
+        const responseContent = decision.reasoning_synthesis || decision.consensus;
+
         assistantMsg = {
           id: `a_${Date.now()}`, role: 'assistant', timestamp: Date.now(),
-          content: decision.reasoning_synthesis || decision.consensus,
+          content: responseContent,
           mode: 'swarm',
           trinity: decision,
           emotion,
           voiceId,
         };
+
+        // Store swarm response to memory
+        brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA [SWARM]: ${responseContent.slice(0, 500)}`, 6, ['sentinel', 'swarm', 'trinity']).catch(() => {});
       } else if (sentinelMode === 'echo_prime') {
         // ── Echo Prime Mode: Personality + Memory ──
         // Inject memory context
@@ -281,8 +294,18 @@ export default function SentinelPage() {
         // Store to memory
         brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA: ${(result.summary || result.analysis).slice(0, 500)}`, 5, ['sentinel', 'query']).catch(() => {});
       } else {
-        // ── Standard Mode: Direct engine query ──
-        const result = await queryEngine(text, analysisMode);
+        // ── Standard Mode: Direct engine query + Memory ──
+        let memoryContext = '';
+        try {
+          const ctx = await brainGetContext(SENTINEL_INSTANCE, text);
+          if (ctx.context_window) memoryContext = ctx.context_window;
+          if (cortexStats) setCortexStats({ ...cortexStats, contextInjected: true });
+        } catch { /* proceed without memory */ }
+
+        const result = await queryEngine(
+          memoryContext ? `[CONTEXT: ${memoryContext.slice(0, 500)}]\n\n${text}` : text,
+          analysisMode
+        );
         assistantMsg = {
           id: `a_${Date.now()}`, role: 'assistant', timestamp: Date.now(),
           content: result.summary || result.analysis,
@@ -299,6 +322,9 @@ export default function SentinelPage() {
           emotion,
           voiceId,
         };
+
+        // Store to memory
+        brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA: ${(result.summary || result.analysis).slice(0, 500)}`, 5, ['sentinel', 'standard']).catch(() => {});
       }
 
       setMessages(prev => [...prev, assistantMsg]);
