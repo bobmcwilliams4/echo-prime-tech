@@ -67,8 +67,8 @@ interface Message {
   voiceId?: string;
 }
 
-// ── Sentinel Instance ID ──
-const SENTINEL_INSTANCE = 'sentinel_web_' + (typeof window !== 'undefined' ? Date.now().toString(36) : '0');
+// ── Sentinel Instance ID (stable to avoid hydration mismatch) ──
+const SENTINEL_INSTANCE = 'sentinel_web_ept';
 
 // ── Component ──
 
@@ -532,7 +532,7 @@ export default function SentinelPage() {
 
           {/* User info */}
           <div style={{ padding: '12px 16px', borderTop: '1px solid #1e293b', fontSize: 11, color: '#64748b' }}>
-            {user?.email || getStoredUserId()?.slice(0, 8) + '...'}
+            {user?.email || (apiKeyReady ? 'Authenticated' : 'Not signed in')}
           </div>
         </div>
       )}
