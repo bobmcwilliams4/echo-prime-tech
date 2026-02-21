@@ -482,10 +482,13 @@ export default function SentinelPage() {
                 {/* Memory Search */}
                 <div style={{ display: 'flex', gap: 4 }}>
                   <input
+                    id="memory-search"
+                    name="memory-search"
                     value={memorySearch}
                     onChange={e => setMemorySearch(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleMemorySearch()}
                     placeholder="Search memory..."
+                    autoComplete="off"
                     style={{ flex: 1, padding: '6px 8px', borderRadius: 6, border: '1px solid #334155', backgroundColor: '#0f1117', color: '#e2e8f0', fontSize: 11, outline: 'none' }}
                   />
                   <button onClick={handleMemorySearch} style={{ padding: '6px 10px', borderRadius: 6, border: 'none', backgroundColor: '#6366f1', color: '#fff', fontSize: 11, cursor: 'pointer' }}>
@@ -706,12 +709,15 @@ export default function SentinelPage() {
                 </button>
                 <textarea
                   ref={inputRef}
+                  id="sentinel-input"
+                  name="sentinel-input"
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={sentinelMode === 'swarm' ? 'Ask the Trinity Council...' : 'Ask anything — tax, legal, cybersecurity, engineering...'}
                   disabled={loading}
                   rows={1}
+                  autoComplete="off"
                   style={{ flex: 1, padding: '10px 14px', borderRadius: 12, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 14, outline: 'none', resize: 'none', lineHeight: 1.5, minHeight: 40, maxHeight: 200, fontFamily: 'inherit' }}
                   onInput={e => { const t = e.target as HTMLTextAreaElement; t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 200) + 'px'; }}
                 />
