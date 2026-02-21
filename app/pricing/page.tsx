@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { getServices, Service } from '../../lib/ept-api';
+import ReadAloudButton from '../../components/ReadAloudButton';
 
 export default function PricingPage() {
   const { user } = useAuth();
@@ -37,6 +38,10 @@ export default function PricingPage() {
           <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Pricing</div>
           <h1 className="text-3xl md:text-5xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Simple, transparent pricing</h1>
           <p className="mt-4 text-lg max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>Every service has clear tiers. No hidden fees. Scale up or down anytime.</p>
+          <div className="mt-4"><ReadAloudButton label="Read pricing" getText={() => {
+            const el = document.querySelector('.max-w-6xl');
+            return el?.textContent?.trim().slice(0, 3000) || '';
+          }} /></div>
         </div>
 
         {/* Service tabs */}

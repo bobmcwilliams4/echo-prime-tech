@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
+import ReadAloudButton from '../../components/ReadAloudButton';
 
 const TEMPLATES = [
   { name: 'SaaS Landing', preview: 'Modern SaaS product page with hero, features, pricing, and CTA sections', category: 'Business' },
@@ -68,6 +69,10 @@ export default function WebsitesPage() {
             <Link href="/pricing" className="px-8 py-4 rounded-xl border font-semibold text-lg" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
               View Pricing
             </Link>
+            <ReadAloudButton size="md" label="Listen" getText={() => {
+              const sections = document.querySelectorAll('h1, h2, p, [class*="desc"]');
+              return Array.from(sections).map(s => s.textContent?.trim()).filter(Boolean).join('. ').slice(0, 3000);
+            }} />
           </div>
         </div>
       </section>

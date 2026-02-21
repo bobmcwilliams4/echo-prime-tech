@@ -96,3 +96,99 @@ export async function getAdminAnalytics(): Promise<AdminAnalytics> {
 export async function getAdminUsers(): Promise<{ users: Array<{ uid: string; email: string; display_name: string; photo_url: string; role: string; created_at: string; last_login: string; subscribed_services: string | null }> }> {
   return fetchApi('/api/admin/users');
 }
+
+// ─── Stripe Billing ───
+
+export async function createCheckout(serviceId: string, tier: string): Promise<{ url: string }> {
+  return fetchApi('/api/checkout', { method: 'POST', body: JSON.stringify({ service_id: serviceId, tier }) });
+}
+
+export async function getBillingPortal(): Promise<{ url: string }> {
+  return fetchApi('/api/billing/portal');
+}
+
+export async function getStripeConfig(): Promise<{ publishable_key: string }> {
+  return fetchApi('/api/billing/config');
+}
+
+// ─── Commander Vault API ───
+
+const VAULT_API_URL = 'https://echo-vault-api.bmcii1976.workers.dev';
+
+async function fetchVault<T = unknown>(path: string, masterPassword?: string, options: RequestInit = {}): Promise<T> {
+  const token = await getToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+  if (masterPassword) {
+    headers['X-Vault-Key'] = btoa(masterPassword);
+  }
+  const res = await fetch(`${VAULT_API_URL}${path}`, { ...options, headers: { ...headers, ...options.headers } });
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(`Vault ${res.status}: ${text}`);
+  }
+  return res.json() as Promise<T>;
+}
+
+export interface VaultCredential {
+  service: string;
+  username: string;
+  tags: string[];
+  strength: number;
+  last_accessed: string;
+}
+
+export interface VaultStats {
+  total_credentials: number;
+  total_backups: number;
+  storage_used_mb: number;
+  last_sync: string;
+  strength_distribution: Record<string, number>;
+}
+
+export interface VaultBackup {
+  key: string;
+  size: number;
+  uploaded: string;
+}
+
+export interface VaultAuditEntry {
+  action: string;
+  service: string;
+  timestamp: string;
+  ip: string;
+}
+
+export async function vaultList(masterPassword: string): Promise<{ objects: { key: string; size: number; uploaded: string }[] }> {
+  return fetchVault('/api/vault/list', masterPassword);
+}
+
+export async function vaultCredentials(masterPassword: string): Promise<{ credentials: VaultCredential[] }> {
+  return fetchVault('/api/vault/credentials', masterPassword);
+}
+
+export async function vaultCredential(masterPassword: string, service: string): Promise<{ service: string; username: string; password: string }> {
+  return fetchVault(`/api/vault/credential/${encodeURIComponent(service)}`, masterPassword);
+}
+
+export async function vaultSearch(masterPassword: string, query: string): Promise<{ results: VaultCredential[] }> {
+  return fetchVault('/api/vault/search', masterPassword, { method: 'POST', body: JSON.stringify({ query }) });
+}
+
+export async function vaultKeychain(masterPassword: string): Promise<{ keys: { name: string; masked_value: string }[] }> {
+  return fetchVault('/api/vault/keychain', masterPassword);
+}
+
+export async function vaultBackups(masterPassword: string): Promise<{ backups: VaultBackup[] }> {
+  return fetchVault('/api/vault/backups', masterPassword);
+}
+
+export async function vaultStats(masterPassword: string): Promise<VaultStats> {
+  return fetchVault('/api/vault/stats', masterPassword);
+}
+
+export async function vaultAudit(masterPassword: string): Promise<{ entries: VaultAuditEntry[] }> {
+  return fetchVault('/api/vault/audit', masterPassword);
+}

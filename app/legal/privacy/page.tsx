@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../../lib/theme-context';
+import ReadAloudButton from '../../../components/ReadAloudButton';
 
 export default function PrivacyPage() {
   const { isDark } = useTheme();
@@ -14,8 +15,9 @@ export default function PrivacyPage() {
       </nav>
       <div className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-3xl font-extrabold mb-2" style={{ color: 'var(--ept-text)' }}>Privacy Policy</h1>
-        <p className="text-sm mb-10" style={{ color: 'var(--ept-text-muted)' }}>Last updated: February 19, 2026</p>
-        <div className="prose-ept space-y-6 text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
+        <p className="text-sm mb-4" style={{ color: 'var(--ept-text-muted)' }}>Last updated: February 19, 2026</p>
+        <div className="mb-8"><ReadAloudButton label="Read Policy Aloud" getText={() => document.getElementById('privacy-content')?.textContent?.trim() || ''} /></div>
+        <div id="privacy-content" className="prose-ept space-y-6 text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
           <section>
             <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>1. Information We Collect</h2>
             <p>When you create an account, we collect your name, email address, and authentication credentials through Google, Apple, email/password, or phone number sign-in. When you use our services, we collect usage data including queries, API calls, and interaction patterns to improve our products.</p>

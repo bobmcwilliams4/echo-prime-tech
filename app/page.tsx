@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../lib/auth-context';
 import { useTheme } from '../lib/theme-context';
 import { SmokeDivider } from '../components/ParticleBackground';
+import ReadAloudButton from '../components/ReadAloudButton';
 
 interface LiveStats {
   engines: string;
@@ -194,7 +195,7 @@ export default function HomePage() {
               We build domain-specific intelligence engines for industries that can&apos;t afford to be wrong. Over {live.engines} engines across {live.categories} verticals. Production-grade. Always on.
             </p>
 
-            <div className="mt-12 flex flex-col sm:flex-row gap-4 animate-fade-up animate-fade-up-delay-3">
+            <div className="mt-12 flex flex-col sm:flex-row gap-4 items-start animate-fade-up animate-fade-up-delay-3">
               <a href="#capabilities" className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-semibold transition-all hover:opacity-90 hover:gap-3" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
                 See What We Build
                 <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 transition-transform group-hover:translate-x-0.5"><path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" /></svg>
@@ -202,6 +203,11 @@ export default function HomePage() {
               <a href="#approach" className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl border font-semibold transition-all hover:border-opacity-60" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
                 Our Approach
               </a>
+              <ReadAloudButton size="md" label="Listen" getText={() => {
+                const el = document.querySelector('main, [role=main]') || document.body;
+                const sections = el.querySelectorAll('h1, h2, p, [class*="description"]');
+                return Array.from(sections).map(s => s.textContent?.trim()).filter(Boolean).join('. ').slice(0, 3000);
+              }} />
             </div>
           </div>
 

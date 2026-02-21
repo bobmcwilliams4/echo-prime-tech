@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../../lib/theme-context';
+import ReadAloudButton from '../../../components/ReadAloudButton';
 
 export default function TermsPage() {
   const { isDark } = useTheme();
@@ -14,8 +15,9 @@ export default function TermsPage() {
       </nav>
       <div className="max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-3xl font-extrabold mb-2" style={{ color: 'var(--ept-text)' }}>Terms of Service</h1>
-        <p className="text-sm mb-10" style={{ color: 'var(--ept-text-muted)' }}>Last updated: February 19, 2026</p>
-        <div className="space-y-6 text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
+        <p className="text-sm mb-4" style={{ color: 'var(--ept-text-muted)' }}>Last updated: February 19, 2026</p>
+        <div className="mb-8"><ReadAloudButton label="Read Terms Aloud" getText={() => document.getElementById('terms-content')?.textContent?.trim() || ''} /></div>
+        <div id="terms-content" className="space-y-6 text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
           <section>
             <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>1. Acceptance of Terms</h2>
             <p>By accessing or using Echo Prime Technologies (&quot;EPT&quot;) services, you agree to be bound by these Terms of Service. If you do not agree, do not use our services.</p>
