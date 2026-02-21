@@ -356,10 +356,10 @@ export default function EnginesPage() {
             }) : (
               /* Static fallback pricing */
               [
-                { name: 'Free', price: 0, queries: 3, features: ['3 queries/month', 'Standard domains', 'Summary responses'], popular: false },
-                { name: 'Professional', price: 499, queries: 500, features: ['500 queries/month', 'All 65 domains', 'Encrypted reports', 'API access'], popular: true },
-                { name: 'Business', price: 1499, queries: 2000, features: ['2,000 queries/month', 'Priority routing', 'Bulk reports', 'Dedicated support'], popular: false },
-                { name: 'Enterprise', price: 4999, queries: 10000, features: ['10,000 queries/month', 'Custom domains', 'SLA guarantee', 'On-prem option'], popular: false },
+                { name: 'Free', price: 0, queries: 3, features: ['3 queries/month', 'All 932 engines', 'Court-defensible analysis'], popular: false },
+                { name: 'Professional', price: 3000, queries: 250, features: ['250 queries/month', 'All 65 domains', 'Encrypted reports', 'Quarterly: $7,500 · Annual: $25,000'], popular: false },
+                { name: 'Business', price: 9000, queries: 1000, features: ['1,000 queries/month', 'Priority routing', 'Full reports', 'Quarterly: $22,500 · Annual: $75,000'], popular: true },
+                { name: 'Enterprise', price: 30000, queries: 5000, features: ['5,000 queries/month', 'Custom training', 'Dedicated AM', 'Quarterly: $75,000 · Annual: $250,000'], popular: false },
               ].map(tier => (
                 <div key={tier.name} className="p-6 rounded-2xl" style={{
                   backgroundColor: 'var(--ept-card-bg)',
