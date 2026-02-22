@@ -56,6 +56,7 @@ const CAPABILITIES = [
     statKey: 'engines' as const,
     statLabel: 'Engines Live',
     icon: '⬡',
+    link: '/engines',
   },
   {
     title: 'Autonomous Data Pipelines',
@@ -63,6 +64,7 @@ const CAPABILITIES = [
     statKey: 'categories' as const,
     statLabel: 'Verticals',
     icon: '◈',
+    link: '/orchestration',
   },
   {
     title: 'Edge Infrastructure',
@@ -70,6 +72,7 @@ const CAPABILITIES = [
     stat: '<50ms',
     statLabel: 'Global Latency',
     icon: '◇',
+    link: '/services',
   },
   {
     title: 'Knowledge Systems',
@@ -77,6 +80,7 @@ const CAPABILITIES = [
     statKey: 'doctrines' as const,
     statLabel: 'Knowledge Blocks',
     icon: '△',
+    link: '/knowledge',
   },
   {
     title: 'Multi-Model Orchestration',
@@ -84,6 +88,7 @@ const CAPABILITIES = [
     stat: '30+',
     statLabel: 'AI Models',
     icon: '⬢',
+    link: '/orchestration',
   },
   {
     title: 'Enterprise Security',
@@ -91,6 +96,7 @@ const CAPABILITIES = [
     stat: '256-bit',
     statLabel: 'AES Encryption',
     icon: '⬟',
+    link: '/security',
   },
   {
     title: 'Website Creation',
@@ -98,6 +104,7 @@ const CAPABILITIES = [
     stat: '<1s',
     statLabel: 'Page Load Time',
     icon: '◉',
+    link: '/websites',
   },
   {
     title: 'AI Sales Agent',
@@ -105,6 +112,7 @@ const CAPABILITIES = [
     stat: '24/7',
     statLabel: 'Always Closing',
     icon: '⬣',
+    link: '/closer',
   },
   {
     title: 'AI Collectibles Grading',
@@ -144,9 +152,15 @@ export default function HomePage() {
       <nav className="fixed top-0 w-full z-50 backdrop-blur-2xl border-b transition-colors duration-500" style={{ backgroundColor: 'var(--ept-nav-bg)', borderColor: 'var(--ept-border)' }}>
         <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
           <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={600} height={400} className="w-[240px] md:w-[340px] h-auto transition-opacity duration-500" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority />
-          <div className="hidden md:flex items-center gap-8">
-            {['Capabilities', 'Approach', 'Industries', 'Contact'].map(s => (
-              <a key={s} href={`#${s.toLowerCase()}`} className="text-sm font-medium transition-colors hover:opacity-100" style={{ color: 'var(--ept-text-secondary)' }}>{s}</a>
+          <div className="hidden md:flex items-center gap-6">
+            {[
+              { label: 'Engines', href: '/engines' },
+              { label: 'Voice', href: '/voice' },
+              { label: 'Security', href: '/security' },
+              { label: 'Services', href: '/services' },
+              { label: 'Pricing', href: '/pricing' },
+            ].map(item => (
+              <Link key={item.href} href={item.href} className="text-sm font-medium transition-colors hover:opacity-100" style={{ color: 'var(--ept-text-secondary)' }}>{item.label}</Link>
             ))}
             <Link href="/sentinel" className="text-sm font-semibold transition-colors" style={{ color: 'var(--ept-accent)' }}>Sentinel AI</Link>
           </div>
@@ -384,19 +398,53 @@ export default function HomePage() {
       </section>
 
       {/* ─── Footer ─── */}
-      <footer className="border-t py-12 px-6 transition-colors" style={{ borderColor: 'var(--ept-border)' }}>
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={400} height={260} className="w-[200px] md:w-[280px] h-auto opacity-80 transition-opacity duration-500" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} />
-          <div className="flex flex-wrap items-center justify-center md:justify-end gap-6 text-xs font-medium" style={{ color: 'var(--ept-text-muted)' }}>
-            <span>Midland, Texas</span>
-            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--ept-text-muted)', opacity: 0.3 }} />
-            <a href="mailto:contact@echo-op.com" className="hover:opacity-80 transition-opacity">contact@echo-op.com</a>
-            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--ept-text-muted)', opacity: 0.3 }} />
-            <Link href="/legal/privacy" className="hover:opacity-80 transition-opacity">Privacy Policy</Link>
-            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--ept-text-muted)', opacity: 0.3 }} />
-            <Link href="/legal/terms" className="hover:opacity-80 transition-opacity">Terms of Service</Link>
-            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: 'var(--ept-text-muted)', opacity: 0.3 }} />
-            <span>&copy; {new Date().getFullYear()} Echo Prime Technologies</span>
+      <footer className="border-t py-16 px-6 transition-colors" style={{ borderColor: 'var(--ept-border)' }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
+            <div>
+              <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={400} height={260} className="w-[180px] h-auto opacity-80 mb-4" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} />
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>Autonomous intelligence systems for industries that demand precision.</p>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-text-secondary)' }}>Products</h4>
+              <div className="flex flex-col gap-2.5">
+                {[
+                  { label: 'Engine Catalog', href: '/engines' },
+                  { label: 'Sentinel AI', href: '/sentinel' },
+                  { label: 'Voice Studio', href: '/voice' },
+                  { label: 'AI Closer', href: '/closer' },
+                  { label: 'AI Grading', href: '/grading' },
+                ].map(item => (
+                  <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-text-secondary)' }}>Solutions</h4>
+              <div className="flex flex-col gap-2.5">
+                {[
+                  { label: 'Services', href: '/services' },
+                  { label: 'Pricing', href: '/pricing' },
+                  { label: 'Security', href: '/security' },
+                  { label: 'Pen Testing', href: '/pentesting' },
+                  { label: 'Websites', href: '/websites' },
+                ].map(item => (
+                  <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-text-secondary)' }}>Company</h4>
+              <div className="flex flex-col gap-2.5">
+                <a href="mailto:contact@echo-op.com" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>contact@echo-op.com</a>
+                <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Midland, Texas</span>
+                <Link href="/legal/privacy" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>Privacy Policy</Link>
+                <Link href="/legal/terms" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>Terms of Service</Link>
+              </div>
+            </div>
+          </div>
+          <div className="border-t pt-6 text-center" style={{ borderColor: 'var(--ept-border)' }}>
+            <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>&copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved.</span>
           </div>
         </div>
       </footer>
