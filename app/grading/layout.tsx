@@ -8,7 +8,9 @@ export const metadata: Metadata = {
     title: 'AI Collectibles Grading',
     description: 'AI-powered collectibles grading with machine vision. Sports cards, comics, coins, and more. 99.2% accuracy.',
     url: 'https://echo-ept.com/grading',
+    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  alternates: { canonical: '/grading' },
 };
 
 export default function GradingLayout({ children }: { children: React.ReactNode }) {

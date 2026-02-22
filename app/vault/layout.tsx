@@ -7,7 +7,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Commander Vault — Echo Prime Technologies',
     url: 'https://echo-ept.com/vault',
+    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  alternates: { canonical: '/vault' },
 };
 
 export default function VaultLayout({ children }: { children: React.ReactNode }) {

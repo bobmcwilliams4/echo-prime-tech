@@ -8,7 +8,9 @@ export const metadata: Metadata = {
     title: 'Security Sandbox — CTF Challenges & Defense Testing',
     description: 'Interactive cyber range with 27 CTF challenges and defense scanning for your infrastructure.',
     url: 'https://echo-ept.com/sandbox',
+    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  alternates: { canonical: '/sandbox' },
 };
 
 export default function SandboxLayout({ children }: { children: React.ReactNode }) {

@@ -6,7 +6,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Sign In — Echo Prime Technologies',
     url: 'https://echo-ept.com/login',
+    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  alternates: { canonical: '/login' },
 };
 
 export default function LoginLayout({ children }: { children: React.ReactNode }) {

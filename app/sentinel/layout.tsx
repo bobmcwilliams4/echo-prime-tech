@@ -8,7 +8,9 @@ export const metadata: Metadata = {
     title: 'Sentinel Intelligence Engine',
     description: 'Query 932 doctrine-hardened engines. Standard, Swarm, and Echo Prime modes. Memory cortex. Court-defensible AI.',
     url: 'https://echo-ept.com/sentinel',
+    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  alternates: { canonical: '/sentinel' },
 };
 
 export default function SentinelLayout({ children }: { children: React.ReactNode }) {

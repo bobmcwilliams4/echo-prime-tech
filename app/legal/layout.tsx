@@ -6,7 +6,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Legal — Echo Prime Technologies',
     url: 'https://echo-ept.com/legal',
+    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  alternates: { canonical: '/legal' },
 };
 
 export default function LegalLayout({ children }: { children: React.ReactNode }) {

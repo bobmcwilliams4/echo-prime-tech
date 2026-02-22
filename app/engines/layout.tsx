@@ -8,7 +8,9 @@ export const metadata: Metadata = {
     title: 'Engine Catalog — 932 AI Engines',
     description: 'Browse 932 doctrine-hardened intelligence engines across 65 domains. Court-defensible AI. Zero hallucination.',
     url: 'https://echo-ept.com/engines',
+    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  alternates: { canonical: '/engines' },
 };
 
 export default function EnginesLayout({ children }: { children: React.ReactNode }) {

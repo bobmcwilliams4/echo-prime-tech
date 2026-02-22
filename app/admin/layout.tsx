@@ -7,7 +7,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Admin Panel — Echo Prime Technologies',
     url: 'https://echo-ept.com/admin',
+    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  alternates: { canonical: '/admin' },
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

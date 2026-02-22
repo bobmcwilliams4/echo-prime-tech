@@ -8,7 +8,9 @@ export const metadata: Metadata = {
     title: 'AI Orchestration — Multi-Engine Intelligence',
     description: 'Orchestrate 900+ AI engines with swarm intelligence and Trinity Council consensus.',
     url: 'https://echo-ept.com/orchestration',
+    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  alternates: { canonical: '/orchestration' },
 };
 
 export default function OrchestrationLayout({ children }: { children: React.ReactNode }) {

@@ -8,7 +8,9 @@ export const metadata: Metadata = {
     title: 'Knowledge Systems — Doctrine Intelligence',
     description: '30,000+ doctrine blocks with semantic search and court-defensible reasoning across 65 verticals.',
     url: 'https://echo-ept.com/knowledge',
+    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  alternates: { canonical: '/knowledge' },
 };
 
 export default function KnowledgeLayout({ children }: { children: React.ReactNode }) {

@@ -9,7 +9,9 @@ export const metadata: Metadata = {
     title: 'Closer — AI Sales Agent Platform',
     description: 'AI-powered sales agent platform. Lead management, automated calls, campaigns, and real-time analytics.',
     url: 'https://echo-ept.com/closer',
+    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  alternates: { canonical: '/closer' },
 };
 
 export default function CloserLayout({ children }: { children: React.ReactNode }) {

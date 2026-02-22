@@ -8,7 +8,9 @@ export const metadata: Metadata = {
     title: 'Enterprise AI Services',
     description: 'Autonomous intelligence engines, voice synthesis, cybersecurity, and more. Built for industries that demand precision.',
     url: 'https://echo-ept.com/services',
+    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  alternates: { canonical: '/services' },
 };
 
 export default function ServicesLayout({ children }: { children: React.ReactNode }) {
