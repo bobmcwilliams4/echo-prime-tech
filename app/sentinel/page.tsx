@@ -191,10 +191,22 @@ export default function SentinelPage() {
   // ── Voice playback via Echo Speak (tts.echo-op.com) ──
   const playVoice = useCallback(async (text: string, voice: string) => {
     try {
-      const res = await fetch('https://tts.echo-op.com/tts/generate', {
+      // Strip markdown formatting for cleaner TTS
+      const cleanText = text
+        .replace(/#{1,6}\s/g, '')           // headers
+        .replace(/\*{1,3}([^*]+)\*{1,3}/g, '$1')  // bold/italic
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')   // links
+        .replace(/```[\s\S]*?```/g, '')      // code blocks
+        .replace(/`([^`]+)`/g, '$1')        // inline code
+        .replace(/^[-*]\s/gm, '')           // bullet points
+        .replace(/\n{2,}/g, '. ')           // paragraph breaks → pause
+        .replace(/---/g, '')                // horizontal rules
+        .slice(0, 2000);
+
+      const res = await fetch('https://tts.echo-op.com/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text.slice(0, 2000), voice_id: voice || 'default', output_format: 'mp3' }),
+        body: JSON.stringify({ text: cleanText, voice_id: voice || 'default', output_format: 'wav' }),
       });
       if (!res.ok) return;
       const blob = await res.blob();
@@ -203,7 +215,7 @@ export default function SentinelPage() {
         audioRef.current.src = url;
         audioRef.current.play().catch(() => {});
       }
-    } catch { /* non-critical */ }
+    } catch { /* non-critical — TTS failure should never block UI */ }
   }, []);
 
   // ── Memory search ──
@@ -211,7 +223,7 @@ export default function SentinelPage() {
     if (!memorySearch.trim()) return;
     try {
       const res = await brainSearch(memorySearch, 10);
-      setMemoryResults(res.results.map(r => ({ content: r.content, timestamp: r.timestamp })));
+      setMemoryResults((res?.results || []).map(r => ({ content: r.content, timestamp: r.timestamp })));
     } catch {
       setMemoryResults([]);
     }
@@ -259,8 +271,8 @@ export default function SentinelPage() {
         // Store swarm response to memory
         brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA [SWARM]: ${(responseContent || '').slice(0, 500)}`, 6, ['sentinel', 'swarm', 'trinity']).catch(() => {});
       } else if (sentinelMode === 'echo_prime') {
-        // ── Echo Prime Mode: Personality + Memory + Echo Talk Directive ──
-        // Build personality directive from Echo Talk engine
+        // ── Echo Prime Mode: Personality + Memory + LLM Chat ──
+        // Build personality directive as system prompt for the LLM
         const personalityDirective = buildPersonalityDirective(activeProfile, emotion);
 
         // Inject memory context
@@ -271,27 +283,30 @@ export default function SentinelPage() {
           if (cortexStats) setCortexStats({ ...cortexStats, contextInjected: true });
         } catch { /* proceed without memory */ }
 
-        // Compose full query: personality + memory + user question
-        const fullQuery = [
+        // Build system prompt: personality + memory context
+        const systemPrompt = [
           personalityDirective,
-          memoryContext ? `[MEMORY CONTEXT: ${memoryContext.slice(0, 500)}]` : '',
-          text,
-        ].filter(Boolean).join('\n\n');
+          memoryContext ? `\n\n[MEMORY CONTEXT — previous interactions with this user]:\n${memoryContext.slice(0, 800)}` : '',
+          '\n\nProvide insightful, personality-driven responses. Use markdown for structure. Reference doctrine knowledge when relevant.',
+        ].filter(Boolean).join('');
 
-        const result = await queryEngine(fullQuery, analysisMode);
+        // Build conversation history for context continuity
+        const history = messages
+          .filter(m => m.role === 'user' || m.role === 'assistant')
+          .slice(-6)
+          .map(m => ({ role: m.role, content: m.content.slice(0, 1000) }));
+
+        // Route through /api/chat (LLM with personality system prompt)
+        const result = await chatEngine(text, systemPrompt, history);
 
         assistantMsg = {
           id: `a_${Date.now()}`, role: 'assistant', timestamp: Date.now(),
-          content: result.summary || result.analysis,
-          confidence: result.confidence,
-          sources: result.sources_cited,
+          content: result.response,
+          confidence: 'DISCLOSURE',
+          sources: result.has_doctrine_context ? 1 : 0,
           cost: commanderMode ? 0 : result.usage.cost,
           remaining: commanderMode ? 999999 : result.usage.remaining,
-          hash: result.determinism_hash,
-          reportId: result.report_id,
-          reportAvailable: result.report_available,
-          domain: result.domain,
-          domainCost: result.domain_cost,
+          domain: 'Echo Prime Intelligence',
           mode: 'echo_prime',
           emotion,
           personality: activeProfile,
@@ -299,7 +314,7 @@ export default function SentinelPage() {
         };
 
         // Store to memory
-        brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA: ${(result.summary || result.analysis).slice(0, 500)}`, 5, ['sentinel', 'query']).catch(() => {});
+        brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA [ECHO_PRIME]: ${(result.response || '').slice(0, 500)}`, 5, ['sentinel', 'echo_prime', 'personality']).catch(() => {});
       } else {
         // ── Standard Mode: Direct engine query + Memory ──
         let memoryContext = '';
@@ -648,10 +663,10 @@ export default function SentinelPage() {
                         {msg.trinity && (
                           <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #1e293b' }}>
                             <div style={{ fontSize: 11, fontWeight: 600, color: '#f59e0b', marginBottom: 6 }}>
-                              Trinity Council — Consensus: {(msg.trinity.consensus_score * 100).toFixed(0)}% ({msg.trinity.harmony_level})
+                              Trinity Council — Consensus: {((msg.trinity.consensus_score || 0) * 100).toFixed(0)}% ({msg.trinity.harmony_level || 'unknown'})
                             </div>
                             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                              {msg.trinity.votes.map((v, i) => (
+                              {(msg.trinity.votes || []).map((v, i) => (
                                 <div key={i} style={{ padding: '4px 8px', borderRadius: 6, backgroundColor: '#1e293b', fontSize: 10, color: '#94a3b8' }}>
                                   <span style={{ fontWeight: 600, color: '#f59e0b' }}>{v.model}</span>: {v.decision.slice(0, 60)}
                                   <span style={{ color: '#64748b' }}> ({(v.confidence * 100).toFixed(0)}%)</span>
@@ -815,7 +830,7 @@ export default function SentinelPage() {
                     </div>
                     <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>{tier.queries.toLocaleString()} queries/month</div>
                     <ul style={{ listStyle: 'none', padding: 0, marginTop: 14 }}>
-                      {tier.features.map((f, i) => (
+                      {(tier.features || []).map((f, i) => (
                         <li key={i} style={{ fontSize: 11, color: '#94a3b8', padding: '2px 0', display: 'flex', gap: 6 }}>
                           <span style={{ color: '#10b981', flexShrink: 0 }}>✓</span> {f}
                         </li>
