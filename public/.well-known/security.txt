@@ -1,0 +1,5 @@
+Contact: mailto:security@echo-op.com
+Expires: 2027-02-22T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://echo-ept.com/.well-known/security.txt
+Policy: https://echo-ept.com/legal/terms
