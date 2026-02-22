@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setRole(sync.role as 'owner' | 'user');
           setSubscriptions(sync.subscriptions || []);
         } catch {
-          setRole(u.email === 'bmcii1976@gmail.com' ? 'owner' : 'user');
+          setRole('user');
         }
       } else {
         setRole(null);

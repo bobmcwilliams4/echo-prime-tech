@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '../../lib/auth-context';
 import {
   queryEngine,
+  chatEngine,
   getUsage,
   registerUser,
   getPricing,
@@ -29,7 +30,6 @@ import {
   sentinelStore,
   trinityDecide,
   swarmHealth,
-  isCommander,
   loadCortexStats,
   detectEmotion,
   buildPersonalityDirective,
@@ -74,7 +74,7 @@ const SENTINEL_INSTANCE = 'sentinel_web_ept';
 // ── Component ──
 
 export default function SentinelPage() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -118,7 +118,7 @@ export default function SentinelPage() {
 
   // ── Commander detection ──
   useEffect(() => {
-    if (user?.email && isCommander(user.email)) {
+    if (role === 'owner') {
       setCommanderMode(true);
     }
   }, [user]);
@@ -245,7 +245,7 @@ export default function SentinelPage() {
 
         const queryWithContext = memoryContext ? `[MEMORY CONTEXT: ${memoryContext.slice(0, 500)}]\n\n${text}` : text;
         const decision = await trinityDecide(queryWithContext);
-        const responseContent = decision.reasoning_synthesis || decision.consensus;
+        const responseContent = decision?.reasoning_synthesis || decision?.consensus || 'Trinity Council returned no consensus. Try rephrasing your question.';
 
         assistantMsg = {
           id: `a_${Date.now()}`, role: 'assistant', timestamp: Date.now(),
@@ -257,7 +257,7 @@ export default function SentinelPage() {
         };
 
         // Store swarm response to memory
-        brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA [SWARM]: ${responseContent.slice(0, 500)}`, 6, ['sentinel', 'swarm', 'trinity']).catch(() => {});
+        brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA [SWARM]: ${(responseContent || '').slice(0, 500)}`, 6, ['sentinel', 'swarm', 'trinity']).catch(() => {});
       } else if (sentinelMode === 'echo_prime') {
         // ── Echo Prime Mode: Personality + Memory + Echo Talk Directive ──
         // Build personality directive from Echo Talk engine

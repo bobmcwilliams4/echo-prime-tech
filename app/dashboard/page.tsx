@@ -7,12 +7,22 @@ import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { getProfile, getServices, Service } from '../../lib/ept-api';
+import {
+  isAuthenticated as hasEngineKey,
+  getUsage,
+  getProfile as getEngineProfile,
+  type UsageResponse,
+  type ProfileResponse as EngineProfile,
+} from '../../lib/engine-cloud-api';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, loading, role, subscriptions, signOut } = useAuth();
   const { isDark } = useTheme();
   const [services, setServices] = useState<Service[]>([]);
+  const [engineUsage, setEngineUsage] = useState<UsageResponse | null>(null);
+  const [engineProfile, setEngineProfile] = useState<EngineProfile | null>(null);
+  const [commanderMode, setCommanderMode] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) router.push('/login');
@@ -21,6 +31,19 @@ export default function DashboardPage() {
   useEffect(() => {
     getServices().then(d => setServices(d.services)).catch(() => {});
   }, []);
+
+  // Load Sentinel AI usage
+  useEffect(() => {
+    if (hasEngineKey()) {
+      getUsage().then(setEngineUsage).catch(() => {});
+      getEngineProfile().then(setEngineProfile).catch(() => {});
+    }
+  }, []);
+
+  // Commander detection
+  useEffect(() => {
+    if (role === 'owner') setCommanderMode(true);
+  }, [user]);
 
   const handleSignOut = async () => { await signOut(); router.push('/'); };
 
@@ -54,6 +77,75 @@ export default function DashboardPage() {
             Welcome, <span className="gradient-text">{user.displayName || user.email?.split('@')[0] || 'there'}</span>
           </h1>
           <p className="mt-2 text-sm" style={{ color: 'var(--ept-text-muted)' }}>Your Echo Prime Technologies dashboard. Manage your active services below.</p>
+        </div>
+
+        {/* ── Sentinel AI — always visible ── */}
+        <div className="mb-10">
+          <Link href="/sentinel" className="block p-6 rounded-2xl border group transition-all hover:shadow-lg" style={{ backgroundColor: isDark ? '#0c0c1a' : '#f0f0ff', borderColor: isDark ? '#2d2d5e' : '#c7c7f0', boxShadow: isDark ? '0 0 30px rgba(99,102,241,0.08)' : 'none' }}>
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold" style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)', color: '#fff' }}>
+                  S
+                </div>
+                <div>
+                  <h2 className="text-xl font-extrabold flex items-center gap-2" style={{ color: 'var(--ept-text)' }}>
+                    Sentinel AI
+                    {commanderMode && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: '#f59e0b20', color: '#f59e0b', border: '1px solid #f59e0b40' }}>COMMANDER</span>}
+                  </h2>
+                  <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+                    932 engines. 65 domains. Court-defensible doctrine intelligence.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-sm font-semibold transition-all group-hover:gap-2" style={{ color: '#818cf8' }}>
+                Open
+                <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" /></svg>
+              </div>
+            </div>
+
+            {/* Usage stats row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+                <div className="text-lg font-extrabold font-mono" style={{ color: '#818cf8' }}>{engineProfile?.tier || (hasEngineKey() ? '—' : 'Free')}</div>
+                <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Plan</div>
+              </div>
+              <div className="px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+                <div className="text-lg font-extrabold font-mono" style={{ color: 'var(--ept-text)' }}>
+                  {commanderMode ? '∞' : engineUsage ? `${engineUsage.queries}` : '0'}
+                </div>
+                <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Queries Used</div>
+              </div>
+              <div className="px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+                <div className="text-lg font-extrabold font-mono" style={{ color: commanderMode ? '#f59e0b' : engineUsage && engineUsage.remaining < 5 ? '#ef4444' : '#10b981' }}>
+                  {commanderMode ? '∞' : engineUsage ? `${engineUsage.remaining}` : '3'}
+                </div>
+                <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Remaining</div>
+              </div>
+              <div className="px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+                <div className="text-lg font-extrabold font-mono" style={{ color: 'var(--ept-text)' }}>3</div>
+                <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Modes</div>
+              </div>
+            </div>
+
+            {/* Mode badges */}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {[
+                { label: 'Standard', desc: 'Doctrine analysis', color: '#10b981' },
+                { label: 'Swarm', desc: 'Trinity Council', color: '#6366f1' },
+                { label: 'Echo Prime', desc: 'Personality + Memory', color: '#a855f7' },
+              ].map(m => (
+                <span key={m.label} className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full" style={{ backgroundColor: `${m.color}15`, color: m.color, border: `1px solid ${m.color}30` }}>
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: m.color }} />
+                  {m.label}
+                </span>
+              ))}
+              {!hasEngineKey() && (
+                <span className="inline-flex items-center text-[11px] font-medium px-2.5 py-1 rounded-full" style={{ backgroundColor: 'var(--ept-accent-glow)', color: 'var(--ept-accent)' }}>
+                  3 free queries — no credit card
+                </span>
+              )}
+            </div>
+          </Link>
         </div>
 
         {/* Subscribed Services */}

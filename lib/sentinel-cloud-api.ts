@@ -351,13 +351,10 @@ export function buildPersonalityDirective(profile: PersonalityProfile, emotion?:
 [VARIATION PROTOCOL: Never repeat openers. Rotate transition words. Write for voice — no markdown, no bullet lists, no headers. Natural flowing speech.]`;
 }
 
-// ── Commander Detection ──
+// ── Commander Detection (role-based, not email-based) ──
 
-const COMMANDER_EMAILS = ['bmcii1976@gmail.com', 'bob@echo-op.com', 'bobmcwilliams4@outlook.com'];
-
-export function isCommander(email?: string | null): boolean {
-  if (!email) return false;
-  return COMMANDER_EMAILS.includes(email.toLowerCase());
+export function isCommander(_email?: string | null, role?: string | null): boolean {
+  return role === 'owner';
 }
 
 // ── Cortex Stats Loader ──

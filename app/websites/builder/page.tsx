@@ -463,8 +463,7 @@ function BuilderInner() {
               if (gjs) {
                 const html = gjs.getHtml();
                 const css = gjs.getCss();
-                console.log('HTML:', html, 'CSS:', css);
-                alert('Site exported to console. Full publish coming soon.');
+                alert(`Site exported (${html.length} chars HTML, ${css.length} chars CSS). Full publish coming soon.`);
               }
             }}
             className="text-xs font-semibold px-4 py-1.5 rounded-lg"

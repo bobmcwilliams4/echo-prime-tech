@@ -22,7 +22,7 @@ import {
 
 type Tab = 'credentials' | 'keychain' | 'backups' | 'stats' | 'audit';
 
-const COMMANDER_EMAILS = ['bmcii1976@gmail.com', 'bobmcwilliams4@outlook.com', 'bob@echo-op.com'];
+// Auth check uses role from API (server-enforced), not client-side email list
 const SESSION_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
 
 export default function VaultPage() {
@@ -58,7 +58,7 @@ export default function VaultPage() {
 
   // Redirect non-commanders
   useEffect(() => {
-    if (!loading && user && !COMMANDER_EMAILS.includes(user.email || '')) {
+    if (!loading && user && role !== 'owner') {
       router.push('/dashboard');
     }
     if (!loading && !user) {
@@ -94,7 +94,7 @@ export default function VaultPage() {
     );
   }
 
-  if (!COMMANDER_EMAILS.includes(user.email || '')) return null;
+  if (role !== 'owner') return null;
 
   // Lock screen
   if (!unlocked) {
