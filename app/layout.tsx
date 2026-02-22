@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     images: ['/logo-day.png'],
   },
   robots: { index: true, follow: true },
+  other: { 'theme-color': '#0a0e17' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
