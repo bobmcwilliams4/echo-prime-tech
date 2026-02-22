@@ -303,10 +303,37 @@ export async function sentinelStore(playerId: string, content: string, type: str
 // ── Swarm Brain / Trinity API ──
 
 export async function trinityDecide(question: string): Promise<TrinityDecision> {
-  return fetchJson(`${SWARM_BRAIN_URL}/trinity/decide`, {
+  const raw = await fetchJson(`${SWARM_BRAIN_URL}/trinity/decide`, {
     method: 'POST',
     body: JSON.stringify({ question }),
   });
+  // Transform API response shape to match frontend TrinityDecision interface
+  const d = raw?.decision || raw;
+  const reasoningStr = d.reasoning || '';
+  // Parse individual council member reasoning from combined string
+  const parseReasoning = (name: string): string => {
+    const upper = name.toUpperCase();
+    const re = new RegExp(`${upper}\\s*\\([^)]*\\):\\s*(.+?)(?=\\s*\\|\\s*[A-Z]+\\s*\\(|$)`, 's');
+    const m = reasoningStr.match(re);
+    return m ? m[1].trim().slice(0, 300) : '';
+  };
+  // votes can be object {sage:0.5,nyx:0.9,thorne:0.5} or array — normalize to array
+  const votesObj = d.votes || {};
+  const modelsObj = d.models || {};
+  const votes: TrinityVote[] = Array.isArray(votesObj) ? votesObj : ['sage', 'nyx', 'thorne'].map(name => ({
+    model: modelsObj[name] || name,
+    decision: (votesObj[name] || 0) >= 0.7 ? 'approve' : (votesObj[name] || 0) >= 0.4 ? 'neutral' : 'reject',
+    reasoning: parseReasoning(name),
+    confidence: votesObj[name] || 0,
+  }));
+  return {
+    consensus: d.approved ? 'approved' : 'not approved',
+    consensus_score: d.consensus || d.harmony || 0,
+    harmony_level: d.harmony >= 0.8 ? 'high' : d.harmony >= 0.5 ? 'moderate' : 'low',
+    votes,
+    reasoning_synthesis: reasoningStr.slice(0, 2000),
+    timestamp: new Date().toISOString(),
+  };
 }
 
 export async function swarmProcess(task: string, guild?: string): Promise<SwarmProcessResponse> {
