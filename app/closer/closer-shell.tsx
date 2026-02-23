@@ -1,10 +1,97 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
+
+/* ── Service Health Monitor ── */
+
+interface ServiceStatus {
+  name: string;
+  status: 'online' | 'offline' | 'checking';
+  latency?: number;
+}
+
+const ECHO_CHAT_URL = 'https://echo-chat.bmcii1976.workers.dev';
+
+function useServiceStatus(interval = 60000) {
+  const [services, setServices] = useState<ServiceStatus[]>([
+    { name: 'AI Chat', status: 'checking' },
+    { name: 'Memory Cortex', status: 'checking' },
+    { name: 'Voice AI', status: 'checking' },
+  ]);
+
+  const checkServices = useCallback(async () => {
+    const results: ServiceStatus[] = [];
+
+    // Check AI Chat (echo-chat worker /health)
+    try {
+      const t0 = Date.now();
+      const res = await fetch(`${ECHO_CHAT_URL}/health`, { signal: AbortSignal.timeout(5000) });
+      if (res.ok) {
+        const data = await res.json();
+        results.push({ name: 'AI Chat', status: data.status === 'healthy' ? 'online' : 'offline', latency: Date.now() - t0 });
+      } else {
+        results.push({ name: 'AI Chat', status: 'offline' });
+      }
+    } catch {
+      results.push({ name: 'AI Chat', status: 'offline' });
+    }
+
+    // Check Memory Cortex (via echo-chat /cortex/status)
+    try {
+      const t0 = Date.now();
+      const res = await fetch(`${ECHO_CHAT_URL}/cortex/status`, { signal: AbortSignal.timeout(5000) });
+      if (res.ok) {
+        const data = await res.json();
+        const onlineCount = (data.cortex || []).filter((s: any) => s.status === 'up').length;
+        results.push({ name: 'Memory Cortex', status: onlineCount > 0 ? 'online' : 'offline', latency: Date.now() - t0 });
+      } else {
+        results.push({ name: 'Memory Cortex', status: 'offline' });
+      }
+    } catch {
+      results.push({ name: 'Memory Cortex', status: 'offline' });
+    }
+
+    // Check Voice AI (Echo Speak via tts.echo-op.com or echo-chat /tts check)
+    try {
+      const t0 = Date.now();
+      const res = await fetch('https://tts.echo-op.com/health', { signal: AbortSignal.timeout(5000) });
+      results.push({ name: 'Voice AI', status: res.ok ? 'online' : 'offline', latency: Date.now() - t0 });
+    } catch {
+      results.push({ name: 'Voice AI', status: 'offline' });
+    }
+
+    setServices(results);
+  }, []);
+
+  useEffect(() => {
+    checkServices();
+    const id = setInterval(checkServices, interval);
+    return () => clearInterval(id);
+  }, [checkServices, interval]);
+
+  return services;
+}
+
+/* ── Status Dot Component ── */
+
+function StatusDot({ status, pulse }: { status: 'online' | 'offline' | 'checking'; pulse?: boolean }) {
+  const color = status === 'online' ? '#10b981' : status === 'offline' ? '#ef4444' : '#f59e0b';
+  return (
+    <span style={{ position: 'relative', display: 'inline-flex', width: 8, height: 8 }}>
+      {pulse && status === 'online' && (
+        <span style={{
+          position: 'absolute', inset: 0, borderRadius: '50%', backgroundColor: color, opacity: 0.4,
+          animation: 'statusPing 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
+        }} />
+      )}
+      <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: color, display: 'block' }} />
+    </span>
+  );
+}
 
 const NAV_ITEMS = [
   { href: '/closer', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', label: 'Dashboard', exact: true },
@@ -29,6 +116,7 @@ export default function CloserShell({ children }: { children: React.ReactNode })
   const { user, loading, signOut } = useAuth();
   const { isDark, toggle: toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const services = useServiceStatus(60000);
 
   useEffect(() => {
     if (!loading && !user) router.push('/login');
@@ -98,9 +186,18 @@ export default function CloserShell({ children }: { children: React.ReactNode })
             <div style={{ width: 1, height: 24, backgroundColor: 'var(--ept-border)' }} />
             <h1 className="text-xs font-semibold uppercase tracking-[0.15em]" style={{ color: 'var(--ept-text-muted)' }}>AI Sales Agent</h1>
             <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: 'var(--ept-accent)' }}>{currentPage.label}</span>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#10b981' }} />
-              <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: '#10b981' }}>Live</span>
+            <div style={{ width: 1, height: 20, backgroundColor: 'var(--ept-border)' }} />
+            <div className="flex items-center gap-3">
+              {services.map(svc => (
+                <div key={svc.name} className="flex items-center gap-1.5" title={svc.latency ? `${svc.name}: ${svc.latency}ms` : svc.name}>
+                  <StatusDot status={svc.status} pulse={svc.status === 'online'} />
+                  <span className="text-[10px] font-medium uppercase tracking-wider" style={{
+                    color: svc.status === 'online' ? '#10b981' : svc.status === 'offline' ? '#ef4444' : '#f59e0b',
+                  }}>
+                    {svc.name}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -124,6 +221,12 @@ export default function CloserShell({ children }: { children: React.ReactNode })
         </header>
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
+      <style>{`
+        @keyframes statusPing {
+          0% { transform: scale(1); opacity: 0.4; }
+          75%, 100% { transform: scale(2.2); opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }
