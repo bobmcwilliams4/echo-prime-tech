@@ -167,6 +167,30 @@ export async function queryEngine(
   });
 }
 
+export interface ChatResponse {
+  response: string;
+  model: string;
+  usage: { remaining: number; cost: number };
+  has_doctrine_context: boolean;
+}
+
+export async function chatEngine(
+  query: string,
+  systemPrompt: string,
+  history?: { role: string; content: string }[],
+  includeDoctrine: boolean = true,
+): Promise<ChatResponse> {
+  return fetchEngine('/api/chat', {
+    method: 'POST',
+    body: JSON.stringify({
+      query,
+      system_prompt: systemPrompt,
+      history,
+      include_doctrines: includeDoctrine,
+    }),
+  });
+}
+
 export async function getUsage(): Promise<UsageResponse> {
   return fetchEngine('/api/usage');
 }
