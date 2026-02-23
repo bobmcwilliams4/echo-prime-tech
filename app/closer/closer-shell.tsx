@@ -55,10 +55,10 @@ function useServiceStatus(interval = 60000) {
       results.push({ name: 'Memory Cortex', status: 'offline' });
     }
 
-    // Check Voice AI (Echo Speak via tts.echo-op.com or echo-chat /tts check)
+    // Check Voice AI (Echo Speak via tts.echo-op.com — can be slow to respond)
     try {
       const t0 = Date.now();
-      const res = await fetch('https://tts.echo-op.com/health', { signal: AbortSignal.timeout(5000) });
+      const res = await fetch('https://tts.echo-op.com/health', { signal: AbortSignal.timeout(15000) });
       results.push({ name: 'Voice AI', status: res.ok ? 'online' : 'offline', latency: Date.now() - t0 });
     } catch {
       results.push({ name: 'Voice AI', status: 'offline' });
