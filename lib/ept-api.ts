@@ -97,6 +97,35 @@ export async function getAdminUsers(): Promise<{ users: Array<{ uid: string; ema
   return fetchApi('/api/admin/users');
 }
 
+// ─── Admin User Management ───
+
+export interface AdminUserDetail {
+  user: { uid: string; email: string; display_name: string; photo_url: string; role: string; stripe_customer_id: string | null; created_at: string; last_login: string };
+  subscriptions: Array<{ service_id: string; status: string; tier: string; stripe_subscription_id: string | null; created_at: string }>;
+  grants: Record<string, string>;
+  services: Service[];
+}
+
+export async function getAdminUserDetail(uid: string): Promise<AdminUserDetail> {
+  return fetchApi(`/api/admin/users/${uid}`);
+}
+
+export async function updateUserRole(uid: string, role: string): Promise<{ ok: boolean }> {
+  return fetchApi(`/api/admin/users/${uid}/role`, { method: 'PUT', body: JSON.stringify({ role }) });
+}
+
+export async function grantUserServices(uid: string, serviceIds: string[]): Promise<{ ok: boolean; granted: string[] }> {
+  return fetchApi(`/api/admin/users/${uid}/services`, { method: 'POST', body: JSON.stringify({ service_ids: serviceIds }) });
+}
+
+export async function revokeUserService(uid: string, serviceId: string): Promise<{ ok: boolean }> {
+  return fetchApi(`/api/admin/users/${uid}/services/${serviceId}`, { method: 'DELETE' });
+}
+
+export async function updateUserSettings(uid: string, settings: Record<string, string>): Promise<{ ok: boolean }> {
+  return fetchApi(`/api/admin/users/${uid}/settings`, { method: 'PUT', body: JSON.stringify(settings) });
+}
+
 // ─── Stripe Billing ───
 
 export async function createCheckout(serviceId: string, tier: string): Promise<{ url: string }> {
