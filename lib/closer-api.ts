@@ -66,5 +66,5 @@ export const getMe = () => closerFetch('/auth/me');
 export const signup = (data: { firebase_token: string; company_name: string; owner_name: string; industry: string }) =>
   closerFetch('/auth/signup', { method: 'POST', body: JSON.stringify(data) });
 
-// --- Billy Copilot ---
-export const chatWithBilly = (message: string) => closerFetch('/billy/chat', { method: 'POST', body: JSON.stringify({ message }) });
+// --- Echo Prime AI Chat ---
+export const chatWithEcho = (message: string) => closerFetch('/chat', { method: 'POST', body: JSON.stringify({ message }) });

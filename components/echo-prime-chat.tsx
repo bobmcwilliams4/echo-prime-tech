@@ -12,24 +12,21 @@ interface ChatMessage {
   emotion?: string;
 }
 
-const CLOSER_API = 'https://billymc-api.bmcii1976.workers.dev';
-const EPT_API = 'https://ept-api.bmcii1976.workers.dev';
+const ECHO_CHAT_API = 'https://echo-chat.bmcii1976.workers.dev';
 
-function getPageContext(pathname: string): { service: string; label: string; api: string; endpoint: string } {
+function getPageContext(pathname: string): { service: string; label: string; siteId: string } {
   if (pathname.startsWith('/closer')) {
     const sub = pathname.replace('/closer', '').replace('/', '');
     return {
       service: 'ai-closer',
       label: sub ? `AI Sales Agent — ${sub.charAt(0).toUpperCase() + sub.slice(1)}` : 'AI Sales Agent',
-      api: CLOSER_API,
-      endpoint: '/chat',
+      siteId: 'echo-ept.com',
     };
   }
   return {
     service: 'platform',
     label: 'Echo Prime',
-    api: EPT_API,
-    endpoint: '/api/chat',
+    siteId: 'echo-ept.com',
   };
 }
 
@@ -121,7 +118,7 @@ export default function EchoPrimeChat() {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const res = await fetch(`${EPT_API}/api/tts`, {
+      const res = await fetch(`${ECHO_CHAT_API}/tts`, {
         method: 'POST',
         headers,
         body: JSON.stringify({ text, emotion: em }),
@@ -174,13 +171,14 @@ export default function EchoPrimeChat() {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const body: Record<string, string> = { message: text };
-      if (ctx.service !== 'ai-closer') {
-        body.page = pathname;
-        body.service_context = ctx.service;
-      }
+      const userId = user?.uid || user?.email || `anon_${Date.now()}`;
+      const body: Record<string, string> = {
+        message: text,
+        user_id: userId,
+        site_id: ctx.siteId,
+      };
 
-      const res = await fetch(`${ctx.api}${ctx.endpoint}`, {
+      const res = await fetch(`${ECHO_CHAT_API}/chat`, {
         method: 'POST',
         headers,
         body: JSON.stringify(body),
@@ -189,7 +187,7 @@ export default function EchoPrimeChat() {
       if (!res.ok) throw new Error(`API ${res.status}`);
 
       const data = await res.json();
-      const reply = data.reply || data.response || data.message || 'No response.';
+      const reply = data.response || data.reply || data.message || 'No response.';
       const em = data.emotion || detectEmotion(reply);
       setEmotion(em);
 
