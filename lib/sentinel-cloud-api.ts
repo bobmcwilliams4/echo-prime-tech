@@ -308,8 +308,8 @@ export async function trinityDecide(question: string): Promise<TrinityDecision> 
     body: JSON.stringify({ question }),
   });
   // Transform API response shape to match frontend TrinityDecision interface
-  const d = raw?.decision || raw;
-  const reasoningStr = d.reasoning || '';
+  const d = (raw as any)?.decision || raw;
+  const reasoningStr = (d as any).reasoning || '';
   // Parse individual council member reasoning from combined string
   const parseReasoning = (name: string): string => {
     const upper = name.toUpperCase();
@@ -318,8 +318,9 @@ export async function trinityDecide(question: string): Promise<TrinityDecision> 
     return m ? m[1].trim().slice(0, 300) : '';
   };
   // votes can be object {sage:0.5,nyx:0.9,thorne:0.5} or array — normalize to array
-  const votesObj = d.votes || {};
-  const modelsObj = d.models || {};
+  const da = d as any;
+  const votesObj = da.votes || {};
+  const modelsObj = da.models || {};
   const votes: TrinityVote[] = Array.isArray(votesObj) ? votesObj : ['sage', 'nyx', 'thorne'].map(name => ({
     model: modelsObj[name] || name,
     decision: (votesObj[name] || 0) >= 0.7 ? 'approve' : (votesObj[name] || 0) >= 0.4 ? 'neutral' : 'reject',
@@ -327,9 +328,9 @@ export async function trinityDecide(question: string): Promise<TrinityDecision> 
     confidence: votesObj[name] || 0,
   }));
   return {
-    consensus: d.approved ? 'approved' : 'not approved',
-    consensus_score: d.consensus || d.harmony || 0,
-    harmony_level: d.harmony >= 0.8 ? 'high' : d.harmony >= 0.5 ? 'moderate' : 'low',
+    consensus: da.approved ? 'approved' : 'not approved',
+    consensus_score: da.consensus || da.harmony || 0,
+    harmony_level: da.harmony >= 0.8 ? 'high' : da.harmony >= 0.5 ? 'moderate' : 'low',
     votes,
     reasoning_synthesis: reasoningStr.slice(0, 2000),
     timestamp: new Date().toISOString(),
