@@ -33,6 +33,9 @@ export default function AdminPage() {
   const [editSentinelVoice, setEditSentinelVoice] = useState('true');
   const [editSentinelMemory, setEditSentinelMemory] = useState('true');
   const [editCustomTier, setEditCustomTier] = useState('free');
+  const [editDisplayName, setEditDisplayName] = useState('');
+  const [editTrustLevel, setEditTrustLevel] = useState('1');
+  const [editBloodline, setEditBloodline] = useState(false);
   const [editNotes, setEditNotes] = useState('');
   const [saveMessage, setSaveMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,6 +78,9 @@ export default function AdminPage() {
       setEditSentinelVoice(detail.grants.sentinel_voice || 'true');
       setEditSentinelMemory(detail.grants.sentinel_memory || 'true');
       setEditCustomTier(detail.grants.custom_tier || 'free');
+      setEditDisplayName(detail.user.display_name || '');
+      setEditTrustLevel(detail.grants.trust_level || '1');
+      setEditBloodline(detail.grants.is_bloodline === 'true');
       setEditNotes(detail.grants.notes || '');
     } catch (err) {
       console.error('Failed to load user detail:', err);
@@ -113,13 +119,16 @@ export default function AdminPage() {
         .map(([id]) => id);
       for (const sid of toRevoke) await revokeUserService(uid, sid);
 
-      // 4. Update settings
+      // 4. Update settings (includes display_name, trust_level, bloodline)
       await updateUserSettings(uid, {
+        display_name: editDisplayName,
         sentinel_mode: editSentinelMode,
         sentinel_queries_limit: editSentinelQueries,
         sentinel_voice: editSentinelVoice,
         sentinel_memory: editSentinelMemory,
         custom_tier: editCustomTier,
+        trust_level: editTrustLevel,
+        is_bloodline: editBloodline ? 'true' : 'false',
         notes: editNotes,
       });
 
@@ -425,7 +434,15 @@ Authorization: Bearer <firebase-token>
                       </div>
                     )}
                     <div>
-                      <h2 className="text-lg font-extrabold" style={{ color: 'var(--ept-text)' }}>{editUser.user.display_name || 'Unknown'}</h2>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-lg font-extrabold" style={{ color: 'var(--ept-text)' }}>{editUser.user.display_name || 'Unknown'}</h2>
+                        {editUser.grants.is_bloodline === 'true' && (
+                          <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>BLOODLINE</span>
+                        )}
+                        {editUser.grants.trust_level && parseInt(editUser.grants.trust_level) >= 8 && (
+                          <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ backgroundColor: '#22c55e', color: '#fff' }}>TL{editUser.grants.trust_level}</span>
+                        )}
+                      </div>
                       <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{editUser.user.email}</p>
                     </div>
                   </div>
@@ -440,6 +457,53 @@ Authorization: Bearer <firebase-token>
                     <span>Joined: {editUser.user.created_at ? new Date(editUser.user.created_at + 'Z').toLocaleDateString() : '-'}</span>
                     <span>Last Login: {editUser.user.last_login ? new Date(editUser.user.last_login + 'Z').toLocaleString() : '-'}</span>
                     {editUser.user.stripe_customer_id && <span>Stripe: <span className="font-mono">{editUser.user.stripe_customer_id.slice(0, 14)}...</span></span>}
+                  </div>
+
+                  {/* Display Name */}
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider block mb-2" style={{ color: 'var(--ept-text-muted)' }}>Display Name</label>
+                    <input
+                      type="text"
+                      value={editDisplayName}
+                      onChange={e => setEditDisplayName(e.target.value)}
+                      placeholder="Full name..."
+                      className="w-full px-4 py-2.5 rounded-xl border text-sm outline-none"
+                      style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
+                    />
+                  </div>
+
+                  {/* Trust Level & Bloodline */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider block mb-2" style={{ color: 'var(--ept-text-muted)' }}>Trust Level</label>
+                      <div className="flex gap-1.5 flex-wrap">
+                        {['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'].map(lvl => (
+                          <button key={lvl} onClick={() => setEditTrustLevel(lvl)} className="w-9 h-9 rounded-lg text-sm font-bold transition-all" style={{
+                            backgroundColor: editTrustLevel === lvl ? 'var(--ept-accent)' : 'var(--ept-surface)',
+                            color: editTrustLevel === lvl ? '#fff' : 'var(--ept-text-secondary)',
+                            borderWidth: '1px',
+                            borderColor: editTrustLevel === lvl ? 'transparent' : 'var(--ept-border)',
+                          }}>{lvl}</button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider block mb-2" style={{ color: 'var(--ept-text-muted)' }}>Bloodline</label>
+                      <label className="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all" style={{
+                        backgroundColor: editBloodline ? 'var(--ept-accent-glow)' : 'var(--ept-surface)',
+                        borderColor: editBloodline ? 'var(--ept-accent)' : 'var(--ept-border)',
+                      }}>
+                        <input type="checkbox" checked={editBloodline} onChange={e => setEditBloodline(e.target.checked)} className="w-5 h-5 rounded" style={{ accentColor: 'var(--ept-accent)' }} />
+                        <div>
+                          <span className="text-sm font-bold block" style={{ color: editBloodline ? 'var(--ept-accent)' : 'var(--ept-text-secondary)' }}>
+                            {editBloodline ? 'McWilliams Dynasty' : 'Standard'}
+                          </span>
+                          <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+                            {editBloodline ? 'Full sovereign access' : 'Regular user'}
+                          </span>
+                        </div>
+                      </label>
+                    </div>
                   </div>
 
                   {/* Role Selector */}
