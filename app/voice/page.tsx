@@ -1138,7 +1138,7 @@ function SampleVoiceCards({ voices, setVoiceId, deleteVoice }: { voices: Voice[]
 function VoiceCloning({ voices, setVoices, setVoiceId }: { voices: Voice[]; setVoices: (v: Voice[]) => void; setVoiceId: (v: string) => void }) {
   const [cloneName, setCloneName] = useState('');
   const [cloneDesc, setCloneDesc] = useState('');
-  const [cloneFile, setCloneFile] = useState<File | null>(null);
+  const [cloneFiles, setCloneFiles] = useState<File[]>([]);
   const [cloning, setCloning] = useState(false);
   const [cloneResult, setCloneResult] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -1168,19 +1168,20 @@ function VoiceCloning({ voices, setVoices, setVoiceId }: { voices: Voice[]; setV
   };
 
   const cloneVoice = async () => {
-    const src = cloneFile || (recordedBlob ? new File([recordedBlob], 'recording.webm', { type: 'audio/webm' }) : null);
-    if (!src || !cloneName.trim() || cloning) return;
+    const srcs: File[] = cloneFiles.length > 0 ? cloneFiles : (recordedBlob ? [new File([recordedBlob], 'recording.webm', { type: 'audio/webm' })] : []);
+    if (srcs.length === 0 || !cloneName.trim() || cloning) return;
     setCloning(true); setCloneResult(null);
     try {
       const form = new FormData();
-      form.append('audio', src); form.append('name', cloneName.trim()); form.append('description', cloneDesc.trim());
+      srcs.forEach(f => form.append('files', f));
+      form.append('name', cloneName.trim()); form.append('description', cloneDesc.trim());
       const res = await fetch(`${TTS_API}/voices/clone`, { method: 'POST', body: form });
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
-      setCloneResult(`Voice "${data.name}" created! Duration: ${data.duration_seconds}s`);
-      setVoiceId(data.voice_id);
+      setCloneResult(`Voice "${data.name}" created from ${data.source_files} file(s)! Duration: ${data.ref_duration_s}s`);
+      setVoiceId(data.id);
       fetch(`${TTS_API}/voices`).then(r => r.json()).then(setVoices).catch(() => {});
-      setCloneName(''); setCloneDesc(''); setCloneFile(null); setRecordedBlob(null);
+      setCloneName(''); setCloneDesc(''); setCloneFiles([]); setRecordedBlob(null);
     } catch (e: unknown) { setCloneResult(`Error: ${e instanceof Error ? e.message : 'Clone failed'}`); } finally { setCloning(false); }
   };
 
@@ -1194,7 +1195,7 @@ function VoiceCloning({ voices, setVoices, setVoiceId }: { voices: Voice[]; setV
     <div className="space-y-5">
       <div>
         <h2 className="text-lg font-bold" style={{ color: 'var(--ept-text)' }}>Instant Voice Cloning</h2>
-        <p className="text-xs mt-0.5" style={{ color: 'var(--ept-text-muted)' }}>Upload 5-30 seconds of clean speech to create an instant voice clone.</p>
+        <p className="text-xs mt-0.5" style={{ color: 'var(--ept-text-muted)' }}>Upload multiple audio files for the best clone quality. More samples = better voice match.</p>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-5">
@@ -1205,26 +1206,38 @@ function VoiceCloning({ voices, setVoices, setVoiceId }: { voices: Voice[]; setV
             className="w-full rounded-lg px-3 py-2.5 text-sm border-0 outline-none" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text)' }} />
 
           <label className="flex flex-col items-center justify-center p-6 rounded-xl border-2 border-dashed cursor-pointer transition-all hover:border-opacity-80"
-            style={{ borderColor: cloneFile ? 'var(--ept-accent)' : 'var(--ept-border)', backgroundColor: cloneFile ? 'var(--ept-accent-glow)' : 'transparent' }}>
-            <input type="file" accept="audio/*" className="hidden" onChange={e => {
-              const file = e.target.files?.[0] || null;
-              if (file && file.size > MAX_CLONE_SIZE) { setCloneResult(`Error: File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Max 50MB.`); return; }
-              setCloneFile(file); setRecordedBlob(null); setCloneResult(null);
+            style={{ borderColor: cloneFiles.length > 0 ? 'var(--ept-accent)' : 'var(--ept-border)', backgroundColor: cloneFiles.length > 0 ? 'var(--ept-accent-glow)' : 'transparent' }}>
+            <input type="file" accept="audio/*" multiple className="hidden" onChange={e => {
+              const newFiles = Array.from(e.target.files || []);
+              const oversized = newFiles.find(f => f.size > MAX_CLONE_SIZE);
+              if (oversized) { setCloneResult(`Error: "${oversized.name}" too large (${(oversized.size / 1024 / 1024).toFixed(1)}MB). Max 50MB per file.`); return; }
+              setCloneFiles(prev => [...prev, ...newFiles]); setRecordedBlob(null); setCloneResult(null);
+              e.target.value = '';
             }} />
-            {cloneFile ? (
-              <div className="text-center">
+            {cloneFiles.length > 0 ? (
+              <div className="text-center w-full">
                 <svg className="w-6 h-6 mx-auto mb-1" style={{ color: 'var(--ept-accent)' }} viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg>
-                <div className="text-sm font-medium" style={{ color: 'var(--ept-text)' }}>{cloneFile.name}</div>
-                <div className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>{(cloneFile.size / 1024 / 1024).toFixed(1)} MB</div>
+                <div className="text-sm font-medium" style={{ color: 'var(--ept-text)' }}>{cloneFiles.length} file{cloneFiles.length > 1 ? 's' : ''} selected</div>
+                <div className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>{(cloneFiles.reduce((s, f) => s + f.size, 0) / 1024 / 1024).toFixed(1)} MB total — click to add more</div>
               </div>
             ) : (
               <div className="text-center">
                 <svg className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--ept-text-muted)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 20h16" /></svg>
-                <div className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>Drop audio file or click</div>
-                <div className="text-[10px] mt-1" style={{ color: 'var(--ept-text-muted)' }}>WAV, MP3, M4A, OGG, FLAC</div>
+                <div className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>Drop audio files or click</div>
+                <div className="text-[10px] mt-1" style={{ color: 'var(--ept-text-muted)' }}>WAV, MP3, M4A, OGG, FLAC — multiple files for better clones</div>
               </div>
             )}
           </label>
+          {cloneFiles.length > 0 && (
+            <div className="space-y-1">
+              {cloneFiles.map((f, i) => (
+                <div key={i} className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                  <span className="truncate flex-1" style={{ color: 'var(--ept-text-secondary)' }}>{f.name} ({(f.size / 1024 / 1024).toFixed(1)}MB)</span>
+                  <button onClick={(e) => { e.preventDefault(); setCloneFiles(prev => prev.filter((_, j) => j !== i)); }} className="ml-2 hover:opacity-80" style={{ color: 'var(--ept-text-muted)' }}>&times;</button>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px" style={{ backgroundColor: 'var(--ept-border)' }} />
@@ -1240,7 +1253,7 @@ function VoiceCloning({ voices, setVoices, setVoiceId }: { voices: Voice[]; setV
           </button>
           {recordedBlob && !isRecording && <div className="text-[10px] text-center" style={{ color: 'var(--ept-accent)' }}>Recording ready ({recordDuration}s)</div>}
 
-          <button onClick={cloneVoice} disabled={cloning || (!cloneFile && !recordedBlob) || !cloneName.trim()}
+          <button onClick={cloneVoice} disabled={cloning || (cloneFiles.length === 0 && !recordedBlob) || !cloneName.trim()}
             className="w-full py-2.5 rounded-lg text-sm font-bold disabled:opacity-40"
             style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
             {cloning ? 'Cloning...' : 'Clone Voice'}
@@ -1261,7 +1274,7 @@ function VoiceCloning({ voices, setVoices, setVoiceId }: { voices: Voice[]; setV
           <div className="rounded-xl border p-5" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
             <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Tips</span>
             <div className="mt-3 space-y-2 text-[11px]" style={{ color: 'var(--ept-text-secondary)' }}>
-              {['Use 10-30 seconds of clean speech', 'Minimize background noise', 'Speak naturally and consistently', 'WAV at 24kHz+ gives best results', 'Higher quality audio = better clone'].map((t, i) => (
+              {['Upload multiple files for best results', 'Use 10-30 seconds of clean speech per file', 'Minimize background noise', 'Speak naturally and consistently', 'WAV at 24kHz+ gives best results'].map((t, i) => (
                 <div key={i} className="flex items-start gap-2">
                   <span style={{ color: 'var(--ept-accent)' }}>{'\u2713'}</span><span>{t}</span>
                 </div>
