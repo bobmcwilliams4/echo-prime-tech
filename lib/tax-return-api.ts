@@ -1,6 +1,6 @@
-// Echo Tax Return — Frontend API Client v3.2
+// Echo Tax Return — Frontend API Client v4.0
 // Connects to echo-tax-return.bmcii1976.workers.dev
-// Covers: core CRUD, v2.0 features, v3.1 advanced, v3.2 advanced
+// Covers: core CRUD, v2.0 features, v3.1 advanced, v3.2 advanced, v4.0 tools/filing/audit
 
 const TAX_API = 'https://echo-tax-return.bmcii1976.workers.dev';
 const API_KEY = 'echo-omega-prime-forge-x-2026';
@@ -213,6 +213,205 @@ export interface RequiredForm {
   title: string;
   reason: string;
   required: boolean;
+}
+
+// ─── v4.0 Types ─────────────────────────────────────────────
+
+export interface WhatIfScenario {
+  income_overrides?: Record<string, number>;
+  deduction_overrides?: Record<string, number>;
+  filing_status?: string;
+  [key: string]: any;
+}
+
+export interface WhatIfResult {
+  original: Record<string, any>;
+  scenario: Record<string, any>;
+  delta: Record<string, any>;
+  [key: string]: any;
+}
+
+export interface AuditRisk {
+  return_id: string;
+  risk_score: number;
+  risk_level: string;
+  flags: Array<{ category: string; description: string; weight: number }>;
+  [key: string]: any;
+}
+
+export interface WithholdingEstimate {
+  return_id: string;
+  recommended_withholding: number;
+  current_withholding: number;
+  adjustment_needed: number;
+  [key: string]: any;
+}
+
+export interface ReturnSummary {
+  return_id: string;
+  client_name: string;
+  tax_year: number;
+  filing_status: string;
+  total_income: number;
+  agi: number;
+  taxable_income: number;
+  total_tax: number;
+  refund_or_owed: number;
+  [key: string]: any;
+}
+
+export interface EstimatedPayment {
+  id: string;
+  return_id: string;
+  quarter: number;
+  amount: number;
+  due_date: string;
+  paid_date: string | null;
+  [key: string]: any;
+}
+
+export interface Amendment {
+  id: string;
+  return_id: string;
+  reason: string;
+  changes: Record<string, any>;
+  status: string;
+  created_at: string;
+  [key: string]: any;
+}
+
+export interface TaxCalendarEntry {
+  date: string;
+  description: string;
+  form: string | null;
+  applies_to: string[];
+  [key: string]: any;
+}
+
+export interface TaxTip {
+  category: string;
+  tip: string;
+  potential_savings: number | null;
+  [key: string]: any;
+}
+
+export interface PenaltyEstimate {
+  return_id: string;
+  underpayment_penalty: number;
+  late_filing_penalty: number;
+  late_payment_penalty: number;
+  total_penalty: number;
+  [key: string]: any;
+}
+
+export interface ReturnNote {
+  id: string;
+  return_id: string;
+  content: string;
+  author: string | null;
+  created_at: string;
+  [key: string]: any;
+}
+
+export interface EngagementLetter {
+  return_id: string;
+  letter_html: string;
+  [key: string]: any;
+}
+
+export interface IncomeProjection {
+  return_id: string;
+  projected_income: number;
+  projected_tax: number;
+  [key: string]: any;
+}
+
+export interface ReturnHealth {
+  return_id: string;
+  score: number;
+  issues: Array<{ severity: string; message: string; field: string | null }>;
+  [key: string]: any;
+}
+
+export interface BracketAnalysis {
+  return_id: string;
+  current_bracket: { rate: number; range_start: number; range_end: number };
+  room_in_bracket: number;
+  marginal_rate: number;
+  effective_rate: number;
+  brackets: Array<{ rate: number; range_start: number; range_end: number; taxable_in_bracket: number; tax_in_bracket: number }>;
+  [key: string]: any;
+}
+
+export interface DocumentChecklist {
+  return_id: string;
+  items: Array<{ document: string; required: boolean; received: boolean; category: string }>;
+  [key: string]: any;
+}
+
+export interface ReturnDiff {
+  return_a: string;
+  return_b: string;
+  differences: Array<{ field: string; value_a: any; value_b: any; delta: any }>;
+  [key: string]: any;
+}
+
+export interface PortalView {
+  return_id: string;
+  client_name: string;
+  summary: Record<string, any>;
+  [key: string]: any;
+}
+
+export interface DeductionOpportunity {
+  category: string;
+  description: string;
+  estimated_savings: number;
+  confidence: number;
+  [key: string]: any;
+}
+
+export interface ClientSummary {
+  client_id: string;
+  name: string;
+  returns_count: number;
+  total_revenue: number;
+  years: number[];
+  [key: string]: any;
+}
+
+export interface TimelineEntry {
+  timestamp: string;
+  event: string;
+  details: string | null;
+  [key: string]: any;
+}
+
+export interface FilingPackage {
+  return_id: string;
+  forms: Array<{ form: string; pages: number }>;
+  efile_ready: boolean;
+  [key: string]: any;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  action: string;
+  entity_type: string;
+  entity_id: string;
+  user_id: string | null;
+  timestamp: string;
+  details: Record<string, any>;
+  [key: string]: any;
+}
+
+export interface PreparerDashboard {
+  total_clients: number;
+  total_returns: number;
+  returns_by_status: Record<string, number>;
+  revenue: number;
+  pending_items: number;
+  [key: string]: any;
 }
 
 // ─── Client Endpoints ───────────────────────────────────────
@@ -487,4 +686,315 @@ export async function getStrategy(returnId: string): Promise<TaxStrategy> {
 
 export async function getTrend(returnId: string): Promise<TrendAnalysis> {
   return fetchJSON<TrendAnalysis>(`${TAX_API}/returns/${returnId}/trend`, { headers: headers() });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// v4.0: Tools Endpoints
+// ═══════════════════════════════════════════════════════════════
+
+export async function whatIf(returnId: string, scenario: WhatIfScenario): Promise<WhatIfResult> {
+  return fetchJSON<WhatIfResult>(`${TAX_API}/returns/${returnId}/what-if`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(scenario),
+  });
+}
+
+export async function compareReturns(clientId: string): Promise<any> {
+  return fetchJSON<any>(
+    `${TAX_API}/returns/compare?client_id=${encodeURIComponent(clientId)}`,
+    { headers: headers() },
+  );
+}
+
+export async function getAuditRisk(returnId: string): Promise<AuditRisk> {
+  return fetchJSON<AuditRisk>(`${TAX_API}/returns/${returnId}/audit-risk`, { headers: headers() });
+}
+
+export async function getWithholdingEstimate(returnId: string, data: Record<string, any>): Promise<WithholdingEstimate> {
+  return fetchJSON<WithholdingEstimate>(`${TAX_API}/returns/${returnId}/withholding-estimate`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getReturnSummary(returnId: string): Promise<ReturnSummary> {
+  return fetchJSON<ReturnSummary>(`${TAX_API}/returns/${returnId}/summary`, { headers: headers() });
+}
+
+export async function getSupportedYears(): Promise<any> {
+  return fetchJSON<any>(`${TAX_API}/returns/supported-years`, { headers: headers() });
+}
+
+export async function addEstimatedPayment(returnId: string, data: {
+  quarter: number;
+  amount: number;
+  paid_date?: string;
+}): Promise<EstimatedPayment> {
+  return fetchJSON<EstimatedPayment>(`${TAX_API}/returns/${returnId}/estimated-payments`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getEstimatedPayments(returnId: string): Promise<EstimatedPayment[]> {
+  const resp = await fetchJSON<{ payments: EstimatedPayment[] }>(
+    `${TAX_API}/returns/${returnId}/estimated-payments`,
+    { headers: headers() },
+  );
+  return resp.payments;
+}
+
+export async function createAmendment(returnId: string, data: {
+  reason: string;
+  changes: Record<string, any>;
+}): Promise<Amendment> {
+  return fetchJSON<Amendment>(`${TAX_API}/returns/${returnId}/amendments`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getAmendments(returnId: string): Promise<Amendment[]> {
+  const resp = await fetchJSON<{ amendments: Amendment[] }>(
+    `${TAX_API}/returns/${returnId}/amendments`,
+    { headers: headers() },
+  );
+  return resp.amendments;
+}
+
+export async function getTaxCalendar(year: number): Promise<TaxCalendarEntry[]> {
+  const resp = await fetchJSON<{ calendar: TaxCalendarEntry[] }>(
+    `${TAX_API}/returns/tax-calendar?year=${year}`,
+    { headers: headers() },
+  );
+  return resp.calendar;
+}
+
+export async function getTaxTips(returnId: string): Promise<TaxTip[]> {
+  const resp = await fetchJSON<{ tips: TaxTip[] }>(
+    `${TAX_API}/returns/${returnId}/tips`,
+    { headers: headers() },
+  );
+  return resp.tips;
+}
+
+export async function getPenaltyEstimate(returnId: string): Promise<PenaltyEstimate> {
+  return fetchJSON<PenaltyEstimate>(`${TAX_API}/returns/${returnId}/penalty-estimate`, { headers: headers() });
+}
+
+export async function addNote(returnId: string, data: {
+  content: string;
+  author?: string;
+}): Promise<ReturnNote> {
+  return fetchJSON<ReturnNote>(`${TAX_API}/returns/${returnId}/notes`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getNotes(returnId: string): Promise<ReturnNote[]> {
+  const resp = await fetchJSON<{ notes: ReturnNote[] }>(
+    `${TAX_API}/returns/${returnId}/notes`,
+    { headers: headers() },
+  );
+  return resp.notes;
+}
+
+export async function deleteNote(returnId: string, noteId: string): Promise<void> {
+  await fetchJSON(`${TAX_API}/returns/${returnId}/notes/${noteId}`, {
+    method: 'DELETE',
+    headers: headers(),
+  });
+}
+
+export async function getEngagementLetter(returnId: string): Promise<EngagementLetter> {
+  return fetchJSON<EngagementLetter>(`${TAX_API}/returns/${returnId}/engagement-letter`, { headers: headers() });
+}
+
+export async function exportReturn(returnId: string, format: 'json' | 'csv' = 'json'): Promise<any> {
+  return fetchJSON<any>(
+    `${TAX_API}/returns/${returnId}/export?format=${format}`,
+    { headers: headers() },
+  );
+}
+
+export async function projectIncome(returnId: string, data: Record<string, any>): Promise<IncomeProjection> {
+  return fetchJSON<IncomeProjection>(`${TAX_API}/returns/${returnId}/project`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(data),
+  });
+}
+
+export async function duplicateReturn(returnId: string): Promise<TaxReturn> {
+  const resp = await fetchJSON<{ return: TaxReturn }>(`${TAX_API}/returns/${returnId}/duplicate`, {
+    method: 'POST',
+    headers: headers(),
+  });
+  return resp.return;
+}
+
+export async function getClientActivity(clientId: string): Promise<any> {
+  return fetchJSON<any>(`${TAX_API}/returns/activity/${clientId}`, { headers: headers() });
+}
+
+export async function getTaxReference(topic: string): Promise<any> {
+  return fetchJSON<any>(
+    `${TAX_API}/returns/tax-reference/${encodeURIComponent(topic)}`,
+    { headers: headers() },
+  );
+}
+
+export async function getReturnHealth(returnId: string): Promise<ReturnHealth> {
+  return fetchJSON<ReturnHealth>(`${TAX_API}/returns/${returnId}/health`, { headers: headers() });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// v4.0: Advanced Endpoints
+// ═══════════════════════════════════════════════════════════════
+
+export async function batchCalculate(clientId: string): Promise<any> {
+  return fetchJSON<any>(`${TAX_API}/returns/batch-calculate`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ client_id: clientId }),
+  });
+}
+
+export async function diffReturns(returnA: string, returnB: string): Promise<ReturnDiff> {
+  return fetchJSON<ReturnDiff>(
+    `${TAX_API}/returns/diff?return_a=${encodeURIComponent(returnA)}&return_b=${encodeURIComponent(returnB)}`,
+    { headers: headers() },
+  );
+}
+
+export async function getDocumentChecklist(returnId: string): Promise<DocumentChecklist> {
+  return fetchJSON<DocumentChecklist>(`${TAX_API}/returns/${returnId}/document-checklist`, { headers: headers() });
+}
+
+export async function getBracketAnalysis(returnId: string): Promise<BracketAnalysis> {
+  return fetchJSON<BracketAnalysis>(`${TAX_API}/returns/${returnId}/bracket-analysis`, { headers: headers() });
+}
+
+export async function lockReturn(returnId: string, locked: boolean): Promise<any> {
+  return fetchJSON<any>(`${TAX_API}/returns/${returnId}/lock`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ locked }),
+  });
+}
+
+export async function getLockStatus(returnId: string): Promise<{ locked: boolean; locked_at: string | null; locked_by: string | null }> {
+  return fetchJSON<{ locked: boolean; locked_at: string | null; locked_by: string | null }>(
+    `${TAX_API}/returns/${returnId}/lock-status`,
+    { headers: headers() },
+  );
+}
+
+export async function generatePortalToken(returnId: string): Promise<{ token: string; expires_at: string }> {
+  return fetchJSON<{ token: string; expires_at: string }>(`${TAX_API}/returns/portal-token`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ return_id: returnId }),
+  });
+}
+
+export async function getPortalView(token: string): Promise<PortalView> {
+  return fetchJSON<PortalView>(`${TAX_API}/returns/portal/${token}`, { headers: headers() });
+}
+
+export async function getDeductionOpportunities(returnId: string): Promise<DeductionOpportunity[]> {
+  const resp = await fetchJSON<{ opportunities: DeductionOpportunity[] }>(
+    `${TAX_API}/returns/${returnId}/deduction-opportunities`,
+    { headers: headers() },
+  );
+  return resp.opportunities;
+}
+
+export async function getClientSummary(clientId: string): Promise<ClientSummary> {
+  return fetchJSON<ClientSummary>(`${TAX_API}/returns/client-summary/${clientId}`, { headers: headers() });
+}
+
+export async function getReturnTimeline(returnId: string): Promise<TimelineEntry[]> {
+  const resp = await fetchJSON<{ timeline: TimelineEntry[] }>(
+    `${TAX_API}/returns/${returnId}/timeline`,
+    { headers: headers() },
+  );
+  return resp.timeline;
+}
+
+export async function searchTaxKnowledge(query: string): Promise<any> {
+  return fetchJSON<any>(
+    `${TAX_API}/returns/tax-knowledge/search?q=${encodeURIComponent(query)}`,
+    { headers: headers() },
+  );
+}
+
+export async function createSnapshot(returnId: string): Promise<any> {
+  return fetchJSON<any>(`${TAX_API}/returns/${returnId}/snapshot`, {
+    method: 'POST',
+    headers: headers(),
+  });
+}
+
+export async function validateReturn(returnId: string): Promise<any> {
+  return fetchJSON<any>(`${TAX_API}/returns/${returnId}/validate`, { headers: headers() });
+}
+
+export async function getPreparerDashboard(): Promise<PreparerDashboard> {
+  return fetchJSON<PreparerDashboard>(`${TAX_API}/returns/preparer/dashboard`, { headers: headers() });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// v4.0: Filing Endpoints
+// ═══════════════════════════════════════════════════════════════
+
+export async function getFilingPackage(returnId: string): Promise<FilingPackage> {
+  return fetchJSON<FilingPackage>(`${TAX_API}/returns/${returnId}/filing-package`, { headers: headers() });
+}
+
+export async function fileReturn(returnId: string, method: 'efile' | 'paper'): Promise<any> {
+  return fetchJSON<any>(`${TAX_API}/returns/${returnId}/file`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ method }),
+  });
+}
+
+export async function batchFile(clientId: string): Promise<any> {
+  return fetchJSON<any>(`${TAX_API}/returns/batch-file`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ client_id: clientId }),
+  });
+}
+
+export async function getPrintableReturn(returnId: string): Promise<any> {
+  return fetchJSON<any>(`${TAX_API}/returns/${returnId}/printable`, { headers: headers() });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// v4.0: Audit Log Endpoints
+// ═══════════════════════════════════════════════════════════════
+
+export async function getAuditLog(page?: number, limit?: number): Promise<{ entries: AuditLogEntry[]; total: number; page: number }> {
+  const params = new URLSearchParams();
+  if (page !== undefined) params.set('page', String(page));
+  if (limit !== undefined) params.set('limit', String(limit));
+  const qs = params.toString();
+  const url = qs ? `${TAX_API}/returns/audit-log?${qs}` : `${TAX_API}/returns/audit-log`;
+  return fetchJSON<{ entries: AuditLogEntry[]; total: number; page: number }>(url, { headers: headers() });
+}
+
+export async function exportAuditLog(): Promise<any> {
+  return fetchJSON<any>(`${TAX_API}/returns/audit-log/export`, { headers: headers() });
+}
+
+export async function getAuditStats(): Promise<any> {
+  return fetchJSON<any>(`${TAX_API}/returns/audit-log/stats`, { headers: headers() });
 }

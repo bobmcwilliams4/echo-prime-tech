@@ -5,10 +5,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import {
-  createClient, createReturn, getReturn, addIncome, deleteIncome,
-  addDeduction, deleteDeduction, addDependent, deleteDependent,
+  createClient, getClient, listClients, createReturn, getReturn, listReturns,
+  addIncome, deleteIncome, addDeduction, deleteDeduction, addDependent, deleteDependent,
   uploadDocument, calculateReturn, getOptimizations, getReturnForms,
-  getPricing, createCheckout, healthCheck,
+  getPricing, createCheckout, healthCheck, updateReturnStatus,
+  getAuditRisk, whatIf, getStrategy, getTrend, getSelfEmploymentTax,
+  getSafeHarbor, getStateTax, getBracketAnalysis, getPenaltyEstimate,
+  getKeyNumbers, getTaxCalendar, getPreparerDashboard, getAuditLog,
+  getReturnSummary, getDocumentChecklist, getDeductionOpportunities,
+  getClientSummary, getReturnTimeline, searchTaxKnowledge, validateReturn,
+  lockReturn, getLockStatus, getReturnHealth, getWithholdingEstimate,
+  addNote, getNotes, getEngagementLetter, exportReturn, getIncomeAnalysis,
   type Client, type TaxReturn, type IncomeItem, type Deduction,
   type Dependent, type TaxDocument, type Optimization, type TaxCalculation,
   type PricingTier,
@@ -18,7 +25,7 @@ import {
 // TYPES
 // ===============================================================
 
-type Tab = 'hero' | 'intake' | 'documents' | 'dashboard' | 'forms' | 'status';
+type Tab = 'hero' | 'intake' | 'documents' | 'dashboard' | 'strategy' | 'forms' | 'tools' | 'status' | 'admin';
 type IntakeStep = 1 | 2 | 3;
 
 const FILING_STATUSES = [
@@ -73,8 +80,11 @@ const TAB_ITEMS: { id: Tab; label: string }[] = [
   { id: 'intake', label: 'Intake' },
   { id: 'documents', label: 'Documents' },
   { id: 'dashboard', label: 'Dashboard' },
+  { id: 'strategy', label: 'Strategy' },
   { id: 'forms', label: 'Forms' },
+  { id: 'tools', label: 'Tools' },
   { id: 'status', label: 'Status' },
+  { id: 'admin', label: 'Admin' },
 ];
 
 // ===============================================================
@@ -100,6 +110,30 @@ export default function TaxReturnPage() {
   const [formData, setFormData] = useState<any>(null);
   const [pricing, setPricing] = useState<PricingTier[]>([]);
 
+  // Advanced state
+  const [auditRisk, setAuditRisk] = useState<any>(null);
+  const [strategyData, setStrategyData] = useState<any>(null);
+  const [trendData, setTrendData] = useState<any>(null);
+  const [bracketData, setBracketData] = useState<any>(null);
+  const [penaltyData, setPenaltyData] = useState<any>(null);
+  const [keyNumbers, setKeyNumbers] = useState<any>(null);
+  const [calendarData, setCalendarData] = useState<any[]>([]);
+  const [dashboard, setDashboard] = useState<any>(null);
+  const [auditLog, setAuditLog] = useState<any>(null);
+  const [seTaxData, setSeTaxData] = useState<any>(null);
+  const [safeHarborData, setSafeHarborData] = useState<any>(null);
+  const [deductionOps, setDeductionOps] = useState<any[]>([]);
+  const [timeline, setTimeline] = useState<any[]>([]);
+  const [validationResult, setValidationResult] = useState<any>(null);
+  const [whatIfResult, setWhatIfResult] = useState<any>(null);
+  const [whatIfForm, setWhatIfForm] = useState({ field: 'income', amount: '' });
+  const [notes, setNotes] = useState<any[]>([]);
+  const [noteText, setNoteText] = useState('');
+  const [clientList, setClientList] = useState<Client[]>([]);
+  const [returnList, setReturnList] = useState<TaxReturn[]>([]);
+  const [knowledgeQuery, setKnowledgeQuery] = useState('');
+  const [knowledgeResults, setKnowledgeResults] = useState<any>(null);
+
   // Intake form
   const [intakeStep, setIntakeStep] = useState<IntakeStep>(1);
   const [form, setForm] = useState({
@@ -119,9 +153,35 @@ export default function TaxReturnPage() {
   const [uploadDocType, setUploadDocType] = useState('w2');
   const [uploadIssuer, setUploadIssuer] = useState('');
 
+  // Restore session from localStorage on mount
   useEffect(() => {
     getPricing().then(setPricing).catch(() => {});
+    try {
+      const saved = localStorage.getItem('ept-tax-session');
+      if (saved) {
+        const { clientId, returnId } = JSON.parse(saved);
+        if (clientId && returnId) {
+          getClient(clientId).then(c => { setClient(c); }).catch(() => {});
+          getReturn(returnId).then(data => {
+            setTaxReturn(data.return);
+            setIncomeItems(data.income_items);
+            setDeductions(data.deductions);
+            setDependents(data.dependents);
+            setDocuments(data.documents);
+            setOptimizations(data.optimizations);
+            if (data.return.status !== 'intake') setTab('dashboard');
+          }).catch(() => {});
+        }
+      }
+    } catch {}
   }, []);
+
+  // Save session to localStorage when client/return changes
+  useEffect(() => {
+    if (client?.id && taxReturn?.id) {
+      localStorage.setItem('ept-tax-session', JSON.stringify({ clientId: client.id, returnId: taxReturn.id }));
+    }
+  }, [client?.id, taxReturn?.id]);
 
   const clearMessages = () => { setError(''); setSuccess(''); };
 
@@ -258,6 +318,161 @@ export default function TaxReturnPage() {
   };
 
   const fmt = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
+
+  // --- Strategy Handlers ---
+
+  const handleGetStrategy = async () => {
+    if (!taxReturn) return;
+    clearMessages(); setLoading(true);
+    try {
+      const data = await getStrategy(taxReturn.id);
+      setStrategyData(data);
+    } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleGetAuditRisk = async () => {
+    if (!taxReturn) return;
+    clearMessages(); setLoading(true);
+    try {
+      const data = await getAuditRisk(taxReturn.id);
+      setAuditRisk(data);
+    } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleWhatIf = async () => {
+    if (!taxReturn || !whatIfForm.amount) return;
+    clearMessages(); setLoading(true);
+    try {
+      const scenario: any = {};
+      if (whatIfForm.field === 'income') scenario.income_overrides = { wages: parseFloat(whatIfForm.amount) };
+      else if (whatIfForm.field === 'deduction') scenario.deduction_overrides = { charitable: parseFloat(whatIfForm.amount) };
+      else if (whatIfForm.field === 'filing_status') scenario.filing_status = whatIfForm.amount;
+      const data = await whatIf(taxReturn.id, scenario);
+      setWhatIfResult(data);
+    } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleGetSETax = async () => {
+    if (!taxReturn) return;
+    clearMessages(); setLoading(true);
+    try { setSeTaxData(await getSelfEmploymentTax(taxReturn.id)); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleGetTrend = async () => {
+    if (!taxReturn) return;
+    clearMessages(); setLoading(true);
+    try { setTrendData(await getTrend(taxReturn.id)); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleGetSafeHarbor = async () => {
+    if (!taxReturn) return;
+    clearMessages(); setLoading(true);
+    try { setSafeHarborData(await getSafeHarbor(taxReturn.id)); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleGetDeductionOps = async () => {
+    if (!taxReturn) return;
+    clearMessages(); setLoading(true);
+    try { setDeductionOps(await getDeductionOpportunities(taxReturn.id)); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  // --- Tools Handlers ---
+
+  const handleGetPenalty = async () => {
+    if (!taxReturn) return;
+    clearMessages(); setLoading(true);
+    try { setPenaltyData(await getPenaltyEstimate(taxReturn.id)); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleGetBrackets = async () => {
+    if (!taxReturn) return;
+    clearMessages(); setLoading(true);
+    try { setBracketData(await getBracketAnalysis(taxReturn.id)); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleGetKeyNumbers = async (year = 2025) => {
+    clearMessages(); setLoading(true);
+    try { setKeyNumbers(await getKeyNumbers(year)); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleGetCalendar = async (year = 2025) => {
+    clearMessages(); setLoading(true);
+    try { setCalendarData(await getTaxCalendar(year)); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleSearchKnowledge = async () => {
+    if (!knowledgeQuery) return;
+    clearMessages(); setLoading(true);
+    try { setKnowledgeResults(await searchTaxKnowledge(knowledgeQuery)); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleValidate = async () => {
+    if (!taxReturn) return;
+    clearMessages(); setLoading(true);
+    try { setValidationResult(await validateReturn(taxReturn.id)); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  // --- Admin Handlers ---
+
+  const handleLoadDashboard = async () => {
+    clearMessages(); setLoading(true);
+    try { setDashboard(await getPreparerDashboard()); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleLoadAuditLog = async () => {
+    clearMessages(); setLoading(true);
+    try { setAuditLog(await getAuditLog(1, 50)); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleLoadClients = async () => {
+    clearMessages(); setLoading(true);
+    try { setClientList(await listClients()); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleLoadReturns = async () => {
+    clearMessages(); setLoading(true);
+    try { setReturnList(await listReturns()); } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleAddNote = async () => {
+    if (!taxReturn || !noteText.trim()) return;
+    clearMessages(); setLoading(true);
+    try {
+      await addNote(taxReturn.id, { content: noteText, author: 'Preparer' });
+      setNotes(await getNotes(taxReturn.id));
+      setNoteText('');
+      setSuccess('Note added');
+    } catch (err) { setError(String(err)); }
+    setLoading(false);
+  };
+
+  const handleLoadNotes = async () => {
+    if (!taxReturn) return;
+    try { setNotes(await getNotes(taxReturn.id)); } catch {}
+  };
+
+  const handleLoadTimeline = async () => {
+    if (!taxReturn) return;
+    try { setTimeline(await getReturnTimeline(taxReturn.id)); } catch {}
+  };
 
   // ===============================================================
   // RENDER
@@ -992,6 +1207,205 @@ export default function TaxReturnPage() {
           </div>
         )}
 
+        {/* ======= STRATEGY TAB ======= */}
+        {tab === 'strategy' && (
+          <div className="space-y-6 animate-fade-up">
+            {!taxReturn ? (
+              <NeedReturn onGo={() => setTab('intake')} message="Complete intake and calculate your return to access strategy tools." />
+            ) : (
+              <>
+                <h3 className="text-2xl font-bold" style={{ color: 'var(--ept-text)' }}>Tax Strategy &amp; Analysis</h3>
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <ActionBtn label="Tax Strategy" onClick={handleGetStrategy} loading={loading} color="var(--ept-accent)" />
+                  <ActionBtn label="Audit Risk" onClick={handleGetAuditRisk} loading={loading} color="#f59e0b" />
+                  <ActionBtn label="Deduction Opportunities" onClick={handleGetDeductionOps} loading={loading} color="#10b981" />
+                  <ActionBtn label="SE Tax" onClick={handleGetSETax} loading={loading} color="#8b5cf6" />
+                  <ActionBtn label="Trend Analysis" onClick={handleGetTrend} loading={loading} color="#3b82f6" />
+                  <ActionBtn label="Safe Harbor" onClick={handleGetSafeHarbor} loading={loading} color="#ec4899" />
+                </div>
+
+                {/* What-If Simulator */}
+                <Card title="What-If Scenario Simulator">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs mb-1" style={{ color: 'var(--ept-text-muted)' }}>Scenario Type</label>
+                      <select
+                        value={whatIfForm.field}
+                        onChange={e => setWhatIfForm(f => ({ ...f, field: e.target.value }))}
+                        className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none"
+                        style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }}
+                      >
+                        <option value="income">Change Income</option>
+                        <option value="deduction">Add Deduction</option>
+                        <option value="filing_status">Change Filing Status</option>
+                      </select>
+                    </div>
+                    <Input
+                      label={whatIfForm.field === 'filing_status' ? 'New Filing Status' : 'Amount'}
+                      value={whatIfForm.amount}
+                      onChange={v => setWhatIfForm(f => ({ ...f, amount: v }))}
+                      type={whatIfForm.field === 'filing_status' ? 'text' : 'number'}
+                      placeholder={whatIfForm.field === 'filing_status' ? 'married_joint' : '75000'}
+                    />
+                    <div className="flex items-end">
+                      <button
+                        onClick={handleWhatIf}
+                        disabled={loading || !whatIfForm.amount}
+                        className="w-full py-2.5 rounded-lg text-sm font-semibold disabled:opacity-50 transition-all hover:opacity-90"
+                        style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
+                      >
+                        Run Scenario
+                      </button>
+                    </div>
+                  </div>
+                  {whatIfResult && (
+                    <div className="mt-4 grid grid-cols-3 gap-4">
+                      <MiniStat label="Original Tax" value={fmt(whatIfResult.original?.total_tax || 0)} color="var(--ept-text)" />
+                      <MiniStat label="Scenario Tax" value={fmt(whatIfResult.scenario?.total_tax || 0)} color="#3b82f6" />
+                      <MiniStat label="Difference" value={fmt(whatIfResult.delta?.total_tax || 0)} color={whatIfResult.delta?.total_tax < 0 ? '#10b981' : '#ef4444'} />
+                    </div>
+                  )}
+                </Card>
+
+                {/* Audit Risk */}
+                {auditRisk && (
+                  <Card title="Audit Risk Assessment">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div
+                        className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold"
+                        style={{
+                          backgroundColor: auditRisk.risk_level === 'low' ? 'rgba(16,185,129,0.15)' : auditRisk.risk_level === 'medium' ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.15)',
+                          color: auditRisk.risk_level === 'low' ? '#10b981' : auditRisk.risk_level === 'medium' ? '#f59e0b' : '#ef4444',
+                        }}
+                      >
+                        {auditRisk.risk_score}
+                      </div>
+                      <div>
+                        <div className="text-lg font-semibold capitalize" style={{ color: 'var(--ept-text)' }}>{auditRisk.risk_level} Risk</div>
+                        <div className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>Score: {auditRisk.risk_score}/100</div>
+                      </div>
+                    </div>
+                    {auditRisk.flags?.length > 0 && (
+                      <div className="space-y-2">
+                        {auditRisk.flags.map((f: any, i: number) => (
+                          <div key={i} className="flex items-center justify-between p-2 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                            <div>
+                              <span className="text-xs font-semibold uppercase px-2 py-0.5 rounded mr-2" style={{ backgroundColor: 'rgba(245,158,11,0.1)', color: '#f59e0b' }}>{f.category}</span>
+                              <span className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{f.description}</span>
+                            </div>
+                            <span className="text-xs font-mono" style={{ color: 'var(--ept-text-muted)' }}>wt: {f.weight}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+                )}
+
+                {/* Tax Strategy */}
+                {strategyData?.strategies?.length > 0 && (
+                  <Card title="Tax Strategy Recommendations">
+                    <div className="space-y-3">
+                      {strategyData.strategies.map((s: any, i: number) => (
+                        <div key={i} className="p-3 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--ept-accent-glow)', color: 'var(--ept-accent)' }}>#{s.rank}</span>
+                              <span className="text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>{s.strategy}</span>
+                            </div>
+                            {s.potential_savings > 0 && (
+                              <span className="text-xs font-mono" style={{ color: '#10b981' }}>Save ~{fmt(s.potential_savings)}</span>
+                            )}
+                          </div>
+                          <div className="text-xs mt-1" style={{ color: 'var(--ept-text-muted)' }}>{s.implementation}</div>
+                          <div className="flex gap-2 mt-2">
+                            <span className="text-xs px-2 py-0.5 rounded capitalize" style={{ backgroundColor: 'var(--ept-card-bg)', color: 'var(--ept-text-secondary)' }}>{s.category}</span>
+                            <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--ept-card-bg)', color: 'var(--ept-text-secondary)' }}>Confidence: {pct(s.confidence)}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                {/* SE Tax */}
+                {seTaxData?.schedule_se && (
+                  <Card title="Self-Employment Tax (Schedule SE)">
+                    <div className="grid grid-cols-2 gap-4">
+                      {Object.entries(seTaxData.schedule_se).map(([k, v]) => (
+                        <div key={k} className="flex justify-between py-1" style={{ borderBottom: '1px solid var(--ept-surface)' }}>
+                          <span className="text-sm capitalize" style={{ color: 'var(--ept-text-secondary)' }}>{k.replace(/_/g, ' ')}</span>
+                          <span className="font-mono text-sm" style={{ color: 'var(--ept-text)' }}>{typeof v === 'number' ? fmt(v) : String(v)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                {/* Trend Analysis */}
+                {trendData?.years?.length > 0 && (
+                  <Card title="Year-over-Year Trend">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr style={{ borderBottom: '1px solid var(--ept-border)' }}>
+                            <th className="py-2 text-left" style={{ color: 'var(--ept-text-muted)' }}>Year</th>
+                            <th className="py-2 text-right" style={{ color: 'var(--ept-text-muted)' }}>Income</th>
+                            <th className="py-2 text-right" style={{ color: 'var(--ept-text-muted)' }}>Tax</th>
+                            <th className="py-2 text-right" style={{ color: 'var(--ept-text-muted)' }}>Eff. Rate</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {trendData.years.map((y: any) => (
+                            <tr key={y.year} style={{ borderBottom: '1px solid var(--ept-surface)' }}>
+                              <td className="py-2" style={{ color: 'var(--ept-accent)' }}>{y.year}</td>
+                              <td className="py-2 text-right font-mono" style={{ color: 'var(--ept-text)' }}>{fmt(y.income)}</td>
+                              <td className="py-2 text-right font-mono" style={{ color: '#ef4444' }}>{fmt(y.tax)}</td>
+                              <td className="py-2 text-right font-mono" style={{ color: '#f59e0b' }}>{pct(y.effective_rate)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Card>
+                )}
+
+                {/* Safe Harbor */}
+                {safeHarborData?.analysis && (
+                  <Card title="Safe Harbor Analysis">
+                    <div className="space-y-2">
+                      {Object.entries(safeHarborData.analysis).map(([k, v]) => (
+                        <div key={k} className="flex justify-between py-1" style={{ borderBottom: '1px solid var(--ept-surface)' }}>
+                          <span className="text-sm capitalize" style={{ color: 'var(--ept-text-secondary)' }}>{k.replace(/_/g, ' ')}</span>
+                          <span className="font-mono text-sm" style={{ color: 'var(--ept-text)' }}>{typeof v === 'number' ? fmt(v) : typeof v === 'boolean' ? (v ? 'Yes' : 'No') : String(v)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                {/* Deduction Opportunities */}
+                {deductionOps.length > 0 && (
+                  <Card title="Deduction Opportunities">
+                    <div className="space-y-2">
+                      {deductionOps.map((op, i) => (
+                        <div key={i} className="flex items-center justify-between p-2 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                          <div>
+                            <span className="text-xs font-semibold uppercase px-2 py-0.5 rounded mr-2" style={{ backgroundColor: 'rgba(16,185,129,0.1)', color: '#10b981' }}>{op.category}</span>
+                            <span className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{op.description}</span>
+                          </div>
+                          <span className="text-xs font-mono" style={{ color: '#10b981' }}>~{fmt(op.estimated_savings)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
         {/* ======= FORMS TAB ======= */}
         {tab === 'forms' && (
           <div className="max-w-3xl mx-auto space-y-6 animate-fade-up">
@@ -1061,6 +1475,202 @@ export default function TaxReturnPage() {
           </div>
         )}
 
+        {/* ======= TOOLS TAB ======= */}
+        {tab === 'tools' && (
+          <div className="space-y-6 animate-fade-up">
+            <h3 className="text-2xl font-bold" style={{ color: 'var(--ept-text)' }}>Tax Tools &amp; Reference</h3>
+
+            {/* Tools Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <ActionBtn label="Key Numbers 2025" onClick={() => handleGetKeyNumbers(2025)} loading={loading} color="var(--ept-accent)" />
+              <ActionBtn label="Tax Calendar" onClick={() => handleGetCalendar(2025)} loading={loading} color="#3b82f6" />
+              {taxReturn && <ActionBtn label="Penalty Estimate" onClick={handleGetPenalty} loading={loading} color="#ef4444" />}
+              {taxReturn && <ActionBtn label="Bracket Analysis" onClick={handleGetBrackets} loading={loading} color="#f59e0b" />}
+              {taxReturn && <ActionBtn label="Validate Return" onClick={handleValidate} loading={loading} color="#10b981" />}
+            </div>
+
+            {/* Tax Knowledge Search */}
+            <Card title="Tax Knowledge Search">
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={knowledgeQuery}
+                    onChange={e => setKnowledgeQuery(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleSearchKnowledge()}
+                    placeholder="Search tax knowledge (e.g., Section 179, QBI deduction, EITC)..."
+                    className="w-full rounded-lg px-4 py-2.5 text-sm focus:outline-none"
+                    style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }}
+                  />
+                </div>
+                <button
+                  onClick={handleSearchKnowledge}
+                  disabled={loading || !knowledgeQuery}
+                  className="px-6 py-2.5 rounded-lg text-sm font-semibold disabled:opacity-50 transition-all hover:opacity-90"
+                  style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
+                >
+                  Search
+                </button>
+              </div>
+              {knowledgeResults && (
+                <div className="mt-4 space-y-2">
+                  {knowledgeResults.results?.map((r: any, i: number) => (
+                    <div key={i} className="p-3 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                      <div className="text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>{r.title || r.topic || `Result ${i + 1}`}</div>
+                      <div className="text-xs mt-1" style={{ color: 'var(--ept-text-muted)' }}>{r.content || r.summary || JSON.stringify(r).slice(0, 200)}</div>
+                    </div>
+                  )) || (
+                    <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                      <pre className="text-xs whitespace-pre-wrap" style={{ color: 'var(--ept-text-secondary)' }}>{JSON.stringify(knowledgeResults, null, 2).slice(0, 2000)}</pre>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Card>
+
+            {/* Key Numbers */}
+            {keyNumbers && (
+              <Card title={`Key Tax Numbers — ${keyNumbers.year}`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {keyNumbers.standard_deductions && (
+                    <div>
+                      <h5 className="text-sm font-semibold mb-2 gradient-text">Standard Deductions</h5>
+                      {Object.entries(keyNumbers.standard_deductions).map(([k, v]) => (
+                        <div key={k} className="flex justify-between py-1" style={{ borderBottom: '1px solid var(--ept-surface)' }}>
+                          <span className="text-xs capitalize" style={{ color: 'var(--ept-text-secondary)' }}>{k.replace(/_/g, ' ')}</span>
+                          <span className="font-mono text-xs" style={{ color: 'var(--ept-text)' }}>{fmt(v as number)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {keyNumbers.contribution_limits && (
+                    <div>
+                      <h5 className="text-sm font-semibold mb-2 gradient-text">Contribution Limits</h5>
+                      {Object.entries(keyNumbers.contribution_limits).map(([k, v]) => (
+                        <div key={k} className="flex justify-between py-1" style={{ borderBottom: '1px solid var(--ept-surface)' }}>
+                          <span className="text-xs capitalize" style={{ color: 'var(--ept-text-secondary)' }}>{k.replace(/_/g, ' ')}</span>
+                          <span className="font-mono text-xs" style={{ color: 'var(--ept-text)' }}>{fmt(v as number)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {keyNumbers.fica && (
+                    <div>
+                      <h5 className="text-sm font-semibold mb-2 gradient-text">FICA / Payroll</h5>
+                      {Object.entries(keyNumbers.fica).map(([k, v]) => (
+                        <div key={k} className="flex justify-between py-1" style={{ borderBottom: '1px solid var(--ept-surface)' }}>
+                          <span className="text-xs capitalize" style={{ color: 'var(--ept-text-secondary)' }}>{k.replace(/_/g, ' ')}</span>
+                          <span className="font-mono text-xs" style={{ color: 'var(--ept-text)' }}>{typeof v === 'number' && v > 100 ? fmt(v) : String(v)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {keyNumbers.brackets && (
+                    <div>
+                      <h5 className="text-sm font-semibold mb-2 gradient-text">Tax Brackets (Single)</h5>
+                      {(keyNumbers.brackets.single || []).map((b: any, i: number) => (
+                        <div key={i} className="flex justify-between py-1" style={{ borderBottom: '1px solid var(--ept-surface)' }}>
+                          <span className="text-xs" style={{ color: 'var(--ept-accent)' }}>{(b.rate * 100).toFixed(0)}%</span>
+                          <span className="font-mono text-xs" style={{ color: 'var(--ept-text-secondary)' }}>
+                            {fmt(b.min)} &mdash; {b.max ? fmt(b.max) : 'No limit'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </Card>
+            )}
+
+            {/* Tax Calendar */}
+            {calendarData.length > 0 && (
+              <Card title="Tax Calendar — Key Dates">
+                <div className="space-y-2">
+                  {calendarData.map((entry, i) => (
+                    <div key={i} className="flex items-center gap-4 p-2 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                      <div className="text-xs font-mono font-bold w-24 shrink-0" style={{ color: 'var(--ept-accent)' }}>{entry.date}</div>
+                      <div className="flex-1">
+                        <span className="text-sm" style={{ color: 'var(--ept-text)' }}>{entry.description}</span>
+                        {entry.form && <span className="text-xs ml-2 px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--ept-card-bg)', color: 'var(--ept-text-muted)' }}>{entry.form}</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            {/* Penalty Estimate */}
+            {penaltyData && (
+              <Card title="Penalty Estimate">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <MiniStat label="Underpayment" value={fmt(penaltyData.underpayment_penalty || 0)} color="#ef4444" />
+                  <MiniStat label="Late Filing" value={fmt(penaltyData.late_filing_penalty || 0)} color="#f59e0b" />
+                  <MiniStat label="Late Payment" value={fmt(penaltyData.late_payment_penalty || 0)} color="#f59e0b" />
+                  <MiniStat label="Total Penalty" value={fmt(penaltyData.total_penalty || 0)} color="#ef4444" />
+                </div>
+              </Card>
+            )}
+
+            {/* Bracket Analysis */}
+            {bracketData && (
+              <Card title="Bracket Analysis">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                  <MiniStat label="Current Bracket" value={pct(bracketData.marginal_rate || 0)} color="var(--ept-accent)" />
+                  <MiniStat label="Effective Rate" value={pct(bracketData.effective_rate || 0)} color="#f59e0b" />
+                  <MiniStat label="Room in Bracket" value={fmt(bracketData.room_in_bracket || 0)} color="#10b981" />
+                  <MiniStat label="Next Bracket At" value={fmt(bracketData.current_bracket?.range_end || 0)} color="var(--ept-text-muted)" />
+                </div>
+                {bracketData.brackets?.length > 0 && (
+                  <div className="space-y-1">
+                    {bracketData.brackets.map((b: any, i: number) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <span className="text-xs w-10 text-right font-mono" style={{ color: 'var(--ept-accent)' }}>{pct(b.rate)}</span>
+                        <div className="flex-1 rounded-full h-3 overflow-hidden" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                          <div className="h-full rounded-full" style={{ width: `${Math.min(100, (b.tax_in_bracket / (bracketData.brackets[bracketData.brackets.length - 1]?.tax_in_bracket || 1)) * 100)}%`, backgroundColor: 'var(--ept-accent)' }} />
+                        </div>
+                        <span className="text-xs font-mono w-20 text-right" style={{ color: 'var(--ept-text-secondary)' }}>{fmt(b.tax_in_bracket)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            )}
+
+            {/* Validation Result */}
+            {validationResult && (
+              <Card title="Return Validation">
+                <div className="flex items-center gap-3 mb-3">
+                  <div
+                    className="px-3 py-1 rounded-full text-sm font-bold"
+                    style={{
+                      backgroundColor: validationResult.valid ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
+                      color: validationResult.valid ? '#10b981' : '#ef4444',
+                    }}
+                  >
+                    {validationResult.valid ? 'VALID' : 'ISSUES FOUND'}
+                  </div>
+                  {validationResult.score !== undefined && (
+                    <span className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>Score: {validationResult.score}/100</span>
+                  )}
+                </div>
+                {validationResult.issues?.length > 0 && (
+                  <div className="space-y-1">
+                    {validationResult.issues.map((issue: any, i: number) => (
+                      <div key={i} className="flex items-center gap-2 p-2 rounded" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                        <span className="text-xs px-2 py-0.5 rounded font-semibold uppercase" style={{
+                          backgroundColor: issue.severity === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)',
+                          color: issue.severity === 'error' ? '#ef4444' : '#f59e0b',
+                        }}>{issue.severity}</span>
+                        <span className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{issue.message}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            )}
+          </div>
+        )}
+
         {/* ======= STATUS TAB ======= */}
         {tab === 'status' && (
           <div className="max-w-2xl mx-auto space-y-6 animate-fade-up">
@@ -1122,6 +1732,189 @@ export default function TaxReturnPage() {
             )}
           </div>
         )}
+        {/* ======= ADMIN TAB ======= */}
+        {tab === 'admin' && (
+          <div className="space-y-6 animate-fade-up">
+            <h3 className="text-2xl font-bold" style={{ color: 'var(--ept-text)' }}>Preparer Admin</h3>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <ActionBtn label="Load Dashboard" onClick={handleLoadDashboard} loading={loading} color="var(--ept-accent)" />
+              <ActionBtn label="Client List" onClick={handleLoadClients} loading={loading} color="#3b82f6" />
+              <ActionBtn label="All Returns" onClick={handleLoadReturns} loading={loading} color="#8b5cf6" />
+              <ActionBtn label="Audit Log" onClick={handleLoadAuditLog} loading={loading} color="#f59e0b" />
+              {taxReturn && <ActionBtn label="Load Notes" onClick={handleLoadNotes} loading={loading} color="#10b981" />}
+              {taxReturn && <ActionBtn label="Timeline" onClick={handleLoadTimeline} loading={loading} color="#ec4899" />}
+            </div>
+
+            {/* Preparer Dashboard */}
+            {dashboard && (
+              <Card title="Preparer Dashboard">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                  <MiniStat label="Total Clients" value={String(dashboard.total_clients || 0)} color="var(--ept-accent)" />
+                  <MiniStat label="Total Returns" value={String(dashboard.total_returns || 0)} color="#3b82f6" />
+                  <MiniStat label="Revenue" value={fmt(dashboard.revenue || 0)} color="#10b981" />
+                  <MiniStat label="Pending Items" value={String(dashboard.pending_items || 0)} color="#f59e0b" />
+                </div>
+                {dashboard.returns_by_status && (
+                  <div>
+                    <h5 className="text-sm font-semibold mb-2" style={{ color: 'var(--ept-text-muted)' }}>Returns by Status</h5>
+                    <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                      {Object.entries(dashboard.returns_by_status).map(([status, count]) => (
+                        <div key={status} className="p-2 rounded-lg text-center" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                          <div className="text-lg font-bold" style={{ color: 'var(--ept-text)' }}>{String(count)}</div>
+                          <div className="text-xs capitalize" style={{ color: 'var(--ept-text-muted)' }}>{status}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </Card>
+            )}
+
+            {/* Client List */}
+            {clientList.length > 0 && (
+              <Card title={`Clients (${clientList.length})`}>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--ept-border)' }}>
+                        <th className="py-2 text-left" style={{ color: 'var(--ept-text-muted)' }}>Name</th>
+                        <th className="py-2 text-left" style={{ color: 'var(--ept-text-muted)' }}>Email</th>
+                        <th className="py-2 text-left" style={{ color: 'var(--ept-text-muted)' }}>Filing Status</th>
+                        <th className="py-2 text-left" style={{ color: 'var(--ept-text-muted)' }}>Created</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {clientList.map(c => (
+                        <tr key={c.id} className="hover:opacity-80 cursor-pointer" style={{ borderBottom: '1px solid var(--ept-surface)' }}
+                          onClick={() => { setClient(c); setTab('intake'); }}>
+                          <td className="py-2" style={{ color: 'var(--ept-text)' }}>{c.first_name} {c.last_name}</td>
+                          <td className="py-2" style={{ color: 'var(--ept-text-secondary)' }}>{c.email || '-'}</td>
+                          <td className="py-2 capitalize" style={{ color: 'var(--ept-text-secondary)' }}>{c.filing_status?.replace(/_/g, ' ') || '-'}</td>
+                          <td className="py-2 text-xs" style={{ color: 'var(--ept-text-muted)' }}>{new Date(c.created_at).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            )}
+
+            {/* Returns List */}
+            {returnList.length > 0 && (
+              <Card title={`Returns (${returnList.length})`}>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--ept-border)' }}>
+                        <th className="py-2 text-left" style={{ color: 'var(--ept-text-muted)' }}>Year</th>
+                        <th className="py-2 text-left" style={{ color: 'var(--ept-text-muted)' }}>Status</th>
+                        <th className="py-2 text-right" style={{ color: 'var(--ept-text-muted)' }}>Income</th>
+                        <th className="py-2 text-right" style={{ color: 'var(--ept-text-muted)' }}>Tax</th>
+                        <th className="py-2 text-right" style={{ color: 'var(--ept-text-muted)' }}>Refund/Owed</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {returnList.map(r => (
+                        <tr key={r.id} className="hover:opacity-80 cursor-pointer" style={{ borderBottom: '1px solid var(--ept-surface)' }}
+                          onClick={() => { loadReturnData(r.id); setTab('dashboard'); }}>
+                          <td className="py-2 font-mono" style={{ color: 'var(--ept-accent)' }}>{r.tax_year}</td>
+                          <td className="py-2 capitalize" style={{ color: 'var(--ept-text-secondary)' }}>{r.status}</td>
+                          <td className="py-2 text-right font-mono" style={{ color: 'var(--ept-text)' }}>{fmt(r.total_income)}</td>
+                          <td className="py-2 text-right font-mono" style={{ color: '#ef4444' }}>{fmt(r.total_tax)}</td>
+                          <td className="py-2 text-right font-mono" style={{ color: r.refund_or_owed >= 0 ? '#10b981' : '#ef4444' }}>{fmt(Math.abs(r.refund_or_owed))}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            )}
+
+            {/* Notes */}
+            {taxReturn && (
+              <Card title="Preparer Notes">
+                <div className="flex gap-3 mb-4">
+                  <input
+                    type="text"
+                    value={noteText}
+                    onChange={e => setNoteText(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleAddNote()}
+                    placeholder="Add a note about this return..."
+                    className="flex-1 rounded-lg px-4 py-2.5 text-sm focus:outline-none"
+                    style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }}
+                  />
+                  <button
+                    onClick={handleAddNote}
+                    disabled={loading || !noteText.trim()}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 transition-all hover:opacity-90"
+                    style={{ backgroundColor: '#10b981', color: '#fff' }}
+                  >
+                    Add Note
+                  </button>
+                </div>
+                {notes.length > 0 && (
+                  <div className="space-y-2">
+                    {notes.map((n, i) => (
+                      <div key={n.id || i} className="p-3 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-semibold" style={{ color: 'var(--ept-accent)' }}>{n.author || 'System'}</span>
+                          <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{new Date(n.created_at).toLocaleString()}</span>
+                        </div>
+                        <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{n.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            )}
+
+            {/* Return Timeline */}
+            {timeline.length > 0 && (
+              <Card title="Return Timeline">
+                <div className="space-y-2">
+                  {timeline.map((entry, i) => (
+                    <div key={i} className="flex gap-4 p-2 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                      <div className="text-xs font-mono shrink-0 w-36" style={{ color: 'var(--ept-text-muted)' }}>{new Date(entry.timestamp).toLocaleString()}</div>
+                      <div>
+                        <span className="text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>{entry.event}</span>
+                        {entry.details && <span className="text-xs ml-2" style={{ color: 'var(--ept-text-muted)' }}>{entry.details}</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            {/* Audit Log */}
+            {auditLog?.entries?.length > 0 && (
+              <Card title={`Audit Log (${auditLog.total} entries)`}>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--ept-border)' }}>
+                        <th className="py-2 text-left" style={{ color: 'var(--ept-text-muted)' }}>Time</th>
+                        <th className="py-2 text-left" style={{ color: 'var(--ept-text-muted)' }}>Action</th>
+                        <th className="py-2 text-left" style={{ color: 'var(--ept-text-muted)' }}>Entity</th>
+                        <th className="py-2 text-left" style={{ color: 'var(--ept-text-muted)' }}>Details</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {auditLog.entries.map((entry: any) => (
+                        <tr key={entry.id} style={{ borderBottom: '1px solid var(--ept-surface)' }}>
+                          <td className="py-1.5 font-mono" style={{ color: 'var(--ept-text-muted)' }}>{new Date(entry.timestamp).toLocaleString()}</td>
+                          <td className="py-1.5" style={{ color: 'var(--ept-accent)' }}>{entry.action}</td>
+                          <td className="py-1.5" style={{ color: 'var(--ept-text-secondary)' }}>{entry.entity_type}:{entry.entity_id?.slice(0, 8)}</td>
+                          <td className="py-1.5" style={{ color: 'var(--ept-text-muted)' }}>{JSON.stringify(entry.details || {}).slice(0, 80)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            )}
+          </div>
+        )}
       </main>
 
       {/* Footer */}
@@ -1155,6 +1948,48 @@ function Input({ label, value, onChange, type = 'text', placeholder }: {
           color: 'var(--ept-text)',
         }}
       />
+    </div>
+  );
+}
+
+function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="p-5 rounded-xl" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
+      <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--ept-text)' }}>{title}</h4>
+      {children}
+    </div>
+  );
+}
+
+function ActionBtn({ label, onClick, loading, color }: { label: string; onClick: () => void; loading: boolean; color: string }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={loading}
+      className="px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 transition-all hover:opacity-90"
+      style={{ backgroundColor: `${color}15`, color, border: `1px solid ${color}40` }}
+    >
+      {label}
+    </button>
+  );
+}
+
+function MiniStat({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--ept-surface)' }}>
+      <div className="text-xs mb-1" style={{ color: 'var(--ept-text-muted)' }}>{label}</div>
+      <div className="text-xl font-bold font-mono" style={{ color }}>{value}</div>
+    </div>
+  );
+}
+
+function NeedReturn({ onGo, message }: { onGo: () => void; message: string }) {
+  return (
+    <div className="p-6 rounded-xl text-center" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
+      <p style={{ color: 'var(--ept-text-muted)' }}>{message}</p>
+      <button onClick={onGo} className="mt-3 px-4 py-2 rounded-lg text-sm transition-all hover:opacity-80" style={{ backgroundColor: 'var(--ept-accent-glow)', color: 'var(--ept-accent)' }}>
+        Go to Intake
+      </button>
     </div>
   );
 }
