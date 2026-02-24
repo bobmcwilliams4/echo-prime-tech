@@ -130,6 +130,14 @@ const CAPABILITIES = [
     icon: '▣',
     link: '/tax-returns',
   },
+  {
+    title: 'ShadowGlass Browser',
+    description: 'Privacy-first desktop browser with 120+ anti-detection techniques, integrated Tor routing, proxy chaining, uncensored meta-search across 13 engines, autonomous web scraping, embedded Claude AI terminal, and Memory Cortex integration. Four privacy modes from Standard to Ghost. Built on Chromium via Electron.',
+    stat: '120+',
+    statLabel: 'Evasion Techniques',
+    icon: '◆',
+    link: '/services',
+  },
 ];
 
 const FALLBACK_INDUSTRIES = [
