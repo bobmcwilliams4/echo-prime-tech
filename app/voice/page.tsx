@@ -1016,40 +1016,31 @@ function SampleVoiceCards({ voices, setVoiceId, deleteVoice }: { voices: Voice[]
 
     try {
       const text = `Hi, I'm ${voiceName}. This is what I sound like when I speak.`;
-      const res = await fetch(`${TTS_API}/tts/chunked`, {
+      // Use single /tts endpoint instead of /tts/chunked — eliminates choppy gaps between sentences
+      const res = await fetch(`${TTS_API}/tts`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, voice_id: voiceId, speed: 0.95, output_format: 'wav' }),
         signal: ctrl.signal,
       });
       if (!res.ok) { setPreviewingId(null); return; }
-      const reader = res.body?.getReader();
-      if (!reader) { setPreviewingId(null); return; }
-      const dec = new TextDecoder();
-      let buf = '';
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buf += dec.decode(value, { stream: true });
-        const parts = buf.split('\n\n');
-        buf = parts.pop() || '';
-        for (const part of parts) {
-          const m = part.match(/^data:\s*(.+)$/m);
-          if (!m) continue;
-          try {
-            const evt = JSON.parse(m[1]);
-            if (evt.done || evt.error) continue;
-            if (evt.audio_b64) {
-              const bytes = Uint8Array.from(atob(evt.audio_b64), c => c.charCodeAt(0));
-              const blob = new Blob([bytes], { type: 'audio/wav' });
-              queueRef.current.push(URL.createObjectURL(blob));
-              if (!isPlayingRef.current) drainQueue(voiceId);
-            }
-          } catch { /* skip */ }
-        }
-      }
+      const blob = await res.blob();
+      if (blob.size < 100) { setPreviewingId(null); return; }
+      const url = URL.createObjectURL(blob);
+      setPlayingId(voiceId);
+      isPlayingRef.current = true;
+      const audio = new Audio(url);
+      await new Promise<void>((resolve, reject) => {
+        audio.onended = () => { URL.revokeObjectURL(url); resolve(); };
+        audio.onerror = () => { URL.revokeObjectURL(url); reject(); };
+        audio.play().catch(reject);
+      });
     } catch (e: unknown) {
       if (e instanceof Error && e.name === 'AbortError') return;
-    } finally { setPreviewingId(null); }
+    } finally {
+      isPlayingRef.current = false;
+      setPreviewingId(null);
+      setPlayingId(null);
+    }
   };
 
   const clonedVoices = voices.filter(v => v.has_ref_audio || ['commander', 'lanny_owens', 'steven', 'phone_call'].includes(v.id));
@@ -1305,24 +1296,6 @@ function VoiceLibrary({ voices, voiceId, setVoiceId, onNavigate }: { voices: Voi
   const playingRef = useRef(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  const playQueue = async () => {
-    if (playingRef.current) return;
-    playingRef.current = true;
-    while (audioQueueRef.current.length > 0) {
-      const url = audioQueueRef.current.shift()!;
-      try {
-        const a = new Audio(url);
-        await new Promise<void>((resolve, reject) => {
-          a.onended = () => { URL.revokeObjectURL(url); resolve(); };
-          a.onerror = () => { URL.revokeObjectURL(url); reject(new Error('playback error')); };
-          a.play().catch(reject);
-        });
-      } catch { /* continue to next chunk */ }
-    }
-    playingRef.current = false;
-    setPreviewId(null);
-  };
-
   const preview = async (vid: string) => {
     // Abort any existing preview
     if (abortRef.current) abortRef.current.abort();
@@ -1334,7 +1307,8 @@ function VoiceLibrary({ voices, voiceId, setVoiceId, onNavigate }: { voices: Voi
     abortRef.current = controller;
 
     try {
-      const res = await fetch(`${TTS_API}/tts/chunked`, {
+      // Use single /tts endpoint — eliminates choppy gaps between sentence chunks
+      const res = await fetch(`${TTS_API}/tts`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: 'Hello, this is a preview of my voice. I can speak naturally and clearly.', voice_id: vid, speed: 0.95, output_format: 'wav' }),
         signal: controller.signal,
@@ -1342,38 +1316,21 @@ function VoiceLibrary({ voices, voiceId, setVoiceId, onNavigate }: { voices: Voi
       if (!res.ok) {
         setPreviewError(`TTS error: ${res.status}`); setPreviewId(null); return;
       }
-      const reader = res.body?.getReader();
-      if (!reader) { setPreviewError('No stream'); setPreviewId(null); return; }
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n\n');
-        buffer = lines.pop() || '';
-        for (const line of lines) {
-          const match = line.match(/^data:\s*(.+)$/m);
-          if (!match) continue;
-          try {
-            const evt = JSON.parse(match[1]);
-            if (evt.done) { break; }
-            if (evt.error) { setPreviewError(`Chunk ${evt.chunk}: ${evt.error}`); continue; }
-            if (evt.audio_b64) {
-              const bytes = Uint8Array.from(atob(evt.audio_b64), c => c.charCodeAt(0));
-              const blob = new Blob([bytes], { type: 'audio/wav' });
-              const url = URL.createObjectURL(blob);
-              audioQueueRef.current.push(url);
-              // Start playing as soon as first chunk arrives
-              if (!playingRef.current) playQueue();
-            }
-          } catch { /* skip malformed */ }
-        }
-      }
+      const blob = await res.blob();
+      if (blob.size < 100) { setPreviewError('Empty audio'); setPreviewId(null); return; }
+      const url = URL.createObjectURL(blob);
+      playingRef.current = true;
+      const audio = new Audio(url);
+      await new Promise<void>((resolve, reject) => {
+        audio.onended = () => { URL.revokeObjectURL(url); resolve(); };
+        audio.onerror = () => { URL.revokeObjectURL(url); reject(new Error('playback error')); };
+        audio.play().catch(reject);
+      });
     } catch (e: unknown) {
       if (e instanceof Error && e.name === 'AbortError') return;
       setPreviewError(e instanceof Error ? e.message : 'Preview failed');
+    } finally {
+      playingRef.current = false;
       setPreviewId(null);
     }
   };
