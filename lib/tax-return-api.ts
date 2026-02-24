@@ -27,7 +27,9 @@ export interface Client {
   user_id: string;
   email: string | null;
   first_name: string | null;
+  middle_name: string | null;
   last_name: string | null;
+  suffix: string | null;
   has_ssn: boolean;
   dob: string | null;
   phone: string | null;
@@ -216,7 +218,7 @@ export interface RequiredForm {
 // ─── Client Endpoints ───────────────────────────────────────
 
 export async function createClient(data: {
-  first_name: string; last_name: string; email?: string; ssn?: string;
+  first_name: string; middle_name?: string; last_name: string; suffix?: string; email?: string; ssn?: string;
   dob?: string; phone?: string; filing_status?: string;
   address_street?: string; address_city?: string; address_state?: string; address_zip?: string;
 }): Promise<Client> {

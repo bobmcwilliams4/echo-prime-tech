@@ -103,9 +103,9 @@ export default function TaxReturnPage() {
   // Intake form
   const [intakeStep, setIntakeStep] = useState<IntakeStep>(1);
   const [form, setForm] = useState({
-    first_name: '', last_name: '', email: '', ssn: '', dob: '', phone: '',
+    first_name: '', middle_name: '', last_name: '', suffix: '', email: '', ssn: '', dob: '', phone: '',
     address_street: '', address_city: '', address_state: '', address_zip: '',
-    filing_status: 'single', tax_year: 2024,
+    filing_status: 'single', tax_year: 2025,
   });
 
   // Income form
@@ -146,7 +146,7 @@ export default function TaxReturnPage() {
     clearMessages(); setLoading(true);
     try {
       const c = await createClient({
-        first_name: form.first_name, last_name: form.last_name, email: form.email,
+        first_name: form.first_name, middle_name: form.middle_name || undefined, last_name: form.last_name, suffix: form.suffix || undefined, email: form.email,
         ssn: form.ssn || undefined, dob: form.dob || undefined, phone: form.phone || undefined,
         address_street: form.address_street || undefined, address_city: form.address_city || undefined,
         address_state: form.address_state || undefined, address_zip: form.address_zip || undefined,
@@ -323,7 +323,7 @@ export default function TaxReturnPage() {
                 Professional Tax Preparation
               </h2>
               <p className="text-xl max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
-                Powered by 14 AI Tax Intelligence Engines. Accurate calculations, expert optimization,
+                Powered by the TIE Backbone + 14 AI Tax Intelligence Engines. Accurate calculations, expert optimization,
                 and dedicated preparer review for every return.
               </p>
               <div className="flex gap-4 justify-center">
@@ -411,6 +411,12 @@ export default function TaxReturnPage() {
             <div className="text-center space-y-3 pb-8">
               <p className="text-sm uppercase tracking-widest" style={{ color: 'var(--ept-text-muted)' }}>Powered by Echo Prime Tax Intelligence</p>
               <div className="flex flex-wrap justify-center gap-2">
+                <span
+                  className="px-3 py-1 rounded-full text-xs font-bold"
+                  style={{ backgroundColor: 'var(--ept-accent)', color: '#fff', border: '1px solid var(--ept-accent)' }}
+                >
+                  TIE (Backbone)
+                </span>
                 {Array.from({ length: 14 }, (_, i) => (
                   <span
                     key={i}
@@ -443,9 +449,11 @@ export default function TaxReturnPage() {
             {intakeStep === 1 && (
               <div className="space-y-4">
                 <h3 className="text-2xl font-bold" style={{ color: 'var(--ept-text)' }}>Personal Information</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-4 gap-4">
                   <Input label="First Name *" value={form.first_name} onChange={v => setForm(f => ({ ...f, first_name: v }))} />
+                  <Input label="Middle Name" value={form.middle_name} onChange={v => setForm(f => ({ ...f, middle_name: v }))} />
                   <Input label="Last Name *" value={form.last_name} onChange={v => setForm(f => ({ ...f, last_name: v }))} />
+                  <Input label="Suffix" value={form.suffix} onChange={v => setForm(f => ({ ...f, suffix: v }))} placeholder="Jr, Sr, II, III" />
                 </div>
                 <Input label="Email" value={form.email} onChange={v => setForm(f => ({ ...f, email: v }))} type="email" />
                 <Input label="SSN (encrypted, optional)" value={form.ssn} onChange={v => setForm(f => ({ ...f, ssn: v }))} placeholder="XXX-XX-XXXX" />
@@ -478,7 +486,7 @@ export default function TaxReturnPage() {
                     className="w-full rounded-lg px-4 py-2.5 focus:outline-none transition-all"
                     style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)', border: '1px solid var(--ept-border)' }}
                   >
-                    {[2024, 2023, 2022, 2021, 2020].map(y => <option key={y} value={y}>{y}</option>)}
+                    {[2025, 2024, 2023, 2022, 2021, 2020].map(y => <option key={y} value={y}>{y}</option>)}
                   </select>
                 </div>
                 <button
@@ -1007,7 +1015,7 @@ export default function TaxReturnPage() {
                   <div className="text-sm">Tax Year {formData.form_1040.tax_year}</div>
                 </div>
                 <div className="pb-2" style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <div>{formData.form_1040.taxpayer.first_name} {formData.form_1040.taxpayer.last_name}</div>
+                  <div>{[formData.form_1040.taxpayer.first_name, formData.form_1040.taxpayer.middle_name, formData.form_1040.taxpayer.last_name, formData.form_1040.taxpayer.suffix].filter(Boolean).join(' ')}</div>
                   <div className="text-xs" style={{ color: '#64748b' }}>{formData.form_1040.taxpayer.address}</div>
                   <div className="text-xs" style={{ color: '#64748b' }}>Filing Status: {formData.form_1040.filing_status.replace(/_/g, ' ')}</div>
                 </div>
