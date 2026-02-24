@@ -1,5 +1,6 @@
-// Echo Tax Return — Frontend API Client
+// Echo Tax Return — Frontend API Client v3.2
 // Connects to echo-tax-return.bmcii1976.workers.dev
+// Covers: core CRUD, v2.0 features, v3.1 advanced, v3.2 advanced
 
 const TAX_API = 'https://echo-tax-return.bmcii1976.workers.dev';
 const API_KEY = 'echo-omega-prime-forge-x-2026';
@@ -19,7 +20,7 @@ async function fetchJSON<T>(url: string, opts?: RequestInit): Promise<T> {
   return data as T;
 }
 
-// ─── Types ───────────────────────────────────────────────────
+// ─── Core Types ─────────────────────────────────────────────
 
 export interface Client {
   id: string;
@@ -131,7 +132,88 @@ export interface PricingTier {
   includes: string[];
 }
 
-// ─── Client Endpoints ────────────────────────────────────────
+// ─── v3.1 / v3.2 Types ─────────────────────────────────────
+
+export interface KeyNumbers {
+  year: number;
+  brackets: Record<string, any>;
+  standard_deductions: Record<string, number>;
+  contribution_limits: Record<string, number>;
+  fica: Record<string, number>;
+}
+
+export interface Communication {
+  id: string;
+  client_id: string;
+  type: string;
+  subject: string;
+  body: string;
+  created_at: string;
+}
+
+export interface SelfEmploymentTax {
+  schedule_se: Record<string, number>;
+}
+
+export interface SafeHarbor {
+  analysis: Record<string, any>;
+}
+
+export interface StateTaxEstimate {
+  state: string;
+  state_tax: number;
+  effective_rate: number;
+  [key: string]: any;
+}
+
+export interface DepreciationResult {
+  asset: string;
+  schedule: Array<{ year: number; depreciation: number; remaining: number }>;
+}
+
+export interface TaxStrategy {
+  strategies: Array<{
+    rank: number;
+    strategy: string;
+    category: string;
+    potential_savings: number;
+    implementation: string;
+    confidence: number;
+  }>;
+}
+
+export interface TrendAnalysis {
+  years: Array<{ year: number; income: number; tax: number; effective_rate: number }>;
+  projections: Record<string, any>;
+}
+
+export interface PrintPackage {
+  return_id: string;
+  client: Record<string, any>;
+  summary: Record<string, any>;
+  income_detail: Record<string, any>;
+  deduction_detail: Record<string, any>;
+  credits: Record<string, any>;
+  payments: Record<string, any>;
+  forms: string[];
+  [key: string]: any;
+}
+
+export interface IncomeAnalysis {
+  return_id: string;
+  diversification: Record<string, any>;
+  sources: Array<{ category: string; amount: number; percentage: number }>;
+  [key: string]: any;
+}
+
+export interface RequiredForm {
+  form: string;
+  title: string;
+  reason: string;
+  required: boolean;
+}
+
+// ─── Client Endpoints ───────────────────────────────────────
 
 export async function createClient(data: {
   first_name: string; last_name: string; email?: string; ssn?: string;
@@ -149,7 +231,34 @@ export async function getClient(id: string): Promise<Client> {
   return resp.client;
 }
 
-// ─── Return Endpoints ────────────────────────────────────────
+// ─── v2.0: List Clients / Returns / Stats ───────────────────
+
+export async function listClients(): Promise<Client[]> {
+  const resp = await fetchJSON<{ clients: Client[] }>(`${TAX_API}/clients`, { headers: headers() });
+  return resp.clients;
+}
+
+export async function listReturns(params?: {
+  client_id?: string;
+  tax_year?: number;
+  status?: string;
+}): Promise<TaxReturn[]> {
+  const searchParams = new URLSearchParams();
+  if (params?.client_id) searchParams.set('client_id', params.client_id);
+  if (params?.tax_year) searchParams.set('tax_year', String(params.tax_year));
+  if (params?.status) searchParams.set('status', params.status);
+  const qs = searchParams.toString();
+  const url = qs ? `${TAX_API}/returns?${qs}` : `${TAX_API}/returns`;
+  const resp = await fetchJSON<{ returns: TaxReturn[] }>(url, { headers: headers() });
+  return resp.returns;
+}
+
+export async function getStats(): Promise<any> {
+  const resp = await fetchJSON<{ stats: any }>(`${TAX_API}/stats`, { headers: headers() });
+  return resp.stats;
+}
+
+// ─── Return Endpoints ───────────────────────────────────────
 
 export async function createReturn(clientId: string, taxYear: number): Promise<TaxReturn> {
   const resp = await fetchJSON<{ return: TaxReturn }>(`${TAX_API}/returns`, {
@@ -176,7 +285,7 @@ export async function updateReturnStatus(id: string, status: string): Promise<Ta
   return resp.return;
 }
 
-// ─── Income / Deduction / Dependent ──────────────────────────
+// ─── Income / Deduction / Dependent ─────────────────────────
 
 export async function addIncome(returnId: string, data: { category: string; description?: string; amount: number; tax_withheld?: number }): Promise<IncomeItem> {
   const resp = await fetchJSON<{ income_item: IncomeItem }>(`${TAX_API}/returns/${returnId}/income`, {
@@ -211,7 +320,7 @@ export async function deleteDependent(returnId: string, id: string): Promise<voi
   await fetchJSON(`${TAX_API}/returns/${returnId}/dependents/${id}`, { method: 'DELETE', headers: headers() });
 }
 
-// ─── Document Upload ─────────────────────────────────────────
+// ─── Document Upload ────────────────────────────────────────
 
 export async function uploadDocument(returnId: string, file: File, docType: string, issuerName?: string): Promise<TaxDocument> {
   const formData = new FormData();
@@ -235,7 +344,7 @@ export async function getDocuments(returnId: string): Promise<TaxDocument[]> {
   return resp.documents;
 }
 
-// ─── Calculate + Optimize ────────────────────────────────────
+// ─── Calculate + Optimize ───────────────────────────────────
 
 export async function calculateReturn(returnId: string): Promise<TaxCalculation> {
   const resp = await fetchJSON<{ calculation: TaxCalculation }>(`${TAX_API}/returns/${returnId}/calculate`, {
@@ -251,13 +360,13 @@ export async function getOptimizations(returnId: string): Promise<Optimization[]
   return resp.optimizations;
 }
 
-// ─── Forms ───────────────────────────────────────────────────
+// ─── Forms ──────────────────────────────────────────────────
 
 export async function getReturnForms(returnId: string): Promise<any> {
   return fetchJSON(`${TAX_API}/returns/${returnId}/forms`, { headers: headers() });
 }
 
-// ─── Billing ─────────────────────────────────────────────────
+// ─── Billing ────────────────────────────────────────────────
 
 export async function getPricing(): Promise<PricingTier[]> {
   const resp = await fetchJSON<{ pricing: PricingTier[] }>(`${TAX_API}/pricing`);
@@ -271,8 +380,109 @@ export async function createCheckout(clientId: string, returnId: string, tier: s
   return resp;
 }
 
-// ─── Health ──────────────────────────────────────────────────
+// ─── Health ─────────────────────────────────────────────────
 
 export async function healthCheck(): Promise<{ status: string; clients: number }> {
   return fetchJSON(`${TAX_API}/health`);
+}
+
+// ─── v3.1: Key Numbers ─────────────────────────────────────
+
+export async function getKeyNumbers(year: number): Promise<KeyNumbers> {
+  return fetchJSON<KeyNumbers>(`${TAX_API}/returns/key-numbers/${year}`, { headers: headers() });
+}
+
+// ─── v3.1: Communications ──────────────────────────────────
+
+export async function addCommunication(clientId: string, data: {
+  type: string;
+  subject: string;
+  body: string;
+}): Promise<Communication> {
+  const resp = await fetchJSON<{ communication: Communication }>(`${TAX_API}/returns/communications`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ client_id: clientId, ...data }),
+  });
+  return resp.communication;
+}
+
+export async function getCommunications(clientId: string): Promise<Communication[]> {
+  const resp = await fetchJSON<{ communications: Communication[] }>(
+    `${TAX_API}/returns/communications/${clientId}`,
+    { headers: headers() },
+  );
+  return resp.communications;
+}
+
+// ─── v3.1: Self-Employment Tax ─────────────────────────────
+
+export async function getSelfEmploymentTax(returnId: string): Promise<SelfEmploymentTax> {
+  return fetchJSON<SelfEmploymentTax>(`${TAX_API}/returns/${returnId}/se-tax`, { headers: headers() });
+}
+
+// ─── v3.1: Safe Harbor ─────────────────────────────────────
+
+export async function getSafeHarbor(returnId: string): Promise<SafeHarbor> {
+  return fetchJSON<SafeHarbor>(`${TAX_API}/returns/${returnId}/safe-harbor`, { headers: headers() });
+}
+
+// ─── v3.1: Print Package ───────────────────────────────────
+
+export async function getPrintPackage(returnId: string): Promise<PrintPackage> {
+  return fetchJSON<PrintPackage>(`${TAX_API}/returns/${returnId}/print-package`, { headers: headers() });
+}
+
+// ─── v3.1: Income Analysis ─────────────────────────────────
+
+export async function getIncomeAnalysis(returnId: string): Promise<IncomeAnalysis> {
+  return fetchJSON<IncomeAnalysis>(`${TAX_API}/returns/${returnId}/income-analysis`, { headers: headers() });
+}
+
+// ─── v3.2: State Tax ───────────────────────────────────────
+
+export async function getStateTax(returnId: string, state: string): Promise<StateTaxEstimate> {
+  return fetchJSON<StateTaxEstimate>(
+    `${TAX_API}/returns/${returnId}/state-tax?state=${encodeURIComponent(state)}`,
+    { headers: headers() },
+  );
+}
+
+// ─── v3.2: Required Forms ──────────────────────────────────
+
+export async function getRequiredForms(returnId: string): Promise<RequiredForm[]> {
+  const resp = await fetchJSON<{ forms: RequiredForm[] }>(
+    `${TAX_API}/returns/${returnId}/required-forms`,
+    { headers: headers() },
+  );
+  return resp.forms;
+}
+
+// ─── v3.2: Depreciation Calculator ─────────────────────────
+
+export async function calculateDepreciation(returnId: string, data: {
+  asset_description: string;
+  cost_basis: number;
+  placed_in_service: string;
+  asset_class: string;
+  section_179?: boolean;
+  bonus_depreciation?: boolean;
+}): Promise<DepreciationResult> {
+  return fetchJSON<DepreciationResult>(`${TAX_API}/returns/${returnId}/depreciation`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(data),
+  });
+}
+
+// ─── v3.2: Tax Strategy ────────────────────────────────────
+
+export async function getStrategy(returnId: string): Promise<TaxStrategy> {
+  return fetchJSON<TaxStrategy>(`${TAX_API}/returns/${returnId}/strategy`, { headers: headers() });
+}
+
+// ─── v3.2: Year-over-Year Trend ────────────────────────────
+
+export async function getTrend(returnId: string): Promise<TrendAnalysis> {
+  return fetchJSON<TrendAnalysis>(`${TAX_API}/returns/${returnId}/trend`, { headers: headers() });
 }

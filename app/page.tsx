@@ -122,6 +122,14 @@ const CAPABILITIES = [
     icon: '⬡',
     link: '/grading',
   },
+  {
+    title: 'Tax Return Preparation',
+    description: 'Professional income tax preparation powered by 14 AI Tax Intelligence Engines. IRS 1040 calculation with full bracket analysis, optimization suggestions, state tax estimates, MACRS depreciation, document OCR, strategy planning, and PTIN-certified preparer review. From simple W-2 returns to complex oil & gas taxation.',
+    stat: '14',
+    statLabel: 'TX Engines',
+    icon: '▣',
+    link: '/tax-returns',
+  },
 ];
 
 const FALLBACK_INDUSTRIES = [
@@ -158,6 +166,7 @@ export default function HomePage() {
               { label: 'Voice', href: '/voice' },
               { label: 'Security', href: '/security' },
               { label: 'Services', href: '/services' },
+              { label: 'Tax Prep', href: '/tax-returns' },
               { label: 'Pricing', href: '/pricing' },
             ].map(item => (
               <Link key={item.href} href={item.href} className="text-sm font-medium transition-colors hover:opacity-100" style={{ color: 'var(--ept-text-secondary)' }}>{item.label}</Link>
