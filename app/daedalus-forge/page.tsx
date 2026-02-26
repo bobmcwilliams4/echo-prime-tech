@@ -73,7 +73,7 @@ const API_ENDPOINTS = [
 ];
 
 export default function DaedalusForgePage() {
-  const { theme, toggleTheme } = useTheme();
+  const { isDark, toggle } = useTheme();
   const [activeSection, setActiveSection] = useState('overview');
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [stats, setStats] = useState<ForgeStats | null>(null);
@@ -88,7 +88,7 @@ export default function DaedalusForgePage() {
       {/* ── Sidebar ── */}
       <aside style={{ width: 260, borderRight: '1px solid var(--ept-border)', padding: '24px 16px', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto', background: 'var(--ept-bg-alt)' }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32, textDecoration: 'none' }}>
-          <Image src={theme === 'dark' ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={32} height={32} />
+          <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={32} height={32} />
           <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--ept-text)', letterSpacing: -0.3 }}>Echo Prime</span>
         </Link>
 
@@ -106,8 +106,8 @@ export default function DaedalusForgePage() {
         ))}
 
         <div style={{ paddingTop: 24, borderTop: '1px solid var(--ept-border)', marginTop: 24 }}>
-          <button onClick={toggleTheme} style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--ept-border)', borderRadius: 8, cursor: 'pointer', fontSize: 12, background: 'var(--ept-surface)', color: 'var(--ept-text-secondary)' }}>
-            {theme === 'dark' ? '☀ Day Mode' : '☾ Night Mode'}
+          <button onClick={toggle} style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--ept-border)', borderRadius: 8, cursor: 'pointer', fontSize: 12, background: 'var(--ept-surface)', color: 'var(--ept-text-secondary)' }}>
+            {isDark ? '☀ Day Mode' : '☾ Night Mode'}
           </button>
         </div>
       </aside>
