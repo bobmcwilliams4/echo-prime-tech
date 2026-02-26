@@ -138,6 +138,30 @@ const CAPABILITIES = [
     icon: '◆',
     link: '/services',
   },
+  {
+    title: 'EchoCAD',
+    description: 'AI-native parametric CAD engine with 20 engineering alloys, 8 geometry primitives, Von Mises stress analysis, Lame pressure vessel calculations, RSS tolerance stackup, DFM scoring, BOM generation, and full OpenSCAD export. Engineering-grade material intelligence running serverless at the edge.',
+    stat: '20',
+    statLabel: 'Engineering Alloys',
+    icon: '⬠',
+    link: '/echocad',
+  },
+  {
+    title: 'Daedalus Forge',
+    description: 'AI manufacturing intelligence platform with a 50-stage pipeline, 15 specialized guilds, 80 AI agents, and Trinity Council governance. Covers 8 industry verticals from aerospace to medical devices with built-in compliance checking against AS9100, IATF 16949, ISO 13485, and more.',
+    stat: '80',
+    statLabel: 'AI Agents',
+    icon: '⚒',
+    link: '/daedalus-forge',
+  },
+  {
+    title: 'Hephaestion Forge',
+    description: 'Autonomous software factory with 12 specialized guilds, 60 AI agents, and a 40-stage build pipeline. Full-stack code generation, automated testing, CI/CD integration, and production monitoring. From concept to deployed application in hours, not months.',
+    stat: '60',
+    statLabel: 'Build Agents',
+    icon: '⚡',
+    link: '/hephaestion-forge',
+  },
 ];
 
 const FALLBACK_INDUSTRIES = [
@@ -431,6 +455,9 @@ export default function HomePage() {
                   { label: 'Voice Studio', href: '/voice' },
                   { label: 'AI Closer', href: '/closer' },
                   { label: 'AI Grading', href: '/grading' },
+                  { label: 'EchoCAD', href: '/echocad' },
+                  { label: 'Daedalus Forge', href: '/daedalus-forge' },
+                  { label: 'Hephaestion Forge', href: '/hephaestion-forge' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}
