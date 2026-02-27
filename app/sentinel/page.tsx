@@ -51,6 +51,17 @@ import {
 
 // ── Types ──
 
+import {
+  classifyQuery as agenticClassify,
+  startStreamingSession,
+  getDocument as getAgenticDocument,
+  cancelSession as cancelAgenticSession,
+  type ExecutionPlan,
+  type SSECallbacks,
+} from '../../lib/agentic-engine-api';
+import AgenticProgressPanel, { type AgenticStepDisplay } from '../../components/AgenticProgressPanel';
+import DocumentViewer from '../../components/DocumentViewer';
+
 type SentinelMode = 'standard' | 'swarm' | 'echo_prime';
 type AnalysisMode = 'FAST' | 'DEFENSE' | 'MEMO';
 
@@ -131,6 +142,17 @@ export default function SentinelPage() {
   const [activePreset, setActivePreset] = useState<string | null>(null);
   const [showDomainSelector, setShowDomainSelector] = useState(false);
   const [showDoctrineDetail, setShowDoctrineDetail] = useState<string | null>(null);
+  // ── Agentic Mode State ──
+  const [agenticMode, setAgenticMode] = useState(false);
+  const [agenticSession, setAgenticSession] = useState<string | null>(null);
+  const [agenticSteps, setAgenticSteps] = useState<AgenticStepDisplay[]>([]);
+  const [agenticPlan, setAgenticPlan] = useState<ExecutionPlan | null>(null);
+  const [agenticStatus, setAgenticStatus] = useState<string>('idle');
+  const [agenticElapsed, setAgenticElapsed] = useState(0);
+  const [agenticDocument, setAgenticDocument] = useState<string | null>(null);
+  const [agenticAbort, setAgenticAbort] = useState<(() => void) | null>(null);
+  const agenticTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const agenticStartTimeRef = useRef<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -262,6 +284,125 @@ export default function SentinelPage() {
       setMemoryResults([]);
     }
   }, [memorySearch]);
+
+  // ── Start Agentic Deep Analysis ──
+  const startAgenticAnalysis = useCallback(async () => {
+    const text = input.trim();
+    if (!text || loading || !apiKeyReady) return;
+
+    // Add user message to chat
+    const userMsg: Message = { id: `u_${Date.now()}`, role: 'user', content: text, timestamp: Date.now() };
+    setMessages(prev => [...prev, userMsg]);
+    setInput('');
+
+    // Enter agentic mode
+    setAgenticMode(true);
+    setAgenticSession(null);
+    setAgenticSteps([]);
+    setAgenticPlan(null);
+    setAgenticStatus('planning');
+    setAgenticElapsed(0);
+    setAgenticDocument(null);
+    agenticStartTimeRef.current = Date.now();
+
+    // Start elapsed timer
+    if (agenticTimerRef.current) clearInterval(agenticTimerRef.current);
+    agenticTimerRef.current = setInterval(() => {
+      setAgenticElapsed(Date.now() - agenticStartTimeRef.current);
+    }, 500);
+
+    const callbacks: SSECallbacks = {
+      onPlan: (plan) => {
+        setAgenticPlan(plan);
+        setAgenticStatus('executing');
+        // Initialize steps from plan
+        setAgenticSteps(plan.steps.map(s => ({
+          id: s.id,
+          name: s.name,
+          type: s.type as AgenticStepDisplay['type'],
+          status: 'pending',
+          duration_ms: 0,
+        })));
+      },
+      onStepStart: (step) => {
+        setAgenticSteps(prev => prev.map(s =>
+          s.id === step.step_id ? { ...s, status: 'running' } : s
+        ));
+      },
+      onStepComplete: (step) => {
+        setAgenticSteps(prev => prev.map(s =>
+          s.id === step.step_id ? { ...s, status: 'complete', duration_ms: step.duration_ms, summary: step.summary } : s
+        ));
+      },
+      onStepFailed: (step) => {
+        setAgenticSteps(prev => prev.map(s =>
+          s.id === step.step_id ? { ...s, status: 'failed', error: step.error } : s
+        ));
+      },
+      onValidation: () => {
+        setAgenticStatus('validating');
+      },
+      onDocumentReady: async (data) => {
+        setAgenticStatus('complete');
+        if (agenticTimerRef.current) clearInterval(agenticTimerRef.current);
+        try {
+          const html = await getAgenticDocument(data.session_id);
+          setAgenticDocument(html);
+        } catch { /* document fetch failed — user can retry */ }
+      },
+      onError: (error) => {
+        setAgenticStatus('failed');
+        if (agenticTimerRef.current) clearInterval(agenticTimerRef.current);
+        setMessages(prev => [...prev, { id: `e_${Date.now()}`, role: 'system', content: `Agentic analysis failed: ${error}`, timestamp: Date.now() }]);
+      },
+      onDone: (data) => {
+        setAgenticSession(data.session_id);
+        if (data.status === 'complete') {
+          setAgenticStatus('complete');
+        } else if (data.status === 'failed') {
+          setAgenticStatus('failed');
+        }
+        if (agenticTimerRef.current) clearInterval(agenticTimerRef.current);
+      },
+    };
+
+    try {
+      const { sessionPromise, abort } = startStreamingSession(text, selectedDomains, callbacks);
+      setAgenticAbort(() => abort);
+      const sessionId = await sessionPromise;
+      setAgenticSession(sessionId);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      if (!msg.includes('aborted')) {
+        setAgenticStatus('failed');
+        if (agenticTimerRef.current) clearInterval(agenticTimerRef.current);
+        setMessages(prev => [...prev, { id: `e_${Date.now()}`, role: 'system', content: `Agentic session failed: ${msg}`, timestamp: Date.now() }]);
+      }
+    }
+  }, [input, loading, apiKeyReady, selectedDomains]);
+
+  const cancelAgentic = useCallback(() => {
+    if (agenticAbort) agenticAbort();
+    if (agenticSession) cancelAgenticSession(agenticSession).catch(() => {});
+    setAgenticStatus('cancelled');
+    if (agenticTimerRef.current) clearInterval(agenticTimerRef.current);
+  }, [agenticAbort, agenticSession]);
+
+  const closeAgenticMode = useCallback(() => {
+    setAgenticMode(false);
+    setAgenticDocument(null);
+    setAgenticSteps([]);
+    setAgenticPlan(null);
+    setAgenticStatus('idle');
+    setAgenticSession(null);
+  }, []);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (agenticTimerRef.current) clearInterval(agenticTimerRef.current);
+    };
+  }, []);
 
   // ── Send message ──
   const sendMessage = useCallback(async () => {
@@ -763,9 +904,52 @@ export default function SentinelPage() {
           </div>
         </div>
 
-        {/* Messages */}
+        {/* Messages / Agentic Mode */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '20px 0' }}>
           <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 24px' }}>
+
+            {/* ═══ Agentic Deep Analysis Panel ═══ */}
+            {agenticMode && (
+              <div style={{ marginBottom: 24 }}>
+                <AgenticProgressPanel
+                  plan={agenticPlan}
+                  steps={agenticSteps}
+                  status={agenticStatus}
+                  elapsed={agenticElapsed}
+                  onCancel={cancelAgentic}
+                />
+                {agenticStatus === 'complete' && !agenticDocument && agenticSession && (
+                  <div style={{ marginTop: 12, padding: '12px 16px', borderRadius: 8, backgroundColor: '#111827', border: '1px solid #1e293b', fontSize: 13, color: '#94a3b8' }}>
+                    Analysis complete. Loading document...
+                    <button onClick={async () => {
+                      try {
+                        const html = await getAgenticDocument(agenticSession);
+                        setAgenticDocument(html);
+                      } catch { /* retry manually */ }
+                    }} style={{ marginLeft: 12, padding: '4px 12px', borderRadius: 6, border: '1px solid #334155', backgroundColor: 'transparent', color: '#818cf8', cursor: 'pointer', fontSize: 12 }}>
+                      Retry
+                    </button>
+                  </div>
+                )}
+                {['complete', 'failed', 'cancelled'].includes(agenticStatus) && (
+                  <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+                    <button onClick={closeAgenticMode} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #334155', backgroundColor: 'transparent', color: '#94a3b8', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
+                      Back to Chat
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ═══ Document Viewer Overlay ═══ */}
+            {agenticDocument && agenticSession && (
+              <DocumentViewer
+                html={agenticDocument}
+                sessionId={agenticSession}
+                onClose={() => setAgenticDocument(null)}
+              />
+            )}
+
             {messages.map(msg => (
               <div key={msg.id} style={{ marginBottom: 20 }}>
                 {msg.role === 'user' ? (
@@ -983,6 +1167,27 @@ export default function SentinelPage() {
                   style={{ flex: 1, padding: '10px 14px', borderRadius: 12, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 14, outline: 'none', resize: 'none', lineHeight: 1.5, minHeight: 40, maxHeight: 200, fontFamily: 'inherit' }}
                   onInput={e => { const t = e.target as HTMLTextAreaElement; t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 200) + 'px'; }}
                 />
+                {/* Deep Analysis button — visible when Landman preset or relevant domains active */}
+                {(activePreset === 'Landman / Title' || selectedDomains.some(d => ['LAND', 'LG', 'OILGAS'].includes(d))) && (
+                  <button
+                    onClick={startAgenticAnalysis}
+                    disabled={loading || !input.trim() || agenticMode}
+                    title="Deep Analysis — multi-step agentic orchestration"
+                    style={{
+                      height: 38, padding: '0 14px', borderRadius: 10, border: '1px solid #14b8a6',
+                      cursor: loading || !input.trim() || agenticMode ? 'default' : 'pointer',
+                      backgroundColor: loading || !input.trim() || agenticMode ? '#1e293b' : '#0d9488',
+                      color: '#fff', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0,
+                      fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 6v6l4 2" />
+                    </svg>
+                    Deep Analysis
+                  </button>
+                )}
                 <button onClick={sendMessage} disabled={loading || !input.trim()} style={{
                   width: 38, height: 38, borderRadius: 10, border: 'none',
                   cursor: loading || !input.trim() ? 'default' : 'pointer',
