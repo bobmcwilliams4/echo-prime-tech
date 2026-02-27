@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import {
   consult,
   getStats,
@@ -357,6 +358,26 @@ export default function DaedalusForge() {
               {messages.filter(m => m.role === 'user').length} messages
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* ─── Manufacturing Doctrine ─── */}
+      <div style={{ maxWidth: 900, margin: '24px auto', padding: '0 24px' }}>
+        <div className="p-6 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <h3 className="text-base font-bold mb-1" style={{ color: 'var(--ept-text)' }}>Manufacturing &amp; Safety Doctrine</h3>
+          <p className="text-xs mb-4" style={{ color: 'var(--ept-text-muted)' }}>Query manufacturing, materials, safety, and quality doctrine for compliance standards and best practices.</p>
+          <EngineQueryPanel
+            domains={['MFGR', 'MECH', 'MAT', 'SAFE', 'CONST', 'STEEL', 'WELD']}
+            title="Manufacturing Doctrine Search"
+            placeholder="Ask about manufacturing processes, safety standards, material specs..."
+            exampleQueries={[
+              'FMEA risk priority number calculation',
+              'ISO 9001 quality management requirements',
+              'Heat treatment specifications for 4140 steel',
+              'OSHA machine guarding requirements',
+            ]}
+            showStats
+          />
         </div>
       </div>
     </div>

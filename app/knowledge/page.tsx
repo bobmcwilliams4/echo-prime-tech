@@ -7,6 +7,7 @@ import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { getServices, Service, createCheckout } from '../../lib/ept-api';
 import ReadAloudButton from '../../components/ReadAloudButton';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 const SERVICE_ID = 'knowledge-systems';
 
@@ -165,6 +166,27 @@ export default function KnowledgePage() {
           <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>Stop losing institutional knowledge</h2>
           <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>Every document your team creates becomes searchable, connected, and actionable. Set up in minutes.</p>
           <Link href={user ? '/services' : '/signup'} className="inline-block px-10 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
+        </div>
+      </section>
+
+      {/* ─── Domain Intelligence Browser ─── */}
+      <section className="max-w-4xl mx-auto px-6 pb-16">
+        <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Intelligence Engine Query</h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>Search across all 210 knowledge domains, 2,632 engines, and 188K+ pre-compiled doctrines. Select a domain or search globally.</p>
+          <EngineQueryPanel
+            title="Cross-Domain Intelligence Search"
+            placeholder="Search all 210 domains — tax, legal, cyber, engineering, medical, finance, AI/ML..."
+            exampleQueries={[
+              'Section 1031 like-kind exchange requirements',
+              'NIST cybersecurity framework core functions',
+              'Welding procedure specification variables',
+              'HIPAA minimum necessary standard',
+              'Machine learning model evaluation metrics',
+              'Partnership tax allocation methods',
+            ]}
+            showStats
+          />
         </div>
       </section>
 

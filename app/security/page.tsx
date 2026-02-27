@@ -7,6 +7,7 @@ import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { getServices, Service, createCheckout } from '../../lib/ept-api';
 import ReadAloudButton from '../../components/ReadAloudButton';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 const SERVICE_ID = 'cyber-defense';
 
@@ -444,6 +445,26 @@ export default function SecurityPage() {
           <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Pair with Offensive Testing</h2>
           <p className="text-sm mb-4" style={{ color: 'var(--ept-text-muted)' }}>Defense finds the threats. Offense finds the gaps. Our Red Team uses 300+ attack tools — including 8 C2 frameworks — to simulate real adversaries and validate your defenses under fire.</p>
           <Link href="/pentesting" className="inline-block px-8 py-3 rounded-xl font-semibold text-sm border transition-all hover:shadow-md" style={{ borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)' }}>Explore Penetration Testing</Link>
+        </div>
+      </section>
+
+      {/* ─── Cyber Doctrine Intelligence ─── */}
+      <section className="max-w-4xl mx-auto px-6 pb-12">
+        <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Security Intelligence Engine</h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>Query our cyber defense doctrine library — backed by 100+ security engines covering MITRE ATT&CK, NIST, OWASP, and real-world threat intelligence.</p>
+          <EngineQueryPanel
+            domains={['CYBER', 'MALWARE', 'REVENG', 'PENTEST', 'DFIR', 'NET', 'INTELL']}
+            title="Cyber Doctrine Search"
+            placeholder="Ask about threats, vulnerabilities, compliance, incident response..."
+            exampleQueries={[
+              'Ransomware incident response playbook',
+              'NIST 800-53 access control requirements',
+              'Lateral movement detection techniques',
+              'Zero trust architecture implementation',
+            ]}
+            showStats
+          />
         </div>
       </section>
 

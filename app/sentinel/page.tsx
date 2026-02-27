@@ -23,6 +23,14 @@ import {
   type ProfileResponse,
 } from '../../lib/engine-cloud-api';
 import {
+  queryMultiDomain,
+  queryDoctrines,
+  getRuntimeStats,
+  getConfidenceBadge,
+  type DoctrineResult,
+  type QueryResponse as RuntimeQueryResponse,
+} from '../../lib/engine-runtime-api';
+import {
   brainGetContext,
   brainIngest,
   brainSearch,
@@ -46,6 +54,25 @@ import {
 type SentinelMode = 'standard' | 'swarm' | 'echo_prime';
 type AnalysisMode = 'FAST' | 'DEFENSE' | 'MEMO';
 
+interface DomainPreset {
+  label: string;
+  icon: string;
+  desc: string;
+  domains: string[];
+}
+
+const DOMAIN_PRESETS: DomainPreset[] = [
+  { label: 'Tax / CPA', icon: '📊', desc: 'Tax planning, compliance, audit defense', domains: ['TX', 'ACCT', 'TXLAW', 'TXRE', 'TXINS', 'FIN', 'INS'] },
+  { label: 'Landman / Title', icon: '🗺️', desc: 'Chain of title, mineral rights, oil & gas', domains: ['LAND', 'LG', 'TXRE', 'OILGAS', 'PETRO'] },
+  { label: 'Cybersecurity', icon: '🔒', desc: 'Threats, pentesting, forensics, compliance', domains: ['CYBER', 'MALWARE', 'PENTEST', 'REVENG', 'DFIR', 'NET', 'INTELL'] },
+  { label: 'Engineering', icon: '⚙️', desc: 'Mechanical, structural, materials, welding', domains: ['MECH', 'AERO', 'CHEM', 'CONST', 'MAT', 'PIPE', 'STEEL', 'WELD', 'EE'] },
+  { label: 'Legal', icon: '⚖️', desc: 'Business law, contracts, compliance', domains: ['LG', 'TXLAW', 'BIZ', 'ENT', 'COMP'] },
+  { label: 'Medical / Health', icon: '🏥', desc: 'Clinical, research, compliance', domains: ['MED', 'NEURO', 'PSY', 'PHARMA', 'BIOMED'] },
+  { label: 'Software / AI', icon: '💻', desc: 'Architecture, DevOps, ML, testing', domains: ['PROG', 'WEBAPP', 'DEVOPS', 'AIML', 'CLOUD', 'MOBILE', 'TEST'] },
+  { label: 'Finance', icon: '💰', desc: 'Markets, valuation, strategy, commerce', domains: ['FIN', 'BIZ', 'DCOM', 'SAAS', 'ECOMM', 'ENT'] },
+  { label: 'All Domains', icon: '🌐', desc: 'Search all 210 domains', domains: [] },
+];
+
 interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
@@ -66,6 +93,9 @@ interface Message {
   emotion?: DetectedEmotion;
   personality?: PersonalityProfile;
   voiceId?: string;
+  // Engine doctrine results
+  doctrineResults?: DoctrineResult[];
+  domainsQueried?: string[];
 }
 
 // ── Sentinel Instance ID (stable to avoid hydration mismatch) ──
@@ -97,6 +127,10 @@ export default function SentinelPage() {
   const [showPersonalities, setShowPersonalities] = useState(false);
   const [swarmOnline, setSwarmOnline] = useState(false);
   const [commanderMode, setCommanderMode] = useState(false);
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const [activePreset, setActivePreset] = useState<string | null>(null);
+  const [showDomainSelector, setShowDomainSelector] = useState(false);
+  const [showDoctrineDetail, setShowDoctrineDetail] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -167,8 +201,8 @@ export default function SentinelPage() {
       setMessages([{
         id: 'welcome', role: 'system', timestamp: Date.now(),
         content: commanderMode
-          ? 'COMMANDER MODE ACTIVE. Authority 11.0. Unlimited queries. All engines unlocked.\n\n932 engines. 35,331 doctrine blocks. Standard, Swarm, and Echo Prime modes online.\nMemory cortex connected. Voice output available.'
-          : 'Sentinel Intelligence Engine online. 932 engines. 35,331 doctrine blocks. Zero hallucination.\n\nThis AI is court-defensible — every response grounded in pre-compiled doctrine blocks with deterministic hashing.\n\nModes: Standard (doctrine), Swarm (Trinity Council), Echo Prime (personality + memory).\n\nAsk anything across 65 verticals.',
+          ? 'COMMANDER MODE ACTIVE. Authority 11.0. Unlimited queries. All engines unlocked.\n\n2,632 engines. 210 domains. 186K+ doctrine blocks. Standard, Swarm, and Echo Prime modes online.\nDomain selector active. Memory cortex connected. Voice output available.'
+          : 'Sentinel Intelligence Engine online. 2,632 engines. 210 domains. 186K+ doctrine blocks. Zero hallucination.\n\nThis AI is court-defensible — every response grounded in pre-compiled doctrine blocks with deterministic hashing.\n\nSelect your domain in the sidebar (Tax/CPA, Landman, Engineering, Legal, Medical, Cybersecurity, etc.) for targeted engine intelligence. Or ask anything across all 210 domains.\n\nModes: Standard (doctrine), Swarm (Trinity Council), Echo Prime (personality + memory).',
       }]);
     }
   }, [apiKeyReady, commanderMode]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -246,8 +280,38 @@ export default function SentinelPage() {
     try {
       let assistantMsg: Message;
 
+      // ── Domain-specific doctrine query (runs for ALL modes when domains selected) ──
+      let doctrineResults: DoctrineResult[] = [];
+      let domainsQueried: string[] = [];
+      if (selectedDomains.length > 0) {
+        try {
+          const docRes = await queryMultiDomain(text, selectedDomains, 5);
+          if (docRes.ok && docRes.results?.length > 0) {
+            doctrineResults = docRes.results;
+            domainsQueried = selectedDomains;
+          }
+        } catch { /* doctrine enrichment is additive — proceed without */ }
+      } else {
+        // No preset selected — do cross-domain search to auto-detect relevant domains
+        try {
+          const docRes = await queryDoctrines(text, undefined, 3);
+          if (docRes.ok && docRes.results?.length > 0) {
+            doctrineResults = docRes.results;
+            domainsQueried = [...new Set(docRes.results.map(r => r.domain))];
+          }
+        } catch { /* proceed without */ }
+      }
+
+      // Build doctrine context string for injection into all modes
+      const doctrineContext = doctrineResults.length > 0
+        ? `\n\n[DOCTRINE ENGINE RESULTS — ${domainsQueried.join(', ')}]:\n` +
+          doctrineResults.slice(0, 3).map(d =>
+            `• ${d.topic} (${d.confidence}, ${d.domain}): ${d.conclusion.slice(0, 300)}`
+          ).join('\n')
+        : '';
+
       if (sentinelMode === 'swarm') {
-        // ── Swarm Mode: Trinity Council + Memory ──
+        // ── Swarm Mode: Trinity Council + Memory + Doctrine ──
         let memoryContext = '';
         try {
           const ctx = await brainGetContext(SENTINEL_INSTANCE, text);
@@ -255,7 +319,11 @@ export default function SentinelPage() {
           if (cortexStats) setCortexStats({ ...cortexStats, contextInjected: true });
         } catch { /* proceed without memory */ }
 
-        const queryWithContext = memoryContext ? `[MEMORY CONTEXT: ${memoryContext.slice(0, 500)}]\n\n${text}` : text;
+        const queryWithContext = [
+          memoryContext ? `[MEMORY CONTEXT: ${memoryContext.slice(0, 500)}]` : '',
+          doctrineContext,
+          text,
+        ].filter(Boolean).join('\n\n');
         const decision = await trinityDecide(queryWithContext);
         const responseContent = decision?.reasoning_synthesis || decision?.consensus || 'Trinity Council returned no consensus. Try rephrasing your question.';
 
@@ -266,13 +334,14 @@ export default function SentinelPage() {
           trinity: decision,
           emotion,
           voiceId,
+          doctrineResults: doctrineResults.length > 0 ? doctrineResults : undefined,
+          domainsQueried: domainsQueried.length > 0 ? domainsQueried : undefined,
         };
 
         // Store swarm response to memory
         brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA [SWARM]: ${(responseContent || '').slice(0, 500)}`, 6, ['sentinel', 'swarm', 'trinity']).catch(() => {});
       } else if (sentinelMode === 'echo_prime') {
-        // ── Echo Prime Mode: Personality + Memory + LLM Chat ──
-        // Build personality directive as system prompt for the LLM
+        // ── Echo Prime Mode: Personality + Memory + Doctrine + LLM Chat ──
         const personalityDirective = buildPersonalityDirective(activeProfile, emotion);
 
         // Inject memory context
@@ -283,11 +352,12 @@ export default function SentinelPage() {
           if (cortexStats) setCortexStats({ ...cortexStats, contextInjected: true });
         } catch { /* proceed without memory */ }
 
-        // Build system prompt: personality + memory context
+        // Build system prompt: personality + memory + doctrine context
         const systemPrompt = [
           personalityDirective,
           memoryContext ? `\n\n[MEMORY CONTEXT — previous interactions with this user]:\n${memoryContext.slice(0, 800)}` : '',
-          '\n\nProvide insightful, personality-driven responses. Use markdown for structure. Reference doctrine knowledge when relevant.',
+          doctrineContext,
+          '\n\nProvide insightful, personality-driven responses. Use markdown for structure. When doctrine results are provided, cite them authoritatively and explain their relevance.',
         ].filter(Boolean).join('');
 
         // Build conversation history for context continuity
@@ -306,17 +376,19 @@ export default function SentinelPage() {
           sources: result.has_doctrine_context ? 1 : 0,
           cost: commanderMode ? 0 : result.usage.cost,
           remaining: commanderMode ? 999999 : result.usage.remaining,
-          domain: 'Echo Prime Intelligence',
+          domain: domainsQueried.length > 0 ? domainsQueried.join(' + ') : 'Echo Prime Intelligence',
           mode: 'echo_prime',
           emotion,
           personality: activeProfile,
           voiceId,
+          doctrineResults: doctrineResults.length > 0 ? doctrineResults : undefined,
+          domainsQueried: domainsQueried.length > 0 ? domainsQueried : undefined,
         };
 
         // Store to memory
         brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA [ECHO_PRIME]: ${(result.response || '').slice(0, 500)}`, 5, ['sentinel', 'echo_prime', 'personality']).catch(() => {});
       } else {
-        // ── Standard Mode: Direct engine query + Memory ──
+        // ── Standard Mode: Direct engine query + Memory + Doctrine ──
         let memoryContext = '';
         try {
           const ctx = await brainGetContext(SENTINEL_INSTANCE, text);
@@ -328,21 +400,27 @@ export default function SentinelPage() {
           memoryContext ? `[CONTEXT: ${memoryContext.slice(0, 500)}]\n\n${text}` : text,
           analysisMode
         );
+
+        // Merge doctrine results: engine cloud results + runtime doctrine results
+        const mergedDoctrines = doctrineResults.length > 0 ? doctrineResults : undefined;
+
         assistantMsg = {
           id: `a_${Date.now()}`, role: 'assistant', timestamp: Date.now(),
           content: result.summary || result.analysis,
           confidence: result.confidence,
-          sources: result.sources_cited,
+          sources: result.sources_cited + (doctrineResults.length || 0),
           cost: commanderMode ? 0 : result.usage.cost,
           remaining: commanderMode ? 999999 : result.usage.remaining,
           hash: result.determinism_hash,
           reportId: result.report_id,
           reportAvailable: result.report_available,
-          domain: result.domain,
+          domain: domainsQueried.length > 0 ? domainsQueried.join(' + ') : result.domain,
           domainCost: result.domain_cost,
           mode: 'standard',
           emotion,
           voiceId,
+          doctrineResults: mergedDoctrines,
+          domainsQueried: domainsQueried.length > 0 ? domainsQueried : undefined,
         };
 
         // Store to memory
@@ -377,7 +455,7 @@ export default function SentinelPage() {
     } finally {
       setLoading(false);
     }
-  }, [input, loading, apiKeyReady, analysisMode, sentinelMode, usage, personality, voiceEnabled, commanderMode, cortexStats, playVoice]);
+  }, [input, loading, apiKeyReady, analysisMode, sentinelMode, usage, personality, voiceEnabled, commanderMode, cortexStats, playVoice, selectedDomains, messages]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
@@ -466,6 +544,72 @@ export default function SentinelPage() {
               ))}
             </div>
           )}
+
+          {/* Domain Selector — Engine Intelligence Focus */}
+          <div style={{ padding: '12px', borderBottom: '1px solid #1e293b' }}>
+            <button onClick={() => setShowDomainSelector(!showDomainSelector)} style={{
+              width: '100%', textAlign: 'left', border: 'none', cursor: 'pointer', backgroundColor: 'transparent', padding: 0,
+            }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Engine Domains</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  {selectedDomains.length > 0 && (
+                    <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 4, backgroundColor: '#6366f120', color: '#818cf8', fontWeight: 700 }}>
+                      {selectedDomains.length}
+                    </span>
+                  )}
+                  <span style={{ fontSize: 10 }}>{showDomainSelector ? '▲' : '▼'}</span>
+                </div>
+              </div>
+              {activePreset && (
+                <div style={{ fontSize: 12, color: '#818cf8', fontWeight: 600, marginTop: 2 }}>
+                  {DOMAIN_PRESETS.find(p => p.label === activePreset)?.icon} {activePreset}
+                </div>
+              )}
+              {!activePreset && selectedDomains.length === 0 && (
+                <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>All domains (general)</div>
+              )}
+            </button>
+            {showDomainSelector && (
+              <div style={{ marginTop: 8 }}>
+                <div style={{ fontSize: 10, color: '#475569', marginBottom: 6 }}>Select your professional domain for targeted engine queries:</div>
+                <div style={{ maxHeight: 260, overflowY: 'auto' }}>
+                  {DOMAIN_PRESETS.map(preset => {
+                    const isActive = activePreset === preset.label;
+                    return (
+                      <button key={preset.label} onClick={() => {
+                        if (isActive) {
+                          setSelectedDomains([]);
+                          setActivePreset(null);
+                        } else {
+                          setSelectedDomains(preset.domains);
+                          setActivePreset(preset.label);
+                        }
+                      }} style={{
+                        display: 'flex', alignItems: 'flex-start', gap: 8, width: '100%', padding: '8px 10px', marginBottom: 3,
+                        borderRadius: 8, border: `1px solid ${isActive ? '#6366f140' : 'transparent'}`, cursor: 'pointer', textAlign: 'left',
+                        backgroundColor: isActive ? '#6366f110' : 'transparent',
+                      }}>
+                        <span style={{ fontSize: 16, lineHeight: '20px', flexShrink: 0 }}>{preset.icon}</span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? '#818cf8' : '#e2e8f0' }}>{preset.label}</div>
+                          <div style={{ fontSize: 10, color: '#475569', lineHeight: 1.3 }}>{preset.desc}</div>
+                          {isActive && preset.domains.length > 0 && (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 4 }}>
+                              {preset.domains.map(d => (
+                                <span key={d} style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, backgroundColor: '#1e293b', color: '#94a3b8', fontFamily: 'monospace' }}>{d}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {isActive && <span style={{ fontSize: 12, color: '#818cf8', flexShrink: 0 }}>✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Personality Selector (Echo Prime mode) */}
           {sentinelMode === 'echo_prime' && (
@@ -597,8 +741,13 @@ export default function SentinelPage() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
             </button>
             <span style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9' }}>
-              Sentinel — 932 Engines
+              Sentinel — 2,632 Engines
             </span>
+            {activePreset && (
+              <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, backgroundColor: '#6366f115', color: '#818cf8', fontWeight: 600, border: '1px solid #6366f130' }}>
+                {DOMAIN_PRESETS.find(p => p.label === activePreset)?.icon} {activePreset}
+              </span>
+            )}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             {commanderMode && (
@@ -676,6 +825,65 @@ export default function SentinelPage() {
                           </div>
                         )}
 
+                        {/* Doctrine citations */}
+                        {msg.doctrineResults && msg.doctrineResults.length > 0 && (
+                          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #1e293b' }}>
+                            <button onClick={() => setShowDoctrineDetail(showDoctrineDetail === msg.id ? null : msg.id)} style={{
+                              display: 'flex', alignItems: 'center', gap: 6, border: 'none', cursor: 'pointer', backgroundColor: 'transparent', padding: 0,
+                            }}>
+                              <span style={{ fontSize: 11, fontWeight: 600, color: '#818cf8' }}>
+                                {msg.doctrineResults.length} Doctrine{msg.doctrineResults.length > 1 ? 's' : ''} Cited
+                              </span>
+                              {msg.domainsQueried && (
+                                <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 4, backgroundColor: '#1e293b', color: '#94a3b8', fontFamily: 'monospace' }}>
+                                  {msg.domainsQueried.join(', ')}
+                                </span>
+                              )}
+                              <span style={{ fontSize: 10, color: '#475569' }}>{showDoctrineDetail === msg.id ? '▲' : '▼'}</span>
+                            </button>
+                            {showDoctrineDetail === msg.id && (
+                              <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                {msg.doctrineResults.map((doc, di) => {
+                                  const badge = getConfidenceBadge(doc.confidence);
+                                  return (
+                                    <div key={di} style={{ padding: '10px 12px', borderRadius: 8, backgroundColor: '#0a0a0f', border: '1px solid #1e293b' }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                                        <span style={{ fontSize: 11, fontWeight: 700, color: '#e2e8f0' }}>{doc.topic}</span>
+                                        <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, backgroundColor: badge.color + '20', color: badge.color, fontWeight: 700 }}>
+                                          {badge.label}
+                                        </span>
+                                        <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, backgroundColor: '#1e293b', color: '#64748b', fontFamily: 'monospace' }}>
+                                          {doc.domain}
+                                        </span>
+                                        {doc.score > 0 && (
+                                          <span style={{ fontSize: 9, color: '#475569', marginLeft: 'auto' }}>
+                                            {(doc.score * 100).toFixed(0)}% match
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>{doc.conclusion}</div>
+                                      {doc.reasoning && (
+                                        <div style={{ fontSize: 11, color: '#475569', marginTop: 4, lineHeight: 1.4, borderTop: '1px solid #1e293b40', paddingTop: 4 }}>
+                                          {doc.reasoning.slice(0, 200)}{doc.reasoning.length > 200 ? '...' : ''}
+                                        </div>
+                                      )}
+                                      {doc.authority && doc.authority.length > 0 && (
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 4 }}>
+                                          {doc.authority.slice(0, 3).map((a, ai) => (
+                                            <span key={ai} style={{ fontSize: 9, padding: '1px 5px', borderRadius: 3, backgroundColor: '#1e293b', color: '#64748b' }}>
+                                              {a.slice(0, 60)}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         {/* Report download */}
                         {msg.reportAvailable && msg.reportId && (
                           <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #1e293b' }}>
@@ -727,7 +935,9 @@ export default function SentinelPage() {
                     {sentinelMode === 'swarm' ? 'Trinity Council' : 'Sentinel'}
                   </div>
                   <div style={{ padding: '16px 20px', borderRadius: 12, backgroundColor: '#111827', border: '1px solid #1e293b', fontSize: 13, color: '#64748b' }}>
-                    {sentinelMode === 'swarm' ? 'SAGE, NYX, and THORNE are deliberating...' : 'Analyzing across 932 engines...'}
+                    {sentinelMode === 'swarm' ? 'SAGE, NYX, and THORNE are deliberating...'
+                      : activePreset ? `Querying ${activePreset} engines across ${selectedDomains.length} domains...`
+                      : 'Analyzing across 2,632 engines...'}
                   </div>
                 </div>
               </div>
@@ -762,7 +972,11 @@ export default function SentinelPage() {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={sentinelMode === 'swarm' ? 'Ask the Trinity Council...' : 'Ask anything — tax, legal, cybersecurity, engineering...'}
+                  placeholder={
+                    sentinelMode === 'swarm' ? 'Ask the Trinity Council...'
+                    : activePreset ? `Ask about ${activePreset.toLowerCase()}...`
+                    : 'Ask anything — tax, legal, cybersecurity, engineering...'
+                  }
                   disabled={loading}
                   rows={1}
                   autoComplete="off"

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 /* ═══════════════════════════════════════════════════════════════
    CGC GRADING DATA
@@ -2709,6 +2710,26 @@ export default function GradingPage() {
           </div>
         </div>
       )}
+
+      {/* ─── Collectible Doctrine Intelligence ─── */}
+      <div style={{ maxWidth: 900, margin: '24px auto', padding: '24px' }}>
+        <div className="p-6 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <h3 className="text-base font-bold mb-1" style={{ color: 'var(--ept-text)' }}>Valuation &amp; Authentication Doctrine</h3>
+          <p className="text-xs mb-4" style={{ color: 'var(--ept-text-muted)' }}>Query forensic and financial doctrine for collectible authentication, valuation methodology, and appraisal standards.</p>
+          <EngineQueryPanel
+            domains={['FOREN', 'FIN']}
+            title="Collectible Doctrine Search"
+            placeholder="Ask about authentication standards, valuation methods, appraisal doctrine..."
+            exampleQueries={[
+              'Coin grading scale MS-60 to MS-70 criteria',
+              'Sports memorabilia authentication methods',
+              'Fair market value determination for collectibles',
+              'Provenance verification best practices',
+            ]}
+            showStats
+          />
+        </div>
+      </div>
 
       {/* Footer */}
       <footer className="border-t py-6 mt-12" style={{ borderColor: 'var(--ept-border)' }}>

@@ -20,6 +20,7 @@ import {
   type Dependent, type TaxDocument, type Optimization, type TaxCalculation,
   type PricingTier,
 } from '../../lib/tax-return-api';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 // ===============================================================
 // TYPES
@@ -1401,6 +1402,22 @@ export default function TaxReturnPage() {
                     </div>
                   </Card>
                 )}
+
+                {/* Engine Intelligence — Tax Doctrine */}
+                <Card title="Ask the Tax Intelligence Engine">
+                  <EngineQueryPanel
+                    domains={['TX', 'ACCT', 'TXLAW', 'TXRE', 'TXINS', 'FIN', 'INS']}
+                    title="Tax Doctrine Intelligence"
+                    placeholder="Ask about tax strategy, deductions, credits, audit defense..."
+                    exampleQueries={[
+                      'Section 179 deduction limits for 2025',
+                      'Qualified business income deduction requirements',
+                      'Home office deduction safe harbor',
+                      'Capital gains tax deferral strategies',
+                    ]}
+                    showStats
+                  />
+                </Card>
               </>
             )}
           </div>
@@ -1526,6 +1543,22 @@ export default function TaxReturnPage() {
                   )}
                 </div>
               )}
+            </Card>
+
+            {/* Engine Intelligence — Doctrine Search */}
+            <Card title="Tax Doctrine Intelligence">
+              <EngineQueryPanel
+                domains={['TX', 'ACCT', 'TXLAW', 'TXRE', 'TXINS', 'FIN', 'INS']}
+                title="Tax Engine Intelligence"
+                placeholder="Query tax doctrine engines (IRC, regulations, case law)..."
+                exampleQueries={[
+                  'Disguised sale partnership rules',
+                  'SALT deduction workarounds for 2025',
+                  'Installment sale reporting requirements',
+                  'Pass-through entity tax elections',
+                ]}
+                showStats
+              />
             </Card>
 
             {/* Key Numbers */}

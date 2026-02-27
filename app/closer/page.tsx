@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../../lib/auth-context';
 import { closerFetch, getDashboardStats } from '../../lib/closer-api';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 /* ──────────────────── Types ──────────────────── */
 
@@ -371,6 +372,26 @@ export default function CloserDashboardPage() {
               </span>
             </Link>
           ))}
+        </div>
+      </div>
+
+      {/* ─── Sales & Business Doctrine ─── */}
+      <div style={{ maxWidth: 900, margin: '24px auto', padding: '0 24px 24px' }}>
+        <div className="p-6 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <h3 className="text-base font-bold mb-1" style={{ color: 'var(--ept-text)' }}>Business Intelligence Doctrine</h3>
+          <p className="text-xs mb-4" style={{ color: 'var(--ept-text-muted)' }}>Query business, digital commerce, and finance doctrine for sales strategies and market intelligence.</p>
+          <EngineQueryPanel
+            domains={['BIZ', 'DCOM', 'FIN', 'SAAS', 'ECOMM', 'ENT']}
+            title="Sales Doctrine Search"
+            placeholder="Ask about sales methodology, lead qualification, objection handling..."
+            exampleQueries={[
+              'BANT vs MEDDIC qualification frameworks',
+              'SaaS pricing strategy best practices',
+              'Enterprise deal negotiation tactics',
+              'Customer retention metrics and benchmarks',
+            ]}
+            showStats
+          />
         </div>
       </div>
     </div>

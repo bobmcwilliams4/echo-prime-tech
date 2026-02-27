@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 const SANDBOX_API = 'https://echo-security-sandbox.bmcii1976.workers.dev';
 
@@ -502,6 +503,25 @@ export default function SandboxPage() {
           ))}
         </div>
       )}
+
+      {/* ─── Security Doctrine Hints ─── */}
+      <div style={{ padding: '0 24px 24px', maxWidth: 1200, margin: '0 auto' }}>
+        <div style={{ background: '#0c1220', border: '1px solid #1e293b', borderRadius: 12, padding: 20 }}>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: '#e2e8f0', marginBottom: 12 }}>Security Doctrine Knowledge Base</h3>
+          <p style={{ fontSize: 12, color: '#64748b', marginBottom: 16 }}>Search security doctrine for hints, learning material, and deep technical knowledge about vulnerabilities and exploitation techniques.</p>
+          <EngineQueryPanel
+            domains={['CYBER', 'MALWARE', 'REVENG']}
+            title="CTF Knowledge Base"
+            placeholder="Search security doctrine for hints and learning material..."
+            exampleQueries={[
+              'Cross-site scripting prevention methods',
+              'Buffer overflow exploitation techniques',
+              'SQL injection detection and bypass',
+            ]}
+            showStats={false}
+          />
+        </div>
+      </div>
     </div>
   );
 }

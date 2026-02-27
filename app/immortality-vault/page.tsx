@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
 import { subscribe } from '../../lib/ept-api';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 /* ─── Constants ────────────────────────────────────────────────────────── */
 
@@ -935,6 +936,26 @@ export default function ImmortalityVaultPage() {
           >
             Create Your Vault — Free
           </a>
+        </div>
+      </section>
+
+      {/* ─── Legacy Planning Doctrine ─── */}
+      <section className="max-w-4xl mx-auto px-6 pb-12">
+        <div className="p-8 rounded-2xl" style={{ backgroundColor: '#0c1220', border: `1px solid ${BORDER}` }}>
+          <h2 className="text-xl font-bold mb-2 text-white">Legacy Planning Expert Insights</h2>
+          <p className="text-sm mb-6 text-gray-400">Query legal, medical, and psychological doctrine for digital legacy planning, advance directives, and estate preservation guidance.</p>
+          <EngineQueryPanel
+            domains={['PSY', 'MED', 'LG', 'NEURO']}
+            title="Legacy Doctrine Search"
+            placeholder="Ask about estate planning, advance directives, digital legacy..."
+            exampleQueries={[
+              'Digital asset estate planning requirements',
+              'Advance healthcare directive legal standards',
+              'Psychological aspects of legacy preservation',
+              'Medical power of attorney considerations',
+            ]}
+            showStats
+          />
         </div>
       </section>
 

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import {
   consult,
   getStats,
@@ -385,6 +386,26 @@ export default function HephaestionForge() {
               {messages.filter(m => m.role === 'user').length} messages
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* ─── Software Engineering Doctrine ─── */}
+      <div style={{ maxWidth: 900, margin: '24px auto', padding: '0 24px' }}>
+        <div className="p-6 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <h3 className="text-base font-bold mb-1" style={{ color: 'var(--ept-text)' }}>Software Architecture Doctrine</h3>
+          <p className="text-xs mb-4" style={{ color: 'var(--ept-text-muted)' }}>Query engineering doctrine for best practices on architecture, DevOps, testing, and cloud infrastructure.</p>
+          <EngineQueryPanel
+            domains={['PROG', 'WEBAPP', 'DEVOPS', 'AIML', 'CLOUD', 'MOBILE', 'SAAS', 'TEST']}
+            title="Software Doctrine Search"
+            placeholder="Ask about architecture patterns, CI/CD, testing strategies, cloud design..."
+            exampleQueries={[
+              'Microservices vs monolith trade-offs',
+              'CI/CD pipeline security best practices',
+              'React performance optimization patterns',
+              'Kubernetes horizontal pod autoscaling',
+            ]}
+            showStats
+          />
         </div>
       </div>
     </div>

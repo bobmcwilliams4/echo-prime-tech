@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import {
   getHealth, getStats, getMaterials, compareMaterials,
   createPrimitive, analyzeStress, analyzeDFM, analyzeFatigue,
@@ -854,6 +855,26 @@ export default function EchoCADPage() {
             </div>
           </div>
         )}
+
+        {/* ─── Engineering Doctrine Intelligence ─── */}
+        <section style={{ padding: '32px 24px' }}>
+          <div style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: 16, padding: 24 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 8 }}>Engineering Standards &amp; Doctrine</h3>
+            <p style={{ fontSize: 13, color: 'var(--ept-text-muted)', marginBottom: 20 }}>Query 200+ engineering engines for materials science, structural analysis, welding codes, pipe standards, and manufacturing best practices.</p>
+            <EngineQueryPanel
+              domains={['MECH', 'AERO', 'CHEM', 'CONST', 'MAT', 'PIPE', 'STEEL', 'WELD', 'EE']}
+              title="Engineering Doctrine Search"
+              placeholder="Ask about materials, structural standards, welding codes, pipe specs..."
+              exampleQueries={[
+                'ASTM A36 steel mechanical properties',
+                'AWS D1.1 weld qualification requirements',
+                'ASME B31.3 pipe stress analysis',
+                'Fatigue life calculation for cyclic loading',
+              ]}
+              showStats
+            />
+          </div>
+        </section>
 
       </main>
     </div>

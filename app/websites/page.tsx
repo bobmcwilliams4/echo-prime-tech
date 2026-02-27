@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import ReadAloudButton from '../../components/ReadAloudButton';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 const TEMPLATES = [
   { name: 'SaaS Landing', preview: 'Modern SaaS product page with hero, features, pricing, and CTA sections', category: 'Business' },
@@ -128,6 +129,25 @@ export default function WebsitesPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Web Design Doctrine */}
+      <section className="max-w-4xl mx-auto px-6 pb-12">
+        <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Web Design Best Practices</h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>Query UI/UX, web development, and digital commerce doctrine for design patterns and optimization strategies.</p>
+          <EngineQueryPanel
+            domains={['WEBAPP', 'UIUX', 'DCOM']}
+            title="Web Design Doctrine"
+            placeholder="Ask about web design, UX patterns, SEO, conversion optimization..."
+            exampleQueries={[
+              'Mobile-first responsive design patterns',
+              'Core Web Vitals optimization techniques',
+              'E-commerce conversion rate best practices',
+            ]}
+            showStats
+          />
         </div>
       </section>
 
