@@ -162,6 +162,14 @@ const CAPABILITIES = [
     icon: '⚡',
     link: '/hephaestion-forge',
   },
+  {
+    title: 'Immortality Vault',
+    description: 'Digital consciousness preservation platform. Guided interviews capture memories, personality, and wisdom across 12 life categories. Ultra-realistic voice cloning with 19 emotional expressions. Family members converse with preserved loved ones anytime — text or voice.',
+    stat: '216',
+    statLabel: 'Interview Questions',
+    icon: '🛡',
+    link: '/immortality-vault',
+  },
 ];
 
 const FALLBACK_INDUSTRIES = [
