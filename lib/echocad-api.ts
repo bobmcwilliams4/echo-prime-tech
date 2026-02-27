@@ -34,23 +34,22 @@ export interface Material {
 }
 
 export interface StressResult {
-  force_N: number;
-  area_mm2: number;
-  material: string;
-  sigma_direct_mpa: number;
   vonMises_mpa: number;
-  yield_mpa: number;
+  principal: number[];
   safetyFactor: number;
-  verdict: string;
+  yieldMargin_pct: number;
+  status: string;
+  material: string;
+  yield_mpa: number;
 }
 
 export interface DFMResult {
   score: number;
   grade: string;
-  cost_multiplier: number;
+  estimatedCostMultiplier: number;
   issues: string[];
-  recommendations: string[];
-  breakdown: Record<string, number>;
+  suggestions: string[];
+  processRecommendation: string;
 }
 
 export interface HealthResponse {
@@ -60,10 +59,13 @@ export interface HealthResponse {
 }
 
 export interface StatsResponse {
-  materials: { count: number; categories: string[] };
-  primitives: string[];
+  materials: number;
+  materialCategories: string[];
+  primitiveTypes: string[];
   engineeringCalcs: string[];
+  manufacturing: string[];
   exportFormats: string[];
+  aiFeatures: string[];
 }
 
 // ── Fetcher ──
@@ -92,7 +94,8 @@ export async function getStats(): Promise<StatsResponse> {
 
 export async function getMaterials(category?: string): Promise<Material[]> {
   const q = category ? `?category=${encodeURIComponent(category)}` : '';
-  return fetchJSON(`/materials${q}`);
+  const res = await fetchJSON<{ count: number; categories: string[]; materials: Material[] }>(`/materials${q}`);
+  return res.materials ?? [];
 }
 
 export async function getMaterial(id: string): Promise<Material> {

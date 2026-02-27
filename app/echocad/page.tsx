@@ -150,8 +150,8 @@ export default function EchoCADPage() {
     m.id.toLowerCase().includes(materialFilter.toLowerCase())
   );
 
-  const materialCount = stats?.materials?.count || materials.length || 38;
-  const primitiveCount = stats?.primitives?.length || 15;
+  const materialCount = stats?.materials || materials.length || 38;
+  const primitiveCount = stats?.primitiveTypes?.length || 15;
   const calcCount = stats?.engineeringCalcs?.length || 12;
 
   return (
@@ -321,10 +321,10 @@ export default function EchoCADPage() {
               {stressResult && (
                 <div style={{ marginTop: 16, padding: 16, background: 'var(--ept-surface)', borderRadius: 8 }}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, textAlign: 'center' }}>
-                    <div><div style={{ fontSize: 20, fontWeight: 800, color: 'var(--ept-accent)' }}>{stressResult.vonMises_mpa?.toFixed(1) ?? stressResult.sigma_direct_mpa?.toFixed(1)}</div><div style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>Von Mises (MPa)</div></div>
+                    <div><div style={{ fontSize: 20, fontWeight: 800, color: 'var(--ept-accent)' }}>{stressResult.vonMises_mpa?.toFixed(1)}</div><div style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>Von Mises (MPa)</div></div>
                     <div><div style={{ fontSize: 20, fontWeight: 800, color: 'var(--ept-text)' }}>{stressResult.yield_mpa}</div><div style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>Yield (MPa)</div></div>
                     <div><div style={{ fontSize: 20, fontWeight: 800, color: (stressResult.safetyFactor ?? 0) >= 2 ? '#22c55e' : '#ef4444' }}>{stressResult.safetyFactor?.toFixed(2)}</div><div style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>Safety Factor</div></div>
-                    <div><div style={{ fontSize: 20, fontWeight: 800, color: stressResult.verdict === 'PASS' ? '#22c55e' : '#ef4444' }}>{stressResult.verdict}</div><div style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>Verdict</div></div>
+                    <div><div style={{ fontSize: 20, fontWeight: 800, color: stressResult.status === 'PASS' ? '#22c55e' : '#ef4444' }}>{stressResult.status}</div><div style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>Verdict</div></div>
                   </div>
                 </div>
               )}
@@ -391,18 +391,21 @@ export default function EchoCADPage() {
                   <div style={{ display: 'flex', gap: 32, marginBottom: 16 }}>
                     <div><span style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>SCORE</span><div style={{ fontSize: 28, fontWeight: 800, color: 'var(--ept-accent)' }}>{dfmResult.score}/100</div></div>
                     <div><span style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>GRADE</span><div style={{ fontSize: 28, fontWeight: 800, color: 'var(--ept-text)' }}>{dfmResult.grade}</div></div>
-                    <div><span style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>COST MULT.</span><div style={{ fontSize: 28, fontWeight: 800, color: 'var(--ept-text-secondary)' }}>{dfmResult.cost_multiplier}x</div></div>
+                    <div><span style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>COST MULT.</span><div style={{ fontSize: 28, fontWeight: 800, color: 'var(--ept-text-secondary)' }}>{dfmResult.estimatedCostMultiplier}x</div></div>
                   </div>
+                  {dfmResult.processRecommendation && (
+                    <div style={{ fontSize: 13, color: 'var(--ept-accent)', marginBottom: 12 }}>Process: {dfmResult.processRecommendation}</div>
+                  )}
                   {dfmResult.issues?.length > 0 && (
                     <div style={{ marginBottom: 12 }}>
                       <div style={{ fontSize: 12, fontWeight: 600, color: '#ef4444', marginBottom: 4 }}>Issues Found:</div>
                       {dfmResult.issues.map((issue: string, idx: number) => <div key={idx} style={{ fontSize: 12, color: 'var(--ept-text-secondary)', paddingLeft: 12 }}>- {issue}</div>)}
                     </div>
                   )}
-                  {dfmResult.recommendations?.length > 0 && (
+                  {dfmResult.suggestions?.length > 0 && (
                     <div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#22c55e', marginBottom: 4 }}>Recommendations:</div>
-                      {dfmResult.recommendations.map((rec: string, idx: number) => <div key={idx} style={{ fontSize: 12, color: 'var(--ept-text-secondary)', paddingLeft: 12 }}>- {rec}</div>)}
+                      <div style={{ fontSize: 12, fontWeight: 600, color: '#22c55e', marginBottom: 4 }}>Suggestions:</div>
+                      {dfmResult.suggestions.map((sug: string, idx: number) => <div key={idx} style={{ fontSize: 12, color: 'var(--ept-text-secondary)', paddingLeft: 12 }}>- {sug}</div>)}
                     </div>
                   )}
                 </div>
