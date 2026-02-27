@@ -1,330 +1,659 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import {
-  getHealth,
-  getStats,
-  type HealthResponse,
-  type ForgeStats,
+  getHealth, getStats, getArchetypes, getPipeline, planProject, buildProject,
+  reviewCode, chat, getTemplates, getLanguages,
+  type HealthResponse, type ForgeStats, type Archetype, type PipelineStage,
+  type BuildResult, type ProjectPlan, type CodeReview, type ConversationMessage,
 } from '../../lib/hephaestion-forge-api';
 
-const SECTIONS = [
-  { id: 'overview', label: 'Overview', icon: '⚡' },
-  { id: 'archetypes', label: 'Archetypes', icon: '◎' },
+// ── Constants ──
+
+const TABS = [
+  { id: 'dashboard', label: 'Dashboard', icon: '⚡' },
+  { id: 'build', label: 'Build Project', icon: '◎' },
+  { id: 'review', label: 'Code Review', icon: '✦' },
+  { id: 'chat', label: 'AI Chat', icon: '⟨⟩' },
+  { id: 'archetypes', label: 'Archetypes', icon: '⬡' },
   { id: 'pipeline', label: 'Pipeline', icon: '▸▸' },
-  { id: 'quality', label: 'Quality Gates', icon: '✦' },
-  { id: 'languages', label: 'Languages', icon: '⟨⟩' },
-  { id: 'swarm', label: 'LLM Swarm', icon: '⬡' },
-  { id: 'api', label: 'API Reference', icon: '⟨/⟩' },
 ] as const;
 
-const ARCHETYPES = [
-  { id: 'web_app', name: 'Web Application', stack: ['Next.js', 'React', 'Tailwind', 'PostgreSQL'], desc: 'Full-stack web application with auth, dashboard, API routes, and database. SSR/SSG, responsive design, SEO optimized.' },
-  { id: 'api_service', name: 'API Service', stack: ['FastAPI', 'Hono', 'Express', 'GraphQL'], desc: 'RESTful or GraphQL API with OpenAPI docs, rate limiting, auth middleware, health checks, and structured logging.' },
-  { id: 'cli_tool', name: 'CLI Tool', stack: ['Click', 'Commander.js', 'Clap'], desc: 'Command-line application with argument parsing, colored output, progress bars, configuration management, and shell completion.' },
-  { id: 'worker', name: 'Cloudflare Worker', stack: ['Hono', 'KV', 'D1', 'R2'], desc: 'Edge-deployed serverless worker with KV storage, D1 database, R2 objects, cron triggers, and Durable Objects.' },
-  { id: 'desktop_app', name: 'Desktop Application', stack: ['Electron', 'Tauri', 'Qt'], desc: 'Cross-platform desktop application with native menus, system tray, auto-update, and local storage.' },
-  { id: 'mobile_app', name: 'Mobile Application', stack: ['React Native', 'Flutter', 'Swift'], desc: 'iOS/Android mobile application with navigation, state management, push notifications, and offline support.' },
-  { id: 'ml_pipeline', name: 'ML Pipeline', stack: ['PyTorch', 'HuggingFace', 'MLflow'], desc: 'Machine learning training/inference pipeline with data loading, model training, evaluation, and deployment.' },
-  { id: 'game', name: 'Game', stack: ['Godot', 'Unity', 'Bevy'], desc: 'Game project with game loop, physics, rendering, input handling, asset management, and multiplayer networking.' },
-  { id: 'library', name: 'Library / Package', stack: ['npm', 'PyPI', 'crates.io'], desc: 'Reusable library with public API, documentation, examples, CI/CD, versioning, and package registry publishing.' },
-  { id: 'microservice', name: 'Microservice', stack: ['Docker', 'gRPC', 'Kubernetes'], desc: 'Containerized microservice with health probes, graceful shutdown, distributed tracing, and service mesh integration.' },
-  { id: 'data_pipeline', name: 'Data Pipeline', stack: ['Apache Beam', 'dbt', 'Airflow'], desc: 'ETL/ELT data pipeline with extraction, transformation, loading, scheduling, monitoring, and data quality checks.' },
-  { id: 'browser_ext', name: 'Browser Extension', stack: ['Chrome', 'Firefox', 'Manifest V3'], desc: 'Browser extension with content scripts, background workers, popup UI, storage, and cross-browser compatibility.' },
-  { id: 'smart_contract', name: 'Smart Contract', stack: ['Solidity', 'Rust/Anchor', 'Move'], desc: 'Blockchain smart contract with tests, gas optimization, security audit, deployment scripts, and frontend integration.' },
-  { id: 'embedded', name: 'Embedded System', stack: ['Rust', 'C', 'MicroPython'], desc: 'Firmware for microcontrollers with HAL abstraction, peripheral drivers, RTOS tasks, and OTA update support.' },
-  { id: 'ai_agent', name: 'AI Agent', stack: ['LangChain', 'CrewAI', 'AutoGen'], desc: 'Autonomous AI agent with tool use, memory, planning, multi-agent coordination, and human-in-the-loop.' },
-];
+type TabId = typeof TABS[number]['id'];
 
-const PIPELINE_STAGES = [
-  { phase: 'ANALYSIS', stages: ['Requirements Parsing', 'Archetype Selection', 'Architecture Design'], color: '#3b82f6', desc: 'Understand what to build and how to structure it' },
-  { phase: 'SCAFFOLDING', stages: ['Project Structure', 'Dependency Resolution', 'Configuration Setup'], color: '#8b5cf6', desc: 'Generate project skeleton with all config and deps' },
-  { phase: 'GENERATION', stages: ['Core Logic', 'API Layer', 'Data Layer', 'UI Components'], color: '#f59e0b', desc: 'Write the actual application code across all layers' },
-  { phase: 'QUALITY', stages: ['Lint & Format', 'Type Checking', 'Unit Tests', 'Integration Tests'], color: '#22c55e', desc: 'Validate code quality, types, and test coverage' },
-  { phase: 'DELIVERY', stages: ['Documentation', 'Build Optimization', 'Deployment Config'], color: '#06b6d4', desc: 'Package for production with docs and CI/CD' },
-];
+const LANG_COLORS: Record<string, string> = {
+  TypeScript: '#3178C6', Python: '#3572A5', Rust: '#DEA584', Go: '#00ADD8',
+  Solidity: '#AA6746', 'C/C++': '#555555', Swift: '#F05138', Kotlin: '#A97BFF',
+};
 
-const QUALITY_GATES = [
-  { gate: 'Syntax Validation', desc: 'AST parsing to verify all generated code is syntactically valid. No broken imports, unclosed brackets, or invalid tokens.', threshold: '100% pass', icon: '⟨⟩' },
-  { gate: 'Type Safety', desc: 'Full type checking (TypeScript tsc, Python mypy, Rust cargo check). Zero type errors. Generic types properly constrained.', threshold: '0 errors', icon: '◆' },
-  { gate: 'Lint Compliance', desc: 'ESLint, Ruff, Clippy — zero warnings on strict ruleset. Consistent formatting via Prettier/Black/rustfmt.', threshold: '0 warnings', icon: '✓' },
-  { gate: 'Test Coverage', desc: 'Minimum 80% line coverage. All public APIs tested. Edge cases covered. Mocks for external dependencies.', threshold: '≥80%', icon: '▣' },
-  { gate: 'Security Scan', desc: 'Static analysis for injection, XSS, SSRF, path traversal, and hardcoded secrets. OWASP Top 10 compliance.', threshold: '0 critical', icon: '⛊' },
-  { gate: 'Performance Budget', desc: 'Bundle size limits, startup time benchmarks, memory usage caps. Lighthouse scores for web projects (90+ all categories).', threshold: 'within budget', icon: '⚡' },
-];
+// ── Helpers ──
 
-const LANGUAGES = [
-  { name: 'TypeScript', frameworks: ['Next.js', 'Hono', 'Express', 'NestJS', 'Svelte', 'Astro'], icon: 'TS' },
-  { name: 'Python', frameworks: ['FastAPI', 'Django', 'Flask', 'PyTorch', 'LangChain', 'Streamlit'], icon: 'PY' },
-  { name: 'Rust', frameworks: ['Actix', 'Axum', 'Bevy', 'Tauri', 'Anchor', 'Embassy'], icon: 'RS' },
-  { name: 'Go', frameworks: ['Gin', 'Echo', 'Fiber', 'Cobra', 'gRPC', 'Ent'], icon: 'GO' },
-  { name: 'Solidity', frameworks: ['Hardhat', 'Foundry', 'OpenZeppelin'], icon: 'SOL' },
-  { name: 'C/C++', frameworks: ['Qt', 'SDL', 'Arduino', 'ESP-IDF'], icon: 'C' },
-  { name: 'Swift', frameworks: ['SwiftUI', 'UIKit', 'Vapor'], icon: 'SW' },
-  { name: 'Kotlin', frameworks: ['Ktor', 'Compose', 'Spring Boot'], icon: 'KT' },
-];
+function StatusBadge({ ok, label }: { ok: boolean | null; label: string }) {
+  const c = ok === null ? '#888' : ok ? '#22c55e' : '#ef4444';
+  return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: c }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: c }} />{label}</span>;
+}
 
-const API_ENDPOINTS = [
-  { method: 'GET', path: '/health', desc: 'Forge status, archetype count, pipeline stages' },
-  { method: 'GET', path: '/stats', desc: 'Full forge capabilities and metrics' },
-  { method: 'GET', path: '/archetypes', desc: 'All 15 project archetypes' },
-  { method: 'GET', path: '/pipeline', desc: '13-stage build pipeline' },
-  { method: 'GET', path: '/quality/gates', desc: '6 quality gate definitions' },
-  { method: 'GET', path: '/templates', desc: 'Starter templates per archetype' },
-  { method: 'GET', path: '/languages', desc: 'Supported languages and frameworks' },
-  { method: 'POST', path: '/plan', desc: 'Generate project plan from description' },
-  { method: 'POST', path: '/build', desc: 'Execute full build pipeline' },
-  { method: 'POST', path: '/review', desc: 'Code review with issue detection' },
-  { method: 'POST', path: '/chat', desc: 'Conversational code generation' },
-];
+function ActionButton({ label, onClick, loading, color, disabled }: { label: string; onClick: () => void; loading?: boolean; color?: string; disabled?: boolean }) {
+  return (
+    <button onClick={onClick} disabled={loading || disabled}
+      style={{ padding: '10px 20px', borderRadius: 8, border: 'none', background: color || 'var(--ept-accent)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: loading || disabled ? 'not-allowed' : 'pointer', opacity: loading || disabled ? 0.6 : 1 }}>
+      {loading ? 'Processing...' : label}
+    </button>
+  );
+}
+
+// ── Main Component ──
 
 export default function HephaestionForgePage() {
-  const { isDark, toggle } = useTheme();
-  const [activeSection, setActiveSection] = useState('overview');
+  const { isDark } = useTheme();
+  const [activeTab, setActiveTab] = useState<TabId>('dashboard');
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [stats, setStats] = useState<ForgeStats | null>(null);
+  const [loading, setLoading] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
+  // Data
+  const [archetypes, setArchetypes] = useState<Archetype[]>([]);
+  const [pipeline, setPipeline] = useState<PipelineStage[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [templates, setTemplates] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [languages, setLanguages] = useState<any>(null);
+
+  // Build state
+  const [buildDesc, setBuildDesc] = useState('');
+  const [buildArch, setBuildArch] = useState('');
+  const [buildLang, setBuildLang] = useState('');
+  const [buildPlan, setBuildPlan] = useState<ProjectPlan | null>(null);
+  const [buildResult, setBuildResult] = useState<BuildResult | null>(null);
+  const [buildStep, setBuildStep] = useState<'describe' | 'plan' | 'building' | 'complete'>('describe');
+
+  // Review state
+  const [reviewCodeText, setReviewCodeText] = useState('');
+  const [reviewLang, setReviewLang] = useState('typescript');
+  const [reviewResult, setReviewResult] = useState<CodeReview | null>(null);
+
+  // Chat state
+  const [chatMessages, setChatMessages] = useState<{ role: string; content: string; artifacts?: { name: string; type: string; content: string }[] }[]>([]);
+  const [chatInput, setChatInput] = useState('');
+
+  // Archetype browser
+  const [expandedArch, setExpandedArch] = useState<string | null>(null);
+  const [archFilter, setArchFilter] = useState('');
+
+  // Load data
   useEffect(() => {
     getHealth().then(setHealth).catch(() => {});
     getStats().then(setStats).catch(() => {});
+    getArchetypes().then(r => setArchetypes(r.archetypes || [])).catch(() => {});
+    getPipeline().then(r => setPipeline(r.stages || [])).catch(() => {});
+    getTemplates().then(r => setTemplates(r.templates || [])).catch(() => {});
+    getLanguages().then(setLanguages).catch(() => {});
   }, []);
+
+  // Scroll chat
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
+
+  // Handlers
+  const handlePlan = async () => {
+    if (!buildDesc.trim()) return;
+    setLoading(true); setBuildPlan(null); setBuildResult(null);
+    try {
+      const plan = await planProject(buildDesc, buildArch || undefined, buildLang || undefined);
+      setBuildPlan(plan);
+      setBuildStep('plan');
+    } catch { /* ignore */ }
+    setLoading(false);
+  };
+
+  const handleBuild = async () => {
+    if (!buildPlan) return;
+    setLoading(true); setBuildResult(null); setBuildStep('building');
+    try {
+      const result = await buildProject(buildPlan);
+      setBuildResult(result);
+      setBuildStep('complete');
+    } catch { /* ignore */ }
+    setLoading(false);
+  };
+
+  const handleReview = async () => {
+    if (!reviewCodeText.trim()) return;
+    setLoading(true); setReviewResult(null);
+    try {
+      const result = await reviewCode(reviewCodeText, reviewLang);
+      setReviewResult(result);
+    } catch { /* ignore */ }
+    setLoading(false);
+  };
+
+  const handleChat = async () => {
+    if (!chatInput.trim()) return;
+    const userMsg = chatInput;
+    setChatInput('');
+    setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setLoading(true);
+    try {
+      const result = await chat(userMsg, chatMessages.length > 0 ? chatMessages.map(m => `${m.role}: ${m.content}`).join('\n') : undefined);
+      setChatMessages(prev => [...prev, { role: 'assistant', content: result.content || JSON.stringify(result), artifacts: result.artifacts }]);
+    } catch { setChatMessages(prev => [...prev, { role: 'assistant', content: 'Error processing request. Please try again.' }]); }
+    setLoading(false);
+  };
+
+  // Group pipeline by phase
+  const phaseGroups = pipeline.reduce<Record<string, PipelineStage[]>>((acc, s) => {
+    (acc[s.phase] = acc[s.phase] || []).push(s);
+    return acc;
+  }, {});
+
+  const filteredArchetypes = archFilter ? archetypes.filter(a => `${a.name} ${a.description} ${a.stack?.join(' ')} ${a.default_language}`.toLowerCase().includes(archFilter.toLowerCase())) : archetypes;
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--ept-bg)' }}>
-      {/* ── Sidebar ── */}
+      {/* Sidebar */}
       <aside style={{ width: 260, borderRight: '1px solid var(--ept-border)', padding: '24px 16px', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto', background: 'var(--ept-bg-alt)' }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32, textDecoration: 'none' }}>
           <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={32} height={32} />
           <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--ept-text)', letterSpacing: -0.3 }}>Echo Prime</span>
         </Link>
-
-        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.2, color: 'var(--ept-accent)', marginBottom: 12 }}>Hephaestion Forge</div>
-
-        {SECTIONS.map(s => (
-          <button key={s.id} onClick={() => setActiveSection(s.id)} style={{
-            display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 12px', marginBottom: 2, border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: activeSection === s.id ? 600 : 400,
-            background: activeSection === s.id ? 'var(--ept-accent-glow)' : 'transparent',
-            color: activeSection === s.id ? 'var(--ept-accent)' : 'var(--ept-text-secondary)',
-          }}>
-            <span style={{ fontSize: 16, width: 20, textAlign: 'center' }}>{s.icon}</span>
-            {s.label}
+        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.2, color: 'var(--ept-accent)', marginBottom: 12 }}>Hephaestion Forge v2.1</div>
+        {TABS.map(t => (
+          <button key={t.id} onClick={() => setActiveTab(t.id)}
+            style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 12px', marginBottom: 2, border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 13,
+              fontWeight: activeTab === t.id ? 600 : 400, background: activeTab === t.id ? 'var(--ept-accent-glow)' : 'transparent', color: activeTab === t.id ? 'var(--ept-accent)' : 'var(--ept-text-muted)' }}>
+            <span style={{ fontSize: 16, width: 20, textAlign: 'center' }}>{t.icon}</span>{t.label}
           </button>
         ))}
-
-        <div style={{ paddingTop: 24, borderTop: '1px solid var(--ept-border)', marginTop: 24 }}>
-          <button onClick={toggle} style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--ept-border)', borderRadius: 8, cursor: 'pointer', fontSize: 12, background: 'var(--ept-surface)', color: 'var(--ept-text-secondary)' }}>
-            {isDark ? '☀ Day Mode' : '☾ Night Mode'}
-          </button>
+        <div style={{ marginTop: 24, padding: 12, borderRadius: 8, background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', fontSize: 11 }}>
+          <StatusBadge ok={health?.status === 'healthy'} label={health ? 'Forge Online' : 'Checking...'} />
+          <div style={{ marginTop: 8, color: 'var(--ept-text-muted)' }}>{health ? `${health.archetypes} archetypes | ${health.languages} languages` : 'Loading...'}</div>
+          <div style={{ marginTop: 4, color: 'var(--ept-text-muted)' }}>{health ? `${health.pipeline_stages}-stage pipeline | ${health.quality_gates} gates` : ''}</div>
         </div>
       </aside>
 
-      {/* ── Main Content ── */}
-      <main style={{ flex: 1, padding: '40px 48px', maxWidth: 1000 }}>
+      {/* Main */}
+      <main style={{ flex: 1, padding: '32px 40px', maxWidth: 1200 }}>
 
-        {/* OVERVIEW */}
-        {activeSection === 'overview' && (
-          <section>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
-              <span style={{ fontSize: 40 }}>⚡</span>
+        {/* ═══ DASHBOARD ═══ */}
+        {activeTab === 'dashboard' && (
+          <div>
+            <h1 style={{ fontSize: 28, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 8 }}>Hephaestion Forge</h1>
+            <p style={{ color: 'var(--ept-text-muted)', fontSize: 14, marginBottom: 32 }}>AI-Powered Software Factory — describe what you want to build, and the forge generates production-ready code with full test coverage and documentation.</p>
+
+            {/* Stats */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
+              {[
+                { label: 'Archetypes', value: health?.archetypes || stats?.archetypes?.length || 15, icon: '◎', color: '#3b82f6' },
+                { label: 'Pipeline Stages', value: health?.pipeline_stages || stats?.pipeline_stages || 13, icon: '▸▸', color: '#8b5cf6' },
+                { label: 'Quality Gates', value: health?.quality_gates || stats?.quality_gates || 6, icon: '✦', color: '#f59e0b' },
+                { label: 'Languages', value: health?.languages || languages?.languages?.length || 5, icon: '⟨⟩', color: '#22c55e' },
+              ].map(s => (
+                <div key={s.label} style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: 12, padding: 20 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 28, fontWeight: 700, color: s.color }}>{s.value}</span>
+                    <span style={{ fontSize: 24 }}>{s.icon}</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--ept-text-muted)', marginTop: 4 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Quick Actions */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 32 }}>
+              <button onClick={() => setActiveTab('build')} style={{ padding: 24, borderRadius: 12, border: '2px solid #3b82f6', background: '#3b82f622', color: '#3b82f6', fontWeight: 600, fontSize: 14, cursor: 'pointer', textAlign: 'left' }}>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>◎</div>
+                <div>Build a Project</div>
+                <div style={{ fontSize: 11, fontWeight: 400, marginTop: 4, opacity: 0.8 }}>Describe → Plan → Build → Deploy</div>
+              </button>
+              <button onClick={() => setActiveTab('review')} style={{ padding: 24, borderRadius: 12, border: '2px solid #22c55e', background: '#22c55e22', color: '#22c55e', fontWeight: 600, fontSize: 14, cursor: 'pointer', textAlign: 'left' }}>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>✦</div>
+                <div>Code Review</div>
+                <div style={{ fontSize: 11, fontWeight: 400, marginTop: 4, opacity: 0.8 }}>Paste code for quality analysis</div>
+              </button>
+              <button onClick={() => setActiveTab('chat')} style={{ padding: 24, borderRadius: 12, border: '2px solid #a855f7', background: '#a855f722', color: '#a855f7', fontWeight: 600, fontSize: 14, cursor: 'pointer', textAlign: 'left' }}>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>⟨⟩</div>
+                <div>AI Code Chat</div>
+                <div style={{ fontSize: 11, fontWeight: 400, marginTop: 4, opacity: 0.8 }}>Conversational code generation</div>
+              </button>
+            </div>
+
+            {/* Languages */}
+            {languages?.languages && (
+              <div style={{ marginBottom: 32 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ept-text)', marginBottom: 16 }}>Supported Languages & Frameworks</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
+                  {languages.languages.map((lang: string) => (
+                    <div key={lang} style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: 12, padding: 16 }}>
+                      <div style={{ fontWeight: 600, fontSize: 14, color: LANG_COLORS[lang] || 'var(--ept-text)' }}>{lang}</div>
+                      {languages.frameworks?.[lang] && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
+                          {languages.frameworks[lang].map((f: string) => (
+                            <span key={f} style={{ padding: '2px 8px', borderRadius: 4, background: 'var(--ept-bg)', color: 'var(--ept-text-muted)', fontSize: 10 }}>{f}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Capabilities */}
+            {stats?.capabilities && (
               <div>
-                <h1 style={{ fontSize: 32, fontWeight: 800, color: 'var(--ept-text)', letterSpacing: -0.8, margin: 0 }}>Hephaestion Forge</h1>
-                <p style={{ color: 'var(--ept-accent)', fontSize: 14, fontWeight: 500, margin: 0 }}>AI Program Builder &amp; Code Forge</p>
+                <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ept-text)', marginBottom: 12 }}>Capabilities</h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {stats.capabilities.map(c => (
+                    <span key={c} style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid var(--ept-border)', background: 'var(--ept-card-bg)', fontSize: 11, color: 'var(--ept-text)' }}>{c}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ═══ BUILD PROJECT ═══ */}
+        {activeTab === 'build' && (
+          <div>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 8 }}>Build a Project</h2>
+            <p style={{ color: 'var(--ept-text-muted)', fontSize: 13, marginBottom: 24 }}>Describe your project in natural language. The forge will plan the architecture, generate code, run quality gates, and package for delivery.</p>
+
+            {/* Progress Steps */}
+            <div style={{ display: 'flex', gap: 4, marginBottom: 24 }}>
+              {['describe', 'plan', 'building', 'complete'].map((step, i) => (
+                <div key={step} style={{ flex: 1, height: 4, borderRadius: 2, background: ['describe', 'plan', 'building', 'complete'].indexOf(buildStep) >= i ? 'var(--ept-accent)' : 'var(--ept-border)' }} />
+              ))}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+              {/* Input */}
+              <div style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: 12, padding: 20 }}>
+                {buildStep === 'describe' && (
+                  <>
+                    <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--ept-text)', marginBottom: 16 }}>Step 1: Describe Your Project</h3>
+                    <textarea value={buildDesc} onChange={e => setBuildDesc(e.target.value)}
+                      placeholder="Describe what you want to build in plain English.&#10;&#10;Example: 'Build a REST API with Hono for managing a todo list. It should have CRUD endpoints, D1 database storage, authentication with JWT tokens, and deploy to Cloudflare Workers.'"
+                      style={{ width: '100%', minHeight: 160, padding: 12, borderRadius: 8, border: '1px solid var(--ept-border)', background: 'var(--ept-bg)', color: 'var(--ept-text)', fontSize: 13, resize: 'vertical', fontFamily: 'inherit' }} />
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ept-text-muted)', textTransform: 'uppercase' }}>Archetype (optional)</label>
+                        <select value={buildArch} onChange={e => setBuildArch(e.target.value)}
+                          style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid var(--ept-border)', background: 'var(--ept-bg)', color: 'var(--ept-text)', fontSize: 13 }}>
+                          <option value="">Auto-detect</option>
+                          {archetypes.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                        </select>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ept-text-muted)', textTransform: 'uppercase' }}>Language (optional)</label>
+                        <select value={buildLang} onChange={e => setBuildLang(e.target.value)}
+                          style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid var(--ept-border)', background: 'var(--ept-bg)', color: 'var(--ept-text)', fontSize: 13 }}>
+                          <option value="">Auto-detect</option>
+                          {(languages?.languages || ['TypeScript', 'Python', 'Rust', 'Go', 'Solidity']).map((l: string) => <option key={l} value={l.toLowerCase()}>{l}</option>)}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div style={{ marginTop: 16 }}>
+                      <ActionButton label="Generate Plan" onClick={handlePlan} loading={loading} />
+                    </div>
+                  </>
+                )}
+
+                {buildStep === 'plan' && buildPlan && (
+                  <>
+                    <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--ept-text)', marginBottom: 16 }}>Step 2: Review Plan</h3>
+                    <div style={{ display: 'grid', gap: 8 }}>
+                      <div style={{ padding: '8px 12px', background: 'var(--ept-bg)', borderRadius: 6, fontSize: 12 }}>
+                        <span style={{ color: 'var(--ept-text-muted)' }}>Archetype: </span><span style={{ fontWeight: 600, color: 'var(--ept-text)' }}>{buildPlan.archetype}</span>
+                      </div>
+                      <div style={{ padding: '8px 12px', background: 'var(--ept-bg)', borderRadius: 6, fontSize: 12 }}>
+                        <span style={{ color: 'var(--ept-text-muted)' }}>Language: </span><span style={{ fontWeight: 600, color: LANG_COLORS[buildPlan.language] || 'var(--ept-text)' }}>{buildPlan.language}</span>
+                      </div>
+                      {buildPlan.framework && (
+                        <div style={{ padding: '8px 12px', background: 'var(--ept-bg)', borderRadius: 6, fontSize: 12 }}>
+                          <span style={{ color: 'var(--ept-text-muted)' }}>Framework: </span><span style={{ fontWeight: 600, color: 'var(--ept-text)' }}>{buildPlan.framework}</span>
+                        </div>
+                      )}
+                      <div style={{ padding: '8px 12px', background: 'var(--ept-bg)', borderRadius: 6, fontSize: 12 }}>
+                        <span style={{ color: 'var(--ept-text-muted)' }}>Estimated: </span><span style={{ fontWeight: 600, color: 'var(--ept-text)' }}>{buildPlan.estimated_files} files, {buildPlan.estimated_lines?.toLocaleString()} lines</span>
+                      </div>
+                      {buildPlan.estimated_time && (
+                        <div style={{ padding: '8px 12px', background: 'var(--ept-bg)', borderRadius: 6, fontSize: 12 }}>
+                          <span style={{ color: 'var(--ept-text-muted)' }}>Time: </span><span style={{ fontWeight: 600, color: 'var(--ept-text)' }}>{buildPlan.estimated_time}</span>
+                        </div>
+                      )}
+                      {buildPlan.architecture && (
+                        <div style={{ padding: '8px 12px', background: 'var(--ept-bg)', borderRadius: 6, fontSize: 12 }}>
+                          <span style={{ color: 'var(--ept-text-muted)' }}>Architecture: </span><span style={{ fontWeight: 600, color: 'var(--ept-text)' }}>{buildPlan.architecture}</span>
+                        </div>
+                      )}
+                    </div>
+                    {buildPlan.stages?.length > 0 && (
+                      <div style={{ marginTop: 12 }}>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ept-accent)', marginBottom: 6 }}>Build Stages</div>
+                        {buildPlan.stages.map((s, i) => (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', fontSize: 12 }}>
+                            <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--ept-accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
+                            <span style={{ color: 'var(--ept-text)' }}>{s}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {buildPlan.dependencies?.length > 0 && (
+                      <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                        {buildPlan.dependencies.map((d, i) => (
+                          <span key={i} style={{ padding: '3px 8px', borderRadius: 4, background: 'var(--ept-bg)', color: 'var(--ept-text-muted)', fontSize: 10 }}>{d}</span>
+                        ))}
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+                      <ActionButton label="Execute Build" onClick={handleBuild} loading={loading} color="#22c55e" />
+                      <button onClick={() => { setBuildStep('describe'); setBuildPlan(null); }}
+                        style={{ padding: '10px 20px', borderRadius: 8, border: '1px solid var(--ept-border)', background: 'transparent', color: 'var(--ept-text)', fontSize: 13, cursor: 'pointer' }}>Back</button>
+                    </div>
+                  </>
+                )}
+
+                {buildStep === 'building' && (
+                  <div style={{ textAlign: 'center', padding: 40 }}>
+                    <div style={{ fontSize: 48, marginBottom: 16 }}>⚡</div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--ept-accent)', marginBottom: 8 }}>Building...</div>
+                    <div style={{ fontSize: 13, color: 'var(--ept-text-muted)' }}>The forge is generating your project through the {health?.pipeline_stages || 13}-stage pipeline.</div>
+                    <div style={{ marginTop: 16, height: 4, background: 'var(--ept-border)', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', background: 'var(--ept-accent)', width: '60%', borderRadius: 2, animation: 'pulse 2s infinite' }} />
+                    </div>
+                  </div>
+                )}
+
+                {buildStep === 'complete' && (
+                  <>
+                    <h3 style={{ fontSize: 14, fontWeight: 600, color: '#22c55e', marginBottom: 16 }}>Build Complete</h3>
+                    <button onClick={() => { setBuildStep('describe'); setBuildPlan(null); setBuildResult(null); setBuildDesc(''); }}
+                      style={{ padding: '10px 20px', borderRadius: 8, border: 'none', background: 'var(--ept-accent)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                      Start New Build
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* Results */}
+              <div style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: 12, padding: 20 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--ept-text)', marginBottom: 16 }}>Build Output</h3>
+                {!buildResult ? (
+                  <div style={{ textAlign: 'center', padding: 40, color: 'var(--ept-text-muted)', fontSize: 13 }}>
+                    {buildStep === 'describe' ? 'Describe your project to start the build pipeline.' :
+                     buildStep === 'plan' ? 'Review the plan and click Execute Build.' :
+                     buildStep === 'building' ? 'Build in progress...' : ''}
+                  </div>
+                ) : (
+                  <div>
+                    {/* Summary stats */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 20 }}>
+                      <div style={{ textAlign: 'center', padding: 12, background: 'var(--ept-bg)', borderRadius: 8 }}>
+                        <div style={{ fontSize: 24, fontWeight: 700, color: '#3b82f6' }}>{buildResult.files_generated}</div>
+                        <div style={{ fontSize: 10, color: 'var(--ept-text-muted)' }}>Files</div>
+                      </div>
+                      <div style={{ textAlign: 'center', padding: 12, background: 'var(--ept-bg)', borderRadius: 8 }}>
+                        <div style={{ fontSize: 24, fontWeight: 700, color: '#8b5cf6' }}>{buildResult.lines_of_code?.toLocaleString()}</div>
+                        <div style={{ fontSize: 10, color: 'var(--ept-text-muted)' }}>Lines</div>
+                      </div>
+                      <div style={{ textAlign: 'center', padding: 12, background: 'var(--ept-bg)', borderRadius: 8 }}>
+                        <div style={{ fontSize: 24, fontWeight: 700, color: buildResult.quality_score >= 80 ? '#22c55e' : '#f59e0b' }}>{buildResult.quality_score}</div>
+                        <div style={{ fontSize: 10, color: 'var(--ept-text-muted)' }}>Quality</div>
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div style={{ display: 'grid', gap: 6, marginBottom: 16 }}>
+                      <div style={{ padding: '6px 10px', background: 'var(--ept-bg)', borderRadius: 4, fontSize: 12 }}>
+                        <span style={{ color: 'var(--ept-text-muted)' }}>Test Coverage: </span><span style={{ fontWeight: 600, color: 'var(--ept-text)' }}>{buildResult.test_coverage}%</span>
+                      </div>
+                      <div style={{ padding: '6px 10px', background: 'var(--ept-bg)', borderRadius: 4, fontSize: 12 }}>
+                        <span style={{ color: 'var(--ept-text-muted)' }}>Stages Completed: </span><span style={{ fontWeight: 600, color: 'var(--ept-text)' }}>{buildResult.stages_completed}/{health?.pipeline_stages || 13}</span>
+                      </div>
+                    </div>
+
+                    {/* Artifacts */}
+                    {buildResult.artifacts?.length > 0 && (
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ept-accent)', marginBottom: 8 }}>Generated Artifacts</div>
+                        {buildResult.artifacts.map((a, i) => (
+                          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 10px', borderBottom: '1px solid var(--ept-border)', fontSize: 12 }}>
+                            <span style={{ color: 'var(--ept-text)' }}>{a.name}</span>
+                            <span style={{ color: 'var(--ept-text-muted)' }}>{a.type} | {a.size ? `${(a.size / 1024).toFixed(1)}KB` : '—'}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Warnings */}
+                    {buildResult.warnings?.length > 0 && (
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: '#f59e0b', marginBottom: 6 }}>Warnings</div>
+                        {buildResult.warnings.map((w, i) => (
+                          <div key={i} style={{ padding: '4px 8px', fontSize: 11, color: '#f59e0b', background: '#f59e0b11', borderRadius: 4, marginBottom: 4 }}>{w}</div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
-            <div className="accent-line" style={{ margin: '16px 0 24px' }} />
-            <p style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--ept-text-secondary)', marginBottom: 24 }}>
-              Conversational AI code forge running on Cloudflare&apos;s global edge. Describe what you want to build — Hephaestion plans the architecture, selects the right framework, generates production-ready code, and validates it through 6 quality gates. 15 project archetypes, 8 languages, 13-stage pipeline, and a multi-LLM swarm that picks the best model for each generation task.
-            </p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 32 }}>
-              {[
-                { label: 'Archetypes', value: health?.archetypes || 15 },
-                { label: 'Pipeline', value: `${health?.pipeline_stages || 13} stages` },
-                { label: 'Gates', value: health?.quality_gates || 6 },
-                { label: 'Languages', value: health?.languages || 8 },
-                { label: 'Status', value: health?.status === 'operational' ? 'LIVE' : '...' },
-              ].map(c => (
-                <div key={c.label} style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)', borderRadius: 12, padding: '18px 14px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--ept-accent)' }}>{c.value}</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ept-text-secondary)', marginTop: 4 }}>{c.label}</div>
-                </div>
-              ))}
-            </div>
-
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 16 }}>How It Works</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              {[
-                { title: 'Describe Your Project', desc: 'Tell Hephaestion what you want to build in natural language. "Build a real-time chat app with rooms and file sharing." The forge analyzes requirements and selects the optimal archetype.' },
-                { title: 'Architecture Planning', desc: 'Auto-generates project architecture — directory structure, module boundaries, data models, API contracts, and dependency graph. Review and refine before generation.' },
-                { title: 'Code Generation', desc: 'Multi-LLM swarm generates code across all layers. Core logic, API routes, data access, UI components, tests, and configuration. Every file production-ready.' },
-                { title: 'Quality Validation', desc: '6 quality gates validate every line — syntax, types, lint, tests, security, and performance. Only code that passes all gates ships. Zero-defect pipeline.' },
-                { title: 'Conversational Refinement', desc: 'Chat with the forge to iterate. "Add WebSocket support." "Switch from PostgreSQL to SQLite." "Add rate limiting to the API." Incremental changes, full pipeline re-validation.' },
-                { title: 'Production Delivery', desc: 'Optimized build output with documentation, CI/CD config, deployment scripts, and environment setup. Ready for GitHub → Vercel/Cloudflare → production.' },
-              ].map(f => (
-                <div key={f.title} style={{ background: 'var(--ept-surface)', borderRadius: 10, padding: '16px 18px' }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 6 }}>{f.title}</div>
-                  <div style={{ fontSize: 13, color: 'var(--ept-text-secondary)', lineHeight: 1.6 }}>{f.desc}</div>
-                </div>
-              ))}
-            </div>
-          </section>
+          </div>
         )}
 
-        {/* ARCHETYPES */}
-        {activeSection === 'archetypes' && (
-          <section>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--ept-text)', marginBottom: 8 }}>Project Archetypes</h1>
-            <p style={{ color: 'var(--ept-text-secondary)', fontSize: 14, marginBottom: 20 }}>15 project templates covering every major software category. Each archetype defines optimal stack, architecture, and pipeline configuration.</p>
+        {/* ═══ CODE REVIEW ═══ */}
+        {activeTab === 'review' && (
+          <div>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 8 }}>Code Review</h2>
+            <p style={{ color: 'var(--ept-text-muted)', fontSize: 13, marginBottom: 24 }}>Paste your code for automated quality analysis, security scanning, and improvement suggestions.</p>
 
-            <div style={{ display: 'grid', gap: 10 }}>
-              {ARCHETYPES.map(a => (
-                <div key={a.id} style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)', borderRadius: 10, padding: '16px 20px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--ept-text)' }}>{a.name}</div>
-                    <div style={{ display: 'flex', gap: 4 }}>
-                      {a.stack.slice(0, 3).map(s => (
-                        <span key={s} style={{ fontSize: 10, padding: '2px 8px', background: 'var(--ept-accent-glow)', border: '1px solid var(--ept-accent)', borderRadius: 4, color: 'var(--ept-accent)', fontWeight: 500 }}>{s}</span>
-                      ))}
-                      {a.stack.length > 3 && <span style={{ fontSize: 10, padding: '2px 6px', color: 'var(--ept-text-muted)' }}>+{a.stack.length - 3}</span>}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+              <div style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: 12, padding: 20 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--ept-text)' }}>Code Input</h3>
+                  <select value={reviewLang} onChange={e => setReviewLang(e.target.value)}
+                    style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid var(--ept-border)', background: 'var(--ept-bg)', color: 'var(--ept-text)', fontSize: 12 }}>
+                    {['typescript', 'python', 'rust', 'go', 'javascript', 'solidity'].map(l => <option key={l} value={l}>{l}</option>)}
+                  </select>
+                </div>
+                <textarea value={reviewCodeText} onChange={e => setReviewCodeText(e.target.value)}
+                  placeholder="Paste your code here for review..."
+                  style={{ width: '100%', minHeight: 300, padding: 12, borderRadius: 8, border: '1px solid var(--ept-border)', background: 'var(--ept-bg)', color: 'var(--ept-text)', fontSize: 12, fontFamily: 'monospace', resize: 'vertical', tabSize: 2 }} />
+                <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+                  <ActionButton label="Review Code" onClick={handleReview} loading={loading} color="#22c55e" />
+                  <button onClick={() => { setReviewCodeText(''); setReviewResult(null); }}
+                    style={{ padding: '10px 20px', borderRadius: 8, border: '1px solid var(--ept-border)', background: 'transparent', color: 'var(--ept-text)', fontSize: 13, cursor: 'pointer' }}>Clear</button>
+                </div>
+              </div>
+
+              <div style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: 12, padding: 20 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--ept-text)', marginBottom: 16 }}>Review Results</h3>
+                {!reviewResult ? (
+                  <div style={{ textAlign: 'center', padding: 40, color: 'var(--ept-text-muted)', fontSize: 13 }}>Paste code and click Review to get analysis.</div>
+                ) : (
+                  <div>
+                    {/* Quality Score */}
+                    <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
+                      <div style={{ textAlign: 'center', flex: 1, padding: 16, borderRadius: 8, background: 'var(--ept-bg)' }}>
+                        <div style={{ fontSize: 36, fontWeight: 800, color: reviewResult.quality_score >= 80 ? '#22c55e' : reviewResult.quality_score >= 60 ? '#f59e0b' : '#ef4444' }}>
+                          {reviewResult.quality_score}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>Quality Score</div>
+                      </div>
+                      <div style={{ textAlign: 'center', flex: 1, padding: 16, borderRadius: 8, background: 'var(--ept-bg)' }}>
+                        <div style={{ fontSize: 36, fontWeight: 800, color: 'var(--ept-text)' }}>{reviewResult.complexity || '—'}</div>
+                        <div style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>Complexity</div>
+                      </div>
                     </div>
+
+                    {/* Issues */}
+                    {reviewResult.issues?.length > 0 && (
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ept-text)', marginBottom: 8 }}>Issues ({reviewResult.issues.length})</div>
+                        <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+                          {reviewResult.issues.map((issue, i) => (
+                            <div key={i} style={{ padding: '8px 10px', borderBottom: '1px solid var(--ept-border)', fontSize: 12 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <span style={{ fontWeight: 600, color: issue.severity === 'error' ? '#ef4444' : issue.severity === 'warning' ? '#f59e0b' : '#3b82f6' }}>
+                                  {issue.severity?.toUpperCase()} {issue.line ? `L${issue.line}` : ''}
+                                </span>
+                              </div>
+                              <div style={{ color: 'var(--ept-text)', marginTop: 2 }}>{issue.message}</div>
+                              {issue.suggestion && <div style={{ color: '#22c55e', marginTop: 2, fontStyle: 'italic' }}>{issue.suggestion}</div>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Recommendations */}
+                    {reviewResult.recommendations?.length > 0 && (
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: '#22c55e', marginBottom: 6 }}>Recommendations</div>
+                        {reviewResult.recommendations.map((r, i) => (
+                          <div key={i} style={{ padding: '6px 10px', fontSize: 12, color: 'var(--ept-text)', borderBottom: '1px solid var(--ept-border)' }}>{r}</div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <div style={{ fontSize: 13, color: 'var(--ept-text-secondary)', lineHeight: 1.5 }}>{a.desc}</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ═══ AI CHAT ═══ */}
+        {activeTab === 'chat' && (
+          <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 120px)' }}>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 8 }}>AI Code Chat</h2>
+            <p style={{ color: 'var(--ept-text-muted)', fontSize: 13, marginBottom: 16 }}>Conversational code generation — describe what you need, iterate on the output, refine until perfect.</p>
+
+            {/* Chat Messages */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: 16, background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: '12px 12px 0 0' }}>
+              {chatMessages.length === 0 && (
+                <div style={{ textAlign: 'center', padding: 40, color: 'var(--ept-text-muted)', fontSize: 13 }}>
+                  Start a conversation. Ask the forge to write code, explain concepts, debug issues, or plan architecture.
+                </div>
+              )}
+              {chatMessages.map((msg, i) => (
+                <div key={i} style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                  <div style={{ maxWidth: '80%', padding: '12px 16px', borderRadius: 12, fontSize: 13, lineHeight: 1.5,
+                    background: msg.role === 'user' ? 'var(--ept-accent)' : 'var(--ept-bg)', color: msg.role === 'user' ? '#fff' : 'var(--ept-text)' }}>
+                    {msg.content.split('\n').map((line, j) => <div key={j}>{line || <br />}</div>)}
+                  </div>
+                  {msg.artifacts?.map((a, j) => (
+                    <div key={j} style={{ marginTop: 8, maxWidth: '80%', padding: 12, borderRadius: 8, background: 'var(--ept-bg)', border: '1px solid var(--ept-border)' }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--ept-accent)', marginBottom: 4 }}>{a.name} ({a.type})</div>
+                      <pre style={{ fontSize: 11, color: 'var(--ept-text)', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>{a.content?.substring(0, 500)}{(a.content?.length || 0) > 500 ? '...' : ''}</pre>
+                    </div>
+                  ))}
+                </div>
+              ))}
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* Chat Input */}
+            <div style={{ display: 'flex', gap: 8, padding: 12, background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderTop: 'none', borderRadius: '0 0 12px 12px' }}>
+              <input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleChat()}
+                placeholder="Type your message... (Enter to send)"
+                style={{ flex: 1, padding: '10px 14px', borderRadius: 8, border: '1px solid var(--ept-border)', background: 'var(--ept-bg)', color: 'var(--ept-text)', fontSize: 13 }} />
+              <ActionButton label="Send" onClick={handleChat} loading={loading} />
+              {chatMessages.length > 0 && (
+                <button onClick={() => setChatMessages([])}
+                  style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid var(--ept-border)', background: 'transparent', color: 'var(--ept-text-muted)', fontSize: 12, cursor: 'pointer' }}>Clear</button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ═══ ARCHETYPES ═══ */}
+        {activeTab === 'archetypes' && (
+          <div>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 8 }}>Project Archetypes</h2>
+            <p style={{ color: 'var(--ept-text-muted)', fontSize: 13, marginBottom: 20 }}>15 battle-tested project templates. Each defines architecture, dependencies, patterns, and quality gates for its domain.</p>
+
+            <input type="text" value={archFilter} onChange={e => setArchFilter(e.target.value)} placeholder="Search archetypes, stacks, languages..."
+              style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid var(--ept-border)', background: 'var(--ept-bg)', color: 'var(--ept-text)', fontSize: 13, width: 400, marginBottom: 20 }} />
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 12 }}>
+              {filteredArchetypes.map(a => (
+                <div key={a.id} onClick={() => setExpandedArch(expandedArch === a.id ? null : a.id)}
+                  style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: 12, padding: 16, cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--ept-text)' }}>{a.name}</div>
+                    <span style={{ fontSize: 11, padding: '4px 8px', borderRadius: 4, background: LANG_COLORS[a.default_language] ? `${LANG_COLORS[a.default_language]}22` : 'var(--ept-bg)', color: LANG_COLORS[a.default_language] || 'var(--ept-text-muted)', fontWeight: 600 }}>{a.default_language}</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--ept-text-muted)', marginTop: 8, lineHeight: 1.4 }}>{a.description}</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
+                    {a.stack?.map((s, i) => (
+                      <span key={i} style={{ padding: '2px 8px', borderRadius: 4, background: 'var(--ept-bg)', color: 'var(--ept-text-muted)', fontSize: 10 }}>{s}</span>
+                    ))}
+                  </div>
+                  {expandedArch === a.id && (
+                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--ept-border)' }}>
+                      {a.estimated_time && <div style={{ fontSize: 11, color: 'var(--ept-text-muted)', marginBottom: 4 }}>Estimated build time: <b>{a.estimated_time}</b></div>}
+                      {a.stages?.length > 0 && (
+                        <div style={{ marginTop: 8 }}>
+                          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--ept-accent)', marginBottom: 4 }}>Pipeline Stages</div>
+                          {a.stages.map((s, i) => (
+                            <div key={i} style={{ fontSize: 11, color: 'var(--ept-text)', padding: '2px 0' }}>{i + 1}. {s}</div>
+                          ))}
+                        </div>
+                      )}
+                      <button onClick={(e) => { e.stopPropagation(); setActiveTab('build'); setBuildArch(a.id); }}
+                        style={{ marginTop: 12, padding: '8px 16px', borderRadius: 6, border: 'none', background: 'var(--ept-accent)', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                        Build with this Archetype
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
-          </section>
+          </div>
         )}
 
-        {/* PIPELINE */}
-        {activeSection === 'pipeline' && (
-          <section>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--ept-text)', marginBottom: 8 }}>13-Stage Build Pipeline</h1>
-            <p style={{ color: 'var(--ept-text-secondary)', fontSize: 14, marginBottom: 20 }}>From natural language description to production-ready code in 5 phases.</p>
+        {/* ═══ PIPELINE ═══ */}
+        {activeTab === 'pipeline' && (
+          <div>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 8 }}>Build Pipeline</h2>
+            <p style={{ color: 'var(--ept-text-muted)', fontSize: 13, marginBottom: 24 }}>{health?.pipeline_stages || 13}-stage automated pipeline with {health?.quality_gates || 6} quality gates. Every project passes through all stages.</p>
 
-            <div style={{ display: 'grid', gap: 20 }}>
-              {PIPELINE_STAGES.map((p, i) => (
-                <div key={p.phase} style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)', borderRadius: 12, padding: '20px 24px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: p.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 14 }}>{i + 1}</div>
-                    <div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--ept-text)' }}>{p.phase}</div>
-                      <div style={{ fontSize: 12, color: 'var(--ept-text-muted)' }}>{p.desc}</div>
-                    </div>
+            {/* Phase colors */}
+            {(() => {
+              const phaseColors: Record<string, string> = { ANALYSIS: '#3b82f6', SCAFFOLDING: '#8b5cf6', GENERATION: '#f59e0b', QUALITY: '#22c55e', DELIVERY: '#06b6d4' };
+              return Object.entries(phaseGroups).map(([phase, stagesInPhase]) => (
+                <div key={phase} style={{ marginBottom: 24 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                    <span style={{ width: 12, height: 12, borderRadius: '50%', background: phaseColors[phase] || 'var(--ept-accent)' }} />
+                    <span style={{ fontSize: 14, fontWeight: 700, color: phaseColors[phase] || 'var(--ept-accent)', textTransform: 'uppercase', letterSpacing: 1 }}>{phase}</span>
+                    <span style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>({stagesInPhase.length} stages)</span>
                   </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {p.stages.map(s => (
-                      <span key={s} style={{ fontSize: 12, padding: '5px 12px', background: `${p.color}15`, border: `1px solid ${p.color}30`, borderRadius: 20, color: p.color, fontWeight: 500 }}>{s}</span>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 8, marginLeft: 24 }}>
+                    {stagesInPhase.map(s => (
+                      <div key={s.id} style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: 8, padding: 12, borderLeft: `3px solid ${phaseColors[phase] || 'var(--ept-accent)'}` }}>
+                        <div style={{ fontWeight: 600, fontSize: 12, color: 'var(--ept-text)' }}>{s.id}. {s.name}</div>
+                        {s.description && <div style={{ fontSize: 11, color: 'var(--ept-text-muted)', marginTop: 4 }}>{s.description}</div>}
+                        {s.quality_gate && <div style={{ fontSize: 10, color: '#f59e0b', marginTop: 4, fontWeight: 600 }}>Gate: {s.quality_gate}</div>}
+                      </div>
                     ))}
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
+              ));
+            })()}
+
+            {pipeline.length === 0 && (
+              <div style={{ textAlign: 'center', padding: 40, color: 'var(--ept-text-muted)', fontSize: 13 }}>Loading pipeline stages...</div>
+            )}
+          </div>
         )}
 
-        {/* QUALITY GATES */}
-        {activeSection === 'quality' && (
-          <section>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--ept-text)', marginBottom: 8 }}>Quality Gates</h1>
-            <p style={{ color: 'var(--ept-text-secondary)', fontSize: 14, marginBottom: 20 }}>6 automated validation gates. Every line of generated code must pass all gates before delivery.</p>
-
-            <div style={{ display: 'grid', gap: 14 }}>
-              {QUALITY_GATES.map((g, i) => (
-                <div key={g.gate} style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)', borderRadius: 12, padding: '20px 24px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span style={{ fontSize: 20, width: 28, textAlign: 'center' }}>{g.icon}</span>
-                      <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--ept-text)' }}>Gate {i + 1}: {g.gate}</span>
-                    </div>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#22c55e', background: 'rgba(34,197,94,0.1)', padding: '4px 10px', borderRadius: 6 }}>{g.threshold}</span>
-                  </div>
-                  <div style={{ fontSize: 13, color: 'var(--ept-text-secondary)', lineHeight: 1.6, paddingLeft: 38 }}>{g.desc}</div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* LANGUAGES */}
-        {activeSection === 'languages' && (
-          <section>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--ept-text)', marginBottom: 8 }}>Languages &amp; Frameworks</h1>
-            <p style={{ color: 'var(--ept-text-secondary)', fontSize: 14, marginBottom: 20 }}>8 languages with 40+ frameworks. Hephaestion selects the optimal stack based on project archetype and requirements.</p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              {LANGUAGES.map(l => (
-                <div key={l.name} style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)', borderRadius: 10, padding: '18px 20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                    <span style={{ fontSize: 12, fontWeight: 800, padding: '4px 8px', background: 'var(--ept-accent-glow)', border: '1px solid var(--ept-accent)', borderRadius: 4, color: 'var(--ept-accent)' }}>{l.icon}</span>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--ept-text)' }}>{l.name}</span>
-                  </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {l.frameworks.map(f => (
-                      <span key={f} style={{ fontSize: 11, padding: '3px 10px', background: 'var(--ept-surface)', borderRadius: 20, color: 'var(--ept-text-secondary)' }}>{f}</span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* LLM SWARM */}
-        {activeSection === 'swarm' && (
-          <section>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--ept-text)', marginBottom: 8 }}>Multi-LLM Swarm</h1>
-            <p style={{ color: 'var(--ept-text-secondary)', fontSize: 14, marginBottom: 20 }}>Hephaestion dispatches code generation tasks to the optimal LLM based on language, complexity, and task type.</p>
-
-            <div style={{ display: 'grid', gap: 16 }}>
-              {[
-                { model: 'Claude Opus 4.6', role: 'Architecture & Complex Logic', desc: 'Handles high-level architecture design, complex algorithm implementation, and multi-file refactoring. Best for tasks requiring deep reasoning.', strength: 'Reasoning depth' },
-                { model: 'GPT-4.1', role: 'General Code Generation', desc: 'Primary workhorse for standard code generation, API implementations, and CRUD operations. Fast, reliable, and consistent output quality.', strength: 'Speed + consistency' },
-                { model: 'DeepSeek V3', role: 'Performance Optimization', desc: 'Specializes in performance-critical code, algorithm optimization, and low-level systems programming. Strong at Rust, Go, and C++.', strength: 'Systems code' },
-                { model: 'Groq (Llama 3.3 70B)', role: 'Rapid Prototyping', desc: 'Ultra-fast inference for quick prototypes, boilerplate generation, and iterative refinement cycles. 10x faster than standard models.', strength: 'Generation speed' },
-              ].map(m => (
-                <div key={m.model} style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)', borderRadius: 12, padding: '20px 24px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ept-text)' }}>{m.model}</div>
-                    <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', background: 'var(--ept-accent-glow)', borderRadius: 20, color: 'var(--ept-accent)' }}>{m.strength}</span>
-                  </div>
-                  <div style={{ fontSize: 12, color: 'var(--ept-accent)', fontWeight: 500, marginBottom: 6 }}>{m.role}</div>
-                  <div style={{ fontSize: 13, color: 'var(--ept-text-secondary)', lineHeight: 1.6 }}>{m.desc}</div>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ marginTop: 24, background: 'var(--ept-surface)', borderRadius: 10, padding: '18px 22px' }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 8 }}>Smart Dispatch</div>
-              <div style={{ fontSize: 13, color: 'var(--ept-text-secondary)', lineHeight: 1.7 }}>
-                The forge automatically selects the best model for each generation task based on: (1) language specialization — Rust/Go tasks route to DeepSeek, (2) complexity — architectural decisions route to Claude, (3) speed requirements — rapid iteration uses Groq, (4) cost optimization — simple boilerplate uses smaller models. The dispatch engine tracks success rates per model per task type and continuously improves routing.
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* API REFERENCE */}
-        {activeSection === 'api' && (
-          <section>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: 'var(--ept-text)', marginBottom: 8 }}>API Reference</h1>
-            <p style={{ color: 'var(--ept-text-secondary)', fontSize: 14, marginBottom: 8 }}>
-              Base URL: <code style={{ color: 'var(--ept-accent)', background: 'var(--ept-code-bg)', padding: '2px 8px', borderRadius: 4, fontSize: 12 }}>https://hephaestion-forge.bmcii1976.workers.dev</code>
-            </p>
-            <p style={{ color: 'var(--ept-text-muted)', fontSize: 12, marginBottom: 20 }}>POST endpoints accept JSON. Write endpoints require X-Echo-API-Key header.</p>
-
-            <div style={{ display: 'grid', gap: 8 }}>
-              {API_ENDPOINTS.map(e => (
-                <div key={e.path} style={{ display: 'grid', gridTemplateColumns: '70px 1fr 2fr', gap: 12, alignItems: 'center', padding: '10px 14px', background: 'var(--ept-surface)', borderRadius: 8 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: e.method === 'GET' ? '#22c55e' : '#3b82f6', background: e.method === 'GET' ? 'rgba(34,197,94,0.1)' : 'rgba(59,130,246,0.1)', padding: '3px 8px', borderRadius: 4, textAlign: 'center' }}>{e.method}</span>
-                  <code style={{ fontSize: 12, color: 'var(--ept-text)', fontFamily: "'JetBrains Mono', monospace" }}>{e.path}</code>
-                  <span style={{ fontSize: 12, color: 'var(--ept-text-secondary)' }}>{e.desc}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
       </main>
     </div>
   );

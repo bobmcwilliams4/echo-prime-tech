@@ -209,11 +209,76 @@ export async function exportBOM(parts: Record<string, unknown>[]) {
   });
 }
 
+// ── Additional Engineering ──
+
+export async function analyzeThermal(params: { inner_radius_mm: number; outer_radius_mm: number; length_mm: number; material?: string; inner_temp_c?: number; outer_temp_c?: number }) {
+  return fetchJSON('/engineering/thermal', { method: 'POST', body: JSON.stringify(params) });
+}
+
+export async function analyzeSafetyFactor(params: { loads: Record<string, number>; geometry: Record<string, number>; material: string }) {
+  return fetchJSON('/engineering/safety-factor', { method: 'POST', body: JSON.stringify(params) });
+}
+
+export async function analyzeBeam(params: { length: number; load: number; support_type: string; material: string; width?: number; height?: number }) {
+  return fetchJSON('/engineering/beam', { method: 'POST', body: JSON.stringify(params) });
+}
+
+export async function analyzeWeld(params: { type: string; size: number; length: number; electrode: string; load?: number }) {
+  return fetchJSON('/engineering/weld', { method: 'POST', body: JSON.stringify(params) });
+}
+
+export async function analyzeBolt(params: { size: string; grade: string; clamp_force: number; joint_material?: string }) {
+  return fetchJSON('/engineering/bolt', { method: 'POST', body: JSON.stringify(params) });
+}
+
+// ── Manufacturing ──
+
+export async function estimateCNC(params: { parts: Record<string, unknown>[]; material?: string }) {
+  return fetchJSON('/manufacturing/cnc', { method: 'POST', body: JSON.stringify(params) });
+}
+
+export async function estimateCost(params: { parts: Record<string, unknown>[]; quantity?: number; material?: string }) {
+  return fetchJSON('/manufacturing/cost', { method: 'POST', body: JSON.stringify(params) });
+}
+
+export async function getProcessPlan(params: { parts: Record<string, unknown>[]; material?: string; quantity?: number }) {
+  return fetchJSON('/manufacturing/process-plan', { method: 'POST', body: JSON.stringify(params) });
+}
+
+// ── Additional Export ──
+
+export async function exportSTL(parts: Record<string, unknown>[]) {
+  return fetchJSON('/export/stl', { method: 'POST', body: JSON.stringify({ parts }) });
+}
+
+export async function exportDXF(parts: Record<string, unknown>[]) {
+  return fetchJSON('/export/dxf', { method: 'POST', body: JSON.stringify({ parts }) });
+}
+
+export async function exportGCode(parts: Record<string, unknown>[]) {
+  return fetchJSON('/export/gcode', { method: 'POST', body: JSON.stringify({ parts }) });
+}
+
 // ── Quality ──
 
 export async function checkNACE(material: string) {
-  return fetchJSON('/quality/nace', {
-    method: 'POST',
-    body: JSON.stringify({ material }),
-  });
+  return fetchJSON('/quality/nace', { method: 'POST', body: JSON.stringify({ material }) });
+}
+
+export async function runFMEA(params: { component: string; functions?: string[]; failure_modes?: string[] }) {
+  return fetchJSON('/quality/fmea', { method: 'POST', body: JSON.stringify(params) });
+}
+
+// ── AI ──
+
+export async function textToCAD(prompt: string) {
+  return fetchJSON('/ai/text-to-cad', { method: 'POST', body: JSON.stringify({ prompt }) });
+}
+
+export async function aiCopilot(question: string, context?: string) {
+  return fetchJSON('/ai/copilot', { method: 'POST', body: JSON.stringify({ question, context }) });
+}
+
+export async function aiOptimize(params: { parts: Record<string, unknown>[]; objective?: string; constraints?: Record<string, unknown> }) {
+  return fetchJSON('/ai/optimize', { method: 'POST', body: JSON.stringify(params) });
 }
