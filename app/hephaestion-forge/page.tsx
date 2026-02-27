@@ -946,8 +946,8 @@ export default function HephaestionForge() {
                           </div>
                         )}
                       </div>
-                    )) : (buildResult?.files as { name: string; lines?: number }[])?.length ? (
-                      (buildResult.files as { name: string; lines?: number; language?: string }[]).map((f, i) => (
+                    )) : (buildResult?.files as { name: string; lines?: number }[] | undefined)?.length ? (
+                      (buildResult!.files as { name: string; lines?: number; language?: string }[]).map((f, i) => (
                         <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg"
                              style={{ backgroundColor: 'var(--ept-surface)' }}>
                           <div className="flex items-center gap-2">
