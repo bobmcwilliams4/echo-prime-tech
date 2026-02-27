@@ -130,10 +130,10 @@ export async function getPatterns(): Promise<unknown> {
   return apiFetch('/patterns');
 }
 
-export async function startForge(description: string, archetype?: string, language?: string): Promise<unknown> {
+export async function startForge(description: string, archetype?: string, language?: string, mode?: string): Promise<unknown> {
   return apiFetch('/forge/start', {
     method: 'POST',
-    body: JSON.stringify({ description, archetype, language }),
+    body: JSON.stringify({ description, archetype, language, mode }),
   });
 }
 
@@ -216,7 +216,7 @@ export async function consult(messages: ConsultMessage[], context?: string): Pro
 }
 
 export async function advanceForge(projectId: string): Promise<unknown> {
-  return apiFetch(`/forge/advance/${projectId}`, { method: 'POST' });
+  return apiFetch(`/forge/advance/${projectId}`, { method: 'POST', body: JSON.stringify({}) });
 }
 
 export async function getForgeProject(projectId: string): Promise<unknown> {
@@ -225,4 +225,28 @@ export async function getForgeProject(projectId: string): Promise<unknown> {
 
 export async function exportForge(projectId: string): Promise<unknown> {
   return apiFetch(`/forge/export/${projectId}`);
+}
+
+export async function enhanceForge(projectId: string): Promise<unknown> {
+  return apiFetch(`/forge/enhance/${projectId}`, { method: 'POST', body: JSON.stringify({}) });
+}
+
+export async function optimizeForge(projectId: string): Promise<unknown> {
+  return apiFetch(`/forge/optimize/${projectId}`, { method: 'POST', body: JSON.stringify({}) });
+}
+
+export async function hardenForge(projectId: string): Promise<unknown> {
+  return apiFetch(`/forge/harden/${projectId}`, { method: 'POST', body: JSON.stringify({}) });
+}
+
+export async function refactorForge(projectId: string): Promise<unknown> {
+  return apiFetch(`/forge/refactor/${projectId}`, { method: 'POST', body: JSON.stringify({}) });
+}
+
+export async function competeBenchmark(projectId: string): Promise<unknown> {
+  return apiFetch(`/forge/compete/${projectId}`, { method: 'POST', body: JSON.stringify({}) });
+}
+
+export async function getSovereignModes(): Promise<unknown> {
+  return apiFetch('/sovereign/modes');
 }

@@ -14,6 +14,11 @@ import {
   startForge,
   advanceForge,
   exportForge,
+  enhanceForge,
+  optimizeForge,
+  hardenForge,
+  refactorForge,
+  competeBenchmark,
   type ConsultMessage,
   type ForgeStats,
 } from '../../lib/hephaestion-forge-api';
@@ -68,6 +73,33 @@ const FORGE_STAGES: {
   { key: 'FINAL', name: 'SYNTHESIZING', label: 'Final Assembly', isGate: true,
     messages: ['Assembling project artifact...', 'Verifying structural integrity...', 'Generating build manifest...'] },
 ];
+
+const FORGE_MODES: { id: string; label: string; desc: string; icon: string }[] = [
+  { id: 'standard', label: 'Standard', desc: 'Normal 13-stage pipeline', icon: 'S' },
+  { id: 'apex', label: 'Apex', desc: 'Maximum quality, all enhancement passes', icon: 'A' },
+  { id: 'lightspeed', label: 'Lightspeed', desc: 'Fast build, fewer quality gates', icon: 'L' },
+  { id: 'fortress', label: 'Fortress', desc: 'Security-hardened output', icon: 'F' },
+  { id: 'architect', label: 'Architect', desc: 'Architecture-first, detailed design', icon: 'D' },
+  { id: 'fleet', label: 'Fleet', desc: 'Multi-LLM swarm on every stage', icon: 'W' },
+];
+
+const GUILD_DISPLAY: Record<string, { color: string; label: string }> = {
+  ARCHITECT: { color: '#8b5cf6', label: 'A' },
+  BACKEND:   { color: '#3b82f6', label: 'B' },
+  FRONTEND:  { color: '#ec4899', label: 'F' },
+  QUALITY:   { color: '#10b981', label: 'Q' },
+  INFRA:     { color: '#f59e0b', label: 'I' },
+  DOCS:      { color: '#6366f1', label: 'D' },
+};
+
+type AutoMode = 'manual' | 'auto-answer' | 'auto-pilot';
+
+interface GeneratedFileInfo {
+  path: string;
+  content?: string;
+  language?: string;
+  lines?: number;
+}
 
 // ── Helpers ──
 
@@ -144,6 +176,17 @@ export default function HephaestionForge() {
   const [qualityScore, setQualityScore] = useState(0);
   const [stageScores, setStageScores] = useState<number[]>([]);
 
+  // New: forge mode, auto-answer, guild tracking, post-build
+  const [forgeMode, setForgeMode] = useState('standard');
+  const [autoMode, setAutoMode] = useState<AutoMode>('manual');
+  const [autoAnswering, setAutoAnswering] = useState(false);
+  const [guildMap, setGuildMap] = useState<Record<number, { id: string; name: string; icon: string }>>({});
+  const [languagesUsed, setLanguagesUsed] = useState<string[]>([]);
+  const [generatedFiles, setGeneratedFiles] = useState<GeneratedFileInfo[]>([]);
+  const [postBuildAction, setPostBuildAction] = useState<string | null>(null);
+  const [postBuildResult, setPostBuildResult] = useState<Record<string, unknown> | null>(null);
+  const [expandedFile, setExpandedFile] = useState<number | null>(null);
+
   const chatRef = useRef<HTMLDivElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
 
@@ -180,6 +223,57 @@ export default function HephaestionForge() {
       }]);
     }
   }, [user, messages.length]);
+
+  // Auto-answer: when assistant asks a question and autoMode is active
+  const lastAssistantMsg = messages.filter(m => m.role === 'assistant').slice(-1)[0];
+  const autoAnswerTriggered = useRef(false);
+  useEffect(() => {
+    if (autoMode === 'manual' || !lastAssistantMsg || autoAnswering || sending || readyToBuild) return;
+    const content = lastAssistantMsg.content;
+    const hasQuestion = content.includes('?') && lastAssistantMsg.model !== 'system';
+    if (!hasQuestion) return;
+    // Prevent re-triggering on same message
+    if (autoAnswerTriggered.current) return;
+    autoAnswerTriggered.current = true;
+
+    (async () => {
+      setAutoAnswering(true);
+      try {
+        const projectDesc = messages.filter(m => m.role === 'user').map(m => m.content).join(' ');
+        const metaPrompt = `You are an expert software architect. The AI forge asked: "${content.slice(-500)}". Based on the project description: "${projectDesc.slice(0, 500)}", provide the best technical answer in 2-3 sentences. Be specific and decisive.`;
+        const res = await consult([{ role: 'user', content: metaPrompt }], 'auto-answer');
+        if (res.success && res.response) {
+          const suggestedAnswer = res.response;
+          if (autoMode === 'auto-pilot') {
+            // Auto-pilot: send immediately
+            const userMsg: ChatMessage = { id: genId(), role: 'user', content: suggestedAnswer, timestamp: Date.now() };
+            setMessages(prev => [...prev, userMsg]);
+            const history: ConsultMessage[] = messages
+              .filter(m => m.model !== 'system')
+              .map(m => ({ role: m.role, content: m.content }));
+            history.push({ role: 'user', content: suggestedAnswer });
+            const followUp = await consult(history);
+            if (followUp.success) {
+              setMessages(prev => [...prev, {
+                id: genId(), role: 'assistant', content: followUp.response,
+                timestamp: Date.now(), model: followUp.model,
+              }]);
+              if (followUp.ready_to_build) setReadyToBuild(true);
+            }
+            autoAnswerTriggered.current = false; // Allow next cycle
+          } else {
+            // Auto-answer: show suggestion, let user edit
+            setInput(suggestedAnswer);
+          }
+        }
+      } catch { /* ignore auto-answer failures */ }
+      setAutoAnswering(false);
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastAssistantMsg?.id, autoMode]);
+
+  // Reset auto-answer trigger when messages change
+  useEffect(() => { autoAnswerTriggered.current = false; }, [messages.length]);
 
   // ── Handlers ──
 
@@ -227,7 +321,7 @@ export default function HephaestionForge() {
     setPlanning(true);
     try {
       const conversationSummary = messages.filter(m => m.role === 'user').map(m => m.content).join('\n');
-      const result = await startForge(conversationSummary) as Record<string, unknown>;
+      const result = await startForge(conversationSummary, undefined, undefined, forgeMode) as Record<string, unknown>;
       const proj = result.project as Record<string, unknown> | undefined;
       if (proj?.id) setProjectId(proj.id as string);
       setPlan({
@@ -256,8 +350,13 @@ export default function HephaestionForge() {
     setLinesCount(0);
     setQualityScore(0);
     setStageScores([]);
+    setGuildMap({});
+    setLanguagesUsed([]);
+    setGeneratedFiles([]);
+    setPostBuildAction(null);
+    setPostBuildResult(null);
 
-    addLog('Initializing Hephaestion Forge...', 'system');
+    addLog(`Initializing Hephaestion Forge [${FORGE_MODES.find(m => m.id === forgeMode)?.label || 'Standard'} mode]...`, 'system');
     await sleep(600);
     addLog('Forge core online. Beginning fabrication sequence.', 'system');
     await sleep(400);
@@ -279,12 +378,19 @@ export default function HephaestionForge() {
       try {
         const result = await advanceForge(projectId) as Record<string, unknown>;
         const proj = result?.project as Record<string, unknown> | undefined;
-        const stageResult = result?.stage_result as Record<string, unknown> | undefined;
+        const stageResult = (result?.stageOutput ?? result?.stage_result) as Record<string, unknown> | undefined;
 
         // Third message after API returns
         if (stage.messages[2]) {
           addLog(stage.messages[2], 'process');
           await sleep(200);
+        }
+
+        // Track guild info from response
+        const guildData = result?.guild as { id: string; name: string; icon: string } | undefined;
+        if (guildData) {
+          setGuildMap(prev => ({ ...prev, [i]: guildData }));
+          addLog(`Guild: ${guildData.name}`, 'system');
         }
 
         // Update counters from project
@@ -296,8 +402,18 @@ export default function HephaestionForge() {
           setLinesCount((proj.linesOfCode as number) || Math.round(estLines * ratio));
         }
 
-        // Extract score
-        const score = (stageResult?.score as number) ?? Math.round(75 + Math.random() * 20);
+        // Track files and languages from response
+        const filesGen = (result?.files_generated as number) ?? (proj?.filesGenerated as number);
+        const linesGen = (result?.lines_generated as number) ?? (proj?.linesOfCode as number);
+        const langs = (result?.languages_used as string[]) ?? (proj?.languagesUsed as string[]);
+        if (filesGen) setFilesCount(filesGen);
+        if (linesGen) setLinesCount(linesGen);
+        if (langs?.length) setLanguagesUsed(prev => [...new Set([...prev, ...langs])]);
+
+        // Extract score (top-level in response, or nested in stageResult)
+        const rawScore = (result?.score as number) ?? (stageResult?.score as number);
+        // API returns 0-10 scale; normalize to 0-100 for display
+        const score = rawScore ? Math.min(100, Math.round(rawScore <= 10 ? rawScore * 10 : rawScore)) : Math.round(75 + Math.random() * 20);
         scores.push(score);
         setStageScores([...scores]);
 
@@ -342,9 +458,15 @@ export default function HephaestionForge() {
     try {
       const exported = await exportForge(projectId) as Record<string, unknown>;
       setBuildResult(exported);
-      const proj = exported?.project as Record<string, unknown> | undefined;
+      const exp = exported?.export as Record<string, unknown> | undefined;
+      const proj = (exp?.project ?? exported?.project) as Record<string, unknown> | undefined;
       if (proj?.filesGenerated) setFilesCount(proj.filesGenerated as number);
       if (proj?.linesOfCode) setLinesCount(proj.linesOfCode as number);
+      // Capture generated files for tree viewer
+      const expFiles = (exported?.files ?? exp?.files) as GeneratedFileInfo[] | undefined;
+      if (expFiles?.length) setGeneratedFiles(expFiles);
+      const summary = (exported?.summary ?? exp?.summary) as Record<string, unknown> | undefined;
+      if (summary?.languages) setLanguagesUsed(summary.languages as string[]);
     } catch {
       setBuildResult({ project: { filesGenerated: filesCount, linesOfCode: linesCount } });
     }
@@ -381,6 +503,35 @@ export default function HephaestionForge() {
     setLinesCount(0);
     setQualityScore(0);
     setStageScores([]);
+    setForgeMode('standard');
+    setAutoMode('manual');
+    setGuildMap({});
+    setLanguagesUsed([]);
+    setGeneratedFiles([]);
+    setPostBuildAction(null);
+    setPostBuildResult(null);
+    setExpandedFile(null);
+  }
+
+  async function handlePostBuildAction(action: string) {
+    if (!projectId || postBuildAction) return;
+    setPostBuildAction(action);
+    setPostBuildResult(null);
+    try {
+      let result: unknown;
+      switch (action) {
+        case 'enhance': result = await enhanceForge(projectId); break;
+        case 'optimize': result = await optimizeForge(projectId); break;
+        case 'harden': result = await hardenForge(projectId); break;
+        case 'refactor': result = await refactorForge(projectId); break;
+        case 'compete': result = await competeBenchmark(projectId); break;
+      }
+      setPostBuildResult(result as Record<string, unknown>);
+    } catch {
+      setPostBuildResult({ error: `${action} failed` });
+    } finally {
+      setPostBuildAction(null);
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -640,10 +791,17 @@ export default function HephaestionForge() {
                       <div className="absolute inset-0 rounded-full animate-ping"
                            style={{ backgroundColor: 'var(--ept-accent)', opacity: 0.3 }} />
                     )}
+                    {/* Guild badge */}
+                    {guildMap[i] && isComplete && (
+                      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[7px] font-bold rounded px-0.5"
+                           style={{ color: GUILD_DISPLAY[guildMap[i].id]?.color || 'var(--ept-text-muted)' }}>
+                        {GUILD_DISPLAY[guildMap[i].id]?.label || guildMap[i].id[0]}
+                      </div>
+                    )}
                     {/* Tooltip */}
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
                          style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
-                      {stage.label}{isGate ? ' (Gate)' : ''}
+                      {stage.label}{isGate ? ' (Gate)' : ''}{guildMap[i] ? ` [${guildMap[i].name}]` : ''}
                     </div>
                   </div>
                 );
@@ -704,6 +862,19 @@ export default function HephaestionForge() {
               ))}
             </div>
 
+            {/* ── Language Badges ── */}
+            {languagesUsed.length > 0 && (
+              <div className="flex items-center gap-2 mb-6 flex-wrap">
+                <span className="text-xs font-semibold" style={{ color: 'var(--ept-text-muted)' }}>Languages:</span>
+                {languagesUsed.map(lang => (
+                  <span key={lang} className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded"
+                        style={{ backgroundColor: 'rgba(20,184,166,0.1)', color: 'var(--ept-accent)' }}>
+                    {lang}
+                  </span>
+                ))}
+              </div>
+            )}
+
             {/* ── Completion: Quality Breakdown + Export ── */}
             {buildComplete && (
               <div className="animate-fade-up">
@@ -744,43 +915,94 @@ export default function HephaestionForge() {
                   </div>
                 )}
 
-                {/* File manifest (from export result) */}
-                {buildResult && (
-                  <div className="rounded-xl border p-5 mb-6"
-                       style={{ borderColor: 'var(--ept-card-border)', backgroundColor: 'var(--ept-card-bg)' }}>
-                    <h4 className="text-sm font-bold mb-3" style={{ color: 'var(--ept-text)' }}>
-                      Generated Artifacts
-                    </h4>
-                    <div className="space-y-1.5">
-                      {((buildResult.files as { name: string; lines?: number; language?: string }[]) || []).length > 0 ? (
-                        (buildResult.files as { name: string; lines?: number; language?: string }[]).map((f, i) => (
-                          <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg"
-                               style={{ backgroundColor: 'var(--ept-surface)' }}>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs" style={{ color: 'var(--ept-accent)' }}>
-                                {f.name?.endsWith('.ts') ? 'TS' : f.name?.endsWith('.sql') ? 'SQL' : f.name?.endsWith('.json') ? 'JSON' : f.name?.endsWith('.md') ? 'MD' : 'FILE'}
-                              </span>
-                              <span className="text-sm font-mono" style={{ color: 'var(--ept-text)' }}>
-                                {f.name}
-                              </span>
-                            </div>
-                            {f.lines && (
-                              <span className="text-xs font-mono" style={{ color: 'var(--ept-text-muted)' }}>
-                                {f.lines} lines
-                              </span>
-                            )}
+                {/* File tree viewer */}
+                <div className="rounded-xl border p-5 mb-6"
+                     style={{ borderColor: 'var(--ept-card-border)', backgroundColor: 'var(--ept-card-bg)' }}>
+                  <h4 className="text-sm font-bold mb-3" style={{ color: 'var(--ept-text)' }}>
+                    Generated Source Files
+                  </h4>
+                  <div className="space-y-1">
+                    {generatedFiles.length > 0 ? generatedFiles.map((f, i) => (
+                      <div key={i}>
+                        <button onClick={() => setExpandedFile(expandedFile === i ? null : i)}
+                                className="w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors hover:opacity-80"
+                                style={{ backgroundColor: expandedFile === i ? 'rgba(20,184,166,0.08)' : 'var(--ept-surface)' }}>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                                  style={{ backgroundColor: 'rgba(20,184,166,0.15)', color: 'var(--ept-accent)' }}>
+                              {f.language || f.path?.split('.').pop()?.toUpperCase() || 'FILE'}
+                            </span>
+                            <span className="text-sm font-mono" style={{ color: 'var(--ept-text)' }}>{f.path}</span>
                           </div>
-                        ))
-                      ) : (
-                        <div className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>
-                          {filesCount} files &middot; {linesCount.toLocaleString()} lines generated
+                          <div className="flex items-center gap-2">
+                            {f.lines && <span className="text-xs font-mono" style={{ color: 'var(--ept-text-muted)' }}>{f.lines}L</span>}
+                            <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{expandedFile === i ? '-' : '+'}</span>
+                          </div>
+                        </button>
+                        {expandedFile === i && f.content && (
+                          <div className="mt-1 mx-3 mb-2 rounded-lg overflow-auto font-mono text-xs leading-relaxed p-3"
+                               style={{ backgroundColor: 'var(--ept-bg)', border: '1px solid var(--ept-border)', color: 'var(--ept-text-secondary)', maxHeight: '300px' }}>
+                            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{f.content}</pre>
+                          </div>
+                        )}
+                      </div>
+                    )) : (buildResult?.files as { name: string; lines?: number }[])?.length ? (
+                      (buildResult.files as { name: string; lines?: number; language?: string }[]).map((f, i) => (
+                        <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg"
+                             style={{ backgroundColor: 'var(--ept-surface)' }}>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs" style={{ color: 'var(--ept-accent)' }}>
+                              {f.name?.split('.').pop()?.toUpperCase() || 'FILE'}
+                            </span>
+                            <span className="text-sm font-mono" style={{ color: 'var(--ept-text)' }}>{f.name}</span>
+                          </div>
+                          {f.lines && <span className="text-xs font-mono" style={{ color: 'var(--ept-text-muted)' }}>{f.lines} lines</span>}
                         </div>
-                      )}
-                    </div>
+                      ))
+                    ) : (
+                      <div className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>
+                        {filesCount} files &middot; {linesCount.toLocaleString()} lines generated
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
 
-                {/* Action buttons */}
+                {/* Post-build action buttons */}
+                <div className="rounded-xl border p-5 mb-6"
+                     style={{ borderColor: 'var(--ept-card-border)', backgroundColor: 'var(--ept-card-bg)' }}>
+                  <h4 className="text-sm font-bold mb-3" style={{ color: 'var(--ept-text)' }}>
+                    Post-Build Actions
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                    {[
+                      { id: 'enhance', label: 'Enhance', desc: 'Enhancement Matrix 6-pass', color: '#8b5cf6' },
+                      { id: 'optimize', label: 'Optimize', desc: 'Performance focus', color: '#3b82f6' },
+                      { id: 'harden', label: 'Harden', desc: 'Security hardening', color: '#ef4444' },
+                      { id: 'refactor', label: 'Refactor', desc: 'Structure improvement', color: '#f59e0b' },
+                      { id: 'compete', label: 'Benchmark', desc: 'Competitive analysis', color: '#10b981' },
+                    ].map(action => (
+                      <button key={action.id}
+                              onClick={() => handlePostBuildAction(action.id)}
+                              disabled={!!postBuildAction}
+                              className="p-3 rounded-lg border text-center transition-all hover:opacity-80 disabled:opacity-40"
+                              style={{ borderColor: postBuildAction === action.id ? action.color : 'var(--ept-border)', backgroundColor: 'var(--ept-surface)' }}>
+                        <div className="text-xs font-bold" style={{ color: postBuildAction === action.id ? action.color : 'var(--ept-text)' }}>
+                          {postBuildAction === action.id ? 'Running...' : action.label}
+                        </div>
+                        <div className="text-[9px] mt-0.5" style={{ color: 'var(--ept-text-muted)' }}>{action.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                  {/* Post-build result display */}
+                  {postBuildResult && (
+                    <div className="mt-3 p-3 rounded-lg font-mono text-xs overflow-auto"
+                         style={{ backgroundColor: 'var(--ept-bg)', border: '1px solid var(--ept-border)', color: 'var(--ept-text-secondary)', maxHeight: '200px' }}>
+                      <pre style={{ whiteSpace: 'pre-wrap' }}>{JSON.stringify(postBuildResult, null, 2)}</pre>
+                    </div>
+                  )}
+                </div>
+
+                {/* Primary action buttons */}
                 <div className="flex items-center gap-3 justify-center">
                   <button onClick={handleExport}
                           className="px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90"
@@ -903,6 +1125,39 @@ export default function HephaestionForge() {
       {!buildInProgress && (
         <div className="border-t px-4 md:px-6 py-4 flex-shrink-0" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
           <div className="max-w-3xl mx-auto">
+            {/* Auto-answer toggle + Forge mode selector */}
+            <div className="flex items-center justify-between mb-2 gap-3">
+              {/* Auto mode toggle */}
+              <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                {(['manual', 'auto-answer', 'auto-pilot'] as AutoMode[]).map(mode => (
+                  <button key={mode} onClick={() => setAutoMode(mode)}
+                          className="px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all"
+                          style={{
+                            backgroundColor: autoMode === mode ? 'var(--ept-accent)' : 'transparent',
+                            color: autoMode === mode ? '#fff' : 'var(--ept-text-muted)',
+                          }}>
+                    {mode === 'manual' ? 'Manual' : mode === 'auto-answer' ? 'Auto-Answer' : 'Auto-Pilot'}
+                  </button>
+                ))}
+              </div>
+              {autoAnswering && (
+                <span className="text-[10px] animate-pulse" style={{ color: 'var(--ept-accent)' }}>
+                  AI suggesting answer...
+                </span>
+              )}
+              {/* Forge mode selector */}
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] font-semibold" style={{ color: 'var(--ept-text-muted)' }}>Mode:</span>
+                <select value={forgeMode} onChange={e => setForgeMode(e.target.value)}
+                        className="text-[10px] font-semibold rounded-md px-2 py-1 border outline-none"
+                        style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}>
+                  {FORGE_MODES.map(m => (
+                    <option key={m.id} value={m.id}>{m.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <div className="flex items-end gap-3">
               <div className="flex-1 relative">
                 <textarea
@@ -924,7 +1179,7 @@ export default function HephaestionForge() {
                     t.style.height = 'auto';
                     t.style.height = Math.min(t.scrollHeight, 120) + 'px';
                   }}
-                  disabled={sending}
+                  disabled={sending || autoAnswering}
                 />
               </div>
               <button
@@ -947,6 +1202,7 @@ export default function HephaestionForge() {
             <div className="flex items-center justify-between mt-2">
               <span className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>
                 Powered by Claude &middot; Shift+Enter for new line
+                {autoMode !== 'manual' && ' &middot; ' + (autoMode === 'auto-pilot' ? 'Auto-pilot active' : 'Auto-answer on')}
               </span>
               <span className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>
                 {messages.filter(m => m.role === 'user').length} messages
