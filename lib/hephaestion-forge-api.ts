@@ -214,3 +214,15 @@ export async function consult(messages: ConsultMessage[], context?: string): Pro
     body: JSON.stringify({ messages, context }),
   });
 }
+
+export async function advanceForge(projectId: string): Promise<unknown> {
+  return apiFetch(`/forge/advance/${projectId}`, { method: 'POST' });
+}
+
+export async function getForgeProject(projectId: string): Promise<unknown> {
+  return apiFetch(`/forge/project/${projectId}`);
+}
+
+export async function exportForge(projectId: string): Promise<unknown> {
+  return apiFetch(`/forge/export/${projectId}`);
+}
