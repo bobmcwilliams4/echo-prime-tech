@@ -1,129 +1,86 @@
 /**
- * EchoCAD API — AI-Native Parametric CAD Engine
- *
+ * EchoCAD API Client v2.0
  * Connects to https://echocad.bmcii1976.workers.dev
- * 20 engineering materials, 8 primitive types, OpenSCAD codegen,
- * BOM generation, stress analysis, DFM analysis.
+ * 38 engineering materials, 15 primitive types, 12 engineering calculators,
+ * OpenSCAD/STL/DXF/G-code export, BOM generation, AI-powered design.
  */
 
 const API_URL = 'https://echocad.bmcii1976.workers.dev';
 
-// ── Types ──
+// ── Types (matched to actual API response shapes) ──
 
 export interface Material {
   id: string;
   name: string;
   category: string;
-  density: number;
-  yield_strength: number;
-  tensile_strength: number;
-  elongation: number;
-  hardness: string;
-  thermal_conductivity: number;
-  max_service_temp: number;
-  machinability: string;
-  cost_per_kg: number;
-}
-
-export interface Primitive {
-  type: string;
-  params: Record<string, number>;
-  material: string;
-  position?: [number, number, number];
-  rotation?: [number, number, number];
-}
-
-export interface Assembly {
-  id: string;
-  name: string;
-  parts: Primitive[];
-  created: string;
-}
-
-export interface BOMEntry {
-  part: number;
-  type: string;
-  material: string;
-  volume_cm3: number;
-  weight_kg: number;
-  cost_usd: number;
-}
-
-export interface BOMResult {
-  assembly: string;
-  parts: number;
-  entries: BOMEntry[];
-  total_weight_kg: number;
-  total_cost_usd: number;
+  density_g_cm3: number;
+  yield_mpa: number;
+  tensile_mpa: number;
+  elongation_pct: number;
+  hardness_hrc: number;
+  hardness_hb: number;
+  elastic_modulus_gpa: number;
+  poisson_ratio: number;
+  thermal_conductivity_w_mk: number;
+  thermal_expansion_um_mk: number;
+  melting_point_c: number;
+  max_service_temp_c: number;
+  machinability_rating: number;
+  weldability: string;
+  nace_compliant: boolean;
+  cost_usd_kg: number;
+  color: string;
+  applications: string[];
 }
 
 export interface StressResult {
-  force_n: number;
+  force_N: number;
   area_mm2: number;
   material: string;
-  applied_stress_mpa: number;
-  yield_strength_mpa: number;
-  safety_factor: number;
+  sigma_direct_mpa: number;
+  vonMises_mpa: number;
+  yield_mpa: number;
+  safetyFactor: number;
   verdict: string;
-}
-
-export interface PressureResult {
-  inner_radius_mm: number;
-  outer_radius_mm: number;
-  internal_pressure_mpa: number;
-  material: string;
-  max_hoop_stress_mpa: number;
-  max_radial_stress_mpa: number;
-  von_mises_mpa: number;
-  yield_strength_mpa: number;
-  safety_factor: number;
-  verdict: string;
-}
-
-export interface ToleranceResult {
-  dimensions: { nominal: number; tolerance: number }[];
-  worst_case_min: number;
-  worst_case_max: number;
-  rss_tolerance: number;
-  rss_min: number;
-  rss_max: number;
 }
 
 export interface DFMResult {
-  part_type: string;
-  material: string;
-  issues: string[];
-  recommendations: string[];
   score: number;
   grade: string;
+  cost_multiplier: number;
+  issues: string[];
+  recommendations: string[];
+  breakdown: Record<string, number>;
 }
 
 export interface HealthResponse {
   status: string;
-  service: string;
   version: string;
-  materials: number;
-  categories: number;
-  primitives: number;
+  timestamp: string;
 }
 
 export interface StatsResponse {
-  materials: number;
-  categories: string[];
+  materials: { count: number; categories: string[] };
   primitives: string[];
-  features: string[];
+  engineeringCalcs: string[];
+  exportFormats: string[];
 }
 
-// ── Fetchers ──
+// ── Fetcher ──
 
 async function fetchJSON<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: { 'Content-Type': 'application/json', ...init?.headers },
   });
-  if (!res.ok) throw new Error(`EchoCAD API ${res.status}: ${res.statusText}`);
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(`EchoCAD API ${res.status}: ${text}`);
+  }
   return res.json();
 }
+
+// ── Read endpoints ──
 
 export async function getHealth(): Promise<HealthResponse> {
   return fetchJSON('/health');
@@ -133,87 +90,127 @@ export async function getStats(): Promise<StatsResponse> {
   return fetchJSON('/stats');
 }
 
-export async function getMaterials(): Promise<{ materials: Material[] }> {
-  return fetchJSON('/materials');
+export async function getMaterials(category?: string): Promise<Material[]> {
+  const q = category ? `?category=${encodeURIComponent(category)}` : '';
+  return fetchJSON(`/materials${q}`);
 }
 
-export async function getMaterial(id: string): Promise<{ material: Material }> {
+export async function getMaterial(id: string): Promise<Material> {
   return fetchJSON(`/materials/${encodeURIComponent(id)}`);
 }
 
-export async function compareMaterials(ids: string[]): Promise<{ comparison: Material[] }> {
+// ── Material operations ──
+
+export async function compareMaterials(ids: string[]): Promise<Record<string, Material | null>> {
   return fetchJSON('/materials/compare', {
     method: 'POST',
     body: JSON.stringify({ materials: ids }),
   });
 }
 
-export async function selectMaterial(requirements: Record<string, unknown>): Promise<{ recommendations: Material[] }> {
+export async function selectMaterial(requirements: Record<string, unknown>): Promise<Material[]> {
   return fetchJSON('/materials/select', {
     method: 'POST',
     body: JSON.stringify(requirements),
   });
 }
 
-export async function createPrimitive(primitive: Primitive): Promise<{ primitive: Primitive; volume_cm3: number; weight_kg: number; scad: string }> {
+// ── Primitives ──
+
+export async function createPrimitive(type: string, name: string, dimensions: Record<string, number>, material?: string) {
   return fetchJSON('/primitives/create', {
     method: 'POST',
-    body: JSON.stringify(primitive),
+    body: JSON.stringify({ type, name, dimensions, material }),
   });
 }
 
-export async function createAssembly(name: string, parts: Primitive[]): Promise<{ assembly: Assembly }> {
+// ── Assembly ──
+
+export async function createAssembly(name: string, parts: Record<string, unknown>[]) {
   return fetchJSON('/assembly/create', {
     method: 'POST',
     body: JSON.stringify({ name, parts }),
   });
 }
 
-export async function generateBOM(parts: Primitive[]): Promise<BOMResult> {
-  return fetchJSON('/bom/generate', {
-    method: 'POST',
-    body: JSON.stringify({ parts }),
-  });
-}
+// ── Engineering ──
 
-export async function exportSCAD(parts: Primitive[]): Promise<{ scad: string; parts: number }> {
-  return fetchJSON('/export/scad', {
-    method: 'POST',
-    body: JSON.stringify({ parts }),
-  });
-}
-
-export async function analyzeStress(force_n: number, area_mm2: number, material: string): Promise<StressResult> {
+export async function analyzeStress(force: number, area: number, material?: string): Promise<StressResult> {
   return fetchJSON('/engineering/stress', {
     method: 'POST',
-    body: JSON.stringify({ force_n, area_mm2, material }),
+    body: JSON.stringify({ force, area, material }),
   });
 }
 
-export async function analyzePressure(inner_radius: number, outer_radius: number, pressure: number, material: string): Promise<PressureResult> {
+export async function analyzeDFM(params: {
+  material?: string;
+  features?: string[];
+  tolerances?: string;
+  surface_finish_ra?: number;
+  quantity?: number;
+}): Promise<DFMResult> {
+  return fetchJSON('/engineering/dfm', {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+}
+
+export async function analyzeFatigue(stress_range_mpa: number, mean_stress_mpa: number, material?: string) {
+  return fetchJSON('/engineering/fatigue', {
+    method: 'POST',
+    body: JSON.stringify({ stress_range_mpa, mean_stress_mpa, material }),
+  });
+}
+
+export async function analyzePressure(pressure: number, outer_diameter: number, inner_diameter: number, material?: string) {
   return fetchJSON('/engineering/pressure', {
     method: 'POST',
-    body: JSON.stringify({ inner_radius, outer_radius, pressure, material }),
+    body: JSON.stringify({ pressure, outer_diameter, inner_diameter, material }),
   });
 }
 
-export async function analyzeTolerances(dimensions: { nominal: number; tolerance: number }[]): Promise<ToleranceResult> {
+export async function analyzeTolerances(dimensions: { nominal: number; tolerance: number }[]) {
   return fetchJSON('/engineering/tolerance', {
     method: 'POST',
     body: JSON.stringify({ dimensions }),
   });
 }
 
-export async function analyzeDFM(type: string, material: string, params: Record<string, number>): Promise<DFMResult> {
-  return fetchJSON('/dfm/analyze', {
+export async function analyzeThread(size: string, pitch?: number, type?: string, material?: string) {
+  return fetchJSON('/engineering/thread', {
     method: 'POST',
-    body: JSON.stringify({ type, material, params }),
+    body: JSON.stringify({ size, pitch, type, material }),
   });
 }
 
-export async function calculateRingSize(diameter_mm: number): Promise<{ diameter_mm: number; us_size: number; eu_size: number }> {
-  return fetchJSON('/tools/ring-size', {
+export async function calculateWeight(parts: Record<string, unknown>[]) {
+  return fetchJSON('/engineering/weight', {
     method: 'POST',
-    body: JSON.stringify({ diameter_mm }),
+    body: JSON.stringify({ parts }),
+  });
+}
+
+// ── Export ──
+
+export async function exportSCAD(parts: Record<string, unknown>[]) {
+  return fetchJSON('/export/scad', {
+    method: 'POST',
+    body: JSON.stringify({ parts }),
+  });
+}
+
+export async function exportBOM(parts: Record<string, unknown>[]) {
+  return fetchJSON('/export/bom', {
+    method: 'POST',
+    body: JSON.stringify({ parts }),
+  });
+}
+
+// ── Quality ──
+
+export async function checkNACE(material: string) {
+  return fetchJSON('/quality/nace', {
+    method: 'POST',
+    body: JSON.stringify({ material }),
   });
 }
