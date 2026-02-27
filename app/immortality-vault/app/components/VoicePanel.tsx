@@ -10,16 +10,16 @@ interface Props {
 }
 
 const VOICE_PROMPTS = [
-  { id: 'intro', label: 'Introduction', text: 'Hello, my name is... and I want to tell you about myself. I was born in... and grew up in...', minSec: 10, category: 'Identity' },
-  { id: 'story', label: 'Storytelling', text: 'Let me tell you about one of my favorite memories. It was a time when I felt truly alive...', minSec: 15, category: 'Narrative' },
-  { id: 'emotion', label: 'Emotional Range', text: 'Read this with feeling: I am so proud of everything we have accomplished together. But sometimes, I worry about the future...', minSec: 10, category: 'Emotion' },
-  { id: 'numbers', label: 'Numbers & Dates', text: 'I was born on May 14th, 1976. My phone number is 432-555-1234. The address is 1200 West Wall Street.', minSec: 8, category: 'Precision' },
-  { id: 'questions', label: 'Questions', text: 'How are you doing today? Have you eaten yet? Did you remember to call your mother? What do you want for dinner?', minSec: 8, category: 'Intonation' },
-  { id: 'daily', label: 'Daily Speech', text: "Good morning! Let me get some coffee started. Hey, did you see what's on the news today? I'll be home around six.", minSec: 10, category: 'Natural' },
-  { id: 'wisdom', label: 'Wisdom', text: 'Son, let me tell you something my father told me. The most important thing in life is not money or success...', minSec: 12, category: 'Tone' },
-  { id: 'excited', label: 'Excitement', text: 'Oh my God, you are not going to believe what just happened! This is incredible! I am so happy right now!', minSec: 8, category: 'Energy' },
-  { id: 'calm', label: 'Calm & Soothing', text: 'Everything is going to be alright. Just take a deep breath. I am right here with you, and I am not going anywhere.', minSec: 10, category: 'Warmth' },
-  { id: 'long', label: 'Long Passage', text: 'Read a paragraph from your favorite book, poem, or speech. Choose something meaningful to you that shows your natural reading voice.', minSec: 20, category: 'Extended' },
+  { id: 'intro', label: 'Introduction', text: 'Introduce yourself naturally. Say your name, where you are from, and what matters most to you in life.', minSec: 10, category: 'Identity' },
+  { id: 'story', label: 'Storytelling', text: 'Tell a favorite memory in your own words. Describe where you were, who was there, and how it made you feel.', minSec: 15, category: 'Narrative' },
+  { id: 'emotion', label: 'Emotional Range', text: 'Talk about something that makes you proud, then something that worries you. Let your voice show the contrast.', minSec: 10, category: 'Emotion' },
+  { id: 'numbers', label: 'Numbers & Dates', text: 'Say your birth date, your address, and a phone number you know by heart. Speak clearly and at a natural pace.', minSec: 8, category: 'Precision' },
+  { id: 'questions', label: 'Questions', text: 'Ask a few questions the way you normally would in everyday conversation. Use your natural tone and rhythm.', minSec: 8, category: 'Intonation' },
+  { id: 'daily', label: 'Daily Speech', text: 'Talk through a typical morning routine. Describe what you do, what you say to the people around you.', minSec: 10, category: 'Natural' },
+  { id: 'wisdom', label: 'Wisdom', text: 'Share a piece of advice or life lesson you would pass on to someone you love. Speak from the heart.', minSec: 12, category: 'Tone' },
+  { id: 'excited', label: 'Excitement', text: 'Talk about something that truly excites you. Let your energy and enthusiasm come through naturally.', minSec: 8, category: 'Energy' },
+  { id: 'calm', label: 'Calm & Soothing', text: 'Speak softly and gently, as if comforting someone. Say something reassuring in your most soothing voice.', minSec: 10, category: 'Warmth' },
+  { id: 'long', label: 'Long Passage', text: 'Read a paragraph from your favorite book, poem, or speech. Choose something meaningful that shows your natural reading voice.', minSec: 20, category: 'Extended' },
 ];
 
 export default function VoicePanel({ userId }: Props) {
@@ -28,7 +28,7 @@ export default function VoicePanel({ userId }: Props) {
   const [isRecording, setIsRecording] = useState(false);
   const [duration, setDuration] = useState(0);
   const [profiles, setProfiles] = useState<VoiceProfile[]>([]);
-  const [testText, setTestText] = useState('Hello, this is a test of my voice clone.');
+  const [testText, setTestText] = useState('');
   const [testPlaying, setTestPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

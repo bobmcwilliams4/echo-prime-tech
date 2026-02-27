@@ -40,15 +40,7 @@ export default function AncestorChatPanel({ userId }: Props) {
     setSelected(member);
     setMode(chatMode);
     setSessionId(undefined);
-    setMessages([{
-      role: 'assistant',
-      content: chatMode === 'storytelling'
-        ? `Hello, it's ${member.name} here. What story would you like to hear?`
-        : chatMode === 'wisdom'
-        ? `This is ${member.name}. What wisdom would you like me to share today?`
-        : `Hey there! It's ${member.name}. What's on your mind?`,
-      emotion: 'warmth',
-    }]);
+    setMessages([]);
   };
 
   const send = useCallback(async () => {

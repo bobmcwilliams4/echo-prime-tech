@@ -10,9 +10,7 @@ interface Props {
 }
 
 export default function ChatPanel({ userId }: Props) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'assistant', content: "Hello! I'm your preserved consciousness. Ask me anything about your life, memories, or wisdom. I'll respond based on everything you've shared so far.", emotion: 'joy' },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [playingIdx, setPlayingIdx] = useState<number | null>(null);
