@@ -327,6 +327,11 @@ const FEATURES = [
     description: 'Gamified progress tracking — unlock achievements as you build a more complete digital legacy.',
     icon: '🏆',
   },
+  {
+    title: 'Video Biometric Capture',
+    description: 'Selfie-camera recording captures facial expressions, lip sync, mannerisms, and body movements for ultra-realistic digital cloning.',
+    icon: '📹',
+  },
 ];
 
 const PRICING = [
@@ -376,6 +381,7 @@ const PRICING = [
       'Unlimited voice clones',
       'Unlimited family tree',
       'Custom daily briefings',
+      'FaceTime Calling (coming soon)',
       'Priority support',
       'API access',
       'White-label option',
@@ -409,6 +415,10 @@ const FAQ = [
   {
     q: 'What if I only have old recordings of my loved one?',
     a: 'Even a few minutes of audio from phone calls, home videos, or voicemails can be used for voice cloning. Combined with written memories from family members, we can build a meaningful consciousness profile.',
+  },
+  {
+    q: 'What is FaceTime Calling?',
+    a: 'FaceTime Calling is our upcoming ultra-realistic video calling feature. Using biometric data captured from your selfie-camera recordings — facial expressions, lip sync patterns, mannerisms, and body movements — we create a photorealistic digital avatar that moves and speaks exactly like you. Family members will be able to have live video calls with your preserved consciousness, seeing your face react in real time. Coming 2026.',
   },
 ];
 
@@ -776,6 +786,89 @@ export default function ImmortalityVaultPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ─── FaceTime Coming Soon ──────────────────────────────────────── */}
+      <section className="py-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(251,191,36,0.08) 0%, transparent 70%)',
+        }} />
+        <div className="relative max-w-4xl mx-auto text-center">
+          <div
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold mb-8"
+            style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#0a0a0f' }}
+          >
+            COMING 2026
+          </div>
+          <h2 className="text-4xl sm:text-5xl font-black mb-4">
+            Ultra-Realistic{' '}
+            <span style={{
+              background: 'linear-gradient(135deg, #fbbf24 0%, #f472b6 50%, #c084fc 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              FaceTime Calling
+            </span>
+          </h2>
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+            Imagine picking up the phone and seeing your loved one&apos;s face — smiling, laughing, reacting in real time.
+            Using biometric data captured from your video recordings, we build a photorealistic digital avatar that
+            moves exactly like you: every expression, every mannerism, every subtle head tilt.
+          </p>
+
+          {/* Feature pills */}
+          <div className="flex flex-wrap justify-center gap-3 mb-10">
+            {[
+              { label: 'Face Mesh Mapping', icon: '🎭' },
+              { label: 'Lip Sync Engine', icon: '👄' },
+              { label: 'Emotion Detection', icon: '😊' },
+              { label: 'Mannerism Capture', icon: '🤌' },
+              { label: 'Body Pose Tracking', icon: '🧍' },
+              { label: 'Real-Time Rendering', icon: '⚡' },
+            ].map(p => (
+              <div
+                key={p.label}
+                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm"
+                style={{ background: '#1a1a24', border: `1px solid ${BORDER}` }}
+              >
+                <span>{p.icon}</span>
+                <span className="text-gray-300">{p.label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Mockup concept */}
+          <div className="max-w-sm mx-auto">
+            <div
+              className="rounded-3xl p-1 mx-auto"
+              style={{
+                background: 'linear-gradient(135deg, #fbbf24, #f472b6, #c084fc)',
+                maxWidth: 280,
+              }}
+            >
+              <div
+                className="rounded-[22px] p-8 text-center"
+                style={{ background: BG_DARK }}
+              >
+                <div className="text-6xl mb-4">📱</div>
+                <div className="text-xl font-bold text-white mb-1">FaceTime with Grandpa</div>
+                <div className="text-sm text-gray-400 mb-4">Live video call — 4:32</div>
+                <div className="flex justify-center gap-6">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl" style={{ background: '#ef4444' }}>
+                    📴
+                  </div>
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl animate-pulse" style={{ background: '#22c55e' }}>
+                    📞
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-500 mt-8 max-w-lg mx-auto">
+            Start recording video interviews today — every selfie-camera session captures the biometric data needed for your future FaceTime avatar. The more you record now, the more realistic the experience will be.
+          </p>
         </div>
       </section>
 
