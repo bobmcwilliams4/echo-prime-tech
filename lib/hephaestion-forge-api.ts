@@ -90,6 +90,7 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
+    'X-Echo-API-Key': process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-forge-x-2026',
     ...(options.headers as Record<string, string>),
   };
   if (token) headers['Authorization'] = `Bearer ${token}`;
