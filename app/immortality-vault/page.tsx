@@ -3,7 +3,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useTheme } from '../../lib/theme-context';
+import { useAuth } from '../../lib/auth-context';
+import { subscribe } from '../../lib/ept-api';
 
 /* ─── Constants ────────────────────────────────────────────────────────── */
 
@@ -431,6 +434,8 @@ const TRUST_SIGNALS = [
 
 export default function ImmortalityVaultPage() {
   const { isDark } = useTheme();
+  const { user, loading: authLoading, subscriptions } = useAuth();
+  const router = useRouter();
   const heroRef = useInView(0.1);
   const howRef = useInView(0.1);
   const featRef = useInView(0.1);
@@ -439,6 +444,43 @@ export default function ImmortalityVaultPage() {
 
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [liveUserCount, setLiveUserCount] = useState(0);
+  const [subscribing, setSubscribing] = useState<string | null>(null);
+
+  const isSubscribed = subscriptions.includes('immortality-vault');
+
+  const handlePlanSelect = async (planName: string) => {
+    if (!user) {
+      // Save intent in sessionStorage so we can pick up after login
+      sessionStorage.setItem('vault_plan_intent', planName);
+      router.push('/login?redirect=/immortality-vault');
+      return;
+    }
+    // Already subscribed — go straight to app
+    if (isSubscribed) {
+      router.push('/immortality-vault/app');
+      return;
+    }
+    // Subscribe to the service
+    setSubscribing(planName);
+    try {
+      await subscribe(['immortality-vault']);
+      router.push('/immortality-vault/app');
+    } catch (err) {
+      console.error('Subscribe failed:', err);
+      setSubscribing(null);
+    }
+  };
+
+  // Auto-redirect if user just logged in with a plan intent
+  useEffect(() => {
+    if (user && !authLoading) {
+      const intent = sessionStorage.getItem('vault_plan_intent');
+      if (intent) {
+        sessionStorage.removeItem('vault_plan_intent');
+        handlePlanSelect(intent);
+      }
+    }
+  }, [user, authLoading]);
 
   useEffect(() => {
     fetch(`${API}/stats`).then(r => r.json()).then((d: { users?: number }) => {
@@ -503,16 +545,16 @@ export default function ImmortalityVaultPage() {
           <WaveformHero />
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-            <a
-              href="#pricing"
+            <button
+              onClick={() => isSubscribed ? router.push('/immortality-vault/app') : handlePlanSelect('Free')}
               className="px-8 py-3.5 rounded-full text-base font-bold text-white transition hover:scale-105"
               style={{
                 background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
                 boxShadow: `0 0 30px ${ACCENT_GLOW}40`,
               }}
             >
-              Start Free Trial
-            </a>
+              {isSubscribed ? 'Open My Vault →' : 'Start Free Trial'}
+            </button>
             <a
               href="#demo"
               className="px-8 py-3.5 rounded-full text-base font-semibold transition hover:scale-105"
@@ -710,14 +752,16 @@ export default function ImmortalityVaultPage() {
                   ))}
                 </ul>
                 <button
-                  className="w-full py-2.5 rounded-full text-sm font-bold transition hover:scale-[1.02]"
+                  onClick={() => handlePlanSelect(plan.name)}
+                  disabled={subscribing !== null}
+                  className="w-full py-2.5 rounded-full text-sm font-bold transition hover:scale-[1.02] disabled:opacity-60"
                   style={
                     plan.popular
                       ? { background: `linear-gradient(135deg, #7c3aed, ${ACCENT})`, color: '#fff' }
                       : { border: `1px solid ${BORDER}`, color: '#d4d4d8' }
                   }
                 >
-                  {plan.cta}
+                  {subscribing === plan.name ? 'Activating...' : isSubscribed ? 'Open Vault →' : plan.cta}
                 </button>
               </div>
             ))}
