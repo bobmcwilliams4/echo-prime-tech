@@ -12,12 +12,13 @@ const API_BASE = 'https://hephaestion-forge.bmcii1976.workers.dev';
 
 export interface HealthResponse {
   status: string;
-  forge: string;
+  service: string;
   version: string;
-  archetypes: number;
-  pipeline_stages: number;
-  quality_gates: number;
+  pipeline: { stages: number; gates: number };
+  projectTypes: number;
   languages: number;
+  designPatterns: number;
+  graphicsSystem: boolean;
 }
 
 export interface ForgeStats {
@@ -29,16 +30,6 @@ export interface ForgeStats {
   capabilities: string[];
 }
 
-export interface Archetype {
-  id: string;
-  name: string;
-  description: string;
-  stack: string[];
-  default_language: string;
-  stages: string[];
-  estimated_time: string;
-}
-
 export interface PipelineStage {
   id: number;
   name: string;
@@ -47,27 +38,6 @@ export interface PipelineStage {
   inputs: string[];
   outputs: string[];
   quality_gate?: string;
-}
-
-export interface BuildResult {
-  project_id: string;
-  archetype: string;
-  language: string;
-  files_generated: number;
-  lines_of_code: number;
-  test_coverage: number;
-  quality_score: number;
-  stages_completed: number;
-  artifacts: { name: string; type: string; size: number }[];
-  warnings: string[];
-}
-
-export interface QualityGateResult {
-  gate: string;
-  passed: boolean;
-  score: number;
-  checks: { name: string; status: string; detail: string }[];
-  blockers: string[];
 }
 
 export interface ProjectPlan {
@@ -105,6 +75,13 @@ export interface ConsultResponse {
   error?: string;
 }
 
+export interface LLMProvider {
+  id: string;
+  name: string;
+  model: string;
+  available: boolean;
+}
+
 // ── API Fetch with Firebase Auth ──
 
 async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -132,45 +109,102 @@ export async function getStats(): Promise<ForgeStats> {
   return apiFetch('/stats');
 }
 
-export async function getArchetypes(): Promise<{ archetypes: Archetype[] }> {
-  return apiFetch('/archetypes');
-}
-
 export async function getPipeline(): Promise<{ stages: PipelineStage[] }> {
   return apiFetch('/pipeline');
-}
-
-export async function planProject(description: string, archetype?: string, language?: string): Promise<ProjectPlan> {
-  return apiFetch('/plan', {
-    method: 'POST',
-    body: JSON.stringify({ description, archetype, language }),
-  });
-}
-
-export async function buildProject(plan: ProjectPlan): Promise<BuildResult> {
-  return apiFetch('/build', {
-    method: 'POST',
-    body: JSON.stringify(plan),
-  });
-}
-
-export async function reviewCode(code: string, language: string): Promise<CodeReview> {
-  return apiFetch('/review', {
-    method: 'POST',
-    body: JSON.stringify({ code, language }),
-  });
-}
-
-export async function getQualityGates(): Promise<{ gates: QualityGateResult[] }> {
-  return apiFetch('/quality/gates');
 }
 
 export async function getTemplates(): Promise<{ templates: { id: string; name: string; archetype: string; description: string }[] }> {
   return apiFetch('/templates');
 }
 
+export async function getForgeTemplates(): Promise<unknown> {
+  return apiFetch('/forge/templates');
+}
+
 export async function getLanguages(): Promise<{ languages: string[]; frameworks: Record<string, string[]> }> {
   return apiFetch('/languages');
+}
+
+export async function getPatterns(): Promise<unknown> {
+  return apiFetch('/patterns');
+}
+
+export async function startForge(description: string, archetype?: string, language?: string): Promise<unknown> {
+  return apiFetch('/forge/start', {
+    method: 'POST',
+    body: JSON.stringify({ description, archetype, language }),
+  });
+}
+
+export async function generateScaffold(description: string, archetype?: string, language?: string): Promise<unknown> {
+  return apiFetch('/generate/scaffold', {
+    method: 'POST',
+    body: JSON.stringify({ description, archetype, language }),
+  });
+}
+
+export async function generateModule(name: string, description: string, language?: string): Promise<unknown> {
+  return apiFetch('/generate/module', {
+    method: 'POST',
+    body: JSON.stringify({ name, description, language }),
+  });
+}
+
+export async function reviewCode(code: string, language: string): Promise<CodeReview> {
+  return apiFetch('/quality/review', {
+    method: 'POST',
+    body: JSON.stringify({ code, language }),
+  });
+}
+
+export async function lintCode(code: string, language: string): Promise<unknown> {
+  return apiFetch('/quality/lint', {
+    method: 'POST',
+    body: JSON.stringify({ code, language }),
+  });
+}
+
+export async function securityScan(code: string, language: string): Promise<unknown> {
+  return apiFetch('/quality/security', {
+    method: 'POST',
+    body: JSON.stringify({ code, language }),
+  });
+}
+
+export async function recommendArchitecture(description: string): Promise<unknown> {
+  return apiFetch('/architecture/recommend', {
+    method: 'POST',
+    body: JSON.stringify({ description }),
+  });
+}
+
+export async function planDeploy(description: string, target?: string): Promise<unknown> {
+  return apiFetch('/deploy/plan', {
+    method: 'POST',
+    body: JSON.stringify({ description, target }),
+  });
+}
+
+export async function getLLMProviders(): Promise<{ providers: LLMProvider[] }> {
+  return apiFetch('/llm/providers');
+}
+
+export async function dispatchLLM(prompt: string, provider?: string): Promise<unknown> {
+  return apiFetch('/llm/dispatch', {
+    method: 'POST',
+    body: JSON.stringify({ prompt, provider }),
+  });
+}
+
+export async function queryEngines(query: string): Promise<unknown> {
+  return apiFetch('/engines/query', {
+    method: 'POST',
+    body: JSON.stringify({ query }),
+  });
+}
+
+export async function getEngineDomains(): Promise<unknown> {
+  return apiFetch('/engines/domains');
 }
 
 export async function consult(messages: ConsultMessage[], context?: string): Promise<ConsultResponse> {

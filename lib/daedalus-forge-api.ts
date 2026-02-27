@@ -2,7 +2,7 @@
  * Daedalus Forge API — AI Manufacturing Intelligence Platform
  *
  * Connects to https://daedalus-forge.bmcii1976.workers.dev
- * 50-stage manufacturing pipeline, 15 guilds × 80 agents,
+ * 50-stage manufacturing pipeline, 15 guilds × 1200 agents,
  * 8 engineering domains, Trinity Council (SAGE/NYX/THORNE).
  */
 
@@ -12,13 +12,14 @@ const API_BASE = 'https://daedalus-forge.bmcii1976.workers.dev';
 
 export interface HealthResponse {
   status: string;
-  forge: string;
+  service: string;
   version: string;
+  pipeline_stages: number;
   guilds: number;
   agents: number;
   domains: number;
-  stages: number;
-  council: string[];
+  materials: number;
+  cnc_machines: number;
 }
 
 export interface ForgeStats {
@@ -26,24 +27,19 @@ export interface ForgeStats {
   agents: number;
   domains: string[];
   stages: number;
-  council: string[];
   capabilities: string[];
 }
 
 export interface Guild {
   name: string;
   agents: number;
-  domain: string;
-  specialization: string;
-  capabilities: string[];
 }
 
 export interface Domain {
-  id: string;
   name: string;
-  description: string;
-  guilds: string[];
   standards: string[];
+  certifications: string[];
+  codes: string[];
 }
 
 export interface ManufacturingStage {
@@ -51,8 +47,6 @@ export interface ManufacturingStage {
   name: string;
   phase: string;
   description: string;
-  inputs: string[];
-  outputs: string[];
 }
 
 export interface AnalysisResult {
@@ -135,50 +129,67 @@ export async function getStats(): Promise<ForgeStats> {
   return apiFetch('/stats');
 }
 
-export async function getGuilds(): Promise<{ guilds: Guild[] }> {
+export async function getGuilds(): Promise<{ guilds: Guild[]; total: number; total_agents: number }> {
   return apiFetch('/guilds');
 }
 
-export async function getDomains(): Promise<{ domains: Domain[] }> {
+export async function getDomains(): Promise<{ success: boolean; domains: Record<string, Domain> }> {
   return apiFetch('/domains');
 }
 
-export async function getStages(): Promise<{ stages: ManufacturingStage[] }> {
-  return apiFetch('/pipeline/stages');
+export async function getPipeline(): Promise<{ success: boolean; stages: ManufacturingStage[]; total: number }> {
+  return apiFetch('/pipeline');
 }
 
 export async function getTemplates(): Promise<{ templates: ProjectTemplate[] }> {
-  return apiFetch('/templates');
+  return apiFetch('/forge/templates');
 }
 
-export async function analyzeProject(description: string, domain: string, requirements?: Record<string, unknown>): Promise<AnalysisResult> {
-  return apiFetch('/analyze', {
+export async function getMaterials(): Promise<{ success: boolean; materials: { id: string; name: string; grade: string; yield_mpa: number; nace: boolean; cost_usd_kg: number }[] }> {
+  return apiFetch('/materials');
+}
+
+export async function getStandards(domain?: string): Promise<{ success: boolean; domains: Record<string, Domain>; total_standards: number }> {
+  return apiFetch('/standards');
+}
+
+export async function selectMaterial(requirements: Record<string, unknown>): Promise<unknown> {
+  return apiFetch('/materials/select', {
+    method: 'POST',
+    body: JSON.stringify(requirements),
+  });
+}
+
+export async function startForge(description: string, domain: string, requirements?: Record<string, unknown>): Promise<unknown> {
+  return apiFetch('/forge/start', {
     method: 'POST',
     body: JSON.stringify({ description, domain, requirements }),
   });
 }
 
-export async function runQualityCheck(project: string, stage: string, data: Record<string, unknown>): Promise<QualityReport> {
-  return apiFetch('/quality/check', {
+export async function runQualityFMEA(component: string, domain: string, material?: string): Promise<QualityReport> {
+  return apiFetch('/quality/fmea', {
     method: 'POST',
-    body: JSON.stringify({ project, stage, data }),
+    body: JSON.stringify({ component, domain, material }),
   });
 }
 
 export async function getCouncilVerdict(project: string, context: string): Promise<CouncilVerdict> {
-  return apiFetch('/council/review', {
+  return apiFetch('/council/deliberate', {
     method: 'POST',
     body: JSON.stringify({ project, context }),
   });
 }
 
-export async function getMaterialStandards(material: string): Promise<{ material: string; standards: string[]; properties: Record<string, unknown> }> {
-  return apiFetch(`/materials/standards/${encodeURIComponent(material)}`);
+export async function queryEngines(query: string, domain?: string): Promise<unknown> {
+  return apiFetch('/engines/query', {
+    method: 'POST',
+    body: JSON.stringify({ query, domain }),
+  });
 }
 
-export async function getStandards(domain?: string): Promise<{ standards: { id: string; name: string; domain: string; description: string }[] }> {
-  const query = domain ? `?domain=${encodeURIComponent(domain)}` : '';
-  return apiFetch(`/standards${query}`);
+export async function getEngineDomains(): Promise<unknown> {
+  return apiFetch('/engines/domains');
 }
 
 export async function consult(messages: ConsultMessage[], context?: string): Promise<ConsultResponse> {

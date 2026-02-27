@@ -9,12 +9,10 @@ import { useTheme } from '../../lib/theme-context';
 import {
   consult,
   getStats,
-  getArchetypes,
-  planProject,
+  getTemplates,
+  startForge,
   type ConsultMessage,
   type ForgeStats,
-  type Archetype,
-  type ProjectPlan,
 } from '../../lib/hephaestion-forge-api';
 
 // ── Types ──
@@ -52,9 +50,9 @@ export default function HephaestionForge() {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [stats, setStats] = useState<ForgeStats | null>(null);
-  const [archetypes, setArchetypes] = useState<Archetype[]>([]);
+  const [templateNames, setTemplateNames] = useState<string[]>([]);
   const [readyToBuild, setReadyToBuild] = useState(false);
-  const [plan, setPlan] = useState<ProjectPlan | null>(null);
+  const [plan, setPlan] = useState<{ archetype: string; language: string; framework: string; stages: string[]; estimated_files: number; estimated_lines: number; estimated_time: string; dependencies: string[] } | null>(null);
   const [planning, setPlanning] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
@@ -68,7 +66,7 @@ export default function HephaestionForge() {
   useEffect(() => {
     if (user) {
       getStats().then(setStats).catch(() => {});
-      getArchetypes().then(d => setArchetypes(d.archetypes || [])).catch(() => {});
+      getTemplates().then(d => setTemplateNames((d.templates || []).map((t: { name: string }) => t.name))).catch(() => {});
     }
   }, [user]);
 
@@ -143,8 +141,17 @@ export default function HephaestionForge() {
         .filter(m => m.role === 'user')
         .map(m => m.content)
         .join('\n');
-      const result = await planProject(conversationSummary);
-      setPlan(result);
+      const result = await startForge(conversationSummary) as Record<string, unknown>;
+      setPlan({
+        archetype: (result.archetype as string) ?? 'Custom',
+        language: (result.language as string) ?? 'TypeScript',
+        framework: (result.framework as string) ?? 'Hono',
+        stages: (result.stages as string[]) ?? [],
+        estimated_files: (result.estimated_files as number) ?? 8,
+        estimated_lines: (result.estimated_lines as number) ?? 2000,
+        estimated_time: (result.estimated_time as string) ?? '2-4 hours',
+        dependencies: (result.dependencies as string[]) ?? [],
+      });
     } catch {
       setPlan(null);
     } finally {
@@ -216,13 +223,12 @@ export default function HephaestionForge() {
               </div>
             ))}
           </div>
-          {archetypes.length > 0 && (
+          {templateNames.length > 0 && (
             <div className="max-w-5xl mx-auto mt-4 flex flex-wrap gap-2">
-              {archetypes.map(a => (
-                <span key={a.id} className="text-xs px-2 py-1 rounded border"
-                      style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}
-                      title={a.description}>
-                  {a.name}
+              {templateNames.map(name => (
+                <span key={name} className="text-xs px-2 py-1 rounded border"
+                      style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+                  {name}
                 </span>
               ))}
             </div>

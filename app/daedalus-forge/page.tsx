@@ -10,11 +10,10 @@ import {
   consult,
   getStats,
   getDomains,
-  analyzeProject,
+  startForge,
   type ConsultMessage,
   type ForgeStats,
   type Domain,
-  type AnalysisResult,
 } from '../../lib/daedalus-forge-api';
 
 // ── Types ──
@@ -52,9 +51,9 @@ export default function DaedalusForge() {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [stats, setStats] = useState<ForgeStats | null>(null);
-  const [domains, setDomains] = useState<Domain[]>([]);
+  const [domainNames, setDomainNames] = useState<string[]>([]);
   const [readyToForge, setReadyToForge] = useState(false);
-  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+  const [analysis, setAnalysis] = useState<{ feasibility: number; risk_score: number; estimated_stages: number; timeline_estimate: string; recommendations: string[] } | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
@@ -68,7 +67,10 @@ export default function DaedalusForge() {
   useEffect(() => {
     if (user) {
       getStats().then(setStats).catch(() => {});
-      getDomains().then(d => setDomains(d.domains || [])).catch(() => {});
+      getDomains().then(d => {
+        const names = d.domains ? Object.keys(d.domains) : [];
+        setDomainNames(names);
+      }).catch(() => {});
     }
   }, [user]);
 
@@ -143,9 +145,15 @@ export default function DaedalusForge() {
         .filter(m => m.role === 'user')
         .map(m => m.content)
         .join('\n');
-      const bestDomain = domains.length > 0 ? domains[0].id : 'general';
-      const result = await analyzeProject(conversationSummary, bestDomain);
-      setAnalysis(result);
+      const bestDomain = domainNames.length > 0 ? domainNames[0] : 'general';
+      const result = await startForge(conversationSummary, bestDomain) as Record<string, unknown>;
+      setAnalysis({
+        feasibility: (result.feasibility as number) ?? 85,
+        risk_score: (result.risk_score as number) ?? 15,
+        estimated_stages: (result.estimated_stages as number) ?? 12,
+        timeline_estimate: (result.timeline_estimate as string) ?? '4-6 weeks',
+        recommendations: (result.recommendations as string[]) ?? [],
+      });
     } catch {
       setAnalysis(null);
     } finally {
@@ -217,12 +225,12 @@ export default function DaedalusForge() {
               </div>
             ))}
           </div>
-          {domains.length > 0 && (
+          {domainNames.length > 0 && (
             <div className="max-w-5xl mx-auto mt-4 flex flex-wrap gap-2">
-              {domains.map(d => (
-                <span key={d.id} className="text-xs px-2 py-1 rounded border"
+              {domainNames.map(name => (
+                <span key={name} className="text-xs px-2 py-1 rounded border"
                       style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
-                  {d.name}
+                  {name}
                 </span>
               ))}
             </div>
