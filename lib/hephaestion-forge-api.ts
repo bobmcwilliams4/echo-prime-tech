@@ -6,7 +6,7 @@
  * multi-LLM swarm, conversational code generation.
  */
 
-const API_URL = 'https://hephaestion-forge.bmcii1976.workers.dev';
+const API_BASE = 'https://hephaestion-forge.bmcii1976.workers.dev';
 
 // ── Types ──
 
@@ -91,76 +91,91 @@ export interface CodeReview {
   recommendations: string[];
 }
 
-export interface ConversationMessage {
+export interface ConsultMessage {
   role: 'user' | 'assistant';
   content: string;
-  timestamp: string;
-  artifacts?: { name: string; type: string; content: string }[];
 }
 
-// ── Fetchers ──
+export interface ConsultResponse {
+  success: boolean;
+  response: string;
+  ready_to_build: boolean;
+  model: string;
+  usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
+  error?: string;
+}
 
-async function fetchJSON<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
-  });
+// ── API Fetch with Firebase Auth ──
+
+async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const { auth } = await import('./firebase');
+  const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string>),
+  };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
   if (!res.ok) throw new Error(`Hephaestion Forge API ${res.status}: ${res.statusText}`);
   return res.json();
 }
 
+// ── Endpoints ──
+
 export async function getHealth(): Promise<HealthResponse> {
-  return fetchJSON('/health');
+  return apiFetch('/health');
 }
 
 export async function getStats(): Promise<ForgeStats> {
-  return fetchJSON('/stats');
+  return apiFetch('/stats');
 }
 
 export async function getArchetypes(): Promise<{ archetypes: Archetype[] }> {
-  return fetchJSON('/archetypes');
+  return apiFetch('/archetypes');
 }
 
 export async function getPipeline(): Promise<{ stages: PipelineStage[] }> {
-  return fetchJSON('/pipeline');
+  return apiFetch('/pipeline');
 }
 
 export async function planProject(description: string, archetype?: string, language?: string): Promise<ProjectPlan> {
-  return fetchJSON('/plan', {
+  return apiFetch('/plan', {
     method: 'POST',
     body: JSON.stringify({ description, archetype, language }),
   });
 }
 
 export async function buildProject(plan: ProjectPlan): Promise<BuildResult> {
-  return fetchJSON('/build', {
+  return apiFetch('/build', {
     method: 'POST',
     body: JSON.stringify(plan),
   });
 }
 
 export async function reviewCode(code: string, language: string): Promise<CodeReview> {
-  return fetchJSON('/review', {
+  return apiFetch('/review', {
     method: 'POST',
     body: JSON.stringify({ code, language }),
   });
 }
 
 export async function getQualityGates(): Promise<{ gates: QualityGateResult[] }> {
-  return fetchJSON('/quality/gates');
-}
-
-export async function chat(message: string, context?: string): Promise<ConversationMessage> {
-  return fetchJSON('/chat', {
-    method: 'POST',
-    body: JSON.stringify({ message, context }),
-  });
+  return apiFetch('/quality/gates');
 }
 
 export async function getTemplates(): Promise<{ templates: { id: string; name: string; archetype: string; description: string }[] }> {
-  return fetchJSON('/templates');
+  return apiFetch('/templates');
 }
 
 export async function getLanguages(): Promise<{ languages: string[]; frameworks: Record<string, string[]> }> {
-  return fetchJSON('/languages');
+  return apiFetch('/languages');
+}
+
+export async function consult(messages: ConsultMessage[], context?: string): Promise<ConsultResponse> {
+  return apiFetch('/consult', {
+    method: 'POST',
+    body: JSON.stringify({ messages, context }),
+  });
 }

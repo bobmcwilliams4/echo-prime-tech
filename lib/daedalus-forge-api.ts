@@ -6,7 +6,7 @@
  * 8 engineering domains, Trinity Council (SAGE/NYX/THORNE).
  */
 
-const API_URL = 'https://daedalus-forge.bmcii1976.workers.dev';
+const API_BASE = 'https://daedalus-forge.bmcii1976.workers.dev';
 
 // ── Types ──
 
@@ -94,67 +94,96 @@ export interface ProjectTemplate {
   default_materials: string[];
 }
 
-// ── Fetchers ──
+export interface ConsultMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
-async function fetchJSON<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
-  });
+export interface ConsultResponse {
+  success: boolean;
+  response: string;
+  ready_to_forge: boolean;
+  model: string;
+  usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
+  error?: string;
+}
+
+// ── API Fetch with Firebase Auth ──
+
+async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const { auth } = await import('./firebase');
+  const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string>),
+  };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
   if (!res.ok) throw new Error(`Daedalus Forge API ${res.status}: ${res.statusText}`);
   return res.json();
 }
 
+// ── Endpoints ──
+
 export async function getHealth(): Promise<HealthResponse> {
-  return fetchJSON('/health');
+  return apiFetch('/health');
 }
 
 export async function getStats(): Promise<ForgeStats> {
-  return fetchJSON('/stats');
+  return apiFetch('/stats');
 }
 
 export async function getGuilds(): Promise<{ guilds: Guild[] }> {
-  return fetchJSON('/guilds');
+  return apiFetch('/guilds');
 }
 
 export async function getDomains(): Promise<{ domains: Domain[] }> {
-  return fetchJSON('/domains');
+  return apiFetch('/domains');
 }
 
 export async function getStages(): Promise<{ stages: ManufacturingStage[] }> {
-  return fetchJSON('/pipeline/stages');
+  return apiFetch('/pipeline/stages');
 }
 
 export async function getTemplates(): Promise<{ templates: ProjectTemplate[] }> {
-  return fetchJSON('/templates');
+  return apiFetch('/templates');
 }
 
 export async function analyzeProject(description: string, domain: string, requirements?: Record<string, unknown>): Promise<AnalysisResult> {
-  return fetchJSON('/analyze', {
+  return apiFetch('/analyze', {
     method: 'POST',
     body: JSON.stringify({ description, domain, requirements }),
   });
 }
 
 export async function runQualityCheck(project: string, stage: string, data: Record<string, unknown>): Promise<QualityReport> {
-  return fetchJSON('/quality/check', {
+  return apiFetch('/quality/check', {
     method: 'POST',
     body: JSON.stringify({ project, stage, data }),
   });
 }
 
 export async function getCouncilVerdict(project: string, context: string): Promise<CouncilVerdict> {
-  return fetchJSON('/council/review', {
+  return apiFetch('/council/review', {
     method: 'POST',
     body: JSON.stringify({ project, context }),
   });
 }
 
 export async function getMaterialStandards(material: string): Promise<{ material: string; standards: string[]; properties: Record<string, unknown> }> {
-  return fetchJSON(`/materials/standards/${encodeURIComponent(material)}`);
+  return apiFetch(`/materials/standards/${encodeURIComponent(material)}`);
 }
 
 export async function getStandards(domain?: string): Promise<{ standards: { id: string; name: string; domain: string; description: string }[] }> {
   const query = domain ? `?domain=${encodeURIComponent(domain)}` : '';
-  return fetchJSON(`/standards${query}`);
+  return apiFetch(`/standards${query}`);
+}
+
+export async function consult(messages: ConsultMessage[], context?: string): Promise<ConsultResponse> {
+  return apiFetch('/consult', {
+    method: 'POST',
+    body: JSON.stringify({ messages, context }),
+  });
 }
