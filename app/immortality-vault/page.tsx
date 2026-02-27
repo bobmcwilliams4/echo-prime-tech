@@ -420,7 +420,7 @@ const TRUST_SIGNALS = [
 ];
 
 export default function ImmortalityVaultPage() {
-  const { theme } = useTheme();
+  const { isDark } = useTheme();
   const heroRef = useInView(0.1);
   const howRef = useInView(0.1);
   const featRef = useInView(0.1);
@@ -442,7 +442,7 @@ export default function ImmortalityVaultPage() {
       <nav className="sticky top-0 z-50 backdrop-blur-lg border-b" style={{ background: `${BG_DARK}cc`, borderColor: BORDER }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <Image src={theme === 'night' ? '/logo-sym-night.png' : '/logo-sym-day.png'} alt="EPT" width={28} height={28} />
+            <Image src={isDark ? '/logo-sym-night.png' : '/logo-sym-day.png'} alt="EPT" width={28} height={28} />
             <span className="text-sm font-semibold text-gray-300 group-hover:text-white transition">Echo Prime Technologies</span>
           </Link>
           <div className="flex items-center gap-4">
