@@ -672,27 +672,66 @@ export default function SentinelPage() {
     }
   }, [user]);
 
-  // ── Voice playback via Echo Speak (tts.echo-op.com) ──
-  const playVoice = useCallback(async (text: string, voice: string) => {
-    try {
-      // Strip markdown formatting for cleaner TTS
-      const cleanText = text
-        .replace(/#{1,6}\s/g, '')           // headers
-        .replace(/\*{1,3}([^*]+)\*{1,3}/g, '$1')  // bold/italic
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')   // links
-        .replace(/```[\s\S]*?```/g, '')      // code blocks
-        .replace(/`([^`]+)`/g, '$1')        // inline code
-        .replace(/^[-*]\s/gm, '')           // bullet points
-        .replace(/\n{2,}/g, '. ')           // paragraph breaks → pause
-        .replace(/---/g, '')                // horizontal rules
-        .slice(0, 2000);
+  // ── Voice playback via ElevenLabs v3 (routed through echo-chat worker) ──
+  // Emotion-to-audio-tag mapping for ElevenLabs v3 expressive TTS
+  const emotionAudioTag = useCallback((emotion: string): string => {
+    const tags: Record<string, string> = {
+      joy: '[laughs]', fear: '[nervous]', anger: '[angry]', sadness: '[sighs]',
+      surprise: '[gasps]', concern: '[sighs]', pride: '[excited]',
+      frustration: '[sighs]', curiosity: '[curious]', trust: '', anticipation: '[curious]',
+    };
+    return tags[emotion] || '';
+  }, []);
 
-      const res = await fetch('https://tts.echo-op.com/tts', {
+  const playVoice = useCallback(async (text: string, voice: string, emotion?: string) => {
+    try {
+      // Strip markdown for cleaner spoken output
+      const cleanText = text
+        .replace(/#{1,6}\s/g, '')
+        .replace(/\*{1,3}([^*]+)\*{1,3}/g, '$1')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/```[\s\S]*?```/g, '')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/^[-*]\s/gm, '')
+        .replace(/\n{2,}/g, '. ')
+        .replace(/---/g, '')
+        .slice(0, 2500);
+
+      // Inject emotion audio tag for ElevenLabs v3 expressiveness
+      const emotionTag = emotion ? emotionAudioTag(emotion) : '';
+      const ttsText = emotionTag ? `${emotionTag} ${cleanText}` : cleanText;
+
+      // Map sentinel personality voice names → echo-chat personality IDs
+      const voiceToPersonality: Record<string, string> = {
+        echo_prime: 'EP', commander: 'EP', bree: 'BR', thorne: 'SA',
+        sage: 'EP', phoenix: 'PH', prometheus: 'PR',
+      };
+      const personalityId = voiceToPersonality[voice] || 'EP';
+
+      // Route through echo-chat worker with ElevenLabs provider
+      const res = await fetch('https://echo-chat.bmcii1976.workers.dev/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: cleanText, voice_id: voice || 'default', output_format: 'wav' }),
+        body: JSON.stringify({
+          text: ttsText,
+          personality: personalityId,
+          emotion: emotion || 'neutral',
+          provider: 'elevenlabs',
+        }),
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        // Fallback to Echo Speak local TTS if ElevenLabs fails
+        const fallbackRes = await fetch('https://tts.echo-op.com/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: cleanText, voice_id: voice || 'default', output_format: 'wav' }),
+        });
+        if (!fallbackRes.ok) return;
+        const blob = await fallbackRes.blob();
+        const url = URL.createObjectURL(blob);
+        if (audioRef.current) { audioRef.current.src = url; audioRef.current.play().catch(() => {}); }
+        return;
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       if (audioRef.current) {
@@ -700,7 +739,7 @@ export default function SentinelPage() {
         audioRef.current.play().catch(() => {});
       }
     } catch { /* non-critical — TTS failure should never block UI */ }
-  }, []);
+  }, [emotionAudioTag]);
 
   // ── Memory search ──
   const handleMemorySearch = useCallback(async () => {
@@ -998,12 +1037,15 @@ export default function SentinelPage() {
         } catch { /* proceed without memory */ }
 
         const queryWithContext = [
+          '[INSTRUCTION: Provide a concise consensus — 2-4 sentences max. Be direct and decisive.]',
           memoryContext ? `[MEMORY CONTEXT: ${memoryContext.slice(0, 500)}]` : '',
           doctrineContext,
           text,
         ].filter(Boolean).join('\n\n');
         const decision = await trinityDecide(queryWithContext);
-        const responseContent = decision?.reasoning_synthesis || decision?.consensus || 'Trinity Council returned no consensus. Try rephrasing your question.';
+        // Truncate long reasoning to keep responses punchy
+        const rawResponse = decision?.reasoning_synthesis || decision?.consensus || 'Trinity Council returned no consensus. Try rephrasing your question.';
+        const responseContent = rawResponse.length > 800 ? rawResponse.slice(0, 800) + '...' : rawResponse;
 
         assistantMsg = {
           id: `a_${Date.now()}`, role: 'assistant', timestamp: Date.now(),
@@ -1035,7 +1077,7 @@ export default function SentinelPage() {
           personalityDirective,
           memoryContext ? `\n\n[MEMORY CONTEXT — previous interactions with this user]:\n${memoryContext.slice(0, 800)}` : '',
           doctrineContext,
-          '\n\nProvide insightful, personality-driven responses. Use markdown for structure. When doctrine results are provided, cite them authoritatively and explain their relevance.',
+          '\n\n[RESPONSE RULES — MANDATORY]:\n1. Keep responses CONCISE — 2-4 sentences max for simple questions, 1-2 short paragraphs for complex ones.\n2. Lead with the answer, not the preamble.\n3. Write for VOICE — short punchy sentences. No bullet lists, no markdown headers, no numbered lists.\n4. When citing doctrine, weave it naturally into conversation. Never dump raw citations.\n5. Sound like a brilliant expert talking to a friend — warm, direct, authoritative.\n6. If the answer is simple, give a simple answer. Do NOT pad with unnecessary context.',
         ].filter(Boolean).join('');
 
         // Build conversation history for context continuity
@@ -1074,17 +1116,21 @@ export default function SentinelPage() {
           if (cortexStats) setCortexStats({ ...cortexStats, contextInjected: true });
         } catch { /* proceed without memory */ }
 
+        const queryPrefix = '[INSTRUCTION: Give a concise, direct answer. 2-4 sentences for simple questions. Lead with the answer.]\n\n';
         const result = await queryEngine(
-          memoryContext ? `[CONTEXT: ${memoryContext.slice(0, 500)}]\n\n${text}` : text,
+          memoryContext ? `${queryPrefix}[CONTEXT: ${memoryContext.slice(0, 500)}]\n\n${text}` : `${queryPrefix}${text}`,
           analysisMode
         );
 
         // Merge doctrine results: engine cloud results + runtime doctrine results
         const mergedDoctrines = doctrineResults.length > 0 ? doctrineResults : undefined;
 
+        // Prefer summary (concise) over full analysis; truncate long responses
+        const responseContent = result.summary || (result.analysis?.length > 600 ? result.analysis.slice(0, 600) + '...' : result.analysis);
+
         assistantMsg = {
           id: `a_${Date.now()}`, role: 'assistant', timestamp: Date.now(),
-          content: result.summary || result.analysis,
+          content: responseContent,
           confidence: result.confidence,
           sources: result.sources_cited + (doctrineResults.length || 0),
           cost: commanderMode ? 0 : result.usage.cost,
@@ -1142,9 +1188,9 @@ export default function SentinelPage() {
         });
       }
 
-      // Auto-play voice
+      // Auto-play voice with ElevenLabs v3 emotion tags
       if (voiceEnabled && assistantMsg.content) {
-        playVoice(assistantMsg.content, voiceId);
+        playVoice(assistantMsg.content, voiceId, emotion?.dominant);
       }
 
     } catch (err: unknown) {

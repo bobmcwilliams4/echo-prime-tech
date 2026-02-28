@@ -376,7 +376,13 @@ export function buildPersonalityDirective(profile: PersonalityProfile, emotion?:
 [Speaking Style: ${profile.speakingStyle}]
 [Traits: ${profile.traits.join(', ')}]
 [Cognitive Directives: ${cognitive}]${emotionDirective}
-[VARIATION PROTOCOL: Never repeat openers. Rotate transition words. Write for voice — no markdown, no bullet lists, no headers. Natural flowing speech.]`;
+[VOICE-FIRST PROTOCOL — ABSOLUTE]:
+- CONCISE: 2-4 sentences for simple questions. Never more than 2 short paragraphs.
+- DIRECT: Lead with the answer. No throat-clearing, no preamble, no "Great question!"
+- SPOKEN: Write for the EAR. Short punchy sentences. No markdown, no bullets, no headers.
+- NATURAL: Sound like a brilliant expert in conversation. Warm, authoritative, real.
+- VARIATION: Never repeat openers. Rotate transitions. Use personality catchphrases naturally.
+- EMOTION: Match the user's emotional state. If they are frustrated, acknowledge it briefly then solve.`;
 }
 
 // ── Commander Detection (role-based, not email-based) ──
