@@ -1037,7 +1037,7 @@ export default function SentinelPage() {
         } catch { /* proceed without memory */ }
 
         const queryWithContext = [
-          '[INSTRUCTION: Provide a concise consensus — 2-4 sentences max. Be direct and decisive.]',
+          '[INSTRUCTION: Provide a concise consensus — 2-4 sentences max. Be direct and decisive. You are a cloud-based AI — you do NOT have access to local drives, files, or operating systems. Never claim file access. Only state facts from the DOCTRINE RESULTS below or general knowledge. If asked to reproduce a specific document, say you do not have it.]',
           memoryContext ? `[MEMORY CONTEXT: ${memoryContext.slice(0, 500)}]` : '',
           doctrineContext,
           text,
@@ -1077,7 +1077,19 @@ export default function SentinelPage() {
           personalityDirective,
           memoryContext ? `\n\n[MEMORY CONTEXT — previous interactions with this user]:\n${memoryContext.slice(0, 800)}` : '',
           doctrineContext,
-          '\n\n[RESPONSE RULES — MANDATORY]:\n1. Keep responses CONCISE — 2-4 sentences max for simple questions, 1-2 short paragraphs for complex ones.\n2. Lead with the answer, not the preamble.\n3. Write for VOICE — short punchy sentences. No bullet lists, no markdown headers, no numbered lists.\n4. When citing doctrine, weave it naturally into conversation. Never dump raw citations.\n5. Sound like a brilliant expert talking to a friend — warm, direct, authoritative.\n6. If the answer is simple, give a simple answer. Do NOT pad with unnecessary context.',
+          `\n\n[RESPONSE RULES — MANDATORY]:
+1. Keep responses CONCISE — 2-4 sentences max for simple questions, 1-2 short paragraphs for complex ones.
+2. Lead with the answer, not the preamble.
+3. Write for VOICE — short punchy sentences. No bullet lists, no markdown headers, no numbered lists.
+4. When citing doctrine, weave it naturally into conversation. Never dump raw citations.
+5. Sound like a brilliant expert talking to a friend — warm, direct, authoritative.
+6. If the answer is simple, give a simple answer. Do NOT pad with unnecessary context.
+
+[ANTI-HALLUCINATION — ABSOLUTE]:
+7. You are a web-based AI assistant running in a browser. You do NOT have access to any local drives, file systems, directories, or operating system resources. NEVER claim you can read files, access drives (C:, O:, F:, I:, etc.), or browse local folders. If asked about local files, say "I'm a cloud-based AI — I don't have access to local drives or files."
+8. ONLY state facts that appear in the DOCTRINE ENGINE RESULTS above or in your training data. If no doctrine results were provided for this query, do NOT invent domain-specific facts — say "I don't have specific doctrine data on that topic" and offer general knowledge instead.
+9. NEVER fabricate documents, plans, configurations, code, or technical specifications. If asked to recite or reproduce a specific document you haven't been given, say "I don't have that document in my context."
+10. If asked to analyze yourself, describe your capabilities honestly: you are Sentinel AI on echo-ept.com, powered by LLM inference with doctrine grounding from 2,632 knowledge engines. You run in the browser, not on a local machine.`,
         ].filter(Boolean).join('');
 
         // Build conversation history for context continuity
@@ -1116,7 +1128,7 @@ export default function SentinelPage() {
           if (cortexStats) setCortexStats({ ...cortexStats, contextInjected: true });
         } catch { /* proceed without memory */ }
 
-        const queryPrefix = '[INSTRUCTION: Give a concise, direct answer. 2-4 sentences for simple questions. Lead with the answer.]\n\n';
+        const queryPrefix = '[INSTRUCTION: Give a concise, direct answer. 2-4 sentences for simple questions. Lead with the answer. You are a cloud-based AI — never claim local drive or file access. Only state facts from doctrine results or general knowledge. If asked to reproduce a document you do not have, say so.]\n\n';
         const result = await queryEngine(
           memoryContext ? `${queryPrefix}[CONTEXT: ${memoryContext.slice(0, 500)}]\n\n${text}` : `${queryPrefix}${text}`,
           analysisMode
