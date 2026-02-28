@@ -84,6 +84,348 @@ const DOMAIN_PRESETS: DomainPreset[] = [
   { label: 'All Domains', icon: '🌐', desc: 'Search all 210 domains', domains: [] },
 ];
 
+// ── Domain-Specific Intake Questionnaires ──
+interface IntakeField {
+  key: string;
+  label: string;
+  type: 'text' | 'textarea' | 'select';
+  placeholder?: string;
+  required?: boolean;
+  options?: { value: string; label: string }[];
+  rows?: number;
+}
+
+interface DomainIntake {
+  title: string;
+  subtitle: string;
+  fields: IntakeField[];
+}
+
+const DOMAIN_INTAKE_FORMS: Record<string, DomainIntake> = {
+  'Tax / CPA': {
+    title: 'Tax & Accounting Analysis',
+    subtitle: 'The more details you provide, the more accurate and actionable your analysis will be',
+    fields: [
+      { key: 'entityType', label: 'Entity Type', type: 'select', required: true, options: [
+        { value: '', label: 'Select entity type' },
+        { value: 'individual', label: 'Individual (Single Filer)' },
+        { value: 'married_joint', label: 'Married Filing Jointly' },
+        { value: 'married_separate', label: 'Married Filing Separately' },
+        { value: 'head_of_household', label: 'Head of Household' },
+        { value: 'partnership', label: 'Partnership / LLC (Multi-Member)' },
+        { value: 'smllc', label: 'Single-Member LLC (Disregarded)' },
+        { value: 's_corp', label: 'S-Corporation' },
+        { value: 'c_corp', label: 'C-Corporation' },
+        { value: 'trust_revocable', label: 'Revocable Trust (Grantor)' },
+        { value: 'trust_irrevocable', label: 'Irrevocable Trust' },
+        { value: 'estate', label: 'Estate' },
+        { value: 'nonprofit_501c3', label: 'Nonprofit 501(c)(3)' },
+        { value: 'nonprofit_other', label: 'Nonprofit (Other Exempt)' },
+        { value: 'foreign', label: 'Foreign Entity / NRA' },
+      ]},
+      { key: 'taxYear', label: 'Tax Year(s)', type: 'text', placeholder: 'e.g. 2025, or 2022-2025 for multi-year', required: true },
+      { key: 'filingStatus', label: 'Filing Purpose', type: 'select', required: true, options: [
+        { value: '', label: 'What do you need help with?' },
+        { value: 'planning', label: 'Tax Planning / Strategy' },
+        { value: 'return_prep', label: 'Tax Return Preparation' },
+        { value: 'audit_defense', label: 'IRS Audit Defense' },
+        { value: 'state_audit', label: 'State Tax Audit' },
+        { value: 'amendment', label: 'Amended Return / Correction' },
+        { value: 'penalty_abatement', label: 'Penalty Abatement / Relief' },
+        { value: 'collections', label: 'IRS Collections / OIC' },
+        { value: 'entity_structuring', label: 'Entity Structuring / Formation' },
+        { value: 'succession', label: 'Succession / Estate Planning' },
+        { value: 'international', label: 'International Tax Issues' },
+        { value: 'general', label: 'General Tax Question' },
+      ]},
+      { key: 'state', label: 'State(s) of Filing', type: 'text', placeholder: 'e.g. Texas, California — list all states where you have nexus' },
+      { key: 'industry', label: 'Industry / Business Type', type: 'text', placeholder: 'e.g. Oil & Gas, Real Estate, Tech Startup, Restaurant, Medical Practice' },
+      { key: 'grossIncome', label: 'Approx. Gross Income / Revenue', type: 'text', placeholder: 'e.g. $250,000 W-2 + $50,000 1099, or $2M business revenue' },
+      { key: 'deductions', label: 'Major Deductions / Credits Expected', type: 'textarea', placeholder: 'e.g. Home office, vehicle expenses, depreciation, R&D credit, QBID 199A, IDC, depletion, retirement contributions, charitable donations...', rows: 2 },
+      { key: 'lifeEvents', label: 'Recent Life / Business Events', type: 'textarea', placeholder: 'e.g. Sold property, inherited assets, started business, added partners, received stock options, relocated states, divorce, retirement...', rows: 2 },
+      { key: 'scenario', label: 'Detailed Tax Question', type: 'textarea', placeholder: 'Describe your specific tax question, planning scenario, audit issue, or situation in as much detail as possible. The more context you provide, the better the analysis...', rows: 4, required: true },
+      { key: 'priorPositions', label: 'Prior Tax Positions / Elections', type: 'textarea', placeholder: 'Any existing tax positions, elections (e.g. 754, 338(h)(10)), methods (cash vs accrual), depreciation methods, or strategies already in place...', rows: 2 },
+      { key: 'relevantCodes', label: 'Known IRC Sections / Forms', type: 'text', placeholder: 'e.g. IRC 1031, 754, 199A, Form 1065, Schedule K-1, Form 8832' },
+      { key: 'priorReturns', label: 'Prior Return Issues', type: 'textarea', placeholder: 'Any issues with prior returns — missed deductions, errors, late filings, prior audit history, NOL carryforwards...', rows: 2 },
+      { key: 'advisors', label: 'Current Advisors / Preparers', type: 'text', placeholder: 'e.g. CPA firm name, enrolled agent, self-prepared with TurboTax' },
+    ],
+  },
+  'Cybersecurity': {
+    title: 'Cybersecurity Analysis',
+    subtitle: 'Specific details about your environment, threats, and objectives produce dramatically better results',
+    fields: [
+      { key: 'analysisType', label: 'Analysis Type', type: 'select', required: true, options: [
+        { value: '', label: 'Select analysis type' },
+        { value: 'threat_assessment', label: 'Threat Assessment / Modeling' },
+        { value: 'vulnerability', label: 'Vulnerability Analysis' },
+        { value: 'incident_response', label: 'Incident Response / Active Breach' },
+        { value: 'pentest_planning', label: 'Pentest Planning / Scoping' },
+        { value: 'pentest_execution', label: 'Pentest Execution / Methodology' },
+        { value: 'compliance_audit', label: 'Compliance Audit / Assessment' },
+        { value: 'malware_analysis', label: 'Malware Analysis / Reverse Engineering' },
+        { value: 'forensics', label: 'Digital Forensics / Evidence Analysis' },
+        { value: 'osint', label: 'OSINT / Reconnaissance' },
+        { value: 'network_security', label: 'Network Security / Hardening' },
+        { value: 'cloud_security', label: 'Cloud Security Architecture' },
+        { value: 'appsec', label: 'Application Security / Code Review' },
+        { value: 'red_team', label: 'Red Team Exercise' },
+        { value: 'blue_team', label: 'Blue Team / Detection Engineering' },
+        { value: 'soc_optimization', label: 'SOC Optimization / Alert Tuning' },
+      ]},
+      { key: 'environment', label: 'Environment', type: 'select', required: true, options: [
+        { value: '', label: 'Select environment' },
+        { value: 'aws', label: 'AWS' },
+        { value: 'azure', label: 'Azure' },
+        { value: 'gcp', label: 'Google Cloud' },
+        { value: 'multi_cloud', label: 'Multi-Cloud' },
+        { value: 'on_prem', label: 'On-Premises' },
+        { value: 'hybrid', label: 'Hybrid (Cloud + On-Prem)' },
+        { value: 'iot_ot', label: 'IoT / OT / ICS / SCADA' },
+        { value: 'mobile', label: 'Mobile (iOS/Android)' },
+        { value: 'web', label: 'Web Application' },
+        { value: 'network', label: 'Enterprise Network' },
+        { value: 'wireless', label: 'Wireless / Wi-Fi' },
+        { value: 'embedded', label: 'Embedded / Firmware' },
+      ]},
+      { key: 'targetScope', label: 'Target / Scope', type: 'textarea', placeholder: 'IP ranges, domains, application names, network segments, or systems in scope. Be as specific as possible.', rows: 2, required: true },
+      { key: 'osAndStack', label: 'OS / Technology Stack', type: 'text', placeholder: 'e.g. Windows Server 2022, Ubuntu 22.04, Kubernetes, NGINX, Apache, IIS' },
+      { key: 'framework', label: 'Compliance Framework(s)', type: 'text', placeholder: 'e.g. NIST 800-53, SOC 2 Type II, PCI-DSS 4.0, HIPAA, ISO 27001, CIS Benchmarks' },
+      { key: 'currentDefenses', label: 'Current Security Controls', type: 'textarea', placeholder: 'Existing security tools — firewall, EDR, SIEM, MFA, WAF, IDS/IPS, DLP, VPN, PAM, email security, etc.', rows: 2 },
+      { key: 'scenario', label: 'Detailed Scenario / Objective', type: 'textarea', placeholder: 'Describe the security scenario, indicators of compromise, vulnerability details, assessment objectives, or threat intelligence in as much detail as possible...', rows: 4, required: true },
+      { key: 'indicators', label: 'IOCs / Artifacts', type: 'textarea', placeholder: 'Hashes, IPs, domains, file names, registry keys, log entries, or any suspicious indicators...', rows: 2 },
+      { key: 'tools', label: 'Tools / Platforms Available', type: 'text', placeholder: 'e.g. Nmap, Burp Suite, Metasploit, Splunk, ELK, Wireshark, Ghidra, Volatility' },
+      { key: 'timeline', label: 'Timeline / Urgency', type: 'text', placeholder: 'e.g. Active incident, scheduled pentest next week, annual audit in 30 days' },
+    ],
+  },
+  'Engineering': {
+    title: 'Engineering Analysis',
+    subtitle: 'Precise specs, codes, and parameters yield engineering-grade answers',
+    fields: [
+      { key: 'discipline', label: 'Engineering Discipline', type: 'select', required: true, options: [
+        { value: '', label: 'Select discipline' },
+        { value: 'mechanical', label: 'Mechanical Engineering' },
+        { value: 'structural', label: 'Structural / Civil Engineering' },
+        { value: 'electrical', label: 'Electrical / Power Engineering' },
+        { value: 'petroleum', label: 'Petroleum / Reservoir Engineering' },
+        { value: 'chemical', label: 'Chemical / Process Engineering' },
+        { value: 'materials', label: 'Materials Science / Metallurgy' },
+        { value: 'welding', label: 'Welding / Fabrication Engineering' },
+        { value: 'piping', label: 'Piping / Pressure Vessel Design' },
+        { value: 'hvac', label: 'HVAC / Thermal Engineering' },
+        { value: 'drilling', label: 'Drilling Engineering' },
+        { value: 'completions', label: 'Completions / Frac Engineering' },
+        { value: 'nuclear', label: 'Nuclear Engineering' },
+        { value: 'aerospace', label: 'Aerospace / Aviation' },
+        { value: 'marine', label: 'Marine / Naval Architecture' },
+        { value: 'environmental', label: 'Environmental Engineering' },
+      ]},
+      { key: 'analysisType', label: 'Analysis Type', type: 'select', required: true, options: [
+        { value: '', label: 'Select type' },
+        { value: 'design', label: 'Design / Sizing Calculation' },
+        { value: 'failure', label: 'Failure Analysis / Root Cause' },
+        { value: 'optimization', label: 'Optimization / Improvement' },
+        { value: 'compliance', label: 'Code Compliance Verification' },
+        { value: 'inspection', label: 'Inspection / NDE Interpretation' },
+        { value: 'calculation', label: 'Engineering Calculation' },
+        { value: 'selection', label: 'Equipment / Material Selection' },
+        { value: 'fatigue', label: 'Fatigue / Fracture Analysis' },
+        { value: 'thermal', label: 'Thermal / Heat Transfer Analysis' },
+        { value: 'flow', label: 'Fluid Flow / Hydraulics' },
+        { value: 'fea', label: 'FEA / Stress Analysis Review' },
+      ]},
+      { key: 'materials', label: 'Materials', type: 'text', placeholder: 'e.g. A516 Gr.70, 316SS, A105, 4130 chrome moly, Inconel 625, 6061-T6 aluminum' },
+      { key: 'conditions', label: 'Operating Conditions', type: 'textarea', placeholder: 'Temperature, pressure, flow rate, cycle count, corrosive media, loads, wind/seismic zone, depth...', rows: 2, required: true },
+      { key: 'specs', label: 'Dimensions / Specifications', type: 'textarea', placeholder: 'Pipe size, wall thickness, vessel diameter, flange rating, weld joint type, tolerances, surface finish...', rows: 3, required: true },
+      { key: 'codes', label: 'Applicable Codes / Standards', type: 'text', placeholder: 'e.g. ASME B31.3, API 650, AWS D1.1, AISC 360, API 5L, NACE MR0175, ASTM specs' },
+      { key: 'equipmentInfo', label: 'Equipment / System Details', type: 'textarea', placeholder: 'Equipment type, manufacturer, model, serial number, nameplate data, installation date, service history...', rows: 2 },
+      { key: 'scenario', label: 'Problem Description', type: 'textarea', placeholder: 'Describe the engineering problem, design requirement, failure mode, or analysis needed in detail. Include history of the issue if applicable...', rows: 4, required: true },
+      { key: 'calculations', label: 'Required Calculations', type: 'textarea', placeholder: 'Specific calculations needed — e.g. MAWP, wall thickness per B31.3, WPS qualification, deflection, buckling, heat duty...', rows: 2 },
+      { key: 'attachments', label: 'Reference Documents', type: 'text', placeholder: 'List any P&IDs, drawings, specs, photos, or reports you can reference' },
+    ],
+  },
+  'Legal': {
+    title: 'Legal Research & Analysis',
+    subtitle: 'Detailed case facts, jurisdiction, and legal context produce far more accurate legal analysis',
+    fields: [
+      { key: 'areaOfLaw', label: 'Area of Law', type: 'select', required: true, options: [
+        { value: '', label: 'What area of law?' },
+        { value: 'contract', label: 'Contract / Commercial Law' },
+        { value: 'employment', label: 'Employment / Labor Law' },
+        { value: 'ip_patent', label: 'Patent / Invention' },
+        { value: 'ip_trademark', label: 'Trademark / Trade Dress' },
+        { value: 'ip_copyright', label: 'Copyright / Licensing' },
+        { value: 'ip_trade_secret', label: 'Trade Secret' },
+        { value: 'real_estate', label: 'Real Estate / Property Law' },
+        { value: 'oil_gas', label: 'Oil & Gas / Mineral Rights' },
+        { value: 'regulatory', label: 'Regulatory / Administrative' },
+        { value: 'litigation_civil', label: 'Civil Litigation' },
+        { value: 'litigation_commercial', label: 'Commercial Litigation' },
+        { value: 'corporate_governance', label: 'Corporate Governance' },
+        { value: 'corporate_ma', label: 'M&A / Corporate Transactions' },
+        { value: 'corporate_formation', label: 'Entity Formation / Structure' },
+        { value: 'bankruptcy_debtor', label: 'Bankruptcy (Debtor Side)' },
+        { value: 'bankruptcy_creditor', label: 'Bankruptcy (Creditor Side)' },
+        { value: 'environmental', label: 'Environmental Law / NEPA' },
+        { value: 'family_divorce', label: 'Divorce / Custody' },
+        { value: 'family_estate', label: 'Estate Planning / Probate' },
+        { value: 'family_adoption', label: 'Adoption / Guardianship' },
+        { value: 'criminal', label: 'Criminal Defense' },
+        { value: 'tax_controversy', label: 'Tax Controversy / IRS Dispute' },
+        { value: 'insurance', label: 'Insurance Coverage / Bad Faith' },
+        { value: 'personal_injury', label: 'Personal Injury / Tort' },
+        { value: 'securities', label: 'Securities / SEC Compliance' },
+        { value: 'immigration', label: 'Immigration' },
+        { value: 'other', label: 'Other / Multi-Area' },
+      ]},
+      { key: 'jurisdiction', label: 'Jurisdiction / Venue', type: 'text', placeholder: 'e.g. State of Texas, Northern District of Texas, Delaware Chancery, 5th Circuit, Federal', required: true },
+      { key: 'posture', label: 'Case Posture / Stage', type: 'select', options: [
+        { value: '', label: 'Select stage (if litigation)' },
+        { value: 'pre_litigation', label: 'Pre-Litigation / Demand Letter' },
+        { value: 'filing', label: 'Complaint / Answer' },
+        { value: 'discovery', label: 'Discovery Phase' },
+        { value: 'motions', label: 'Dispositive Motions (MSJ/MTD)' },
+        { value: 'trial_prep', label: 'Trial Preparation' },
+        { value: 'trial', label: 'Trial' },
+        { value: 'appeal', label: 'Appeal' },
+        { value: 'enforcement', label: 'Judgment Enforcement' },
+        { value: 'transactional', label: 'Transactional (Not Litigation)' },
+        { value: 'regulatory', label: 'Regulatory Proceeding' },
+      ]},
+      { key: 'parties', label: 'Parties Involved', type: 'textarea', placeholder: 'Names, roles, and relationships of all parties (plaintiff, defendant, parties to agreement, entities, individuals). Include opposing counsel if known.', rows: 3, required: true },
+      { key: 'facts', label: 'Key Facts / Timeline', type: 'textarea', placeholder: 'Chronological facts: dates of events, key communications, actions taken, contracts signed, injuries sustained, amounts at issue. Be thorough — missing facts lead to incomplete analysis.', rows: 5, required: true },
+      { key: 'legalIssues', label: 'Specific Legal Issues / Questions', type: 'textarea', placeholder: 'What specific legal questions need answering? e.g. "Does this clause survive termination?", "Is there personal liability for LLC member?", "What is the statute of limitations?", "Does the arbitration clause cover this dispute?"', rows: 4, required: true },
+      { key: 'documents', label: 'Key Documents / Evidence', type: 'textarea', placeholder: 'List relevant documents — contracts, leases, emails, text messages, corporate minutes, title documents, medical records, police reports, insurance policies...', rows: 2 },
+      { key: 'relevantLaw', label: 'Known Statutes / Case Law / Rules', type: 'textarea', placeholder: 'Any statutes, regulations, case law, or rules you already know are relevant. e.g. UCC Art. 2, Tex. Bus. Org. Code Ch. 21, FRCP 56, Smith v. Jones, Daubert standard...', rows: 2 },
+      { key: 'opposingArgs', label: 'Opposing Arguments / Position', type: 'textarea', placeholder: 'What is the other side arguing or likely to argue? What are the weakest points in your position?', rows: 2 },
+      { key: 'desiredOutcome', label: 'Desired Outcome', type: 'textarea', placeholder: 'What outcome are you seeking? Damages amount, injunction, contract rescission, compliance pathway, settlement range, legal opinion...', rows: 2 },
+      { key: 'timeline', label: 'Key Dates / Deadlines', type: 'text', placeholder: 'e.g. SOL expires March 2026, response due in 14 days, closing date, hearing date' },
+      { key: 'budget', label: 'Budget / Practical Constraints', type: 'text', placeholder: 'e.g. Client budget for litigation, insurance coverage limits, relationship preservation priorities' },
+    ],
+  },
+  'Medical / Health': {
+    title: 'Medical & Clinical Analysis',
+    subtitle: 'Complete clinical context enables differential diagnosis and evidence-based recommendations',
+    fields: [
+      { key: 'specialty', label: 'Medical Specialty', type: 'select', required: true, options: [
+        { value: '', label: 'Select specialty' },
+        { value: 'general', label: 'General / Internal Medicine' },
+        { value: 'family', label: 'Family Medicine' },
+        { value: 'emergency', label: 'Emergency Medicine' },
+        { value: 'cardiology', label: 'Cardiology' },
+        { value: 'pulmonology', label: 'Pulmonology / Respiratory' },
+        { value: 'gastro', label: 'Gastroenterology' },
+        { value: 'neurology', label: 'Neurology / Neurosurgery' },
+        { value: 'oncology', label: 'Oncology / Hematology' },
+        { value: 'orthopedics', label: 'Orthopedics / Sports Medicine' },
+        { value: 'dermatology', label: 'Dermatology' },
+        { value: 'psychiatry', label: 'Psychiatry / Behavioral Health' },
+        { value: 'pediatrics', label: 'Pediatrics' },
+        { value: 'obstetrics', label: 'OB/GYN' },
+        { value: 'urology', label: 'Urology' },
+        { value: 'nephrology', label: 'Nephrology' },
+        { value: 'endocrinology', label: 'Endocrinology' },
+        { value: 'infectious', label: 'Infectious Disease' },
+        { value: 'pharmacology', label: 'Pharmacology / Drug Interactions' },
+        { value: 'toxicology', label: 'Toxicology / Poisoning' },
+        { value: 'radiology', label: 'Radiology / Imaging' },
+        { value: 'pathology', label: 'Pathology / Lab Interpretation' },
+        { value: 'anesthesiology', label: 'Anesthesiology / Pain Mgmt' },
+        { value: 'surgery', label: 'General Surgery' },
+      ]},
+      { key: 'purposeType', label: 'Purpose of Inquiry', type: 'select', required: true, options: [
+        { value: '', label: 'What do you need?' },
+        { value: 'differential', label: 'Differential Diagnosis' },
+        { value: 'treatment', label: 'Treatment Planning' },
+        { value: 'drug_interaction', label: 'Drug Interaction / Pharmacology' },
+        { value: 'lab_interpretation', label: 'Lab / Imaging Interpretation' },
+        { value: 'guidelines', label: 'Clinical Guidelines / Protocol' },
+        { value: 'research', label: 'Medical Research / Literature' },
+        { value: 'compliance', label: 'Medical Compliance / Billing' },
+        { value: 'patient_education', label: 'Patient Education' },
+        { value: 'second_opinion', label: 'Second Opinion / Review' },
+      ]},
+      { key: 'patientContext', label: 'Patient Demographics', type: 'textarea', placeholder: 'Age, sex, BMI, ethnicity, relevant social history (smoking, alcohol, occupation, living situation), allergies, immunization status (de-identified)', rows: 2, required: true },
+      { key: 'pmh', label: 'Past Medical / Surgical History', type: 'textarea', placeholder: 'Prior diagnoses, surgeries, hospitalizations, chronic conditions, family history of relevant diseases...', rows: 2 },
+      { key: 'presentation', label: 'Clinical Presentation', type: 'textarea', placeholder: 'Chief complaint, HPI (onset, duration, quality, severity, timing, aggravating/alleviating factors), review of systems, vital signs, physical exam findings...', rows: 4, required: true },
+      { key: 'labResults', label: 'Lab Results / Imaging', type: 'textarea', placeholder: 'CBC, CMP, UA, imaging findings (XR, CT, MRI, US), EKG/ECG, pathology reports, culture results — include values and reference ranges', rows: 3 },
+      { key: 'currentMeds', label: 'Current Medications', type: 'textarea', placeholder: 'Full medication list with dosages, frequency, and duration. Include OTC meds, supplements, and herbal remedies.', rows: 3 },
+      { key: 'scenario', label: 'Clinical Question', type: 'textarea', placeholder: 'What specific clinical question needs answering? Be as precise as possible — e.g. "Is levofloxacin safe with this patient\'s QTc of 480ms?", "What is the workup for new-onset ascites in a 45yo?", "Treatment algorithm for stage IIIB NSCLC with EGFR mutation?"', rows: 4, required: true },
+      { key: 'priorTreatments', label: 'Prior Treatments / Interventions', type: 'textarea', placeholder: 'What has already been tried? Response to prior treatments, failed therapies, adverse reactions...', rows: 2 },
+      { key: 'guidelines', label: 'Relevant Guidelines / References', type: 'text', placeholder: 'e.g. AHA/ACC, NCCN, UpToDate, IDSA, WHO, CMS, AGA, AASLD' },
+    ],
+  },
+  'Software / AI': {
+    title: 'Software & Architecture Analysis',
+    subtitle: 'Stack details, scale requirements, and constraints shape the architectural recommendations',
+    fields: [
+      { key: 'projectType', label: 'Project Type', type: 'select', required: true, options: [
+        { value: '', label: 'Select type' },
+        { value: 'web_app', label: 'Web Application (Frontend)' },
+        { value: 'full_stack', label: 'Full-Stack Application' },
+        { value: 'api', label: 'API / Backend Service' },
+        { value: 'mobile_native', label: 'Native Mobile App (iOS/Android)' },
+        { value: 'mobile_cross', label: 'Cross-Platform Mobile (React Native/Flutter)' },
+        { value: 'ml_pipeline', label: 'ML / AI Pipeline' },
+        { value: 'data_pipeline', label: 'Data Engineering / ETL' },
+        { value: 'infrastructure', label: 'Infrastructure / DevOps / IaC' },
+        { value: 'desktop', label: 'Desktop Application' },
+        { value: 'cli', label: 'CLI Tool / SDK' },
+        { value: 'microservices', label: 'Microservices Architecture' },
+        { value: 'system_design', label: 'System Design Review' },
+        { value: 'migration', label: 'Migration / Modernization' },
+        { value: 'performance', label: 'Performance Optimization' },
+        { value: 'debugging', label: 'Bug Investigation / Debugging' },
+      ]},
+      { key: 'techStack', label: 'Technology Stack', type: 'textarea', placeholder: 'Languages, frameworks, databases, message queues, cloud services, CI/CD — be specific with versions.\ne.g. TypeScript 5.4, Next.js 15, PostgreSQL 16, Redis, Cloudflare Workers, GitHub Actions', rows: 2, required: true },
+      { key: 'scale', label: 'Scale / Performance Requirements', type: 'textarea', placeholder: 'Users (DAU/MAU), requests/second, data volume, latency requirements, uptime SLA, geographic distribution...', rows: 2 },
+      { key: 'scenario', label: 'Requirements / Problem Description', type: 'textarea', placeholder: 'Describe what you need to build, the architectural challenge, the bug symptoms, or the optimization target. Include error messages, stack traces, or specific behavior observed...', rows: 5, required: true },
+      { key: 'existing', label: 'Current Architecture / Codebase', type: 'textarea', placeholder: 'Current system architecture — services, databases, APIs, deployment topology, monolith vs microservices, existing tech debt, dependency graph...', rows: 3 },
+      { key: 'constraints', label: 'Constraints & Requirements', type: 'textarea', placeholder: 'Budget, timeline, compliance (SOC 2, GDPR, HIPAA), team size/skills, vendor lock-in concerns, backward compatibility, offline support, accessibility...', rows: 2 },
+      { key: 'errorContext', label: 'Error Messages / Logs', type: 'textarea', placeholder: 'If debugging: paste error messages, stack traces, log output, reproduction steps, environment details...', rows: 3 },
+      { key: 'alternatives', label: 'Alternatives Considered', type: 'text', placeholder: 'e.g. Considering Kafka vs RabbitMQ, PostgreSQL vs DynamoDB, monolith vs microservices' },
+    ],
+  },
+  'Finance': {
+    title: 'Financial & Business Analysis',
+    subtitle: 'Detailed financials, market context, and objectives enable precise business intelligence',
+    fields: [
+      { key: 'analysisType', label: 'Analysis Type', type: 'select', required: true, options: [
+        { value: '', label: 'Select type' },
+        { value: 'valuation', label: 'Business Valuation (DCF, Comps, Precedent)' },
+        { value: 'investment', label: 'Investment Analysis / Due Diligence' },
+        { value: 'risk', label: 'Risk Assessment / Management' },
+        { value: 'modeling', label: 'Financial Modeling / Projections' },
+        { value: 'strategy', label: 'Business Strategy / Planning' },
+        { value: 'ma', label: 'M&A / Deal Analysis' },
+        { value: 'market', label: 'Market Research / Competitive Analysis' },
+        { value: 'pricing', label: 'Pricing Strategy / Unit Economics' },
+        { value: 'fundraising', label: 'Fundraising / Capital Structure' },
+        { value: 'restructuring', label: 'Restructuring / Turnaround' },
+        { value: 'real_estate', label: 'Real Estate Investment Analysis' },
+        { value: 'oil_gas', label: 'Oil & Gas / Energy Economics' },
+        { value: 'crypto', label: 'Crypto / Digital Asset Analysis' },
+      ]},
+      { key: 'industry', label: 'Industry / Sector', type: 'text', placeholder: 'e.g. SaaS B2B, Oil & Gas E&P, Real Estate (Multifamily), E-commerce DTC, Healthcare Services', required: true },
+      { key: 'companyStage', label: 'Company Stage', type: 'select', options: [
+        { value: '', label: 'Select stage' },
+        { value: 'pre_revenue', label: 'Pre-Revenue / Startup' },
+        { value: 'early', label: 'Early Stage ($0-$1M revenue)' },
+        { value: 'growth', label: 'Growth Stage ($1M-$10M)' },
+        { value: 'scale', label: 'Scale-Up ($10M-$100M)' },
+        { value: 'mature', label: 'Mature ($100M+)' },
+        { value: 'public', label: 'Publicly Traded' },
+        { value: 'distressed', label: 'Distressed / Turnaround' },
+      ]},
+      { key: 'financials', label: 'Key Financial Data', type: 'textarea', placeholder: 'Revenue, EBITDA, gross margin, net income, cash flow, debt levels, cap table, burn rate, runway. Include multiple years if available.', rows: 3, required: true },
+      { key: 'scenario', label: 'Analysis Question / Objective', type: 'textarea', placeholder: 'What specific financial analysis do you need? Deal terms to evaluate, valuation question, growth strategy to model, risk to quantify, investment decision to make...', rows: 4, required: true },
+      { key: 'metrics', label: 'Key Metrics / KPIs', type: 'textarea', placeholder: 'CAC, LTV, churn rate, NRR, gross margin, ROIC, IRR target, cap rate, NOI, P/E ratio, EV/EBITDA multiples, production decline curve...', rows: 2 },
+      { key: 'market', label: 'Market / Competitive Context', type: 'textarea', placeholder: 'Market size (TAM/SAM/SOM), growth rate, key competitors, market position, regulatory environment, barriers to entry...', rows: 2 },
+      { key: 'timeline', label: 'Time Horizon / Key Dates', type: 'text', placeholder: 'e.g. 5-year projection, deal closing in 30 days, fundraising Q2 2026, exit in 3-5 years' },
+      { key: 'assumptions', label: 'Key Assumptions', type: 'textarea', placeholder: 'Growth rate assumptions, discount rate, terminal value assumptions, market conditions, pricing assumptions, cost structure assumptions...', rows: 2 },
+    ],
+  },
+};
+
 interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
@@ -152,6 +494,20 @@ export default function SentinelPage() {
   const [agenticDocument, setAgenticDocument] = useState<string | null>(null);
   const [agenticAbort, setAgenticAbort] = useState<(() => void) | null>(null);
   const agenticTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // ── Domain Intake Form ──
+  const [showIntakeForm, setShowIntakeForm] = useState(false);
+  const [intakeFormDomain, setIntakeFormDomain] = useState<string>('');
+  const [intakeData, setIntakeData] = useState<Record<string, string>>({
+    state: 'Texas',
+    county: '',
+    section: '',
+    block: '',
+    lots: '',
+    survey: '',
+    currentOwners: '',
+    previousOwners: '',
+    notes: '',
+  });
   const agenticStartTimeRef = useRef<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -285,7 +641,90 @@ export default function SentinelPage() {
     }
   }, [memorySearch]);
 
-  // ── Start Agentic Deep Analysis ──
+  // ── Start Agentic Analysis from Intake Form ──
+  const startIntakeAnalysis = useCallback(async () => {
+    const d = intakeData;
+    if (!d.county || !d.section || !d.block) return;
+
+    // Build structured query from intake fields
+    const parts: string[] = ['Chain of title for'];
+    if (d.lots) parts.push(`Lots ${d.lots},`);
+    parts.push(`Block ${d.block},`);
+    parts.push(`Section ${d.section},`);
+    if (d.survey) parts.push(`${d.survey} Survey,`);
+    parts.push(`${d.county} County, ${d.state}`);
+    const text = parts.join(' ');
+
+    // Build known owners list for orchestrator
+    const knownOwners: string[] = [];
+    if (d.currentOwners.trim()) knownOwners.push(...d.currentOwners.split('\n').map(s => s.trim()).filter(Boolean));
+    if (d.previousOwners.trim()) knownOwners.push(...d.previousOwners.split('\n').map(s => s.trim()).filter(Boolean));
+
+    setShowIntakeForm(false);
+    setInput(text);
+
+    // Add user message to chat
+    const summaryParts = [`**Chain of Title Analysis**`, `Section ${d.section}, Block ${d.block}${d.lots ? `, Lots ${d.lots}` : ''}`];
+    if (d.survey) summaryParts.push(`${d.survey} Survey`);
+    summaryParts.push(`${d.county} County, ${d.state}`);
+    if (knownOwners.length > 0) summaryParts.push(`Known owners: ${knownOwners.join(', ')}`);
+    if (d.notes) summaryParts.push(`Notes: ${d.notes}`);
+
+    const userMsg: Message = { id: `u_${Date.now()}`, role: 'user', content: summaryParts.join('\n'), timestamp: Date.now() };
+    setMessages(prev => [...prev, userMsg]);
+    setInput('');
+
+    // Enter agentic mode
+    setAgenticMode(true);
+    setAgenticSession(null);
+    setAgenticSteps([]);
+    setAgenticPlan(null);
+    setAgenticStatus('planning');
+    setAgenticElapsed(0);
+    setAgenticDocument(null);
+    agenticStartTimeRef.current = Date.now();
+
+    if (agenticTimerRef.current) clearInterval(agenticTimerRef.current);
+    agenticTimerRef.current = setInterval(() => {
+      setAgenticElapsed(Date.now() - agenticStartTimeRef.current);
+    }, 500);
+
+    const callbacks: SSECallbacks = {
+      onPlan: (plan) => { setAgenticPlan(plan); setAgenticStatus('executing'); setAgenticSteps(plan.steps.map(s => ({ id: s.id, name: s.name, type: s.type as AgenticStepDisplay['type'], status: 'pending', duration_ms: 0 }))); },
+      onStepStart: (step) => { setAgenticSteps(prev => prev.map(s => s.id === step.step_id ? { ...s, status: 'running' } : s)); },
+      onStepComplete: (step) => { setAgenticSteps(prev => prev.map(s => s.id === step.step_id ? { ...s, status: 'complete', duration_ms: step.duration_ms, summary: step.summary } : s)); },
+      onStepFailed: (step) => { setAgenticSteps(prev => prev.map(s => s.id === step.step_id ? { ...s, status: 'failed', error: step.error } : s)); },
+      onValidation: () => { setAgenticStatus('validating'); },
+      onDocumentReady: async (data) => {
+        setAgenticStatus('complete');
+        if (agenticTimerRef.current) clearInterval(agenticTimerRef.current);
+        try { const html = await getAgenticDocument(data.session_id); setAgenticDocument(html); } catch { /* retry */ }
+      },
+      onError: (error) => { setAgenticStatus('failed'); if (agenticTimerRef.current) clearInterval(agenticTimerRef.current); setMessages(prev => [...prev, { id: `e_${Date.now()}`, role: 'system', content: `Agentic analysis failed: ${error}`, timestamp: Date.now() }]); },
+      onDone: (data) => { setAgenticSession(data.session_id); if (data.status === 'complete') setAgenticStatus('complete'); else if (data.status === 'failed') setAgenticStatus('failed'); if (agenticTimerRef.current) clearInterval(agenticTimerRef.current); },
+    };
+
+    try {
+      const { sessionPromise, abort } = startStreamingSession(
+        text,
+        selectedDomains,
+        callbacks,
+        { known_owners: knownOwners, notes: d.notes, property: { state: d.state, county: d.county, section: d.section, block: d.block, lots: d.lots, survey: d.survey } },
+      );
+      setAgenticAbort(() => abort);
+      const sessionId = await sessionPromise;
+      setAgenticSession(sessionId);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      if (!msg.includes('aborted')) {
+        setAgenticStatus('failed');
+        if (agenticTimerRef.current) clearInterval(agenticTimerRef.current);
+        setMessages(prev => [...prev, { id: `e_${Date.now()}`, role: 'system', content: `Agentic session failed: ${msg}`, timestamp: Date.now() }]);
+      }
+    }
+  }, [intakeData, loading, apiKeyReady, selectedDomains]);
+
+  // ── Start Agentic Deep Analysis (freeform fallback) ──
   const startAgenticAnalysis = useCallback(async () => {
     const text = input.trim();
     if (!text || loading || !apiKeyReady) return;
@@ -570,6 +1009,31 @@ export default function SentinelPage() {
 
       setMessages(prev => [...prev, assistantMsg]);
 
+      // ── Tax/CPA Upsell — promote tax return preparation service ──
+      const isTaxDomain = activePreset === 'Tax / CPA' || selectedDomains.some(d => ['TX', 'ACCT', 'TXLAW', 'TXRE', 'TXINS'].includes(d));
+      if (isTaxDomain) {
+        const taxReturnKeywords = /\b(tax return|file|filing|1040|1065|1120|schedule [a-e]|w-2|w2|1099|refund|owe|irs|prepare|preparation|cpa|accountant|deduction|credit|eitc|standard deduction|itemize|dependent|withholding|estimated tax|quarterly|extension|amended|prior year)\b/i;
+        const queryIsTaxReturn = taxReturnKeywords.test(text);
+        // Build autofill params from intake data
+        const taxParams = new URLSearchParams();
+        if (intakeData.entityType) taxParams.set('entity', intakeData.entityType);
+        if (intakeData.taxYear) taxParams.set('year', intakeData.taxYear);
+        if (intakeData.state) taxParams.set('state', intakeData.state);
+        if (intakeData.industry) taxParams.set('industry', intakeData.industry);
+        if (intakeData.filingStatus) taxParams.set('filing', intakeData.filingStatus);
+        if (intakeData.income) taxParams.set('income', intakeData.income.slice(0, 100));
+        const paramStr = taxParams.toString();
+        const taxLink = `/tax-returns${paramStr ? `?${paramStr}` : ''}`;
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            id: `upsell_${Date.now()}`, role: 'system', timestamp: Date.now(),
+            content: queryIsTaxReturn
+              ? `💼 **Need your taxes prepared?** Echo Prime Technologies offers AI-powered tax return preparation — individual, partnership, corporate, and trust returns. Your intake details can be sent directly to auto-fill your return.\n\n[Start Your Tax Return →](${taxLink})`
+              : `💡 **Did you know?** Echo Prime Technologies offers full AI-powered tax return preparation. From simple 1040s to complex partnership and corporate filings — prepared by our tax engines and reviewed by professionals.\n\n[Learn More →](${taxLink})`,
+          }]);
+        }, 1500);
+      }
+
       // Update usage
       if (usage && assistantMsg.cost !== undefined && !commanderMode) {
         setUsage({
@@ -725,6 +1189,12 @@ export default function SentinelPage() {
                         } else {
                           setSelectedDomains(preset.domains);
                           setActivePreset(preset.label);
+                          // Auto-show intake form for domains that have one
+                          if (preset.label in DOMAIN_INTAKE_FORMS || preset.label === 'Landman / Title') {
+                            setIntakeFormDomain(preset.label);
+                            setIntakeData({ state: 'Texas', county: '', section: '', block: '', lots: '', survey: '', currentOwners: '', previousOwners: '', notes: '' });
+                            setShowIntakeForm(true);
+                          }
                         }
                       }} style={{
                         display: 'flex', alignItems: 'flex-start', gap: 8, width: '100%', padding: '8px 10px', marginBottom: 3,
@@ -1101,6 +1571,14 @@ export default function SentinelPage() {
                       </div>
                     </div>
                   </div>
+                ) : msg.id.startsWith('upsell_') ? (
+                  <div style={{ padding: '14px 18px', borderRadius: 10, background: 'linear-gradient(135deg, #0d948810, #6366f110)', border: '1px solid #14b8a640', fontSize: 13, color: '#cbd5e1', lineHeight: 1.7 }}>
+                    <div style={{ whiteSpace: 'pre-wrap', marginBottom: 10 }}>{msg.content.split(/\[.*?\]\(.*?\)/)[0].trim()}</div>
+                    <Link href={(msg.content.match(/\]\(([^)]+)\)/)?.[1]) || '/tax-returns'} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 20px', borderRadius: 8, backgroundColor: '#0d9488', color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                      {(msg.content.match(/\[([^\]]+)\]/)?.[1] || 'Explore Tax Return Services').replace(' →', '')}
+                    </Link>
+                  </div>
                 ) : (
                   <div style={{ padding: '10px 16px', borderRadius: 8, backgroundColor: '#1e293b44', border: '1px solid #334155', fontSize: 13, color: '#94a3b8', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
                     {msg.content}
@@ -1170,13 +1648,13 @@ export default function SentinelPage() {
                 {/* Deep Analysis button — visible when Landman preset or relevant domains active */}
                 {(activePreset === 'Landman / Title' || selectedDomains.some(d => ['LAND', 'LG', 'OILGAS'].includes(d))) && (
                   <button
-                    onClick={startAgenticAnalysis}
-                    disabled={loading || !input.trim() || agenticMode}
-                    title="Deep Analysis — multi-step agentic orchestration"
+                    onClick={() => { setIntakeFormDomain(activePreset || ''); setShowIntakeForm(true); }}
+                    disabled={loading || agenticMode}
+                    title="Chain of Title — structured property analysis"
                     style={{
                       height: 38, padding: '0 14px', borderRadius: 10, border: '1px solid #14b8a6',
-                      cursor: loading || !input.trim() || agenticMode ? 'default' : 'pointer',
-                      backgroundColor: loading || !input.trim() || agenticMode ? '#1e293b' : '#0d9488',
+                      cursor: loading || agenticMode ? 'default' : 'pointer',
+                      backgroundColor: loading || agenticMode ? '#1e293b' : '#0d9488',
                       color: '#fff', display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0,
                       fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap',
                     }}
@@ -1185,10 +1663,10 @@ export default function SentinelPage() {
                       <circle cx="12" cy="12" r="10" />
                       <path d="M12 6v6l4 2" />
                     </svg>
-                    Deep Analysis
+                    Chain of Title
                   </button>
                 )}
-                <button onClick={sendMessage} disabled={loading || !input.trim()} style={{
+                <button data-send-btn onClick={sendMessage} disabled={loading || !input.trim()} style={{
                   width: 38, height: 38, borderRadius: 10, border: 'none',
                   cursor: loading || !input.trim() ? 'default' : 'pointer',
                   backgroundColor: loading || !input.trim() ? '#1e293b' : modeColors[sentinelMode],
@@ -1218,6 +1696,190 @@ export default function SentinelPage() {
           </div>
         </div>
       </div>
+
+      {/* ═══ Domain Intake Form (Dynamic — works for ALL domains) ═══ */}
+      {showIntakeForm && (() => {
+        const isLandman = intakeFormDomain === 'Landman / Title';
+        const domainForm = DOMAIN_INTAKE_FORMS[intakeFormDomain];
+        const presetIcon = DOMAIN_PRESETS.find(p => p.label === intakeFormDomain)?.icon || '🔍';
+
+        // Helper: check if required fields are filled for generic domains
+        const genericRequiredFilled = domainForm
+          ? domainForm.fields.filter(f => f.required).every(f => (intakeData[f.key] || '').trim())
+          : true;
+        const landmanRequiredFilled = !!(intakeData.county && intakeData.section && intakeData.block);
+        const canSubmit = apiKeyReady && (isLandman ? landmanRequiredFilled : genericRequiredFilled);
+
+        // Handler: submit generic domain form
+        const submitGenericForm = () => {
+          if (!domainForm || !canSubmit) return;
+          const parts: string[] = [];
+          domainForm.fields.forEach(f => {
+            const val = (intakeData[f.key] || '').trim();
+            if (val) parts.push(`**${f.label}**: ${val}`);
+          });
+          const text = parts.join('\n');
+          setShowIntakeForm(false);
+
+          // Build freeform query from the scenario/main field
+          const mainField = domainForm.fields.find(f => f.key === 'scenario');
+          const queryText = intakeData.scenario || intakeData[domainForm.fields[domainForm.fields.length - 1]?.key] || text;
+          setInput(queryText);
+
+          // Add structured message and trigger standard analysis
+          const userMsg: Message = { id: `u_${Date.now()}`, role: 'user', content: `**${domainForm.title}**\n${text}`, timestamp: Date.now() };
+          setMessages(prev => [...prev, userMsg]);
+          setInput('');
+
+          // Use the text input + send for non-agentic domains
+          setTimeout(() => {
+            const fakeInput = mainField ? (intakeData.scenario || queryText) : queryText;
+            setInput(fakeInput);
+            // Auto-send after a tick
+            setTimeout(() => {
+              const btn = document.querySelector<HTMLButtonElement>('[data-send-btn]');
+              if (btn) btn.click();
+            }, 100);
+          }, 50);
+        };
+
+        return (
+        <div onClick={() => setShowIntakeForm(false)} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <div onClick={e => e.stopPropagation()} style={{ backgroundColor: '#0f1629', borderRadius: 16, border: '1px solid #1e3a5f', padding: 32, maxWidth: 640, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: '#0d948820', border: '1px solid #14b8a6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
+                {presetIcon}
+              </div>
+              <div>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f1f5f9', margin: 0 }}>
+                  {isLandman ? 'Chain of Title Analysis' : domainForm?.title || intakeFormDomain}
+                </h2>
+                <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>
+                  {isLandman ? 'Enter property details for deep agentic analysis' : domainForm?.subtitle || 'Enter details for targeted analysis'}
+                </p>
+              </div>
+            </div>
+            <div style={{ padding: '10px 14px', borderRadius: 8, backgroundColor: '#0d948815', border: '1px solid #14b8a630', marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+              <span style={{ fontSize: 16, flexShrink: 0, lineHeight: '20px' }}>💡</span>
+              <p style={{ fontSize: 12, color: '#94a3b8', margin: 0, lineHeight: 1.5 }}>
+                <strong style={{ color: '#14b8a6' }}>Better details = better answers.</strong> Every field you fill helps our 2,632 engines find the most relevant doctrine blocks. Required fields get you started, but optional fields dramatically improve accuracy, specificity, and actionability.
+              </p>
+            </div>
+
+            {/* ═══ LANDMAN-SPECIFIC FORM ═══ */}
+            {isLandman && (<>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 12, marginBottom: 12 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' }}>State *</label>
+                  <select value={intakeData.state || 'Texas'} onChange={e => setIntakeData(d => ({ ...d, state: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 14, outline: 'none' }}>
+                    <option value="Texas">Texas</option><option value="New Mexico">New Mexico</option><option value="Oklahoma">Oklahoma</option><option value="Louisiana">Louisiana</option><option value="North Dakota">North Dakota</option><option value="Colorado">Colorado</option><option value="Wyoming">Wyoming</option><option value="Pennsylvania">Pennsylvania</option><option value="West Virginia">West Virginia</option><option value="Ohio">Ohio</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' }}>County *</label>
+                  <input type="text" value={intakeData.county || ''} onChange={e => setIntakeData(d => ({ ...d, county: e.target.value }))} placeholder="e.g. Reeves" style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 14, outline: 'none' }} />
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' }}>Section *</label>
+                  <input type="text" value={intakeData.section || ''} onChange={e => setIntakeData(d => ({ ...d, section: e.target.value }))} placeholder="e.g. 270" style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 14, outline: 'none' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' }}>Block *</label>
+                  <input type="text" value={intakeData.block || ''} onChange={e => setIntakeData(d => ({ ...d, block: e.target.value }))} placeholder="e.g. 8" style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 14, outline: 'none' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' }}>Lot(s)</label>
+                  <input type="text" value={intakeData.lots || ''} onChange={e => setIntakeData(d => ({ ...d, lots: e.target.value }))} placeholder="e.g. 1 & 2" style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 14, outline: 'none' }} />
+                </div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' }}>Survey / Abstract</label>
+                <select value={intakeData.survey || ''} onChange={e => setIntakeData(d => ({ ...d, survey: e.target.value }))} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 14, outline: 'none' }}>
+                  <option value="">Select survey (optional)</option><option value="H&GN RR">H&GN Railroad</option><option value="T&P RR">T&P Railroad</option><option value="GC&SF RR">GC&SF Railroad</option><option value="TCRR">TCRR</option><option value="SPRR">SPRR</option><option value="A&B">A&B</option><option value="EL&RR">EL&RR</option><option value="WCRR">WCRR</option><option value="PSL">PSL (Public School Land)</option><option value="University">University Lands</option>
+                </select>
+              </div>
+              <div style={{ height: 1, backgroundColor: '#1e293b', margin: '20px 0' }} />
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' }}>Known Current Owners</label>
+                <textarea value={intakeData.currentOwners || ''} onChange={e => setIntakeData(d => ({ ...d, currentOwners: e.target.value }))} placeholder={"One per line, e.g.\nRidgefield Permian Minerals LLC\nPermian Resources Operating LLC"} rows={3} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 13, outline: 'none', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5 }} />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' }}>Known Previous Owners</label>
+                <textarea value={intakeData.previousOwners || ''} onChange={e => setIntakeData(d => ({ ...d, previousOwners: e.target.value }))} placeholder={"One per line, e.g.\nH. Grady Chandler\nToyah Valley Grape & Alfalfa Co."} rows={3} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 13, outline: 'none', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5 }} />
+              </div>
+              <div style={{ marginBottom: 24 }}>
+                <label style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' }}>Additional Notes</label>
+                <textarea value={intakeData.notes || ''} onChange={e => setIntakeData(d => ({ ...d, notes: e.target.value }))} placeholder="Any other relevant info — existing leases, family relationships, known instruments, etc." rows={2} style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 13, outline: 'none', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5 }} />
+              </div>
+            </>)}
+
+            {/* ═══ GENERIC DOMAIN FORM (Tax, Cyber, Engineering, Legal, Medical, Software, Finance) ═══ */}
+            {!isLandman && domainForm && (
+              <div>
+                {domainForm.fields.map(field => (
+                  <div key={field.key} style={{ marginBottom: 12 }}>
+                    <label style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' }}>
+                      {field.label}{field.required ? ' *' : ''}
+                    </label>
+                    {field.type === 'select' ? (
+                      <select
+                        value={intakeData[field.key] || ''}
+                        onChange={e => setIntakeData(d => ({ ...d, [field.key]: e.target.value }))}
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 14, outline: 'none' }}
+                      >
+                        {field.options?.map(opt => (
+                          <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                      </select>
+                    ) : field.type === 'textarea' ? (
+                      <textarea
+                        value={intakeData[field.key] || ''}
+                        onChange={e => setIntakeData(d => ({ ...d, [field.key]: e.target.value }))}
+                        placeholder={field.placeholder}
+                        rows={field.rows || 3}
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 13, outline: 'none', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5 }}
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        value={intakeData[field.key] || ''}
+                        onChange={e => setIntakeData(d => ({ ...d, [field.key]: e.target.value }))}
+                        placeholder={field.placeholder}
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #334155', backgroundColor: '#1e293b', color: '#f1f5f9', fontSize: 14, outline: 'none' }}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 20 }}>
+              <p style={{ fontSize: 11, color: '#64748b', margin: 0 }}>
+                {isLandman ? '* Required fields. Analysis takes 10-60 minutes.' : '* Required fields. Structured input produces more targeted results.'}
+              </p>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button onClick={() => setShowIntakeForm(false)} style={{ padding: '10px 20px', borderRadius: 8, border: '1px solid #334155', backgroundColor: 'transparent', color: '#94a3b8', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                  {isLandman ? 'Cancel' : 'Skip'}
+                </button>
+                <button
+                  onClick={isLandman ? startIntakeAnalysis : submitGenericForm}
+                  disabled={!canSubmit}
+                  style={{ padding: '10px 24px', borderRadius: 8, border: 'none', backgroundColor: canSubmit ? '#0d9488' : '#1e293b', color: '#fff', fontSize: 13, fontWeight: 600, cursor: canSubmit ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 8 }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+                  </svg>
+                  {isLandman ? 'Start Deep Analysis' : 'Submit'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        );
+      })()}
 
       {/* ═══ Pricing Modal ═══ */}
       {showPricing && (

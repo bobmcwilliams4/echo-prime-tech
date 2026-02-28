@@ -111,18 +111,33 @@ export async function startSession(
 
 // ─── Start Streaming Session ─────────────────────────────────
 
+export interface PropertyIntake {
+  state?: string;
+  county?: string;
+  section?: string;
+  block?: string;
+  lots?: string;
+  survey?: string;
+}
+
 export function startStreamingSession(
   query: string,
   domains: string[],
   callbacks: SSECallbacks,
+  intake?: { known_owners?: string[]; notes?: string; property?: PropertyIntake },
 ): { sessionPromise: Promise<string>; abort: () => void } {
   const controller = new AbortController();
 
   const sessionPromise = (async () => {
+    const body: Record<string, unknown> = { query, domains, options: { stream: true } };
+    if (intake?.known_owners?.length) body.known_owners = intake.known_owners;
+    if (intake?.notes) body.notes = intake.notes;
+    if (intake?.property) body.property = intake.property;
+
     const resp = await fetch(`${AGENTIC_BASE}/orchestrate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, domains, options: { stream: true } }),
+      body: JSON.stringify(body),
       signal: controller.signal,
     });
 
