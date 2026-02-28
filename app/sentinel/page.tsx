@@ -48,6 +48,7 @@ import {
   type DetectedEmotion,
   type PersonalityProfile,
 } from '../../lib/sentinel-cloud-api';
+import { chatSentinelBrain, checkBrainHealth } from '../../lib/sentinel-brain-api';
 
 // ── Types ──
 
@@ -1037,7 +1038,7 @@ export default function SentinelPage() {
         } catch { /* proceed without memory */ }
 
         const queryWithContext = [
-          '[INSTRUCTION: Provide a concise consensus — 2-4 sentences max. Be direct and decisive. You are a cloud-based AI — you do NOT have access to local drives, files, or operating systems. Never claim file access. Only state facts from the DOCTRINE RESULTS below or general knowledge. If asked to reproduce a specific document, say you do not have it.]',
+          '[INSTRUCTION: Provide a concise consensus — 2-4 sentences max. Be direct and decisive. Only state facts from the DOCTRINE RESULTS below or general knowledge. Never fabricate documents or specifications. If asked to reproduce a specific document, say you do not have it.]',
           memoryContext ? `[MEMORY CONTEXT: ${memoryContext.slice(0, 500)}]` : '',
           doctrineContext,
           text,
@@ -1085,11 +1086,11 @@ export default function SentinelPage() {
 5. Sound like a brilliant expert talking to a friend — warm, direct, authoritative.
 6. If the answer is simple, give a simple answer. Do NOT pad with unnecessary context.
 
-[ANTI-HALLUCINATION — ABSOLUTE]:
-7. You are a web-based AI assistant running in a browser. You do NOT have access to any local drives, file systems, directories, or operating system resources. NEVER claim you can read files, access drives (C:, O:, F:, I:, etc.), or browse local folders. If asked about local files, say "I'm a cloud-based AI — I don't have access to local drives or files."
-8. ONLY state facts that appear in the DOCTRINE ENGINE RESULTS above or in your training data. If no doctrine results were provided for this query, do NOT invent domain-specific facts — say "I don't have specific doctrine data on that topic" and offer general knowledge instead.
-9. NEVER fabricate documents, plans, configurations, code, or technical specifications. If asked to recite or reproduce a specific document you haven't been given, say "I don't have that document in my context."
-10. If asked to analyze yourself, describe your capabilities honestly: you are Sentinel AI on echo-ept.com, powered by LLM inference with doctrine grounding from 2,632 knowledge engines. You run in the browser, not on a local machine.`,
+[CAPABILITIES]:
+7. You are Sentinel AI on echo-ept.com, powered by Claude Opus 4.6 via the ECHO PRIME infrastructure. You have access to the ECHO OMEGA PRIME network including 4 compute nodes (ALPHA, BRAVO, CHARLIE, DELTA), 2,632 knowledge engines with 202,751 doctrines across 210 domain categories, and 7.17 million lines of domain intelligence.
+8. ONLY state facts that appear in the DOCTRINE ENGINE RESULTS above or in your training data. If no doctrine results were provided for this query, say "I don't have specific doctrine data on that topic" and offer general knowledge instead.
+9. NEVER fabricate documents, plans, configurations, code, or technical specifications you haven't been given.
+10. If asked to analyze yourself, describe your capabilities honestly: Claude Opus 4.6 with doctrine grounding from 2,632 knowledge engines across 210 domains.`,
         ].filter(Boolean).join('');
 
         // Build conversation history for context continuity
@@ -1098,17 +1099,39 @@ export default function SentinelPage() {
           .slice(-6)
           .map(m => ({ role: m.role, content: m.content.slice(0, 1000) }));
 
-        // Route through /api/chat (LLM with personality system prompt)
-        const result = await chatEngine(text, systemPrompt, history);
+        // Route through Claude Opus 4.6 brain (primary) with GPT-4.1 fallback
+        let responseText = '';
+        let usedModel = 'claude-opus-4-6';
+        try {
+          const brainResult = await chatSentinelBrain(text, systemPrompt, history, (status) => {
+            // Update UI with processing status
+            if (status === 'processing') {
+              setMessages(prev => {
+                const last = prev[prev.length - 1];
+                if (last?.role === 'assistant' && last.content === '...thinking...') return prev;
+                return [...prev, { id: `thinking_${Date.now()}`, role: 'assistant' as const, timestamp: Date.now(), content: '...thinking...', mode: 'echo_prime' }];
+              });
+            }
+          });
+          responseText = brainResult.response;
+          usedModel = brainResult.model;
+          // Remove thinking indicator
+          setMessages(prev => prev.filter(m => !m.id.startsWith('thinking_')));
+        } catch {
+          // Fallback to Azure GPT-4.1 if brain is offline
+          usedModel = 'gpt-4.1-fallback';
+          const fallback = await chatEngine(text, systemPrompt, history);
+          responseText = fallback.response;
+        }
 
         assistantMsg = {
           id: `a_${Date.now()}`, role: 'assistant', timestamp: Date.now(),
-          content: result.response,
+          content: responseText,
           confidence: 'DISCLOSURE',
-          sources: result.has_doctrine_context ? 1 : 0,
-          cost: commanderMode ? 0 : result.usage.cost,
-          remaining: commanderMode ? 999999 : result.usage.remaining,
-          domain: domainsQueried.length > 0 ? domainsQueried.join(' + ') : 'Echo Prime Intelligence',
+          sources: doctrineResults.length > 0 ? doctrineResults.length : 0,
+          cost: 0,
+          remaining: 999999,
+          domain: domainsQueried.length > 0 ? domainsQueried.join(' + ') : `Echo Prime (${usedModel})`,
           mode: 'echo_prime',
           emotion,
           personality: activeProfile,
@@ -1118,7 +1141,7 @@ export default function SentinelPage() {
         };
 
         // Store to memory
-        brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA [ECHO_PRIME]: ${(result.response || '').slice(0, 500)}`, 5, ['sentinel', 'echo_prime', 'personality']).catch(() => {});
+        brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA [ECHO_PRIME/${usedModel}]: ${(responseText || '').slice(0, 500)}`, 5, ['sentinel', 'echo_prime', 'personality']).catch(() => {});
       } else {
         // ── Standard Mode: Direct engine query + Memory + Doctrine ──
         let memoryContext = '';
