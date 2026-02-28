@@ -37,6 +37,10 @@ export const getCalls = (params?: string) => closerFetch(`/calls${params ? `?${p
 export const getCall = (id: string) => closerFetch(`/calls/${id}`);
 export const getCallEvents = (id: string) => closerFetch(`/calls/${id}/events`);
 export const initiateCall = (data: any) => closerFetch('/calls/initiate', { method: 'POST', body: JSON.stringify(data) });
+export const whisperToAI = (callId: string, message: string) => closerFetch(`/calls/${callId}/whisper`, { method: 'POST', body: JSON.stringify({ message }) });
+export const takeoverCall = (callId: string) => closerFetch(`/calls/${callId}/takeover`, { method: 'POST' });
+export const muteAI = (callId: string, muted: boolean) => closerFetch(`/calls/${callId}/mute`, { method: 'POST', body: JSON.stringify({ muted }) });
+export const endCall = (callId: string) => closerFetch(`/calls/${callId}/end`, { method: 'POST' });
 
 // --- Campaigns ---
 export const getCampaigns = (params?: string) => closerFetch(`/campaigns${params ? `?${params}` : ''}`);
@@ -52,6 +56,12 @@ export const updateScript = (id: string, data: any) => closerFetch(`/scripts/${i
 
 // --- Appointments ---
 export const getAppointments = (params?: string) => closerFetch(`/appointments${params ? `?${params}` : ''}`);
+export const getAppointment = (id: string) => closerFetch(`/appointments/${id}`);
+export const createAppointment = (data: any) => closerFetch('/appointments', { method: 'POST', body: JSON.stringify(data) });
+export const updateAppointment = (id: string, data: any) => closerFetch(`/appointments/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const deleteAppointment = (id: string) => closerFetch(`/appointments/${id}`, { method: 'DELETE' });
+export const bookAppointment = (callId: string, data: { appointment_time: string; duration_minutes?: number; type?: string; interest_level?: string; notes?: string; agent_name?: string }) =>
+  closerFetch(`/calls/${callId}/book-appointment`, { method: 'POST', body: JSON.stringify(data) });
 
 // --- Analytics ---
 export const getDashboardStats = () => closerFetch('/analytics/dashboard');
@@ -66,5 +76,15 @@ export const getMe = () => closerFetch('/auth/me');
 export const signup = (data: { firebase_token: string; company_name: string; owner_name: string; industry: string }) =>
   closerFetch('/auth/signup', { method: 'POST', body: JSON.stringify(data) });
 
+// --- Settings ---
+export const getSettings = () => closerFetch('/settings');
+export const updateSettings = (data: any) => closerFetch('/settings', { method: 'PATCH', body: JSON.stringify(data) });
+
+// --- Ace Copilot Chat ---
+export const chatWithAce = (message: string) => closerFetch('/billy/chat', { method: 'POST', body: JSON.stringify({ message }) });
+
 // --- Echo Prime AI Chat ---
 export const chatWithEcho = (message: string) => closerFetch('/chat', { method: 'POST', body: JSON.stringify({ message }) });
+
+// --- WebSocket URL ---
+export const VOICE_WS_URL = 'wss://billymc-voice.bmcii1976.workers.dev/voice/live';
