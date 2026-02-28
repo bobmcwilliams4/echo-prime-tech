@@ -451,6 +451,72 @@ interface Message {
   domainsQueried?: string[];
 }
 
+// ── Working Panel Data ──
+const ECHO_FACTS: { icon: string; text: string; category: string }[] = [
+  { icon: '🧠', text: 'Echo Prime runs 2,632 doctrine-hardened engines across 210 knowledge domains', category: 'Architecture' },
+  { icon: '⚡', text: 'Each query checks over 202,000 pre-compiled doctrine blocks in under 200ms', category: 'Speed' },
+  { icon: '🔒', text: 'Every response includes a SHA-256 determinism hash for court-defensible audit trails', category: 'Security' },
+  { icon: '🏛️', text: 'The Tax Intelligence Engine (TIE) contains 10,918 lines of pure tax law logic — no hallucination possible', category: 'Tax' },
+  { icon: '⛽', text: 'In 1901, the Spindletop well in Beaumont, TX produced 100,000 barrels per day — launching the oil age', category: 'Oil & Gas' },
+  { icon: '📜', text: 'A "chain of title" traces every deed, will, and conveyance from sovereign patent to present day owner', category: 'Landman' },
+  { icon: '🤖', text: 'Trinity Council mode uses 3 independent AI models that vote on answers — consensus prevents errors', category: 'Swarm' },
+  { icon: '🗺️', text: 'Texas has 254 counties — more than any other US state. Echo Prime covers 80+ with live portal access', category: 'Texas' },
+  { icon: '💎', text: 'Mineral rights in Texas can be severed from surface rights — creating two separate estates', category: 'Landman' },
+  { icon: '📊', text: 'The Permian Basin produces over 6 million barrels of oil per day — 40% of all US production', category: 'Oil & Gas' },
+  { icon: '🔍', text: 'A title examiner may review 100+ years of records to certify ownership of a single tract', category: 'Landman' },
+  { icon: '⚖️', text: 'IRC §1031 like-kind exchanges let investors defer capital gains tax by swapping properties', category: 'Tax' },
+  { icon: '🌐', text: 'Echo Prime\'s Shared Brain stores every interaction — knowledge compounds across all sessions', category: 'Memory' },
+  { icon: '🏗️', text: 'The H&GN Railroad Survey system divided West Texas into numbered sections and blocks in the 1880s', category: 'Landman' },
+  { icon: '🛡️', text: 'Our engines detect 47 types of disguised sale transactions that the IRS frequently challenges', category: 'Tax' },
+  { icon: '🎯', text: 'Echo Prime processes queries through a 3-layer pipeline: Doctrine Cache → Semantic Search → Deep Analysis', category: 'Architecture' },
+  { icon: '📈', text: 'The first Texas oil well was drilled near Nacogdoches in 1866 — 35 years before Spindletop', category: 'Oil & Gas' },
+  { icon: '🔬', text: 'Fact Fragility Scoring rates each assertion on verifiability, recharacterization risk, and testimony dependence', category: 'Security' },
+  { icon: '🏠', text: 'Texas homestead law protects up to 200 acres of rural land and 10 acres of urban land from creditors', category: 'Texas' },
+  { icon: '⏱️', text: 'Average Sentinel query resolves in 5-12 seconds — a human expert would need 2-4 hours for equivalent analysis', category: 'Speed' },
+];
+
+const WORKING_STEPS: Record<string, { label: string; icon: string }[]> = {
+  standard: [
+    { label: 'Initializing doctrine engines', icon: '⚙️' },
+    { label: 'Loading memory context', icon: '🧠' },
+    { label: 'Scanning knowledge domains', icon: '🔍' },
+    { label: 'Matching doctrine blocks', icon: '📚' },
+    { label: 'Running semantic analysis', icon: '🔬' },
+    { label: 'Cross-referencing authorities', icon: '⚖️' },
+    { label: 'Computing confidence scores', icon: '📊' },
+    { label: 'Generating determinism hash', icon: '🔒' },
+    { label: 'Composing response', icon: '✍️' },
+    { label: 'Finalizing...', icon: '✅' },
+  ],
+  swarm: [
+    { label: 'Assembling Trinity Council', icon: '👥' },
+    { label: 'Injecting memory context', icon: '🧠' },
+    { label: 'Enriching with doctrines', icon: '📚' },
+    { label: 'SAGE is analyzing...', icon: '🦉' },
+    { label: 'NYX is deliberating...', icon: '🌙' },
+    { label: 'THORNE is evaluating...', icon: '🗡️' },
+    { label: 'Collecting votes', icon: '🗳️' },
+    { label: 'Computing consensus', icon: '🤝' },
+    { label: 'Measuring harmony level', icon: '📐' },
+    { label: 'Synthesizing reasoning', icon: '💡' },
+    { label: 'Calculating confidence', icon: '📊' },
+    { label: 'Rendering verdict', icon: '⚖️' },
+    { label: 'Finalizing...', icon: '✅' },
+  ],
+  echo_prime: [
+    { label: 'Loading personality profile', icon: '🎭' },
+    { label: 'Detecting emotional context', icon: '💭' },
+    { label: 'Retrieving memory cortex', icon: '🧠' },
+    { label: 'Building cognitive directive', icon: '📋' },
+    { label: 'Enriching with doctrine engines', icon: '📚' },
+    { label: 'Routing to optimal LLM', icon: '🤖' },
+    { label: 'Generating adaptive response', icon: '✨' },
+    { label: 'Storing to Shared Brain', icon: '💾' },
+    { label: 'Composing voice output', icon: '🎤' },
+    { label: 'Finalizing...', icon: '✅' },
+  ],
+};
+
 // ── Sentinel Instance ID (stable to avoid hydration mismatch) ──
 const SENTINEL_INSTANCE = 'sentinel_web_ept';
 
@@ -512,6 +578,12 @@ export default function SentinelPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  // ── Working Panel State ──
+  const [loadingElapsed, setLoadingElapsed] = useState(0);
+  const [loadingFactIndex, setLoadingFactIndex] = useState(0);
+  const [loadingStepIndex, setLoadingStepIndex] = useState(0);
+  const loadingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const loadingFactTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Auth check ──
   useEffect(() => {
@@ -843,6 +915,32 @@ export default function SentinelPage() {
     };
   }, []);
 
+  // ── Working Panel Timer ──
+  useEffect(() => {
+    if (loading) {
+      setLoadingElapsed(0);
+      setLoadingStepIndex(0);
+      setLoadingFactIndex(Math.floor(Math.random() * ECHO_FACTS.length));
+      loadingTimerRef.current = setInterval(() => {
+        setLoadingElapsed(prev => prev + 1);
+        setLoadingStepIndex(prev => {
+          const steps = WORKING_STEPS[sentinelMode] || WORKING_STEPS.standard;
+          return prev < steps.length - 1 ? prev + 1 : prev;
+        });
+      }, 1000);
+      loadingFactTimerRef.current = setInterval(() => {
+        setLoadingFactIndex(prev => (prev + 1) % ECHO_FACTS.length);
+      }, 6000);
+    } else {
+      if (loadingTimerRef.current) { clearInterval(loadingTimerRef.current); loadingTimerRef.current = null; }
+      if (loadingFactTimerRef.current) { clearInterval(loadingFactTimerRef.current); loadingFactTimerRef.current = null; }
+    }
+    return () => {
+      if (loadingTimerRef.current) clearInterval(loadingTimerRef.current);
+      if (loadingFactTimerRef.current) clearInterval(loadingFactTimerRef.current);
+    };
+  }, [loading, sentinelMode]);
+
   // ── Send message ──
   const sendMessage = useCallback(async () => {
     const text = input.trim();
@@ -1078,6 +1176,23 @@ export default function SentinelPage() {
     standard: 'Standard',
     swarm: 'Swarm',
     echo_prime: 'Echo Prime',
+  };
+
+  // ── Format elapsed time ──
+  const formatElapsed = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return m > 0 ? `${m}m ${s.toString().padStart(2, '0')}s` : `${s}s`;
+  };
+
+  // ── Estimate ETA based on mode and elapsed time ──
+  const getETA = (elapsed: number, mode: SentinelMode) => {
+    const baseTimes: Record<SentinelMode, number> = { standard: 8, swarm: 15, echo_prime: 12 };
+    const base = baseTimes[mode];
+    const remaining = Math.max(0, base - elapsed);
+    if (elapsed > base + 10) return 'finalizing...';
+    if (remaining <= 1) return '< 1s';
+    return `~${remaining}s`;
   };
 
   // ── Render ──
@@ -1586,24 +1701,110 @@ export default function SentinelPage() {
                 )}
               </div>
             ))}
-            {loading && (
-              <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: '50%', flexShrink: 0, animation: 'pulse 2s infinite',
-                  background: sentinelMode === 'swarm' ? 'radial-gradient(circle at 35% 35%, #f59e0b, #78350f)' : 'radial-gradient(circle at 35% 35%, #6366f1, #1e1b4b)',
-                }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: modeColors[sentinelMode], marginBottom: 4 }}>
-                    {sentinelMode === 'swarm' ? 'Trinity Council' : 'Sentinel'}
+            {loading && (() => {
+              const steps = WORKING_STEPS[sentinelMode] || WORKING_STEPS.standard;
+              const currentStep = steps[Math.min(loadingStepIndex, steps.length - 1)];
+              const progressPct = Math.min(95, ((loadingStepIndex + 1) / steps.length) * 100);
+              const fact = ECHO_FACTS[loadingFactIndex % ECHO_FACTS.length];
+              const modeColor = modeColors[sentinelMode];
+              return (
+              <div style={{ marginBottom: 20, borderRadius: 16, overflow: 'hidden', border: `1px solid ${modeColor}30`, background: 'linear-gradient(135deg, #0c1220 0%, #111827 50%, #0c1220 100%)' }}>
+                {/* Header — Mode + Timer + ETA */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: `1px solid ${modeColor}20`, background: `linear-gradient(90deg, ${modeColor}08, transparent)` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: modeColor, animation: 'pulse 1.5s infinite', boxShadow: `0 0 12px ${modeColor}88` }} />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: modeColor, textTransform: 'uppercase', letterSpacing: 1 }}>
+                      {sentinelMode === 'swarm' ? 'Trinity Council' : sentinelMode === 'echo_prime' ? 'Echo Prime' : 'Sentinel'} — Working
+                    </span>
                   </div>
-                  <div style={{ padding: '16px 20px', borderRadius: 12, backgroundColor: '#111827', border: '1px solid #1e293b', fontSize: 13, color: '#64748b' }}>
-                    {sentinelMode === 'swarm' ? 'SAGE, NYX, and THORNE are deliberating...'
-                      : activePreset ? `Querying ${activePreset} engines across ${selectedDomains.length} domains...`
-                      : 'Analyzing across 2,632 engines...'}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      <span style={{ fontSize: 13, fontFamily: 'monospace', color: '#e2e8f0', fontWeight: 600 }}>{formatElapsed(loadingElapsed)}</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: '#64748b', padding: '2px 8px', borderRadius: 6, backgroundColor: '#1e293b', border: '1px solid #334155' }}>
+                      ETA {getETA(loadingElapsed, sentinelMode)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div style={{ height: 3, backgroundColor: '#1e293b', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${progressPct}%`, background: `linear-gradient(90deg, ${modeColor}, ${modeColor}aa)`, transition: 'width 0.8s ease', borderRadius: '0 2px 2px 0', boxShadow: `0 0 8px ${modeColor}66` }} />
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: `linear-gradient(90deg, transparent 0%, ${modeColor}33 50%, transparent 100%)`, animation: 'shimmer 2s infinite' }} />
+                </div>
+
+                {/* Pipeline Steps */}
+                <div style={{ padding: '16px 20px', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {steps.map((step, i) => {
+                    const isDone = i < loadingStepIndex;
+                    const isCurrent = i === loadingStepIndex;
+                    return (
+                      <div key={i} style={{
+                        display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 8,
+                        fontSize: 11, fontWeight: isCurrent ? 600 : 400, whiteSpace: 'nowrap',
+                        backgroundColor: isCurrent ? `${modeColor}18` : isDone ? '#1e293b' : '#0f172a',
+                        border: `1px solid ${isCurrent ? `${modeColor}44` : isDone ? '#334155' : '#1e293b22'}`,
+                        color: isCurrent ? modeColor : isDone ? '#94a3b8' : '#475569',
+                        transition: 'all 0.4s ease',
+                      }}>
+                        <span style={{ fontSize: 12 }}>{isDone ? '✓' : isCurrent ? step.icon : '○'}</span>
+                        <span>{step.label}</span>
+                        {isCurrent && <span style={{ animation: 'blink 1s infinite', marginLeft: 2 }}>|</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Active Step Detail */}
+                <div style={{ padding: '0 20px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 18, backgroundColor: `${modeColor}15`, border: `1px solid ${modeColor}30`,
+                    animation: 'pulse 2s infinite',
+                  }}>
+                    {currentStep.icon}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>{currentStep.label}</div>
+                    <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
+                      {activePreset ? `${activePreset} preset` : `${selectedDomains.length || 210} domains`} · Step {loadingStepIndex + 1} of {steps.length}
+                    </div>
+                  </div>
+                  {/* Spinning radar SVG */}
+                  <svg width="32" height="32" viewBox="0 0 40 40" style={{ animation: 'spin 3s linear infinite', opacity: 0.5 }}>
+                    <circle cx="20" cy="20" r="18" stroke={modeColor} strokeWidth="1" fill="none" opacity="0.2" />
+                    <circle cx="20" cy="20" r="12" stroke={modeColor} strokeWidth="1" fill="none" opacity="0.3" />
+                    <circle cx="20" cy="20" r="6" stroke={modeColor} strokeWidth="1" fill="none" opacity="0.4" />
+                    <line x1="20" y1="20" x2="20" y2="2" stroke={modeColor} strokeWidth="2" opacity="0.8" />
+                    <circle cx="20" cy="2" r="2" fill={modeColor} />
+                  </svg>
+                </div>
+
+                {/* Fun Fact / Trivia Bar */}
+                <div style={{
+                  padding: '12px 20px', borderTop: `1px solid ${modeColor}15`,
+                  background: `linear-gradient(90deg, ${modeColor}06, transparent, ${modeColor}06)`,
+                  display: 'flex', alignItems: 'center', gap: 12, minHeight: 52,
+                }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 16, backgroundColor: '#1e293b', border: '1px solid #334155', flexShrink: 0,
+                  }}>
+                    {fact.icon}
+                  </div>
+                  <div style={{ flex: 1, transition: 'opacity 0.5s ease' }}>
+                    <div style={{ fontSize: 10, fontWeight: 600, color: modeColor, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>
+                      {fact.category}
+                    </div>
+                    <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>
+                      {fact.text}
+                    </div>
                   </div>
                 </div>
               </div>
-            )}
+              );
+            })()}
             <div ref={messagesEndRef} />
           </div>
         </div>
@@ -1949,6 +2150,18 @@ export default function SentinelPage() {
         @keyframes pulse {
           0%, 100% { opacity: 0.7; }
           50% { opacity: 1; }
+        }
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
+        }
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </div>
