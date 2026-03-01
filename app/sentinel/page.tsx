@@ -759,11 +759,15 @@ export default function SentinelPage() {
       const playBlob = async (blob: Blob) => {
         const url = URL.createObjectURL(blob);
         lastAudioUrl.current = url;
-        if (audioRef.current) {
-          audioRef.current.src = url;
-          audioRef.current.load();
-          await audioRef.current.play().catch(() => {});
-        }
+        // Create fresh Audio each time — reusing a paused element causes silent failures
+        const audio = new Audio(url);
+        audioRef.current = audio;
+        await new Promise<void>((resolve) => {
+          audio.oncanplaythrough = () => resolve();
+          audio.onerror = () => resolve();
+          audio.load();
+        });
+        await audio.play().catch(() => {});
       };
 
       if (!res.ok) {
@@ -1293,6 +1297,8 @@ export default function SentinelPage() {
       setMessages(prev => [...prev, { id: `e_${Date.now()}`, role: 'system', content: errorMsg, timestamp: Date.now() }]);
     } finally {
       setLoading(false);
+      // Refocus input after send completes (textarea was disabled during loading)
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [input, loading, apiKeyReady, analysisMode, sentinelMode, usage, personality, voiceEnabled, commanderMode, cortexStats, playVoice, selectedDomains, messages]);
 
