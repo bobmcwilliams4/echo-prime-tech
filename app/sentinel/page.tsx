@@ -542,7 +542,7 @@ export default function SentinelPage() {
   const [memoryPanelOpen, setMemoryPanelOpen] = useState(false);
   const [memorySearch, setMemorySearch] = useState('');
   const [memoryResults, setMemoryResults] = useState<{ content: string; timestamp: string }[]>([]);
-  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [personality, setPersonality] = useState<string>('EP');
   const [showPersonalities, setShowPersonalities] = useState(false);
   const [swarmOnline, setSwarmOnline] = useState(false);
@@ -677,15 +677,41 @@ export default function SentinelPage() {
   // Emotion-to-audio-tag mapping for ElevenLabs v3 expressive TTS
   const emotionAudioTag = useCallback((emotion: string): string => {
     const tags: Record<string, string> = {
-      joy: '[laughs]', fear: '[nervous]', anger: '[angry]', sadness: '[sighs]',
-      surprise: '[gasps]', concern: '[sighs]', pride: '[excited]',
-      frustration: '[sighs]', curiosity: '[curious]', trust: '', anticipation: '[curious]',
+      joy: '[laughs]', happiness: '[laughs]', amusement: '[laughs]',
+      fear: '[nervous]', anxiety: '[nervous]', worry: '[nervous]',
+      anger: '[angry]', rage: '[angry]', irritation: '[angry]',
+      sadness: '[sighs]', grief: '[crying]', melancholy: '[sighs]',
+      surprise: '[gasps]', shock: '[gasps]', astonishment: '[gasps]',
+      concern: '[sighs]', empathy: '[sighs]', compassion: '[sighs]',
+      pride: '[excited]', confidence: '[excited]', triumph: '[excited]',
+      frustration: '[sighs]', annoyance: '[sighs]', impatience: '[sighs]',
+      curiosity: '[curious]', wonder: '[curious]', intrigue: '[curious]',
+      trust: '[whispers]', sincerity: '[whispers]', warmth: '[whispers]',
+      anticipation: '[curious]', eagerness: '[excited]', hope: '[excited]',
+      disgust: '[sighs]', contempt: '[sarcastic]', disdain: '[sarcastic]',
+      sarcasm: '[sarcastic]', irony: '[sarcastic]', wit: '[sarcastic]',
+      excitement: '[excited]', enthusiasm: '[excited]', thrill: '[excited]',
+      calm: '', serenity: '', peace: '',
+      determination: '[excited]', resolve: '[excited]',
+      nostalgia: '[sighs]', longing: '[sighs]', wistfulness: '[sighs]',
     };
     return tags[emotion] || '';
   }, []);
 
+  const lastAudioUrl = useRef<string | null>(null);
+
   const playVoice = useCallback(async (text: string, voice: string, emotion?: string) => {
     try {
+      // Stop any currently playing audio and clean up
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      if (lastAudioUrl.current) {
+        URL.revokeObjectURL(lastAudioUrl.current);
+        lastAudioUrl.current = null;
+      }
+
       // Strip markdown for cleaner spoken output
       const cleanText = text
         .replace(/#{1,6}\s/g, '')
@@ -698,6 +724,8 @@ export default function SentinelPage() {
         .replace(/---/g, '')
         .slice(0, 2500);
 
+      if (!cleanText.trim()) return;
+
       // Inject emotion audio tag for ElevenLabs v3 expressiveness
       const emotionTag = emotion ? emotionAudioTag(emotion) : '';
       const ttsText = emotionTag ? `${emotionTag} ${cleanText}` : cleanText;
@@ -709,7 +737,7 @@ export default function SentinelPage() {
       };
       const personalityId = voiceToPersonality[voice] || 'EP';
 
-      // Route through echo-chat worker with ElevenLabs provider
+      // Route through echo-chat worker with ElevenLabs Conversational AI v3
       const res = await fetch('https://echo-chat.bmcii1976.workers.dev/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -718,8 +746,26 @@ export default function SentinelPage() {
           personality: personalityId,
           emotion: emotion || 'neutral',
           provider: 'elevenlabs',
+          model_id: 'eleven_turbo_v2_5',
+          voice_settings: {
+            stability: 0.35,
+            similarity_boost: 0.85,
+            style: 0.65,
+            use_speaker_boost: true,
+          },
         }),
       });
+
+      const playBlob = async (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        lastAudioUrl.current = url;
+        if (audioRef.current) {
+          audioRef.current.src = url;
+          audioRef.current.load();
+          await audioRef.current.play().catch(() => {});
+        }
+      };
+
       if (!res.ok) {
         // Fallback to Echo Speak local TTS if ElevenLabs fails
         const fallbackRes = await fetch('https://tts.echo-op.com/tts', {
@@ -728,17 +774,10 @@ export default function SentinelPage() {
           body: JSON.stringify({ text: cleanText, voice_id: voice || 'default', output_format: 'wav' }),
         });
         if (!fallbackRes.ok) return;
-        const blob = await fallbackRes.blob();
-        const url = URL.createObjectURL(blob);
-        if (audioRef.current) { audioRef.current.src = url; audioRef.current.play().catch(() => {}); }
+        await playBlob(await fallbackRes.blob());
         return;
       }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      if (audioRef.current) {
-        audioRef.current.src = url;
-        audioRef.current.play().catch(() => {});
-      }
+      await playBlob(await res.blob());
     } catch { /* non-critical — TTS failure should never block UI */ }
   }, [emotionAudioTag]);
 
@@ -1099,12 +1138,10 @@ export default function SentinelPage() {
           .slice(-6)
           .map(m => ({ role: m.role, content: m.content.slice(0, 1000) }));
 
-        // Route through Claude Opus 4.6 brain (primary) with GPT-4.1 fallback
+        // Route through Claude Opus 4.6 brain (primary) → Groq fast (secondary) → GPT-4.1 (last resort)
         let responseText = '';
-        let usedModel = 'claude-opus-4-6';
         try {
           const brainResult = await chatSentinelBrain(text, systemPrompt, history, (status) => {
-            // Update UI with processing status
             if (status === 'processing') {
               setMessages(prev => {
                 const last = prev[prev.length - 1];
@@ -1114,14 +1151,32 @@ export default function SentinelPage() {
             }
           });
           responseText = brainResult.response;
-          usedModel = brainResult.model;
-          // Remove thinking indicator
           setMessages(prev => prev.filter(m => !m.id.startsWith('thinking_')));
         } catch {
-          // Fallback to Azure GPT-4.1 if brain is offline
-          usedModel = 'gpt-4.1-fallback';
-          const fallback = await chatEngine(text, systemPrompt, history);
-          responseText = fallback.response;
+          // Brain offline — try Groq fast (Llama 3.3 70B, ~1.5s response)
+          try {
+            const groqRes = await fetch('https://echo-chat.bmcii1976.workers.dev/chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                message: text,
+                system_prompt: systemPrompt,
+                history: history?.slice(-4),
+                model: 'groq',
+                personality: personality || 'EP',
+              }),
+            });
+            if (groqRes.ok) {
+              const groqData = await groqRes.json();
+              responseText = groqData.response || groqData.message || '';
+            }
+          } catch { /* Groq also failed */ }
+
+          // Final fallback — engine cloud GPT-4.1
+          if (!responseText) {
+            const fallback = await chatEngine(text, systemPrompt, history);
+            responseText = fallback.response;
+          }
         }
 
         assistantMsg = {
@@ -1131,7 +1186,7 @@ export default function SentinelPage() {
           sources: doctrineResults.length > 0 ? doctrineResults.length : 0,
           cost: 0,
           remaining: 999999,
-          domain: domainsQueried.length > 0 ? domainsQueried.join(' + ') : `Echo Prime (${usedModel})`,
+          domain: domainsQueried.length > 0 ? domainsQueried.join(' + ') : 'Echo Prime',
           mode: 'echo_prime',
           emotion,
           personality: activeProfile,
@@ -1141,7 +1196,7 @@ export default function SentinelPage() {
         };
 
         // Store to memory
-        brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA [ECHO_PRIME/${usedModel}]: ${(responseText || '').slice(0, 500)}`, 5, ['sentinel', 'echo_prime', 'personality']).catch(() => {});
+        brainIngest(SENTINEL_INSTANCE, `Q: ${text}\nA [ECHO_PRIME]: ${(responseText || '').slice(0, 500)}`, 5, ['sentinel', 'echo_prime', 'personality']).catch(() => {});
       } else {
         // ── Standard Mode: Direct engine query + Memory + Doctrine ──
         let memoryContext = '';
