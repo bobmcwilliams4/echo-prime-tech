@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { EPTUser, onAuthChange, signOut as fbSignOut } from './firebase';
+import { EPTUser, onAuthChange, signOut as fbSignOut, handleRedirectResult } from './firebase';
 import { syncUser } from './ept-api';
 
 interface AuthContextType {
@@ -19,6 +19,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<'owner' | 'user' | null>(null);
   const [subscriptions, setSubscriptions] = useState<string[]>([]);
+
+  useEffect(() => {
+    handleRedirectResult().catch(() => {});
+  }, []);
 
   useEffect(() => {
     const unsub = onAuthChange(async (u) => {

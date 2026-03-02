@@ -87,11 +87,16 @@ appleProvider.addScope('name');
 
 export async function signInWithGoogle(): Promise<EPTUser | null> {
   const { auth } = initFirebase();
+  const isMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    await signInWithRedirect(auth, googleProvider);
+    return null;
+  }
   try {
     const result = await signInWithPopup(auth, googleProvider);
     return toEPTUser(result.user);
   } catch (error: any) {
-    if (error?.code === 'auth/popup-blocked') {
+    if (error?.code === 'auth/popup-blocked' || error?.code === 'auth/popup-closed-by-user') {
       await signInWithRedirect(auth, googleProvider);
       return null;
     }
@@ -101,11 +106,16 @@ export async function signInWithGoogle(): Promise<EPTUser | null> {
 
 export async function signInWithApple(): Promise<EPTUser | null> {
   const { auth } = initFirebase();
+  const isMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    await signInWithRedirect(auth, appleProvider);
+    return null;
+  }
   try {
     const result = await signInWithPopup(auth, appleProvider);
     return toEPTUser(result.user);
   } catch (error: any) {
-    if (error?.code === 'auth/popup-blocked') {
+    if (error?.code === 'auth/popup-blocked' || error?.code === 'auth/popup-closed-by-user') {
       await signInWithRedirect(auth, appleProvider);
       return null;
     }
