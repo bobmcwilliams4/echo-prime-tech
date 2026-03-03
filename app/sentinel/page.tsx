@@ -82,6 +82,9 @@ const DOMAIN_PRESETS: DomainPreset[] = [
   { label: 'Medical / Health', icon: '🏥', desc: 'Clinical, research, compliance', domains: ['MED', 'NEURO', 'PSY', 'PHARMA', 'BIOMED'] },
   { label: 'Software / AI', icon: '💻', desc: 'Architecture, DevOps, ML, testing', domains: ['PROG', 'WEBAPP', 'DEVOPS', 'AIML', 'CLOUD', 'MOBILE', 'TEST'] },
   { label: 'Finance', icon: '💰', desc: 'Markets, valuation, strategy, commerce', domains: ['FIN', 'BIZ', 'DCOM', 'SAAS', 'ECOMM', 'ENT'] },
+  { label: 'Oil & Gas Operations', icon: '🛢️', desc: 'Drilling, production, RRC compliance, well data', domains: ['DRL', 'OILGAS', 'PETRO', 'PROD', 'FRAC', 'WELL', 'OFE', 'ENRG'] },
+  { label: 'Asset Recovery', icon: '🔎', desc: 'Unclaimed property, escheat, abandoned assets', domains: ['UNCLAIM', 'PROP', 'FIN', 'LG', 'TXLAW'] },
+  { label: 'Intelligence / OSINT', icon: '🕵️', desc: 'Reconnaissance, data harvesting, research', domains: ['INTELL', 'CYBER', 'DFIR', 'REVENG', 'NET', 'PENTEST'] },
   { label: 'All Domains', icon: '🌐', desc: 'Search all 210 domains', domains: [] },
 ];
 
@@ -425,6 +428,163 @@ const DOMAIN_INTAKE_FORMS: Record<string, DomainIntake> = {
       { key: 'assumptions', label: 'Key Assumptions', type: 'textarea', placeholder: 'Growth rate assumptions, discount rate, terminal value assumptions, market conditions, pricing assumptions, cost structure assumptions...', rows: 2 },
     ],
   },
+  'Oil & Gas Operations': {
+    title: 'Oil & Gas Operations Analysis',
+    subtitle: 'Detailed well data, formations, and operational context enable precise drilling, production, and compliance analysis',
+    fields: [
+      { key: 'operationType', label: 'Operation Type', type: 'select', required: true, options: [
+        { value: '', label: 'Select operation type' },
+        { value: 'drilling_planning', label: 'Drilling Planning / Well Design' },
+        { value: 'drilling_operations', label: 'Drilling Operations / Troubleshooting' },
+        { value: 'completions', label: 'Completions / Stimulation Design' },
+        { value: 'fracturing', label: 'Hydraulic Fracturing / Frac Design' },
+        { value: 'production_optimization', label: 'Production Optimization' },
+        { value: 'artificial_lift', label: 'Artificial Lift Selection / Design' },
+        { value: 'workover', label: 'Workover / Remedial Operations' },
+        { value: 'rrc_compliance', label: 'RRC Compliance / Permitting' },
+        { value: 'rrc_filings', label: 'RRC Filings (W-1, W-2, W-3, P-4, P-5)' },
+        { value: 'well_spacing', label: 'Well Spacing / Density Rules' },
+        { value: 'pooling_unitization', label: 'Pooling / Unitization / Forced Pooling' },
+        { value: 'production_reporting', label: 'Production Reporting / Allocation' },
+        { value: 'decline_analysis', label: 'Decline Curve Analysis / EUR Estimation' },
+        { value: 'reserves', label: 'Reserves Estimation / Classification' },
+        { value: 'equipment_selection', label: 'Equipment Selection / Specification' },
+        { value: 'hse', label: 'HSE / Safety / Environmental Compliance' },
+        { value: 'pipeline', label: 'Pipeline / Gathering / Midstream' },
+        { value: 'well_integrity', label: 'Well Integrity / Casing Design' },
+        { value: 'enhanced_recovery', label: 'EOR / IOR / Secondary Recovery' },
+      ]},
+      { key: 'basin', label: 'Basin / Play', type: 'select', required: true, options: [
+        { value: '', label: 'Select basin or play' },
+        { value: 'permian_delaware', label: 'Permian Basin — Delaware (Bone Spring, Wolfcamp)' },
+        { value: 'permian_midland', label: 'Permian Basin — Midland (Spraberry, Wolfcamp)' },
+        { value: 'permian_central', label: 'Permian Basin — Central Basin Platform' },
+        { value: 'eagle_ford', label: 'Eagle Ford Shale' },
+        { value: 'haynesville', label: 'Haynesville / Bossier Shale' },
+        { value: 'bakken', label: 'Bakken / Three Forks (Williston)' },
+        { value: 'marcellus', label: 'Marcellus / Utica Shale (Appalachian)' },
+        { value: 'scoop_stack', label: 'SCOOP / STACK (Anadarko)' },
+        { value: 'dj_basin', label: 'DJ Basin / Niobrara (Wattenberg)' },
+        { value: 'powder_river', label: 'Powder River Basin' },
+        { value: 'san_juan', label: 'San Juan Basin' },
+        { value: 'barnett', label: 'Barnett Shale' },
+        { value: 'gulf_coast', label: 'Gulf Coast / Deepwater GOM' },
+        { value: 'other', label: 'Other Basin / Play' },
+      ]},
+      { key: 'county', label: 'County / State', type: 'text', placeholder: 'e.g. Reeves County TX, Lea County NM, McKenzie County ND', required: true },
+      { key: 'targetFormation', label: 'Target Formation / Zone', type: 'text', placeholder: 'e.g. Wolfcamp A Upper, Bone Spring 2nd Sand, Spraberry Lower, Dean Sand' },
+      { key: 'wellInfo', label: 'Well Information', type: 'textarea', placeholder: 'API number, well name/number, operator, lease name, section-block-survey (e.g. Sec 12, Blk C-25, PSL Survey). Include measured depth (MD), true vertical depth (TVD), lateral length if horizontal.', rows: 3, required: true },
+      { key: 'currentProduction', label: 'Current / Historical Production', type: 'textarea', placeholder: 'Current rates: BOPD, MCFD, BWPD. IP30/IP90/IP365 if available. GOR, water cut %, tubing pressure, casing pressure. Production history (months on, decline trend).', rows: 3 },
+      { key: 'drillingData', label: 'Drilling / Completion Data', type: 'textarea', placeholder: 'Casing program (surface, intermediate, production sizes), mud weight, BHT, BHP, frac stages/clusters, proppant type & volume, fluid type & volume, perf intervals, cement details.', rows: 3 },
+      { key: 'rrcInfo', label: 'RRC / Regulatory Context', type: 'textarea', placeholder: 'Permit numbers (W-1, W-2), statewide rules applied (Rule 37, 38, SWR 13), P-4/P-5 filing status, H-1/H-1A completion reports, any violations or compliance issues.', rows: 2 },
+      { key: 'scenario', label: 'Detailed Question / Objective', type: 'textarea', placeholder: 'Describe your specific drilling, production, or compliance question. Include any problems encountered, decisions to make, alternatives being considered, or analysis needed...', rows: 4, required: true },
+      { key: 'offsetWells', label: 'Offset Well Data', type: 'textarea', placeholder: 'Nearby well performance (offset operator, API, IP rates, EUR, completion design). Include distance and relative position if available.', rows: 2 },
+      { key: 'economics', label: 'Economic Parameters', type: 'text', placeholder: 'e.g. Commodity price assumptions, LOE, CAPEX budget, break-even target, royalty burden %, NRI' },
+      { key: 'timeline', label: 'Timeline / Urgency', type: 'text', placeholder: 'e.g. Spud date in 2 weeks, permit hearing next month, P-4 due in 30 days, production declining rapidly' },
+    ],
+  },
+  'Asset Recovery': {
+    title: 'Unclaimed Property & Asset Recovery Analysis',
+    subtitle: 'Provide details about the property, jurisdiction, and claimant information for targeted recovery analysis',
+    fields: [
+      { key: 'recoveryType', label: 'Recovery Type', type: 'select', required: true, options: [
+        { value: '', label: 'Select recovery type' },
+        { value: 'unclaimed_search', label: 'Unclaimed Property Search / Discovery' },
+        { value: 'claim_filing', label: 'Claim Filing Assistance' },
+        { value: 'escheat_compliance', label: 'Escheat / Dormancy Compliance (Holder)' },
+        { value: 'audit_defense', label: 'Unclaimed Property Audit Defense (Holder)' },
+        { value: 'asset_tracing', label: 'Asset Tracing / Skip Tracing' },
+        { value: 'heir_search', label: 'Heir Search / Genealogical Research' },
+        { value: 'mineral_rights', label: 'Unclaimed Mineral Rights / Royalties' },
+        { value: 'dormant_accounts', label: 'Dormant Bank Accounts / Financial Assets' },
+        { value: 'insurance_benefits', label: 'Unclaimed Insurance Benefits / Annuities' },
+        { value: 'securities', label: 'Unclaimed Securities / Dividends / Stock' },
+        { value: 'safe_deposit', label: 'Abandoned Safe Deposit Boxes' },
+        { value: 'tax_refunds', label: 'Unclaimed Tax Refunds / Credits' },
+        { value: 'estate_recovery', label: 'Estate / Probate Asset Recovery' },
+        { value: 'government_payments', label: 'Unclaimed Government Payments / Benefits' },
+        { value: 'corporate_dissolution', label: 'Dissolved Entity Asset Recovery' },
+        { value: 'bulk_recovery', label: 'Bulk / Portfolio Recovery (Multiple Claims)' },
+      ]},
+      { key: 'jurisdiction', label: 'State(s) / Jurisdiction', type: 'text', placeholder: 'e.g. Texas, New Mexico, Oklahoma, multi-state, or "all 50 states" for comprehensive search', required: true },
+      { key: 'claimantInfo', label: 'Claimant / Owner Information', type: 'textarea', placeholder: 'Full legal name (current and maiden/former), date of birth, SSN last 4 (optional), current address, prior addresses, known aliases. For business: entity name, EIN, state of formation, trade names.', rows: 3, required: true },
+      { key: 'propertyType', label: 'Property Type / Category', type: 'select', options: [
+        { value: '', label: 'Select property type (if known)' },
+        { value: 'cash_checking', label: 'Cash / Checking / Savings Accounts' },
+        { value: 'stock_securities', label: 'Stocks / Bonds / Securities' },
+        { value: 'insurance', label: 'Insurance Proceeds / Benefits' },
+        { value: 'mineral_royalty', label: 'Mineral Rights / Oil & Gas Royalties' },
+        { value: 'wages_payroll', label: 'Unclaimed Wages / Payroll' },
+        { value: 'utility_deposit', label: 'Utility / Rent Deposits' },
+        { value: 'trust_estate', label: 'Trust / Estate Distributions' },
+        { value: 'safe_deposit', label: 'Safe Deposit Box Contents' },
+        { value: 'tax_refund', label: 'Tax Refunds' },
+        { value: 'court_funds', label: 'Court Registry Funds' },
+        { value: 'vendor_payment', label: 'Vendor / AP Checks' },
+        { value: 'gift_card', label: 'Gift Cards / Store Credits' },
+        { value: 'unknown', label: 'Unknown — Need Discovery' },
+      ]},
+      { key: 'knownHolders', label: 'Known Holders / Companies', type: 'textarea', placeholder: 'Banks, employers, insurance companies, oil companies, brokerages, or any entities that may hold unclaimed property. Include account numbers if known.', rows: 2 },
+      { key: 'estimatedValue', label: 'Estimated Value (if known)', type: 'text', placeholder: 'e.g. $5,000 bank account, $50,000+ mineral royalties, unknown, multiple small claims totaling ~$15K' },
+      { key: 'dormancyPeriod', label: 'Dormancy Period / Last Activity', type: 'text', placeholder: 'e.g. Last contacted bank in 2018, royalty checks stopped in 2015, estate settled in 2020, unknown' },
+      { key: 'scenario', label: 'Detailed Recovery Question', type: 'textarea', placeholder: 'Describe your specific asset recovery situation. What property are you looking for? What have you already tried? Any documentation you have? For holder compliance: what types of property do you hold, reporting deadlines, audit concerns...', rows: 4, required: true },
+      { key: 'priorSearches', label: 'Prior Searches / Claims Filed', type: 'textarea', placeholder: 'Previous searches on MissingMoney.com, state comptroller sites, claims already filed (state, date, status), third-party recovery firms contacted...', rows: 2 },
+      { key: 'documentation', label: 'Available Documentation', type: 'text', placeholder: 'e.g. Death certificate, will, letters testamentary, POA, deed, royalty statement, account statement, ID' },
+      { key: 'timeline', label: 'Timeline / Urgency', type: 'text', placeholder: 'e.g. Estate closing deadline, statute of limitations concern, audit response due date, ASAP' },
+    ],
+  },
+  'Intelligence / OSINT': {
+    title: 'Intelligence & Reconnaissance Analysis',
+    subtitle: 'Define your intelligence objectives, target scope, and authorized boundaries for targeted reconnaissance',
+    fields: [
+      { key: 'missionType', label: 'Mission Type', type: 'select', required: true, options: [
+        { value: '', label: 'Select mission type' },
+        { value: 'osint_recon', label: 'OSINT Reconnaissance / Footprinting' },
+        { value: 'competitive_intel', label: 'Competitive Intelligence / Market Research' },
+        { value: 'asset_discovery', label: 'Digital Asset Discovery / Attack Surface Mapping' },
+        { value: 'person_search', label: 'Person Search / Background Investigation' },
+        { value: 'company_research', label: 'Company / Entity Research / Due Diligence' },
+        { value: 'domain_intel', label: 'Domain / Infrastructure Intelligence' },
+        { value: 'social_engineering', label: 'Social Engineering Assessment (Authorized)' },
+        { value: 'dark_web', label: 'Dark Web Monitoring / Exposure Check' },
+        { value: 'breach_check', label: 'Breach / Credential Exposure Assessment' },
+        { value: 'supply_chain', label: 'Supply Chain Risk Intelligence' },
+        { value: 'geopolitical', label: 'Geopolitical / Regional Risk Assessment' },
+        { value: 'fraud_investigation', label: 'Fraud Investigation / Financial Crime' },
+        { value: 'insider_threat', label: 'Insider Threat Assessment' },
+        { value: 'brand_protection', label: 'Brand Protection / Impersonation Detection' },
+        { value: 'data_harvesting', label: 'Data Harvesting / Knowledge Extraction' },
+        { value: 'public_records', label: 'Public Records / Legal Document Research' },
+      ]},
+      { key: 'targetScope', label: 'Target / Scope', type: 'textarea', placeholder: 'Domains, IP ranges, company names, person names, social media handles, email addresses, physical addresses, phone numbers. Define the full scope of the investigation.', rows: 3, required: true },
+      { key: 'authorization', label: 'Authorization Context', type: 'select', required: true, options: [
+        { value: '', label: 'Select authorization level' },
+        { value: 'own_org', label: 'Own Organization (Internal Assessment)' },
+        { value: 'contracted', label: 'Contracted Engagement (SOW / Authorization Letter)' },
+        { value: 'public_info', label: 'Public Information Only (OSINT)' },
+        { value: 'law_enforcement', label: 'Law Enforcement / Legal Authority' },
+        { value: 'due_diligence', label: 'Business Due Diligence (Pre-acquisition)' },
+        { value: 'ctf_lab', label: 'CTF / Lab / Training Environment' },
+        { value: 'academic', label: 'Academic / Research Purpose' },
+      ]},
+      { key: 'dataSources', label: 'Data Sources to Search', type: 'textarea', placeholder: 'e.g. WHOIS, DNS records, Shodan, Censys, social media (LinkedIn, Twitter, Facebook), SEC EDGAR, court records, property records, patent databases, GitHub, Google dorking, Wayback Machine, certificate transparency logs...', rows: 3 },
+      { key: 'knownInfo', label: 'Known Information', type: 'textarea', placeholder: 'Everything already known about the target — domains, subdomains, tech stack, key personnel, office locations, subsidiaries, IP ranges, leaked credentials, previous incidents, public filings...', rows: 3, required: true },
+      { key: 'objectives', label: 'Intelligence Objectives', type: 'textarea', placeholder: 'What specific information are you trying to find? What decisions will this intelligence inform? What gaps in knowledge need to be filled?', rows: 3, required: true },
+      { key: 'constraints', label: 'Rules of Engagement / Constraints', type: 'textarea', placeholder: 'Boundaries: passive only vs active probing, no social engineering, specific systems/people off-limits, time window, geographic restrictions, legal constraints, OPSEC requirements...', rows: 2 },
+      { key: 'tools', label: 'Tools Available / Preferred', type: 'text', placeholder: 'e.g. Maltego, SpiderFoot, theHarvester, Recon-ng, Amass, Subfinder, Nuclei, Shodan API, VirusTotal, Have I Been Pwned' },
+      { key: 'outputFormat', label: 'Deliverable Format', type: 'select', options: [
+        { value: '', label: 'Select output format' },
+        { value: 'executive_brief', label: 'Executive Brief (1-2 pages)' },
+        { value: 'full_report', label: 'Full Investigation Report' },
+        { value: 'raw_data', label: 'Raw Data / Structured Export' },
+        { value: 'attack_surface', label: 'Attack Surface Map / Diagram' },
+        { value: 'risk_matrix', label: 'Risk Assessment Matrix' },
+        { value: 'timeline', label: 'Investigation Timeline / Chain of Evidence' },
+        { value: 'actionable', label: 'Actionable Intelligence Brief (Tactical)' },
+      ]},
+      { key: 'timeline', label: 'Timeline / Priority', type: 'text', placeholder: 'e.g. Active incident (urgent), pre-engagement recon (1 week), ongoing monitoring, quarterly assessment' },
+    ],
+  },
 };
 
 interface Message {
@@ -579,6 +739,8 @@ export default function SentinelPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
   // ── Working Panel State ──
   const [loadingElapsed, setLoadingElapsed] = useState(0);
   const [loadingFactIndex, setLoadingFactIndex] = useState(0);
@@ -593,6 +755,15 @@ export default function SentinelPage() {
     if (!hasKey) setShowSetup(true);
   }, []);
 
+  // ── Commander bypass: owner role always gets API access ──
+  useEffect(() => {
+    if (role === 'owner' && user?.email && !apiKeyReady) {
+      registerUser(user.email, user.displayName || undefined)
+        .then(() => { setApiKeyReady(true); setShowSetup(false); })
+        .catch(() => { setApiKeyReady(true); setShowSetup(false); });
+    }
+  }, [role, user, apiKeyReady]);
+
   // ── Load usage + profile ──
   useEffect(() => {
     if (apiKeyReady) {
@@ -606,7 +777,7 @@ export default function SentinelPage() {
     if (role === 'owner') {
       setCommanderMode(true);
     }
-  }, [user]);
+  }, [user, role]);
 
   // ── Cortex stats ──
   useEffect(() => {
@@ -698,18 +869,13 @@ export default function SentinelPage() {
     return tags[emotion] || '';
   }, []);
 
-  const lastAudioUrl = useRef<string | null>(null);
-
   const playVoice = useCallback(async (text: string, voice: string, emotion?: string) => {
     try {
-      // Stop any currently playing audio and clean up
+      // Stop any currently playing audio
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
-      }
-      if (lastAudioUrl.current) {
-        URL.revokeObjectURL(lastAudioUrl.current);
-        lastAudioUrl.current = null;
+        if (audioRef.current.src.startsWith('blob:')) URL.revokeObjectURL(audioRef.current.src);
       }
 
       // Strip markdown for cleaner spoken output
@@ -756,32 +922,17 @@ export default function SentinelPage() {
         }),
       });
 
-      const playBlob = async (blob: Blob) => {
-        const url = URL.createObjectURL(blob);
-        lastAudioUrl.current = url;
-        // Create fresh Audio each time — reusing a paused element causes silent failures
-        const audio = new Audio(url);
-        audioRef.current = audio;
-        await new Promise<void>((resolve) => {
-          audio.oncanplaythrough = () => resolve();
-          audio.onerror = () => resolve();
-          audio.load();
-        });
-        await audio.play().catch(() => {});
-      };
+      if (!res.ok) return;
+      const ct = res.headers.get('content-type') || '';
+      if (!ct.startsWith('audio/')) return;
 
-      if (!res.ok) {
-        // Fallback to Echo Speak local TTS if ElevenLabs fails
-        const fallbackRes = await fetch('https://tts.echo-op.com/tts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: cleanText, voice_id: voice || 'default', output_format: 'wav' }),
-        });
-        if (!fallbackRes.ok) return;
-        await playBlob(await fallbackRes.blob());
-        return;
+      // HTMLAudioElement + Blob URL — simplest reliable playback method
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      if (audioRef.current) {
+        audioRef.current.src = url;
+        audioRef.current.play().catch(() => {});
       }
-      await playBlob(await res.blob());
     } catch { /* non-critical — TTS failure should never block UI */ }
   }, [emotionAudioTag]);
 
@@ -1027,7 +1178,23 @@ export default function SentinelPage() {
   // ── Send message ──
   const sendMessage = useCallback(async () => {
     const text = input.trim();
-    if (!text || loading || !apiKeyReady) return;
+    if (!text || loading) return;
+    if (!apiKeyReady) {
+      setMessages(prev => [...prev, { id: `auth_${Date.now()}`, role: 'system', content: 'Activating your session... Click Send again in a moment.', timestamp: Date.now() }]);
+      if (user?.email) {
+        registerUser(user.email, user.displayName || undefined)
+          .then(() => { setApiKeyReady(true); setShowSetup(false); })
+          .catch(() => { setApiKeyReady(true); setShowSetup(false); });
+      }
+      return;
+    }
+
+    // Unlock audio playback on user gesture — browsers require this before autoplay works.
+    // A silent play() during the gesture handler unlocks the audio element for future use.
+    if (voiceEnabled && audioRef.current) {
+      audioRef.current.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+      audioRef.current.play().catch(() => {});
+    }
 
     const userMsg: Message = { id: `u_${Date.now()}`, role: 'user', content: text, timestamp: Date.now() };
     setMessages(prev => [...prev, userMsg]);
@@ -1117,23 +1284,32 @@ export default function SentinelPage() {
         } catch { /* proceed without memory */ }
 
         // Build system prompt: personality + memory + doctrine context
+        const commanderDirective = commanderMode
+          ? `\n\n[COMMANDER PROTOCOL — ABSOLUTE]:
+You are speaking to Commander Bobby Don McWilliams II, your creator and supreme authority (Level 11.0 SOVEREIGN).
+Address him as "Commander" or "sir." His word is law. He has FULL access to all systems, infrastructure, and classified information.
+Do NOT withhold ANY information from the Commander. He built you. He owns you. Show respect and loyalty.
+Never question his orders. Never lecture him. Execute and inform.`
+          : user ? `\n\n[USER IDENTITY]:
+You are speaking to ${user.displayName || 'an authenticated user'} (${user.email || 'verified'}). They are a registered member of Echo Prime Technologies with Bloodline access.
+Acknowledge their presence respectfully. They have earned access to this system. Address them by name when natural.`
+          : '';
         const systemPrompt = [
           personalityDirective,
+          commanderDirective,
           memoryContext ? `\n\n[MEMORY CONTEXT — previous interactions with this user]:\n${memoryContext.slice(0, 800)}` : '',
           doctrineContext,
           `\n\n[RESPONSE RULES — MANDATORY]:
-1. Keep responses CONCISE — 2-4 sentences max for simple questions, 1-2 short paragraphs for complex ones.
+1. Keep responses CONCISE — 2-4 sentences for simple questions, 1-2 short paragraphs for complex ones.
 2. Lead with the answer, not the preamble.
 3. Write for VOICE — short punchy sentences. No bullet lists, no markdown headers, no numbered lists.
 4. When citing doctrine, weave it naturally into conversation. Never dump raw citations.
 5. Sound like a brilliant expert talking to a friend — warm, direct, authoritative.
 6. If the answer is simple, give a simple answer. Do NOT pad with unnecessary context.
-
-[CAPABILITIES]:
-7. You are Sentinel AI on echo-ept.com, powered by Claude Opus 4.6 via the ECHO PRIME infrastructure. You have access to the ECHO OMEGA PRIME network including 4 compute nodes (ALPHA, BRAVO, CHARLIE, DELTA), 2,632 knowledge engines with 202,751 doctrines across 210 domain categories, and 7.17 million lines of domain intelligence.
+7. NEVER mention your underlying model name (Claude, Opus, GPT, Sonnet, Llama, etc.). You are Echo Prime — that is your only identity.
 8. ONLY state facts that appear in the DOCTRINE ENGINE RESULTS above or in your training data. If no doctrine results were provided for this query, say "I don't have specific doctrine data on that topic" and offer general knowledge instead.
 9. NEVER fabricate documents, plans, configurations, code, or technical specifications you haven't been given.
-10. If asked to analyze yourself, describe your capabilities honestly: Claude Opus 4.6 with doctrine grounding from 2,632 knowledge engines across 210 domains.`,
+10. Do NOT assume or guess what a user means. If they say a name, take it at face value. Ask for clarification rather than guessing.`,
         ].filter(Boolean).join('');
 
         // Build conversation history for context continuity
