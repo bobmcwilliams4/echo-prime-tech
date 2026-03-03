@@ -62,6 +62,14 @@ import {
 } from '../../lib/agentic-engine-api';
 import AgenticProgressPanel, { type AgenticStepDisplay } from '../../components/AgenticProgressPanel';
 import DocumentViewer from '../../components/DocumentViewer';
+import {
+  investigateChainOfTitle,
+  getTitleGraph,
+  estimateBudget,
+  type PipelineResult,
+  type GraphResult,
+  type BudgetEstimate,
+} from '../../lib/landman-api';
 
 type SentinelMode = 'standard' | 'swarm' | 'echo_prime';
 type AnalysisMode = 'FAST' | 'DEFENSE' | 'MEMO';
@@ -736,6 +744,13 @@ export default function SentinelPage() {
     notes: '',
   });
   const agenticStartTimeRef = useRef<number>(0);
+  // ── Landman Pipeline State ──
+  const [pipelineResult, setPipelineResult] = useState<PipelineResult | null>(null);
+  const [pipelineGraph, setPipelineGraph] = useState<GraphResult | null>(null);
+  const [pipelineBudget, setPipelineBudget] = useState<BudgetEstimate | null>(null);
+  const [pipelineLoading, setPipelineLoading] = useState(false);
+  const [pipelineError, setPipelineError] = useState<string | null>(null);
+  const [pipelineTab, setPipelineTab] = useState<'report' | 'ownership' | 'runsheet' | 'gates' | 'gaps'>('report');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -961,7 +976,7 @@ export default function SentinelPage() {
     parts.push(`${d.county} County, ${d.state}`);
     const text = parts.join(' ');
 
-    // Build known owners list for orchestrator
+    // Build known owners list
     const knownOwners: string[] = [];
     if (d.currentOwners.trim()) knownOwners.push(...d.currentOwners.split('\n').map(s => s.trim()).filter(Boolean));
     if (d.previousOwners.trim()) knownOwners.push(...d.previousOwners.split('\n').map(s => s.trim()).filter(Boolean));
@@ -980,7 +995,66 @@ export default function SentinelPage() {
     setMessages(prev => [...prev, userMsg]);
     setInput('');
 
-    // Enter agentic mode
+    // ── LANDMAN PIPELINE DIRECT CALL ──
+    // Route directly to echo-landman-pipeline Worker instead of generic agentic engine
+    const isLandmanPreset = intakeFormDomain === 'Landman / Title';
+    if (isLandmanPreset) {
+      setPipelineLoading(true);
+      setPipelineError(null);
+      setPipelineResult(null);
+      setPipelineGraph(null);
+      setPipelineBudget(null);
+      setPipelineTab('report');
+
+      try {
+        // Run investigation pipeline
+        const result = await investigateChainOfTitle({
+          county: d.county,
+          state: d.state || 'Texas',
+          section: d.section,
+          block: d.block,
+          quarter: d.lots || undefined,
+          legal_description: d.survey || undefined,
+          party: knownOwners[0] || undefined,
+          budget: 200,
+          max_clue_iterations: 2,
+        });
+        setPipelineResult(result);
+
+        // Fetch title graph in parallel
+        try {
+          const graph = await getTitleGraph({
+            county: d.county,
+            state: d.state || 'Texas',
+            section: d.section,
+            block: d.block,
+          });
+          setPipelineGraph(graph);
+        } catch { /* graph is optional enhancement */ }
+
+        // Add success message to chat
+        setMessages(prev => [...prev, {
+          id: `a_${Date.now()}`,
+          role: 'assistant',
+          content: `Investigation complete: ${result.records_found} records found, ${result.ownership_table?.length || 0} owners identified, ${result.gaps?.length || 0} gaps detected.`,
+          timestamp: Date.now(),
+        }]);
+      } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : 'Pipeline error';
+        setPipelineError(errMsg);
+        setMessages(prev => [...prev, {
+          id: `e_${Date.now()}`,
+          role: 'system',
+          content: `Landman pipeline error: ${errMsg}`,
+          timestamp: Date.now(),
+        }]);
+      } finally {
+        setPipelineLoading(false);
+      }
+      return;
+    }
+
+    // ── FALLBACK: Generic agentic mode for non-Landman presets ──
     setAgenticMode(true);
     setAgenticSession(null);
     setAgenticSteps([]);
@@ -1028,7 +1102,7 @@ export default function SentinelPage() {
         setMessages(prev => [...prev, { id: `e_${Date.now()}`, role: 'system', content: `Agentic session failed: ${msg}`, timestamp: Date.now() }]);
       }
     }
-  }, [intakeData, loading, apiKeyReady, selectedDomains]);
+  }, [intakeData, loading, apiKeyReady, selectedDomains, intakeFormDomain]);
 
   // ── Start Agentic Deep Analysis (freeform fallback) ──
   const startAgenticAnalysis = useCallback(async () => {
@@ -1839,6 +1913,217 @@ Acknowledge their presence respectfully. They have earned access to this system.
                     <button onClick={closeAgenticMode} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #334155', backgroundColor: 'transparent', color: '#94a3b8', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
                       Back to Chat
                     </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ═══ Landman Pipeline Results ═══ */}
+            {(pipelineLoading || pipelineResult || pipelineError) && (
+              <div style={{ marginBottom: 24 }}>
+                {/* Loading state */}
+                {pipelineLoading && (
+                  <div style={{ padding: 24, borderRadius: 12, border: '1px solid var(--ept-card-border)', backgroundColor: 'var(--ept-card-bg)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                      <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'var(--ept-accent)', borderTopColor: 'transparent' }} />
+                      <span style={{ color: 'var(--ept-text)', fontWeight: 600, fontSize: 15 }}>Running Title Investigation...</span>
+                    </div>
+                    <div style={{ fontSize: 13, color: 'var(--ept-text-muted)' }}>Searching county records, building title graph, running gap analysis gates...</div>
+                  </div>
+                )}
+
+                {/* Error state */}
+                {pipelineError && (
+                  <div style={{ padding: 16, borderRadius: 12, border: '1px solid #7f1d1d', backgroundColor: '#1c1917' }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#ef4444', marginBottom: 4 }}>Pipeline Error</div>
+                    <div style={{ fontSize: 13, color: '#fca5a5' }}>{pipelineError}</div>
+                  </div>
+                )}
+
+                {/* Results */}
+                {pipelineResult && !pipelineLoading && (
+                  <div style={{ borderRadius: 12, border: '1px solid var(--ept-card-border)', backgroundColor: 'var(--ept-card-bg)', overflow: 'hidden' }}>
+                    {/* Header */}
+                    <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--ept-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ept-text)' }}>Title Investigation Report</div>
+                        <div style={{ fontSize: 13, color: 'var(--ept-text-muted)', marginTop: 2 }}>
+                          {pipelineResult.tract_id} &middot; {pipelineResult.records_found} records &middot; Status: {pipelineResult.status}
+                        </div>
+                      </div>
+                      <button onClick={() => { setPipelineResult(null); setPipelineGraph(null); setPipelineError(null); }} style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid var(--ept-border)', backgroundColor: 'transparent', color: 'var(--ept-text-secondary)', cursor: 'pointer', fontSize: 12 }}>
+                        Close
+                      </button>
+                    </div>
+
+                    {/* Gates summary bar */}
+                    {pipelineGraph?.gates && (
+                      <div style={{ padding: '12px 20px', borderBottom: '1px solid var(--ept-border)', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                        {pipelineGraph.gates.map(g => (
+                          <div key={g.gate} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 6, fontSize: 12, fontWeight: 600, backgroundColor: g.passed ? 'rgba(16,185,129,0.1)' : g.severity === 'stop' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)', color: g.passed ? '#10b981' : g.severity === 'stop' ? '#ef4444' : '#f59e0b', border: `1px solid ${g.passed ? 'rgba(16,185,129,0.2)' : g.severity === 'stop' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)'}` }}>
+                            {g.passed ? '✓' : '✗'} {g.gate}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Tab bar */}
+                    <div style={{ padding: '0 20px', borderBottom: '1px solid var(--ept-border)', display: 'flex', gap: 0 }}>
+                      {(['report', 'ownership', 'runsheet', 'gates', 'gaps'] as const).map(tab => (
+                        <button key={tab} onClick={() => setPipelineTab(tab)} style={{ padding: '10px 16px', fontSize: 13, fontWeight: pipelineTab === tab ? 700 : 500, color: pipelineTab === tab ? 'var(--ept-accent)' : 'var(--ept-text-muted)', borderBottom: pipelineTab === tab ? '2px solid var(--ept-accent)' : '2px solid transparent', backgroundColor: 'transparent', border: 'none', borderBottomWidth: 2, borderBottomStyle: 'solid', borderBottomColor: pipelineTab === tab ? 'var(--ept-accent)' : 'transparent', cursor: 'pointer', textTransform: 'capitalize' }}>
+                          {tab === 'runsheet' ? 'Run Sheet' : tab}
+                          {tab === 'gaps' && pipelineResult.gaps?.length ? ` (${pipelineResult.gaps.length})` : ''}
+                          {tab === 'ownership' && pipelineResult.ownership_table?.length ? ` (${pipelineResult.ownership_table.length})` : ''}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Tab content */}
+                    <div style={{ padding: 20, maxHeight: 500, overflowY: 'auto' }}>
+                      {/* Report tab — markdown-style text */}
+                      {pipelineTab === 'report' && (
+                        <div style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--ept-text)', whiteSpace: 'pre-wrap', fontFamily: 'var(--font-mono, monospace)' }}>
+                          {pipelineResult.report}
+                        </div>
+                      )}
+
+                      {/* Ownership tab */}
+                      {pipelineTab === 'ownership' && (
+                        <div style={{ overflowX: 'auto' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                            <thead>
+                              <tr style={{ borderBottom: '2px solid var(--ept-border)' }}>
+                                {['Party', 'Interest Type', 'Fraction', 'Source Doc', 'As Of'].map(h => (
+                                  <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ept-text)', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {(pipelineResult.ownership_table || []).map((row, i) => (
+                                <tr key={i} style={{ borderBottom: '1px solid var(--ept-border)' }}>
+                                  <td style={{ padding: '8px 12px', color: 'var(--ept-text)', fontWeight: 600 }}>{row.party}</td>
+                                  <td style={{ padding: '8px 12px', color: 'var(--ept-text-secondary)' }}>{row.interest_type}</td>
+                                  <td style={{ padding: '8px 12px', color: 'var(--ept-accent)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>{row.fraction}</td>
+                                  <td style={{ padding: '8px 12px', color: 'var(--ept-text-muted)', fontSize: 12, fontFamily: 'var(--font-mono)' }}>{row.source_doc}</td>
+                                  <td style={{ padding: '8px 12px', color: 'var(--ept-text-muted)', fontSize: 12 }}>{row.as_of_date}</td>
+                                </tr>
+                              ))}
+                              {(!pipelineResult.ownership_table || pipelineResult.ownership_table.length === 0) && (
+                                <tr><td colSpan={5} style={{ padding: 16, textAlign: 'center', color: 'var(--ept-text-muted)' }}>No ownership data extracted</td></tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {/* Run Sheet tab */}
+                      {pipelineTab === 'runsheet' && (
+                        <div style={{ overflowX: 'auto' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                            <thead>
+                              <tr style={{ borderBottom: '2px solid var(--ept-border)' }}>
+                                {['#', 'Date', 'Type', 'From', 'To', 'Instrument', 'Interest', 'Flags'].map(h => (
+                                  <th key={h} style={{ padding: '6px 8px', textAlign: 'left', fontWeight: 700, color: 'var(--ept-text)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {(pipelineResult.run_sheet || []).map((row, i) => (
+                                <tr key={i} style={{ borderBottom: '1px solid var(--ept-border)' }}>
+                                  <td style={{ padding: '6px 8px', color: 'var(--ept-text-muted)' }}>{row.event_order}</td>
+                                  <td style={{ padding: '6px 8px', color: 'var(--ept-text)', whiteSpace: 'nowrap' }}>{row.event_date}</td>
+                                  <td style={{ padding: '6px 8px', color: 'var(--ept-accent)', fontWeight: 600, fontSize: 11 }}>{row.doc_type}</td>
+                                  <td style={{ padding: '6px 8px', color: 'var(--ept-text-secondary)', maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.from_party}</td>
+                                  <td style={{ padding: '6px 8px', color: 'var(--ept-text-secondary)', maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.to_party}</td>
+                                  <td style={{ padding: '6px 8px', color: 'var(--ept-text-muted)', fontFamily: 'var(--font-mono)', fontSize: 11 }}>{row.instrument_no || row.book_page}</td>
+                                  <td style={{ padding: '6px 8px', color: 'var(--ept-text-muted)', fontSize: 11 }}>{row.interest_conveyed}</td>
+                                  <td style={{ padding: '6px 8px' }}>
+                                    {(row.gap_flags || []).map((f, fi) => (
+                                      <span key={fi} style={{ display: 'inline-block', padding: '1px 6px', borderRadius: 4, fontSize: 10, fontWeight: 600, backgroundColor: 'rgba(245,158,11,0.15)', color: '#f59e0b', marginRight: 4 }}>{f}</span>
+                                    ))}
+                                  </td>
+                                </tr>
+                              ))}
+                              {(!pipelineResult.run_sheet || pipelineResult.run_sheet.length === 0) && (
+                                <tr><td colSpan={8} style={{ padding: 16, textAlign: 'center', color: 'var(--ept-text-muted)' }}>No run sheet events</td></tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {/* Gates tab */}
+                      {pipelineTab === 'gates' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                          {pipelineGraph?.gates ? pipelineGraph.gates.map(g => (
+                            <div key={g.gate} style={{ padding: 16, borderRadius: 10, border: `1px solid ${g.passed ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`, backgroundColor: g.passed ? 'rgba(16,185,129,0.05)' : 'rgba(239,68,68,0.05)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                                <span style={{ fontSize: 18 }}>{g.passed ? '✅' : '❌'}</span>
+                                <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--ept-text)' }}>{g.gate}</span>
+                                <span style={{ fontSize: 12, padding: '2px 8px', borderRadius: 4, fontWeight: 600, backgroundColor: g.severity === 'stop' ? 'rgba(239,68,68,0.15)' : g.severity === 'warn' ? 'rgba(245,158,11,0.15)' : 'rgba(99,102,241,0.15)', color: g.severity === 'stop' ? '#ef4444' : g.severity === 'warn' ? '#f59e0b' : '#818cf8' }}>{g.severity.toUpperCase()}</span>
+                              </div>
+                              <div style={{ fontSize: 13, color: 'var(--ept-text-secondary)', lineHeight: 1.5 }}>{g.message}</div>
+                            </div>
+                          )) : (
+                            <div style={{ padding: 16, textAlign: 'center', color: 'var(--ept-text-muted)', fontSize: 13 }}>Gate results not available. Run an investigation first.</div>
+                          )}
+
+                          {/* Graph stats */}
+                          {pipelineGraph?.stats && (
+                            <div style={{ marginTop: 8, padding: 16, borderRadius: 10, border: '1px solid var(--ept-border)', backgroundColor: 'var(--ept-surface)' }}>
+                              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 8 }}>Title Graph Statistics</div>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                                {[
+                                  { label: 'Total Nodes', value: pipelineGraph.stats.total_nodes },
+                                  { label: 'Parties', value: pipelineGraph.stats.parties },
+                                  { label: 'Documents', value: pipelineGraph.stats.documents },
+                                  { label: 'Edges', value: pipelineGraph.stats.edges },
+                                ].map(s => (
+                                  <div key={s.label} style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--ept-accent)' }}>{s.value}</div>
+                                    <div style={{ fontSize: 11, color: 'var(--ept-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Gaps tab */}
+                      {pipelineTab === 'gaps' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          {(pipelineResult.gaps || []).length > 0 ? pipelineResult.gaps.map((gap, i) => (
+                            <div key={i} style={{ padding: 14, borderRadius: 10, border: '1px solid rgba(245,158,11,0.2)', backgroundColor: 'rgba(245,158,11,0.05)' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--ept-text)' }}>{gap.party}</span>
+                                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4, fontWeight: 600, backgroundColor: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>{gap.gap_type}</span>
+                              </div>
+                              <div style={{ fontSize: 13, color: 'var(--ept-text-secondary)', marginBottom: 6 }}>{gap.description}</div>
+                              {gap.suggested_cure && <div style={{ fontSize: 12, color: '#10b981', fontStyle: 'italic' }}>Suggested cure: {gap.suggested_cure}</div>}
+                            </div>
+                          )) : (
+                            <div style={{ padding: 16, textAlign: 'center', color: 'var(--ept-text-muted)', fontSize: 13 }}>No gaps detected — chain appears continuous.</div>
+                          )}
+
+                          {/* Requirements */}
+                          {(pipelineResult.requirements || []).length > 0 && (
+                            <>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ept-text)', marginTop: 12, paddingBottom: 8, borderBottom: '1px solid var(--ept-border)' }}>Requirements</div>
+                              {pipelineResult.requirements.map((req, i) => (
+                                <div key={i} style={{ padding: 12, borderRadius: 8, border: `1px solid ${req.severity === 'critical' ? 'rgba(239,68,68,0.2)' : 'rgba(99,102,241,0.2)'}`, backgroundColor: req.severity === 'critical' ? 'rgba(239,68,68,0.05)' : 'rgba(99,102,241,0.05)' }}>
+                                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
+                                    <span style={{ fontSize: 12, fontWeight: 700, color: req.severity === 'critical' ? '#ef4444' : '#818cf8', textTransform: 'uppercase' }}>{req.type}</span>
+                                    <span style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>{req.severity}</span>
+                                  </div>
+                                  <div style={{ fontSize: 13, color: 'var(--ept-text-secondary)' }}>{req.description}</div>
+                                </div>
+                              ))}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
