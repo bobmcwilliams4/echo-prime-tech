@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../../lib/auth-context';
-import { getCampaigns, createCampaign, updateCampaign, getScripts } from '../../../lib/closer-api';
+import { getCampaigns, createCampaign, updateCampaign, getScripts, getLeads, assignLeadsToCampaign } from '../../../lib/closer-api';
 
 /* ──────────────────── Types ──────────────────── */
 
@@ -76,9 +76,10 @@ const DEFAULT_STATS: CampaignStats = {
 
 /* ──────────────────── Helpers ──────────────────── */
 
-function formatNumber(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
-  return String(n);
+function formatNumber(n: number | null | undefined): string {
+  const v = n ?? 0;
+  if (v >= 1000) return `${(v / 1000).toFixed(1)}k`;
+  return String(v);
 }
 
 function formatCurrency(amount: number): string {
@@ -86,8 +87,10 @@ function formatCurrency(amount: number): string {
 }
 
 function conversionRate(stats: CampaignStats): string {
-  if (!stats.dialed || stats.dialed === 0) return '0%';
-  return `${((stats.appointments / stats.dialed) * 100).toFixed(1)}%`;
+  const dialed = stats.dialed ?? 0;
+  const appts = stats.appointments ?? 0;
+  if (dialed === 0) return '0%';
+  return `${((appts / dialed) * 100).toFixed(1)}%`;
 }
 
 /* ──────────────────── Sub-Components ──────────────────── */
@@ -206,7 +209,15 @@ function CampaignCard({
   onAction: (id: string, action: string) => void;
   actionLoading: string | null;
 }) {
-  const stats = campaign.stats || DEFAULT_STATS;
+  const rawStats = campaign.stats || DEFAULT_STATS;
+  const stats: CampaignStats = {
+    total_leads: rawStats.total_leads ?? 0,
+    dialed: rawStats.dialed ?? 0,
+    connected: rawStats.connected ?? 0,
+    qualified: rawStats.qualified ?? 0,
+    appointments: rawStats.appointments ?? 0,
+    cost: rawStats.cost ?? 0,
+  };
   const isLoading = actionLoading === campaign.id;
 
   return (
@@ -339,6 +350,14 @@ function CampaignCard({
           </button>
         )}
         <button
+          onClick={() => onAction(campaign.id, 'assign_leads')}
+          disabled={isLoading}
+          className="px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          style={{ backgroundColor: 'var(--ept-accent)' }}
+        >
+          Assign Leads
+        </button>
+        <button
           onClick={() => onAction(campaign.id, 'edit')}
           disabled={isLoading}
           className="px-4 py-2 rounded-lg text-xs font-semibold border transition-opacity hover:opacity-70 disabled:opacity-50"
@@ -352,7 +371,7 @@ function CampaignCard({
           className="px-4 py-2 rounded-lg text-xs font-semibold transition-opacity hover:opacity-70 disabled:opacity-50"
           style={{ color: 'var(--ept-accent)' }}
         >
-          View Stats
+          Stats
         </button>
       </div>
     </div>
@@ -695,6 +714,14 @@ export default function CampaignsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  /* Lead assignment state */
+  const [assignCampaignId, setAssignCampaignId] = useState<string | null>(null);
+  const [allLeads, setAllLeads] = useState<any[]>([]);
+  const [leadsLoading, setLeadsLoading] = useState(false);
+  const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
+  const [leadSearch, setLeadSearch] = useState('');
+  const [assigning, setAssigning] = useState(false);
+
   /* ── Fetch campaigns ── */
   const loadCampaigns = useCallback(async () => {
     try {
@@ -758,14 +785,68 @@ export default function CampaignsPage() {
     }
   };
 
-  /* ── Campaign actions (start, pause, resume, edit, stats) ── */
+  /* ── Open lead assignment modal ── */
+  const openAssignLeads = async (campaignId: string) => {
+    setAssignCampaignId(campaignId);
+    setSelectedLeadIds(new Set());
+    setLeadSearch('');
+    setLeadsLoading(true);
+    try {
+      const data: any = await getLeads();
+      const list = Array.isArray(data) ? data : data?.leads ?? data?.results ?? [];
+      setAllLeads(list);
+    } catch {
+      setAllLeads([]);
+    } finally {
+      setLeadsLoading(false);
+    }
+  };
+
+  const handleAssignLeads = async () => {
+    if (!assignCampaignId || selectedLeadIds.size === 0) return;
+    setAssigning(true);
+    try {
+      await assignLeadsToCampaign(assignCampaignId, Array.from(selectedLeadIds));
+      setAssignCampaignId(null);
+      await loadCampaigns();
+    } catch (err: any) {
+      setError(err.message || 'Failed to assign leads');
+    } finally {
+      setAssigning(false);
+    }
+  };
+
+  const toggleLeadSelection = (id: string) => {
+    setSelectedLeadIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAllFiltered = (filteredIds: string[]) => {
+    setSelectedLeadIds((prev) => {
+      const next = new Set(prev);
+      const allSelected = filteredIds.every((id) => next.has(id));
+      if (allSelected) {
+        filteredIds.forEach((id) => next.delete(id));
+      } else {
+        filteredIds.forEach((id) => next.add(id));
+      }
+      return next;
+    });
+  };
+
+  /* ── Campaign actions (start, pause, resume, edit, stats, assign_leads) ── */
   const handleAction = async (campaignId: string, action: string) => {
     if (action === 'edit') {
-      /* For now scroll to top and show form pre-filled in a future iteration */
       return;
     }
     if (action === 'stats') {
-      /* Navigate or show stats modal — future iteration */
+      return;
+    }
+    if (action === 'assign_leads') {
+      openAssignLeads(campaignId);
       return;
     }
 
@@ -859,6 +940,173 @@ export default function CampaignsPage() {
               actionLoading={actionLoading}
             />
           ))}
+        </div>
+      )}
+
+      {/* Lead Assignment Modal */}
+      {assignCampaignId && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 50,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)', padding: 20,
+          }}
+          onClick={() => setAssignCampaignId(null)}
+        >
+          <div
+            style={{
+              width: '100%', maxWidth: 560, maxHeight: '80vh',
+              backgroundColor: 'var(--ept-card-bg)', borderRadius: 14,
+              border: '1px solid var(--ept-card-border)',
+              display: 'flex', flexDirection: 'column', overflow: 'hidden',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--ept-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--ept-text)', margin: 0 }}>
+                  Assign Leads to Campaign
+                </h3>
+                <p style={{ fontSize: 12, color: 'var(--ept-text-muted)', margin: '4px 0 0' }}>
+                  {campaigns.find((c) => c.id === assignCampaignId)?.name || 'Campaign'}
+                </p>
+              </div>
+              <button
+                onClick={() => setAssignCampaignId(null)}
+                style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, border: 'none', backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-muted)', cursor: 'pointer' }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              </button>
+            </div>
+
+            {/* Search + Select All */}
+            <div style={{ padding: '12px 20px', borderBottom: '1px solid var(--ept-border)', display: 'flex', gap: 10, alignItems: 'center' }}>
+              <input
+                type="text"
+                value={leadSearch}
+                onChange={(e) => setLeadSearch(e.target.value)}
+                placeholder="Search leads by name, phone, company..."
+                style={{
+                  flex: 1, padding: '8px 12px', fontSize: 13, color: 'var(--ept-text)',
+                  backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)',
+                  borderRadius: 8, outline: 'none',
+                }}
+              />
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ept-accent)', whiteSpace: 'nowrap' }}>
+                {selectedLeadIds.size} selected
+              </span>
+            </div>
+
+            {/* Lead List */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '8px 20px' }}>
+              {leadsLoading ? (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
+                  <div style={{ width: 24, height: 24, borderRadius: '50%', border: '2px solid var(--ept-accent)', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
+                </div>
+              ) : (() => {
+                const q = leadSearch.toLowerCase().trim();
+                const filtered = allLeads.filter((l: any) => {
+                  if (!q) return true;
+                  const full = `${l.first_name || ''} ${l.last_name || ''} ${l.phone || ''} ${l.company || ''} ${l.email || ''}`.toLowerCase();
+                  return full.includes(q);
+                });
+                const filteredIds = filtered.map((l: any) => l.id);
+                const allSelected = filteredIds.length > 0 && filteredIds.every((id: string) => selectedLeadIds.has(id));
+
+                return filtered.length === 0 ? (
+                  <p style={{ textAlign: 'center', padding: 24, fontSize: 13, color: 'var(--ept-text-muted)' }}>
+                    {allLeads.length === 0 ? 'No leads found. Create leads first on the Leads page.' : 'No leads match your search.'}
+                  </p>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => selectAllFiltered(filteredIds)}
+                      style={{
+                        display: 'block', width: '100%', padding: '6px 0', fontSize: 11, fontWeight: 600,
+                        color: 'var(--ept-accent)', background: 'none', border: 'none', cursor: 'pointer',
+                        textAlign: 'left', marginBottom: 4,
+                      }}
+                    >
+                      {allSelected ? 'Deselect All' : `Select All (${filtered.length})`}
+                    </button>
+                    {filtered.map((lead: any) => {
+                      const isSelected = selectedLeadIds.has(lead.id);
+                      return (
+                        <div
+                          key={lead.id}
+                          onClick={() => toggleLeadSelection(lead.id)}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px',
+                            borderRadius: 8, cursor: 'pointer', marginBottom: 2,
+                            backgroundColor: isSelected ? 'rgba(13,115,119,0.08)' : 'transparent',
+                            border: `1px solid ${isSelected ? 'var(--ept-accent)' : 'transparent'}`,
+                            transition: 'all 0.15s',
+                          }}
+                        >
+                          <div style={{
+                            width: 18, height: 18, borderRadius: 4, flexShrink: 0,
+                            border: `2px solid ${isSelected ? 'var(--ept-accent)' : 'var(--ept-border)'}`,
+                            backgroundColor: isSelected ? 'var(--ept-accent)' : 'transparent',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}>
+                            {isSelected && (
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={3}>
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            )}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ept-text)' }}>
+                              {lead.first_name} {lead.last_name}
+                            </div>
+                            <div style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>
+                              {lead.phone || 'No phone'} {lead.company ? `· ${lead.company}` : ''}
+                            </div>
+                          </div>
+                          <span style={{
+                            fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em',
+                            padding: '2px 6px', borderRadius: 4,
+                            backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-muted)',
+                          }}>
+                            {lead.status || 'new'}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </>
+                );
+              })()}
+            </div>
+
+            {/* Modal Footer */}
+            <div style={{ padding: '12px 20px', borderTop: '1px solid var(--ept-border)', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <button
+                onClick={() => setAssignCampaignId(null)}
+                style={{
+                  padding: '8px 16px', fontSize: 13, fontWeight: 500, borderRadius: 8,
+                  border: '1px solid var(--ept-border)', backgroundColor: 'transparent',
+                  color: 'var(--ept-text-muted)', cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAssignLeads}
+                disabled={assigning || selectedLeadIds.size === 0}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '8px 20px', fontSize: 13, fontWeight: 600,
+                  color: '#fff', backgroundColor: 'var(--ept-accent)', border: 'none', borderRadius: 8,
+                  cursor: assigning || selectedLeadIds.size === 0 ? 'not-allowed' : 'pointer',
+                  opacity: assigning || selectedLeadIds.size === 0 ? 0.5 : 1,
+                }}
+              >
+                {assigning && <div style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid #fff', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />}
+                Assign {selectedLeadIds.size} Lead{selectedLeadIds.size !== 1 ? 's' : ''}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

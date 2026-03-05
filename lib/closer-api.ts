@@ -47,12 +47,16 @@ export const getCampaigns = (params?: string) => closerFetch(`/campaigns${params
 export const getCampaign = (id: string) => closerFetch(`/campaigns/${id}`);
 export const createCampaign = (data: any) => closerFetch('/campaigns', { method: 'POST', body: JSON.stringify(data) });
 export const updateCampaign = (id: string, data: any) => closerFetch(`/campaigns/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const assignLeadsToCampaign = (campaignId: string, leadIds: string[]) => closerFetch(`/campaigns/${campaignId}/leads`, { method: 'POST', body: JSON.stringify({ lead_ids: leadIds }) });
+export const getCampaignLeads = (campaignId: string) => closerFetch(`/campaigns/${campaignId}/leads`);
 
 // --- Scripts ---
 export const getScripts = () => closerFetch('/scripts');
 export const getScript = (id: string) => closerFetch(`/scripts/${id}`);
 export const createScript = (data: any) => closerFetch('/scripts', { method: 'POST', body: JSON.stringify(data) });
 export const updateScript = (id: string, data: any) => closerFetch(`/scripts/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const generateScripts = (text: string, filename: string): Promise<{ scripts: Array<{ id: string; name: string; states_count: number }>; total: number; filename: string }> =>
+  closerFetch('/scripts/generate', { method: 'POST', body: JSON.stringify({ text, filename }) });
 
 // --- Appointments ---
 export const getAppointments = (params?: string) => closerFetch(`/appointments${params ? `?${params}` : ''}`);

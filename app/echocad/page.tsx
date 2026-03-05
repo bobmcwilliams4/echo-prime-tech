@@ -14,6 +14,7 @@ import {
   estimateCost,
   type Material, type HealthResponse, type StatsResponse, type StressResult, type DFMResult,
 } from '../../lib/echocad-api';
+import SubscriptionGate from '../../components/SubscriptionGate';
 
 // ── Constants ──
 
@@ -127,7 +128,7 @@ function ActionButton({ label, onClick, loading, color, disabled }: { label: str
 
 // ── Main Component ──
 
-export default function EchoCADPage() {
+function EchoCADPageContent() {
   const { isDark } = useTheme();
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
   const [health, setHealth] = useState<HealthResponse | null>(null);
@@ -877,6 +878,22 @@ export default function EchoCADPage() {
         </section>
 
       </main>
+
+      {/* ─── CTA ─── */}
+      <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
+        <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>Automate Your CAD Workflow</h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>AI-powered design automation for engineering teams. Generate, optimize, and validate CAD drawings.</p>
+          <div className="flex items-center justify-center gap-4">
+            <Link href="/pricing" className="inline-block px-10 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>View Pricing</Link>
+            <Link href="/sentinel" className="inline-block px-10 py-3 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>Try Free Demo</Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
+}
+
+export default function EchoCADPage() {
+  return <SubscriptionGate serviceId="echocad"><EchoCADPageContent /></SubscriptionGate>;
 }

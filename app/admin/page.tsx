@@ -11,6 +11,10 @@ import {
   updateUserRole, grantUserServices, revokeUserService, updateUserSettings,
   AdminAnalytics, AdminUserDetail, Service,
 } from '../../lib/ept-api';
+import {
+  getRevenueSummary, listTransactions, listInvoices,
+  type PayPalSummary, type PayPalTransaction, type PayPalInvoice,
+} from '../../lib/paypal-api';
 
 type UserRow = { uid: string; email: string; display_name: string; photo_url: string; role: string; created_at: string; last_login: string; subscribed_services: string | null };
 
@@ -21,6 +25,9 @@ export default function AdminPage() {
   const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'services' | 'settings'>('overview');
+  const [paypalSummary, setPaypalSummary] = useState<PayPalSummary | null>(null);
+  const [recentTxns, setRecentTxns] = useState<PayPalTransaction[]>([]);
+  const [pendingInvoices, setPendingInvoices] = useState<PayPalInvoice[]>([]);
 
   // User edit modal
   const [editUser, setEditUser] = useState<AdminUserDetail | null>(null);
@@ -48,6 +55,9 @@ export default function AdminPage() {
     if (role === 'owner') {
       getAdminAnalytics().then(setAnalytics).catch(() => {});
       getAdminUsers().then(d => setUsers(d.users || [])).catch(() => {});
+      getRevenueSummary(30).then(setPaypalSummary).catch(() => {});
+      listTransactions({ limit: 5 }).then(d => setRecentTxns(d.transactions || [])).catch(() => {});
+      listInvoices('SENT', 10).then(d => setPendingInvoices((d.invoices || []).filter((inv: PayPalInvoice) => inv.status === 'SENT' || inv.status === 'DRAFT'))).catch(() => {});
     }
   }, [role]);
 
@@ -166,6 +176,7 @@ export default function AdminPage() {
   );
 
   const serviceName = (id: string) => analytics?.services?.find((s: Service) => s.id === id)?.name || id;
+  const fmt = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
 
   const filteredUsers = searchQuery
     ? users.filter(u =>
@@ -183,6 +194,8 @@ export default function AdminPage() {
           <span className="text-xs font-bold px-2.5 py-1 rounded-md" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>ADMIN</span>
         </div>
         <div className="flex items-center gap-3">
+          <Link href="/admin/payments" className="text-xs font-medium px-3 py-1.5 rounded-lg" style={{ color: 'var(--ept-accent)' }}>Payments</Link>
+          <Link href="/admin/invoices" className="text-xs font-medium px-3 py-1.5 rounded-lg" style={{ color: 'var(--ept-accent)' }}>Invoices</Link>
           <Link href="/dashboard" className="text-xs font-medium px-3 py-1.5 rounded-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>User View</Link>
           <button onClick={handleSignOut} className="text-xs font-medium px-3 py-1.5 rounded-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>Sign Out</button>
         </div>
@@ -218,6 +231,79 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
+
+            {/* Revenue Section */}
+            {paypalSummary && (
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold" style={{ color: 'var(--ept-text)' }}>Revenue (30 days)</h3>
+                  <Link href="/admin/payments" className="text-xs font-medium px-3 py-1.5 rounded-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Full Dashboard</Link>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { label: 'Revenue', value: fmt(paypalSummary.revenue.total), sub: `${paypalSummary.revenue.transaction_count} txns` },
+                    { label: 'Net Revenue', value: fmt(paypalSummary.net_revenue), sub: `After ${fmt(paypalSummary.fees.total)} fees` },
+                    { label: 'Refunds', value: fmt(paypalSummary.refunds.total), sub: `${paypalSummary.refunds.count} refunds` },
+                    { label: 'Active Subs', value: String(paypalSummary.subscriptions.active), sub: `${fmt(paypalSummary.subscriptions.mrr)} MRR` },
+                  ].map((card, i) => (
+                    <div key={i} className="p-5 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                      <p className="text-xs uppercase tracking-wider mb-1 font-medium" style={{ color: 'var(--ept-text-muted)' }}>{card.label}</p>
+                      <p className="text-2xl font-extrabold font-mono gradient-text">{card.value}</p>
+                      <p className="text-xs mt-1" style={{ color: 'var(--ept-text-secondary)' }}>{card.sub}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Outstanding Invoices */}
+            {pendingInvoices.length > 0 && (
+              <div className="p-4 rounded-xl border mb-8 flex items-center justify-between" style={{ borderColor: 'var(--ept-accent)', backgroundColor: isDark ? '#0a1f1f' : '#f0fdfa' }}>
+                <div>
+                  <p className="font-semibold text-sm" style={{ color: 'var(--ept-accent)' }}>
+                    {pendingInvoices.length} Outstanding Invoice{pendingInvoices.length > 1 ? 's' : ''}
+                  </p>
+                  <p className="text-xs" style={{ color: 'var(--ept-text-secondary)' }}>
+                    {fmt(pendingInvoices.reduce((sum, inv) => sum + inv.amount, 0))} awaiting payment
+                  </p>
+                </div>
+                <Link href="/admin/invoices" className="px-4 py-2 rounded-lg text-xs font-medium" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>View Invoices</Link>
+              </div>
+            )}
+
+            {/* Recent Transactions */}
+            {recentTxns.length > 0 && (
+              <div className="rounded-xl border overflow-hidden mb-8" style={{ borderColor: 'var(--ept-card-border)' }}>
+                <div className="px-5 py-3 flex items-center justify-between" style={{ backgroundColor: 'var(--ept-card-bg)' }}>
+                  <h3 className="font-bold text-sm" style={{ color: 'var(--ept-text)' }}>Recent Transactions</h3>
+                  <Link href="/admin/payments" className="text-xs" style={{ color: 'var(--ept-accent)' }}>View All</Link>
+                </div>
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr style={{ backgroundColor: 'var(--ept-surface)' }}>
+                      {['Type', 'Amount', 'Status', 'Customer', 'Date'].map(h => (
+                        <th key={h} className="px-4 py-2 text-left font-medium" style={{ color: 'var(--ept-text-muted)' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentTxns.map(tx => (
+                      <tr key={tx.id} className="border-t" style={{ borderColor: 'var(--ept-border)' }}>
+                        <td className="px-4 py-2">
+                          <span className={`px-2 py-0.5 rounded font-medium ${tx.type === 'REFUND' ? 'bg-red-500/10 text-red-400' : tx.type === 'CAPTURE' ? 'bg-green-500/10 text-green-400' : 'bg-blue-500/10 text-blue-400'}`}>{tx.type}</span>
+                        </td>
+                        <td className="px-4 py-2 font-medium font-mono" style={{ color: 'var(--ept-text)' }}>{fmt(tx.amount)}</td>
+                        <td className="px-4 py-2">
+                          <span className={`px-2 py-0.5 rounded font-medium ${tx.status === 'COMPLETED' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}>{tx.status}</span>
+                        </td>
+                        <td className="px-4 py-2" style={{ color: 'var(--ept-text-secondary)' }}>{tx.customer_email || '—'}</td>
+                        <td className="px-4 py-2" style={{ color: 'var(--ept-text-muted)' }}>{new Date(tx.created_at).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>

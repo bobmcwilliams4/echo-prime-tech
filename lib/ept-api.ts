@@ -40,11 +40,11 @@ export interface Service {
   id: string;
   name: string;
   tagline: string;
-  description: string;
-  icon: string;
-  status: string;
-  url: string;
-  team_contact: string;
+  description?: string;
+  icon?: string;
+  status?: string;
+  url?: string;
+  team_contact?: string;
   pricing: ServicePricing[];
 }
 

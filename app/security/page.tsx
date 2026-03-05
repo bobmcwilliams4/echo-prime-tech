@@ -8,6 +8,7 @@ import { useTheme } from '../../lib/theme-context';
 import { getServices, Service, createCheckout } from '../../lib/ept-api';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import SubscriptionGate from '../../components/SubscriptionGate';
 
 const SERVICE_ID = 'cyber-defense';
 
@@ -185,7 +186,7 @@ const STATS = [
   { value: '8', label: 'Compliance Frameworks' },
 ];
 
-export default function SecurityPage() {
+function SecurityPageContent() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const [service, setService] = useState<Service | null>(null);
@@ -468,6 +469,25 @@ export default function SecurityPage() {
         </div>
       </section>
 
+      {/* ─── Related Services ─── */}
+      <section className="max-w-5xl mx-auto px-6 pb-16">
+        <h2 className="text-2xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Complete Your Security Stack</h2>
+        <p className="text-center text-sm mb-10" style={{ color: 'var(--ept-text-muted)' }}>Defense is just the beginning. Combine with these services for full-spectrum protection.</p>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            { title: 'Penetration Testing', desc: 'Offensive security engagements. Our red team has never failed to breach a target. Find vulnerabilities before attackers do.', href: '/pentesting', price: 'From $2,500' },
+            { title: 'Intelligence Engines', desc: 'AI-powered threat intelligence across 210 domains. Correlate indicators of compromise with deep contextual analysis.', href: '/engines', price: 'From $199/mo' },
+            { title: 'Sentinel AI', desc: 'Real-time security monitoring with natural language queries. Ask your data questions in plain English.', href: '/sentinel', price: 'Free tier available' },
+          ].map((svc, i) => (
+            <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{svc.title}</h3>
+              <p className="text-sm mb-3" style={{ color: 'var(--ept-text-muted)' }}>{svc.desc}</p>
+              <span className="text-xs font-semibold" style={{ color: 'var(--ept-accent)' }}>{svc.price} &rarr;</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* ─── CTA ─── */}
       <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
         <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
@@ -485,4 +505,8 @@ export default function SecurityPage() {
       </footer>
     </div>
   );
+}
+
+export default function SecurityPage() {
+  return <SubscriptionGate serviceId="cyber-defense"><SecurityPageContent /></SubscriptionGate>;
 }

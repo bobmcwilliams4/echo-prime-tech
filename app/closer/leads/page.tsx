@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '../../../lib/auth-context';
-import { getLeads, createLead, updateLead, deleteLead } from '../../../lib/closer-api';
+import { getLeads, createLead, updateLead, deleteLead, initiateCall } from '../../../lib/closer-api';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -211,6 +211,10 @@ export default function LeadsPage() {
   // Delete confirm
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Call state
+  const [callingId, setCallingId] = useState<string | null>(null);
+  const [callSuccess, setCallSuccess] = useState<string | null>(null);
+
   // ─── Data Fetching ──────────────────────────────────────────────────────
 
   const fetchLeads = useCallback(async () => {
@@ -355,6 +359,30 @@ export default function LeadsPage() {
       setError(err?.message || 'Failed to delete lead');
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  // ─── Call with AI Agent ─────────────────────────────────────────────────
+
+  const handleCallLead = async (lead: Lead) => {
+    if (!lead.phone) {
+      setError('This lead has no phone number');
+      return;
+    }
+    setCallingId(lead.id);
+    setCallSuccess(null);
+    try {
+      await initiateCall({
+        lead_id: lead.id,
+        phone: lead.phone,
+        name: `${lead.first_name} ${lead.last_name}`.trim(),
+      });
+      setCallSuccess(lead.id);
+      setTimeout(() => setCallSuccess(null), 4000);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to initiate call');
+    } finally {
+      setCallingId(null);
     }
   };
 
@@ -1089,7 +1117,7 @@ export default function LeadsPage() {
                           </div>
                         )}
 
-                        {/* Call History Placeholder */}
+                        {/* Call with AI Agent */}
                         <div
                           style={{
                             padding: 16,
@@ -1098,15 +1126,49 @@ export default function LeadsPage() {
                             border: '1px solid var(--ept-border)',
                           }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            <IconPhone />
-                            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ept-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                              Call History
-                            </span>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <IconPhone />
+                              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ept-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                                Call History
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => handleCallLead(lead)}
+                              disabled={callingId === lead.id || !lead.phone || lead.status === 'dnc'}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 6,
+                                padding: '6px 14px',
+                                fontSize: 11,
+                                fontWeight: 700,
+                                color: '#fff',
+                                backgroundColor: callingId === lead.id ? '#6b7280' : callSuccess === lead.id ? '#059669' : 'var(--ept-accent)',
+                                border: 'none',
+                                borderRadius: 8,
+                                cursor: callingId === lead.id || !lead.phone || lead.status === 'dnc' ? 'not-allowed' : 'pointer',
+                                opacity: !lead.phone || lead.status === 'dnc' ? 0.4 : 1,
+                                transition: 'all 0.2s',
+                              }}
+                              onMouseOver={(e) => { if (lead.phone && lead.status !== 'dnc' && callingId !== lead.id) e.currentTarget.style.opacity = '0.85'; }}
+                              onMouseOut={(e) => { e.currentTarget.style.opacity = !lead.phone || lead.status === 'dnc' ? '0.4' : '1'; }}
+                            >
+                              <IconPhone />
+                              {callingId === lead.id ? 'Dialing...' : callSuccess === lead.id ? 'Call Started!' : 'Call with AI Agent'}
+                            </button>
                           </div>
-                          <p style={{ fontSize: 12, color: 'var(--ept-text-muted)', lineHeight: 1.5 }}>
-                            No calls recorded for this lead yet. Initiate a call from the Calls page or via a campaign.
-                          </p>
+                          {!lead.phone && (
+                            <p style={{ fontSize: 11, color: '#f59e0b', margin: 0 }}>Add a phone number to enable calling.</p>
+                          )}
+                          {lead.status === 'dnc' && lead.phone && (
+                            <p style={{ fontSize: 11, color: '#ef4444', margin: 0 }}>Lead is on Do Not Call list.</p>
+                          )}
+                          {lead.phone && lead.status !== 'dnc' && (
+                            <p style={{ fontSize: 12, color: 'var(--ept-text-muted)', lineHeight: 1.5, margin: 0 }}>
+                              AI agent will call {lead.phone} and follow the active script. Monitor the call in real-time on the Live Calls page.
+                            </p>
+                          )}
                         </div>
 
                         {/* Detail Actions */}

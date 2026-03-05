@@ -21,6 +21,7 @@ import {
   type PricingTier,
 } from '../../lib/tax-return-api';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import SubscriptionGate from '../../components/SubscriptionGate';
 
 // ===============================================================
 // TYPES
@@ -92,7 +93,7 @@ const TAB_ITEMS: { id: Tab; label: string }[] = [
 // COMPONENT
 // ===============================================================
 
-export default function TaxReturnPage() {
+function TaxReturnPageContent() {
   const { isDark } = useTheme();
   const [tab, setTab] = useState<Tab>('hero');
   const [loading, setLoading] = useState(false);
@@ -1950,6 +1951,25 @@ export default function TaxReturnPage() {
         )}
       </main>
 
+      {/* ─── Cross-Sell ─── */}
+      <section className="mt-16 max-w-5xl mx-auto px-6">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Complete Your Financial Stack</h2>
+        <p className="text-center text-sm mb-10" style={{ color: 'var(--ept-text-muted)' }}>Pair AI tax preparation with these services for full-spectrum financial intelligence</p>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            { title: 'Intelligence Engines', desc: '2,632 domain-specific AI engines including 14 tax law, MACRS depreciation, QBI, and oil & gas IDC engines.', href: '/engines', price: 'From $199/mo' },
+            { title: 'Title Intelligence', desc: 'AI chain of title for oil & gas mineral rights. Perfect for clients with royalty income and depletion deductions.', href: '/title-intelligence', price: 'From $200/mo' },
+            { title: 'Data Pipelines', desc: 'Automated extraction of W-2s, 1099s, K-1s, and financial documents. Feeds directly into tax preparation workflow.', href: '/pipelines', price: 'From $199/mo' },
+          ].map((svc, i) => (
+            <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{svc.title}</h3>
+              <p className="text-sm mb-3" style={{ color: 'var(--ept-text-muted)' }}>{svc.desc}</p>
+              <span className="text-xs font-semibold" style={{ color: 'var(--ept-accent)' }}>{svc.price} &rarr;</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="mt-16 py-8 text-center text-xs" style={{ borderTop: '1px solid var(--ept-border)', color: 'var(--ept-text-muted)' }}>
         <p>Echo Prime Technologies | Tax Return Preparation Service | Powered by 14 TX Engines</p>
@@ -2025,4 +2045,8 @@ function NeedReturn({ onGo, message }: { onGo: () => void; message: string }) {
       </button>
     </div>
   );
+}
+
+export default function TaxReturnPage() {
+  return <SubscriptionGate serviceId="tax-return-prep"><TaxReturnPageContent /></SubscriptionGate>;
 }

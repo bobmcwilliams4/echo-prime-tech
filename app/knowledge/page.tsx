@@ -8,6 +8,7 @@ import { useTheme } from '../../lib/theme-context';
 import { getServices, Service, createCheckout } from '../../lib/ept-api';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import SubscriptionGate from '../../components/SubscriptionGate';
 
 const SERVICE_ID = 'knowledge-systems';
 
@@ -29,7 +30,7 @@ const HOW_IT_WORKS = [
   { step: '04', title: 'Continuous Learning', desc: 'The system learns from usage patterns, improving relevance ranking and suggesting related knowledge proactively.' },
 ];
 
-export default function KnowledgePage() {
+function KnowledgePageContent() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const [service, setService] = useState<Service | null>(null);
@@ -92,6 +93,24 @@ export default function KnowledgePage() {
               <div className="text-2xl mb-3">{f.icon}</div>
               <h3 className="text-base font-bold mb-1.5" style={{ color: 'var(--ept-text)' }}>{f.title}</h3>
               <p className="text-xs leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="max-w-5xl mx-auto px-6 pb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { value: '75K+', label: 'Knowledge Chunks', sub: 'Indexed & searchable' },
+            { value: '140+', label: 'Categories', sub: 'Auto-classified' },
+            { value: '312K', label: 'Graph Nodes', sub: 'Entity relationships' },
+            { value: '<50ms', label: 'Search Latency', sub: 'Vectorize + D1' },
+          ].map((s, i) => (
+            <div key={i} className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-2xl font-extrabold font-mono gradient-text">{s.value}</div>
+              <div className="text-xs font-semibold mt-1" style={{ color: 'var(--ept-text)' }}>{s.label}</div>
+              <div className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>{s.sub}</div>
             </div>
           ))}
         </div>
@@ -197,4 +216,8 @@ export default function KnowledgePage() {
       </footer>
     </div>
   );
+}
+
+export default function KnowledgePage() {
+  return <SubscriptionGate serviceId="knowledge-systems"><KnowledgePageContent /></SubscriptionGate>;
 }

@@ -7,9 +7,67 @@ import { useTheme } from '../../lib/theme-context';
 
 // ─── Constants ───
 const TTS_API = 'https://tts.echo-op.com';
+const TTS_CLOUD_API = 'https://echo-speak-cloud.bmcii1976.workers.dev';
 const MAX_CLONE_SIZE = 50 * 1024 * 1024;
 const MAX_TEXT_LENGTH = 50_000;
 const ENGINE_VERSION = '3.0.0';
+
+/**
+ * TTS generation with ElevenLabs ConvoAI v3 as primary, Echo Speak as fallback.
+ * Chain: ElevenLabs v3 (cloud) → Echo Speak Cloud (edge_tts) → Local tunnel
+ */
+async function ttsGenerate(text: string, voiceId: string, opts: Record<string, unknown> = {}): Promise<Response> {
+  // 1. PRIMARY: ElevenLabs v3 via echo-speak-cloud
+  try {
+    const res = await fetch(`${TTS_CLOUD_API}/tts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text,
+        voice: voiceId,
+        voice_id: voiceId,
+        provider: 'elevenlabs',
+        model: 'eleven_v3',
+        stability: opts.stability ?? opts.cfg_weight,
+        similarity: opts.similarity ?? opts.cfg_weight,
+        style: opts.exaggeration ?? opts.style,
+        speed: opts.speed,
+        format: opts.output_format === 'wav' ? 'wav' : 'mp3',
+        cache: opts.use_cache !== false,
+      }),
+      signal: AbortSignal.timeout(20000),
+    });
+    if (res.ok) return res;
+  } catch { /* ElevenLabs failed — try Echo Speak fallback */ }
+
+  // 2. FALLBACK: Echo Speak Cloud (auto provider — edge_tts or GPU)
+  try {
+    const res = await fetch(`${TTS_CLOUD_API}/tts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text,
+        voice: voiceId,
+        voice_id: voiceId,
+        provider: 'auto',
+        speed: opts.speed,
+        format: opts.output_format === 'wav' ? 'wav' : 'mp3',
+        cache: true,
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (res.ok) return res;
+  } catch { /* cloud worker failed — try local */ }
+
+  // 3. LAST RESORT: Local Echo Speak tunnel
+  const localRes = await fetch(`${TTS_API}/tts`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, voice_id: voiceId, ...opts }),
+  });
+  if (!localRes.ok) throw new Error(`All TTS providers failed (${localRes.status}): ${(await localRes.text()).slice(0, 200)}`);
+  return localRes;
+}
 
 interface Voice { id: string; name: string; description: string; has_ref_audio: boolean; created: string; }
 interface HealthData { status: string; model: string; sample_rate: number; voices_available: number; gpu: { name?: string; vram_free_gb?: number; vram_total_gb?: number; vram_used_pct?: number }; stats: { total_requests: number; total_audio_seconds: number; uptime_human: string; avg_generation_time_ms: number }; }
@@ -149,11 +207,7 @@ function TextToSpeech({ voices, voiceId, setVoiceId, history, setHistory }: {
     setAudioUrl(null); setAudioBlob(null); setDuration(null); setGenTime(null);
     try {
       const t0 = Date.now();
-      const res = await fetch(`${TTS_API}/tts`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text.trim(), voice_id: voiceId, speed, exaggeration: style, cfg_weight: similarity, output_format: outputFormat, preprocess: true, normalize: true, use_cache: true }),
-      });
-      if (!res.ok) throw new Error(`Generation failed (${res.status}): ${(await res.text()).slice(0, 200)}`);
+      const res = await ttsGenerate(text.trim(), voiceId, { speed, exaggeration: style, cfg_weight: similarity, output_format: outputFormat, preprocess: true, normalize: true, use_cache: true });
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const dur = parseFloat(res.headers.get('X-TTS-Duration') || '0');
@@ -334,7 +388,7 @@ function TextToSpeech({ voices, voiceId, setVoiceId, history, setHistory }: {
         <div className="rounded-xl border p-4" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
           <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Model Info</span>
           <div className="mt-3 space-y-1.5 text-[11px] font-mono">
-            {[['Engine', 'ECHO TTS PRIME v3.0'], ['Model', 'Chatterbox Turbo'], ['Params', '350M'], ['Sample Rate', '24kHz'], ['License', 'MIT (Open Source)'], ['API Cost', '$0.00 (self-hosted)'], ['Emotion Tags', '19 supported'], ['Output Formats', '7 (WAV/MP3/OGG/FLAC/OPUS/AAC/PCM)'], ['Effects', 'Reverb, Echo, EQ, Pitch, Age'], ['Features', 'SSML, Cache, Normalize, Watermark']].map(([k, v], i) => (
+            {[['Engine', 'ECHO TTS PRIME v3.0'], ['Primary', 'ElevenLabs v3 (ConvoAI Alpha)'], ['Fallback', 'Edge TTS + Local GPU'], ['Sample Rate', '44.1kHz / 24kHz'], ['Languages', '70+ (v3 multilingual)'], ['Voices', '6 ECHO + ElevenLabs Library'], ['Emotion Tags', '19 supported'], ['Output Formats', '7 (WAV/MP3/OGG/FLAC/OPUS/AAC/PCM)'], ['Effects', 'Reverb, Echo, EQ, Pitch, Age'], ['Features', 'Streaming, Cache, Auto-Fallback']].map(([k, v], i) => (
               <div key={i} className="flex justify-between gap-2">
                 <span className="shrink-0" style={{ color: 'var(--ept-text-muted)' }}>{k}</span>
                 <span className="text-right" style={{ color: 'var(--ept-text-secondary)' }}>{v}</span>
@@ -2582,12 +2636,22 @@ export default function VoicePage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
-    fetch(`${TTS_API}/voices`).then(r => r.json()).then((v: Voice[]) => {
+    // Load voices from cloud (includes ElevenLabs v3 mapped voices), fall back to local
+    fetch(`${TTS_CLOUD_API}/voices`).then(r => r.json()).then((v: Voice[]) => {
       setVoices(v);
-      if (v.length > 0) setVoiceId(v[0].id);
+      if (v.length > 0) setVoiceId(v[0].name || v[0].id);
       setServerOffline(false);
-    }).catch(() => setServerOffline(true));
-    fetch(`${TTS_API}/health`).then(r => r.json()).then((h: HealthData) => { setHealth(h); setServerOffline(false); }).catch(() => setServerOffline(true));
+    }).catch(() => {
+      fetch(`${TTS_API}/voices`).then(r => r.json()).then((v: Voice[]) => {
+        setVoices(v);
+        if (v.length > 0) setVoiceId(v[0].id);
+        setServerOffline(false);
+      }).catch(() => setServerOffline(true));
+    });
+    // Health from cloud first
+    fetch(`${TTS_CLOUD_API}/health`).then(r => r.json()).then((h: HealthData) => { setHealth(h); setServerOffline(false); }).catch(() => {
+      fetch(`${TTS_API}/health`).then(r => r.json()).then((h: HealthData) => { setHealth(h); setServerOffline(false); }).catch(() => setServerOffline(true));
+    });
   }, []);
 
   return (
@@ -2653,6 +2717,44 @@ export default function VoicePage() {
           {section === 'api' && <ApiDocs />}
         </main>
       </div>
+
+      {/* ─── CTA ─── */}
+      <section className="max-w-3xl mx-auto px-6 pb-16 text-center">
+        <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>Ready to Add Voice to Your AI?</h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>AI-powered text-to-speech with 14 natural voices, real-time streaming, and voice cloning.</p>
+          <div className="flex items-center justify-center gap-4">
+            <Link href="/pricing" className="inline-block px-10 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>View Pricing</Link>
+            <Link href="/sentinel" className="inline-block px-10 py-3 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>Try Free Demo</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Cross-Sell ─── */}
+      <section className="max-w-5xl mx-auto px-6 pb-16">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Voice Powers Everything</h2>
+        <p className="text-center text-sm mb-10" style={{ color: 'var(--ept-text-muted)' }}>Add voice capabilities to any Echo Prime product for natural human interaction</p>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            { title: 'AI Sales Agent', desc: 'Autonomous voice closer with real-time STT, LLM reasoning, and natural TTS. Full CRM and lead pipeline.', href: '/closer', price: 'From $299/mo' },
+            { title: 'Sentinel AI', desc: 'Multi-domain intelligence assistant with voice output. Ask anything across 210 domains, hear the answer.', href: '/sentinel', price: 'Free tier available' },
+            { title: 'Immortality Vault', desc: 'Preserve your voice for generations. Voice cloning + guided life story interviews + AI conversational recall.', href: '/immortality-vault', price: 'Coming soon' },
+          ].map((svc, i) => (
+            <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{svc.title}</h3>
+              <p className="text-sm mb-3" style={{ color: 'var(--ept-text-muted)' }}>{svc.desc}</p>
+              <span className="text-xs font-semibold" style={{ color: 'var(--ept-accent)' }}>{svc.price} &rarr;</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Footer ─── */}
+      <footer className="py-8 text-center border-t" style={{ borderColor: 'var(--ept-border)' }}>
+        <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+          &copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved.
+        </p>
+      </footer>
     </div>
   );
 }

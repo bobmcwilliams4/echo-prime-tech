@@ -234,3 +234,244 @@ export async function getHealth(): Promise<{
 }> {
   return apiFetch('/health');
 }
+
+// ── Async Job System ──
+
+export type AsyncJobStatus = 'queued' | 'running' | 'complete' | 'failed' | 'cancelled';
+export type StepStatus = 'pending' | 'running' | 'complete' | 'failed' | 'skipped';
+
+export interface AsyncJobStep {
+  name: string;
+  label: string;
+  status: StepStatus;
+  started_at?: string;
+  completed_at?: string;
+  detail?: string;
+  records_delta?: number;
+}
+
+export interface AsyncJobProgress {
+  job_id: string;
+  status: AsyncJobStatus;
+  progress_pct: number;
+  current_step: string;
+  current_step_label: string;
+  steps: AsyncJobStep[];
+  records_found: number;
+  gaps_found: number;
+  elapsed_ms: number;
+  result?: PipelineResult;
+  error?: string;
+  created_at: string;
+  updated_at: string;
+  completed_at?: string;
+}
+
+export interface AsyncJobSummary {
+  job_id: string;
+  tract_id: string;
+  county: string;
+  status: AsyncJobStatus;
+  progress_pct: number;
+  current_step: string;
+  records_found: number;
+  gaps_found: number;
+  created_at: string;
+  updated_at: string;
+  completed_at?: string;
+}
+
+export interface TrainingExampleSummary {
+  tract_id: string;
+  quality: number;
+  records: number;
+  status: string;
+}
+
+export interface TrainingBatchResult {
+  generated: number;
+  failed: number;
+  skipped: number;
+  total_records: number;
+  avg_quality: number;
+  examples: TrainingExampleSummary[];
+}
+
+export interface TrainingStats {
+  total_examples: number;
+  avg_quality: number;
+  quality_distribution: { label: string; min: number; max: number; count: number }[];
+  by_county: { county: string; count: number; avg_quality: number }[];
+  recent: { tract_id: string; county: string; quality_score: number; records_used: number; created_at: string }[];
+}
+
+// ── Async Job API Functions ──
+
+/** Start an async chain-of-title investigation (returns immediately with job_id) */
+export async function startAsyncInvestigation(input: TractInput): Promise<{
+  job_id: string;
+  status: 'queued';
+  poll_url: string;
+  message: string;
+}> {
+  return apiFetch('/chain-of-title/async', {
+    method: 'POST',
+    body: JSON.stringify({
+      ...input,
+      budget: input.budget ?? 200,
+      max_clue_iterations: input.max_clue_iterations ?? 2,
+    }),
+  });
+}
+
+/** Poll async job progress (call every 2-3 seconds while status is queued/running) */
+export async function getJobProgress(jobId: string): Promise<AsyncJobProgress> {
+  return apiFetch<AsyncJobProgress>(`/jobs/${encodeURIComponent(jobId)}/progress`);
+}
+
+/** Cancel a running async job */
+export async function cancelJob(jobId: string): Promise<{ ok: boolean; job_id: string; status: string }> {
+  return apiFetch(`/jobs/${encodeURIComponent(jobId)}/cancel`, { method: 'POST' });
+}
+
+/** List async jobs with optional status filter */
+export async function listAsyncJobs(
+  status?: AsyncJobStatus,
+  limit?: number,
+): Promise<{ jobs: AsyncJobSummary[]; count: number }> {
+  const params = new URLSearchParams();
+  if (status) params.set('status', status);
+  if (limit) params.set('limit', String(limit));
+  return apiFetch(`/async-jobs?${params.toString()}`);
+}
+
+// ── Training Data API Functions ──
+
+/** Generate training examples from real deed records (auth required) */
+export async function generateTraining(input: {
+  county: string;
+  state?: string;
+  max_examples?: number;
+  min_records?: number;
+}): Promise<TrainingBatchResult> {
+  return apiFetch<TrainingBatchResult>('/training/generate', {
+    method: 'POST',
+    body: JSON.stringify({
+      county: input.county,
+      state: input.state ?? 'TX',
+      max_examples: input.max_examples ?? 50,
+      min_records: input.min_records ?? 3,
+    }),
+  });
+}
+
+/** Export training examples as JSONL (OpenAI fine-tuning format) or JSON array */
+export async function exportTraining(opts?: {
+  format?: 'jsonl' | 'json';
+  min_quality?: number;
+  county?: string;
+}): Promise<string | Array<{ messages: Array<{ role: string; content: string }> }>> {
+  const params = new URLSearchParams();
+  if (opts?.format) params.set('format', opts.format);
+  if (opts?.min_quality) params.set('min_quality', String(opts.min_quality));
+  if (opts?.county) params.set('county', opts.county);
+  const url = `${LANDMAN_API}/training/export?${params.toString()}`;
+  const res = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
+  if (!res.ok) {
+    const text = await res.text().catch(() => 'Unknown error');
+    throw new Error(`Landman API ${res.status}: ${text}`);
+  }
+  if (opts?.format === 'jsonl') return res.text();
+  return res.json();
+}
+
+/** Get training data statistics (quality distribution, county breakdown) */
+export async function getTrainingStats(): Promise<TrainingStats> {
+  return apiFetch<TrainingStats>('/training/stats');
+}
+
+// ── TitleHound AI Analysis ──
+
+export interface TitleHoundGap {
+  gate: string;
+  severity: string;
+  type: string;
+  seq_ref: number;
+  description: string;
+  resolution: string;
+}
+
+export interface TitleHoundAction {
+  priority: number;
+  action: string;
+  estimated_cost: string;
+  expected_result: string;
+}
+
+export interface TitleHoundGateStatus {
+  overall: string;
+  gates: Record<string, { status: string; issues: number }>;
+}
+
+export interface TitleHoundAnalysis {
+  run_sheet?: {
+    property: string;
+    county: string;
+    effective_date: string;
+    chain: Array<{
+      seq: number;
+      date: string;
+      instrument: string;
+      grantor: string;
+      grantee: string;
+      interest: string;
+      fraction: string;
+      recording: string;
+      notes?: string;
+    }>;
+  };
+  gaps?: TitleHoundGap[];
+  next_search_actions?: TitleHoundAction[];
+  open_recommendations?: string[];
+  gate_status?: TitleHoundGateStatus;
+}
+
+export interface TitleHoundResult {
+  ok: boolean;
+  model: string;
+  tract_id: string | null;
+  analysis: TitleHoundAnalysis | string;
+  raw?: string;
+  error?: string;
+}
+
+export interface TitleHoundStatus {
+  titlehound: {
+    available: boolean;
+    bravo_model: string;
+    ai_orchestrator: string;
+    active_backend: string;
+  };
+}
+
+/** Run TitleHound AI analysis on a chain of title */
+export async function analyzeTitleHound(input: {
+  tract_id?: string;
+  county?: string;
+  section?: string;
+  block?: string;
+  abstract?: string;
+  run_sheet?: RunSheetRow[];
+  gaps?: GapEntry[];
+  records?: Record<string, unknown>[];
+}): Promise<TitleHoundResult> {
+  return apiFetch<TitleHoundResult>('/titlehound/analyze', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+/** Check TitleHound availability */
+export async function getTitleHoundStatus(): Promise<TitleHoundStatus> {
+  return apiFetch<TitleHoundStatus>('/titlehound/status');
+}

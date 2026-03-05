@@ -22,6 +22,7 @@ import {
   type ConsultMessage,
   type ForgeStats,
 } from '../../lib/hephaestion-forge-api';
+import SubscriptionGate from '../../components/SubscriptionGate';
 
 // ── Types ──
 
@@ -144,7 +145,7 @@ function AnimCounter({ value, suffix }: { value: number; suffix?: string }) {
 
 // ── Component ──
 
-export default function HephaestionForge() {
+function HephaestionForgeContent() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const { isDark } = useTheme();
@@ -1233,6 +1234,22 @@ export default function HephaestionForge() {
           </div>
         </div>
       )}
+
+      {/* ─── CTA ─── */}
+      <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
+        <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>Ship Code 10x Faster</h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>AI code factory with 13-stage build pipeline, multi-LLM validation, and quality gates.</p>
+          <div className="flex items-center justify-center gap-4">
+            <Link href="/pricing" className="inline-block px-10 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>View Pricing</Link>
+            <Link href="/sentinel" className="inline-block px-10 py-3 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>Try Free Demo</Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
+}
+
+export default function HephaestionForge() {
+  return <SubscriptionGate serviceId="hephaestion-forge"><HephaestionForgeContent /></SubscriptionGate>;
 }

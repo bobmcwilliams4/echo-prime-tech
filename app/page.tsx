@@ -18,17 +18,18 @@ interface LiveStats {
 function useLiveStats(): LiveStats {
   const [stats, setStats] = useState<LiveStats>({ engines: '800+', categories: '59', doctrines: '32K+', industries: [] });
   useEffect(() => {
-    fetch('https://echo-engine-runtime.bmcii1976.workers.dev/public-stats')
-      .then(r => r.json())
-      .then((d: { total_engines?: number; total_categories?: number; total_doctrines?: number; categories?: { name: string; engines: number }[] }) => {
+    fetch('https://echo-engine-runtime.bmcii1976.workers.dev/stats')
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      .then((d: { ok?: boolean; total_engines?: number; total_doctrines?: number; categories?: { category: string; c: number }[] }) => {
         const e = d.total_engines || 0;
-        const c = d.total_categories || 0;
+        const cats = d.categories || [];
+        const c = cats.length;
         const doc = d.total_doctrines || 0;
         setStats({
           engines: e >= 1000 ? `${(e / 1000).toFixed(1).replace(/\.0$/, '')}K+` : `${e}+`,
           categories: String(c),
           doctrines: doc >= 1000 ? `${(doc / 1000).toFixed(1).replace(/\.0$/, '')}K+` : `${doc}+`,
-          industries: (d.categories || []).filter((cat: { name: string; engines: number }) => cat.engines >= 3).map((cat: { name: string }) => cat.name),
+          industries: cats.filter((cat: { category: string; c: number }) => cat.c >= 3).map((cat: { category: string }) => cat.category),
         });
       })
       .catch(() => {});
@@ -203,10 +204,12 @@ export default function HomePage() {
           <div className="hidden md:flex items-center gap-6">
             {[
               { label: 'Engines', href: '/engines' },
-              { label: 'Voice', href: '/voice' },
+              { label: 'Bots', href: '/bots' },
+              { label: 'Scrapers', href: '/scrapers' },
+              { label: 'Closer AI', href: '/closer' },
+              { label: 'Pipelines', href: '/pipelines' },
               { label: 'Security', href: '/security' },
-              { label: 'Services', href: '/services' },
-              { label: 'Tax Prep', href: '/tax-returns' },
+              { label: 'Title Intel', href: '/title-intelligence' },
               { label: 'Pricing', href: '/pricing' },
             ].map(item => (
               <Link key={item.href} href={item.href} className="text-sm font-medium transition-colors hover:opacity-100" style={{ color: 'var(--ept-text-secondary)' }}>{item.label}</Link>
@@ -259,12 +262,12 @@ export default function HomePage() {
             </p>
 
             <div className="mt-12 flex flex-col sm:flex-row gap-4 items-start animate-fade-up animate-fade-up-delay-3">
-              <a href="#capabilities" className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-semibold transition-all hover:opacity-90 hover:gap-3" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
-                See What We Build
+              <Link href="/pricing" className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-semibold transition-all hover:opacity-90 hover:gap-3" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+                Start Building Free
                 <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 transition-transform group-hover:translate-x-0.5"><path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" /></svg>
-              </a>
-              <a href="#approach" className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl border font-semibold transition-all hover:border-opacity-60" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
-                Our Approach
+              </Link>
+              <a href="#capabilities" className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl border font-semibold transition-all hover:border-opacity-60" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+                See What We Build
               </a>
               <ReadAloudButton size="md" label="Listen" getText={() => {
                 const el = document.querySelector('main, [role=main]') || document.body;
@@ -287,6 +290,41 @@ export default function HomePage() {
                 <div className="mt-2 text-xs uppercase tracking-widest font-medium" style={{ color: 'var(--ept-text-muted)' }}>{s.label}</div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Featured Products (revenue drivers) ─── */}
+      <section className="py-20 px-6" style={{ backgroundColor: 'var(--ept-surface)' }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Start Building Today</div>
+            <h2 className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Most Popular Products</h2>
+            <p className="mt-4 text-lg max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>Production-ready AI systems with free tiers and transparent pricing. No contracts.</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: 'AI Sales Agent', desc: 'Autonomous voice closer — STT, LLM reasoning, natural TTS. CRM with full lead pipeline. White-label SaaS.', price: '$299', interval: '/mo', href: '/closer', badge: 'Best Seller' },
+              { title: 'Intelligence Engines', desc: '2,632 domain-specific AI engines with embedded expertise. Tax, legal, oilfield, cyber — 210 verticals.', price: '$199', interval: '/mo', href: '/engines', badge: null },
+              { title: 'Title Intelligence', desc: 'AI chain of title across 80+ Texas counties. 259K+ deed records, mineral rights tracing, gap detection.', price: '$200', interval: '/mo', href: '/title-intelligence', badge: 'Oil & Gas' },
+              { title: 'Sentinel AI', desc: 'Multi-domain AI assistant with web search, knowledge retrieval, and real-time analysis. 14 personalities.', price: 'Free', interval: ' tier', href: '/sentinel', badge: 'Try Free' },
+            ].map((p, i) => (
+              <Link key={i} href={p.href} className="group relative p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                {p.badge && (
+                  <span className="absolute -top-2.5 right-4 px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>{p.badge}</span>
+                )}
+                <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{p.title}</h3>
+                <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>{p.desc}</p>
+                <div className="flex items-baseline gap-1 mb-4">
+                  <span className="text-2xl font-extrabold font-mono gradient-text">{p.price}</span>
+                  <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{p.interval}</span>
+                </div>
+                <span className="text-xs font-semibold uppercase tracking-wider transition-colors group-hover:opacity-80" style={{ color: 'var(--ept-accent)' }}>Get Started &rarr;</span>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Link href="/pricing" className="text-sm font-semibold transition-colors hover:opacity-80" style={{ color: 'var(--ept-accent)' }}>View all pricing &amp; plans &rarr;</Link>
           </div>
         </div>
       </section>
@@ -434,14 +472,22 @@ export default function HomePage() {
             ) : (
               <>
                 <Link href="/signup" className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:opacity-90 hover:gap-3" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
-                  Get Started
+                  Get Started Free
                   <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 transition-transform group-hover:translate-x-0.5"><path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" /></svg>
                 </Link>
-                <a href="mailto:contact@echo-ept.com" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border font-semibold text-lg transition-all" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
-                  Contact Us
-                </a>
+                <Link href="/pricing" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border font-semibold text-lg transition-all" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+                  View Pricing
+                </Link>
               </>
             )}
+          </div>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-6">
+            <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: 'var(--ept-text-muted)' }}>
+              <svg className="w-4 h-4" style={{ color: 'var(--ept-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+              30-day money-back guarantee
+            </span>
+            <span className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>No credit card required</span>
+            <a href="mailto:bob@echo-op.com" className="text-sm underline" style={{ color: 'var(--ept-accent)' }}>Enterprise inquiries</a>
           </div>
         </div>
       </section>
@@ -459,13 +505,19 @@ export default function HomePage() {
               <div className="flex flex-col gap-2.5">
                 {[
                   { label: 'Engine Catalog', href: '/engines' },
+                  { label: 'AI Closer', href: '/closer' },
+                  { label: 'Data Pipelines', href: '/pipelines' },
+                  { label: 'Title Intelligence', href: '/title-intelligence' },
+                  { label: 'Tax Preparation', href: '/tax-returns' },
                   { label: 'Sentinel AI', href: '/sentinel' },
                   { label: 'Voice Studio', href: '/voice' },
-                  { label: 'AI Closer', href: '/closer' },
                   { label: 'AI Grading', href: '/grading' },
+                  { label: 'Knowledge Systems', href: '/knowledge' },
                   { label: 'EchoCAD', href: '/echocad' },
                   { label: 'Daedalus Forge', href: '/daedalus-forge' },
                   { label: 'Hephaestion Forge', href: '/hephaestion-forge' },
+                  { label: 'Immortality Vault', href: '/immortality-vault' },
+                  { label: 'ShadowGlass', href: '/services' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}
@@ -475,11 +527,13 @@ export default function HomePage() {
               <h4 className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-text-secondary)' }}>Solutions</h4>
               <div className="flex flex-col gap-2.5">
                 {[
-                  { label: 'Services', href: '/services' },
+                  { label: 'All Services', href: '/services' },
                   { label: 'Pricing', href: '/pricing' },
-                  { label: 'Security', href: '/security' },
+                  { label: 'Rewards', href: '/rewards' },
+                  { label: 'Cyber Defense', href: '/security' },
                   { label: 'Pen Testing', href: '/pentesting' },
-                  { label: 'Websites', href: '/websites' },
+                  { label: 'Website Builder', href: '/websites' },
+                  { label: 'AI Orchestration', href: '/orchestration' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}

@@ -126,9 +126,11 @@ export function startStreamingSession(
   callbacks: SSECallbacks,
   intake?: { known_owners?: string[]; notes?: string; property?: PropertyIntake },
 ): { sessionPromise: Promise<string>; abort: () => void } {
-  const controller = new AbortController();
+  let aborted = false;
+  let pollStopper: { stop: () => void } | null = null;
 
   const sessionPromise = (async () => {
+    // Step 1: POST to /orchestrate — returns 202 JSON with session_id
     const body: Record<string, unknown> = { query, domains, options: { stream: true } };
     if (intake?.known_owners?.length) body.known_owners = intake.known_owners;
     if (intake?.notes) body.notes = intake.notes;
@@ -138,88 +140,82 @@ export function startStreamingSession(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-      signal: controller.signal,
     });
 
     if (!resp.ok) {
       const text = await resp.text();
-      throw new Error(`Stream failed: ${text}`);
+      throw new Error(`Orchestrate failed: ${text}`);
     }
 
-    const reader = resp.body?.getReader();
-    if (!reader) throw new Error('No response body');
+    const result = await resp.json() as { session_id: string; status: string };
+    const sessionId = result.session_id;
+    if (!sessionId) throw new Error('No session_id returned');
+    if (aborted) return sessionId;
 
-    const decoder = new TextDecoder();
-    let buffer = '';
-    let sessionId = '';
+    // Step 2: Poll /session/:id every 2.5s, map state changes to callbacks
+    let prevStatus = '';
+    let prevStepStates: Record<number, string> = {};
+    let planFired = false;
+    let documentFired = false;
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    await new Promise<void>((resolve) => {
+      pollStopper = pollSession(sessionId, (session) => {
+        if (aborted) { pollStopper?.stop(); resolve(); return; }
 
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
+        // Fire onPlan once when plan becomes available
+        if (!planFired && session.plan && session.steps?.length > 0) {
+          planFired = true;
+          callbacks.onPlan?.(session.plan);
+        }
 
-      let eventType = '';
-      let eventData = '';
-
-      for (const line of lines) {
-        if (line.startsWith('event: ')) {
-          eventType = line.slice(7).trim();
-        } else if (line.startsWith('data: ')) {
-          eventData = line.slice(6).trim();
-          if (eventType && eventData) {
-            try {
-              const data = JSON.parse(eventData);
-              processSSEEvent(eventType, data, callbacks);
-              if (data.session_id) sessionId = data.session_id;
-            } catch {
-              // Skip malformed JSON
+        // Track step status changes
+        if (session.steps) {
+          for (const step of session.steps) {
+            const prev = prevStepStates[step.id];
+            if (prev !== step.status) {
+              if (step.status === 'running') {
+                callbacks.onStepStart?.({ step_id: step.id, name: step.name, type: step.type, tool: step.tool });
+              } else if (step.status === 'complete') {
+                callbacks.onStepComplete?.({ step_id: step.id, name: step.name, duration_ms: step.duration_ms, summary: '' });
+              } else if (step.status === 'failed') {
+                callbacks.onStepFailed?.({ step_id: step.id, name: step.name, error: step.error || 'Unknown' });
+              }
+              prevStepStates[step.id] = step.status;
             }
           }
-          eventType = '';
-          eventData = '';
         }
-      }
-    }
+
+        // Fire status-change callbacks
+        if (session.status !== prevStatus) {
+          if (session.status === 'validating') callbacks.onValidation?.(null);
+          if (session.status === 'complete' && session.document_key && !documentFired) {
+            documentFired = true;
+            callbacks.onDocumentReady?.({ session_id: sessionId, document_key: session.document_key, size_bytes: 0 });
+          }
+          if (session.status === 'failed' && session.error) {
+            callbacks.onError?.(session.error);
+          }
+          prevStatus = session.status;
+        }
+
+        // Terminal states
+        if (['complete', 'failed', 'cancelled'].includes(session.status)) {
+          callbacks.onDone?.({ session_id: sessionId, status: session.status });
+          resolve();
+        }
+      }, 2500);
+    });
 
     return sessionId;
   })();
 
   return {
     sessionPromise,
-    abort: () => controller.abort(),
+    abort: () => {
+      aborted = true;
+      pollStopper?.stop();
+    },
   };
-}
-
-function processSSEEvent(type: string, data: Record<string, unknown>, callbacks: SSECallbacks): void {
-  switch (type) {
-    case 'plan':
-      callbacks.onPlan?.(data.plan as ExecutionPlan);
-      break;
-    case 'step_start':
-      callbacks.onStepStart?.(data as { step_id: number; name: string; type: string; tool: string });
-      break;
-    case 'step_complete':
-      callbacks.onStepComplete?.(data as { step_id: number; name: string; duration_ms: number; summary: string });
-      break;
-    case 'step_failed':
-      callbacks.onStepFailed?.(data as { step_id: number; name: string; error: string });
-      break;
-    case 'validation':
-      callbacks.onValidation?.(data.validation);
-      break;
-    case 'document_ready':
-      callbacks.onDocumentReady?.(data as { session_id: string; document_key: string; size_bytes: number });
-      break;
-    case 'error':
-      callbacks.onError?.(String(data.error || 'Unknown error'));
-      break;
-    case 'done':
-      callbacks.onDone?.(data as { session_id: string; status: string });
-      break;
-  }
 }
 
 // ─── Get Session ─────────────────────────────────────────────

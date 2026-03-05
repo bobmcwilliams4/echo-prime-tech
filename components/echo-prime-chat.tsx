@@ -13,21 +13,106 @@ interface ChatMessage {
 }
 
 const ECHO_CHAT_API = 'https://echo-chat.bmcii1976.workers.dev';
+const EPT_API = 'https://ept-api.bmcii1976.workers.dev';
+const CHAT_STORAGE_KEY = 'ept_chat_history';
+const TRIAL_STORAGE_KEY = 'ept_trial_grants';
+const LEAD_STORAGE_KEY = 'ept_lead_info';
+const MAX_STORED_MESSAGES = 100;
 
-function getPageContext(pathname: string): { service: string; label: string; siteId: string } {
+interface LeadInfo {
+  name: string;
+  email: string;
+  capturedAt: number;
+}
+
+const PAGE_LABELS: Record<string, string> = {
+  '/': 'Home',
+  '/engines': 'Engine Catalog',
+  '/voice': 'Voice Studio',
+  '/security': 'Security Sandbox',
+  '/services': 'Services',
+  '/tax-returns': 'Tax Preparation',
+  '/sentinel': 'Sentinel AI',
+  '/pricing': 'Pricing',
+  '/dashboard': 'Dashboard',
+  '/admin': 'Admin',
+  '/closer': 'AI Sales Agent',
+  '/echocad': 'EchoCAD',
+  '/daedalus-forge': 'Daedalus Forge',
+  '/hephaestion-forge': 'Hephaestion Forge',
+  '/grading': 'Collectibles Grading',
+  '/immortality-vault': 'Immortality Vault',
+  '/knowledge': 'Knowledge Base',
+  '/title-intelligence': 'Title Intelligence',
+  '/orchestration': 'Orchestration',
+  '/pentesting': 'Penetration Testing',
+  '/sandbox': 'Security Sandbox',
+  '/bots': 'Custom Bot Factory',
+  '/scrapers': 'Scraper & Harvester Factory',
+  '/pipelines': 'Data Pipelines',
+  '/rewards': 'Rewards Program',
+};
+
+function getPageContext(pathname: string): { service: string; label: string; siteId: string; page: string } {
   if (pathname.startsWith('/closer')) {
     const sub = pathname.replace('/closer', '').replace('/', '');
     return {
       service: 'ai-closer',
       label: sub ? `AI Sales Agent — ${sub.charAt(0).toUpperCase() + sub.slice(1)}` : 'AI Sales Agent',
       siteId: 'echo-ept.com',
+      page: pathname,
     };
   }
-  return {
-    service: 'platform',
-    label: 'Echo Prime',
-    siteId: 'echo-ept.com',
-  };
+  const label = PAGE_LABELS[pathname] || PAGE_LABELS[`/${pathname.split('/')[1]}`] || 'Echo Prime';
+  return { service: 'platform', label, siteId: 'echo-ept.com', page: pathname };
+}
+
+function loadStoredMessages(): ChatMessage[] {
+  try {
+    const stored = localStorage.getItem(CHAT_STORAGE_KEY);
+    if (!stored) return [];
+    const msgs: ChatMessage[] = JSON.parse(stored);
+    const oneDay = 24 * 60 * 60 * 1000;
+    return msgs.filter(m => Date.now() - m.timestamp < oneDay).slice(-MAX_STORED_MESSAGES);
+  } catch { return []; }
+}
+
+function saveMessages(msgs: ChatMessage[]) {
+  try {
+    localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(msgs.slice(-MAX_STORED_MESSAGES)));
+  } catch {}
+}
+
+function getTrialGrants(): Record<string, number> {
+  try {
+    const stored = localStorage.getItem(TRIAL_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch { return {}; }
+}
+
+function recordTrialGrant(serviceId: string) {
+  try {
+    const grants = getTrialGrants();
+    grants[serviceId] = Date.now();
+    localStorage.setItem(TRIAL_STORAGE_KEY, JSON.stringify(grants));
+  } catch {}
+}
+
+function getStoredLead(): LeadInfo | null {
+  try {
+    const stored = localStorage.getItem(LEAD_STORAGE_KEY);
+    if (!stored) return null;
+    const lead: LeadInfo = JSON.parse(stored);
+    // Lead info valid for 30 days
+    if (Date.now() - lead.capturedAt > 30 * 24 * 60 * 60 * 1000) return null;
+    return lead;
+  } catch { return null; }
+}
+
+function storeLead(name: string, email: string) {
+  try {
+    localStorage.setItem(LEAD_STORAGE_KEY, JSON.stringify({ name, email, capturedAt: Date.now() }));
+  } catch {}
 }
 
 function detectEmotion(text: string): string {
@@ -48,7 +133,7 @@ const EMOTION_COLORS: Record<string, string> = {
 };
 
 export default function EchoPrimeChat() {
-  const { user } = useAuth();
+  const { user, subscriptions } = useAuth();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -57,9 +142,20 @@ export default function EchoPrimeChat() {
   const [emotion, setEmotion] = useState('neutral');
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const [ttsPlaying, setTtsPlaying] = useState(false);
+  const [sessionId] = useState(() => `sess_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`);
+  const [leadInfo, setLeadInfo] = useState<LeadInfo | null>(null);
+  const [leadName, setLeadName] = useState('');
+  const [leadEmail, setLeadEmail] = useState('');
+  const [leadSubmitting, setLeadSubmitting] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Load stored lead info on mount
+  useEffect(() => {
+    const stored = getStoredLead();
+    if (stored) setLeadInfo(stored);
+  }, []);
 
   const ctx = getPageContext(pathname);
 
@@ -71,20 +167,36 @@ export default function EchoPrimeChat() {
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 150);
   }, [isOpen]);
 
+  // Load stored messages on first open
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      const welcome = ctx.service === 'ai-closer'
-        ? "I'm Echo Prime — your AI command center. I have full access to your leads, calls, campaigns, and pipeline data. Ask me anything about your sales operation."
-        : "I'm Echo Prime — the sovereign intelligence behind Echo Prime Technologies. I can help you with any of our services, answer technical questions, or guide you through the platform. What do you need?";
-      setMessages([{
-        id: 'welcome',
-        role: 'assistant',
-        content: welcome,
-        timestamp: Date.now(),
-        emotion: 'neutral',
-      }]);
+      const stored = loadStoredMessages();
+      if (stored.length > 0) {
+        setMessages(stored);
+      } else {
+        const chatName = user?.displayName?.split(' ')[0] || leadInfo?.name?.split(' ')[0];
+        const welcome = ctx.service === 'ai-closer'
+          ? `${chatName ? `Hey ${chatName}! ` : ''}I'm Echo Prime — your AI command center. I have full access to your leads, calls, campaigns, and pipeline data. Ask me anything about your sales operation.`
+          : `${chatName ? `Hey ${chatName}! ` : ''}I'm Echo Prime — the intelligence behind Echo Prime Technologies. I can help you explore our services, answer questions, or guide you through anything on the platform. What can I do for you?`;
+        setMessages([{
+          id: 'welcome',
+          role: 'assistant',
+          content: welcome,
+          timestamp: Date.now(),
+          emotion: 'positive',
+        }]);
+      }
     }
   }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Persist messages to localStorage
+  useEffect(() => {
+    if (messages.length > 0 && messages[0].id !== 'welcome') {
+      saveMessages(messages);
+    } else if (messages.length > 1) {
+      saveMessages(messages);
+    }
+  }, [messages]);
 
   // Initialize audio element
   useEffect(() => {
@@ -152,6 +264,24 @@ export default function EchoPrimeChat() {
     }
   }, []);
 
+  const handleTrialGrant = useCallback(async (reply: string) => {
+    const match = reply.match(/TRIAL_GRANT:(\S+)/);
+    if (!match) return reply;
+    const serviceId = match[1];
+    recordTrialGrant(serviceId);
+    try {
+      const token = await getToken();
+      if (token) {
+        await fetch(`${EPT_API}/api/subscribe`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ service_ids: [serviceId], trial: true }),
+        });
+      }
+    } catch {}
+    return reply.replace(/TRIAL_GRANT:\S+/g, '').trim();
+  }, [getToken]);
+
   const sendMessage = useCallback(async () => {
     const text = input.trim();
     if (!text || loading) return;
@@ -171,11 +301,24 @@ export default function EchoPrimeChat() {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      const userId = user?.uid || user?.email || `anon_${Date.now()}`;
-      const body: Record<string, string> = {
+      const userId = user?.uid || user?.email || leadInfo?.email || `anon_${Date.now()}`;
+      const displayName = user?.displayName || leadInfo?.name || undefined;
+      const trialGrants = getTrialGrants();
+      const body: Record<string, unknown> = {
         message: text,
         user_id: userId,
         site_id: ctx.siteId,
+        session_id: sessionId,
+        email: user?.email || leadInfo?.email || undefined,
+        context: {
+          current_page: ctx.page,
+          page_label: ctx.label,
+          user_name: displayName,
+          subscriptions: subscriptions || [],
+          trial_history: Object.keys(trialGrants),
+          service: ctx.service,
+          lead_source: !user && leadInfo ? 'chat_widget' : undefined,
+        },
       };
 
       const res = await fetch(`${ECHO_CHAT_API}/chat`, {
@@ -187,9 +330,12 @@ export default function EchoPrimeChat() {
       if (!res.ok) throw new Error(`API ${res.status}`);
 
       const data = await res.json();
-      const reply = data.response || data.reply || data.message || 'No response.';
+      let reply = data.response || data.reply || data.message || 'No response.';
       const em = data.emotion || detectEmotion(reply);
       setEmotion(em);
+
+      // Handle trial grants embedded in response
+      reply = await handleTrialGrant(reply);
 
       const assistantMsg: ChatMessage = {
         id: `a_${Date.now()}`,
@@ -202,11 +348,12 @@ export default function EchoPrimeChat() {
 
       // Auto-play TTS for the response
       playTTS(reply, em);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : 'Unknown error';
       setMessages(prev => [...prev, {
         id: `e_${Date.now()}`,
         role: 'assistant',
-        content: `Connection error: ${err.message}. Make sure you're signed in.`,
+        content: `Connection error: ${errMsg}. Make sure you're signed in.`,
         timestamp: Date.now(),
         emotion: 'concern',
       }]);
@@ -214,7 +361,7 @@ export default function EchoPrimeChat() {
     } finally {
       setLoading(false);
     }
-  }, [input, loading, ctx, pathname, getToken, playTTS]);
+  }, [input, loading, ctx, user, leadInfo, subscriptions, sessionId, getToken, playTTS, handleTrialGrant]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -227,6 +374,7 @@ export default function EchoPrimeChat() {
     setMessages([]);
     setEmotion('neutral');
     stopTTS();
+    try { localStorage.removeItem(CHAT_STORAGE_KEY); } catch {}
   };
 
   const orbColor = EMOTION_COLORS[emotion] || 'var(--ept-accent)';
@@ -511,8 +659,8 @@ export default function EchoPrimeChat() {
             </button>
           </div>
 
-          {/* Sign in prompt if no user */}
-          {!user && (
+          {/* Lead capture for anonymous visitors */}
+          {!user && !leadInfo && (
             <div style={{
               position: 'absolute',
               inset: 0,
@@ -530,20 +678,84 @@ export default function EchoPrimeChat() {
                 background: `radial-gradient(circle at 35% 35%, var(--ept-accent), rgba(0,0,0,0.7))`,
                 boxShadow: '0 0 20px var(--ept-accent-glow)',
               }} />
-              <p style={{ color: 'var(--ept-text)', fontWeight: 600, fontSize: 15 }}>Sign in to chat with Echo Prime</p>
-              <p style={{ color: 'var(--ept-text-muted)', fontSize: 13, textAlign: 'center' }}>
-                Get AI-powered assistance across all Echo Prime Technologies services.
+              <p style={{ color: 'var(--ept-text)', fontWeight: 600, fontSize: 15 }}>Chat with Echo Prime AI</p>
+              <p style={{ color: 'var(--ept-text-muted)', fontSize: 13, textAlign: 'center', lineHeight: 1.5 }}>
+                Get instant answers about our AI engines, bots, scrapers, and services. Just enter your info below.
               </p>
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                if (!leadName.trim() || !leadEmail.trim()) return;
+                setLeadSubmitting(true);
+                const info: LeadInfo = { name: leadName.trim(), email: leadEmail.trim(), capturedAt: Date.now() };
+                storeLead(info.name, info.email);
+                setLeadInfo(info);
+                // Send lead to ept-api
+                try {
+                  await fetch(`${EPT_API}/api/leads`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: info.name, email: info.email, source: 'chat_widget', page: ctx.page }),
+                  }).catch(() => {});
+                } catch {}
+                setLeadSubmitting(false);
+              }} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <input
+                  value={leadName}
+                  onChange={e => setLeadName(e.target.value)}
+                  placeholder="Your name"
+                  required
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: 10,
+                    border: '1px solid var(--ept-border)',
+                    backgroundColor: 'var(--ept-surface)',
+                    color: 'var(--ept-text)',
+                    fontSize: 13,
+                    outline: 'none',
+                    width: '100%',
+                  }}
+                />
+                <input
+                  value={leadEmail}
+                  onChange={e => setLeadEmail(e.target.value)}
+                  placeholder="Your email"
+                  type="email"
+                  required
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: 10,
+                    border: '1px solid var(--ept-border)',
+                    backgroundColor: 'var(--ept-surface)',
+                    color: 'var(--ept-text)',
+                    fontSize: 13,
+                    outline: 'none',
+                    width: '100%',
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={leadSubmitting || !leadName.trim() || !leadEmail.trim()}
+                  style={{
+                    padding: '10px 24px',
+                    borderRadius: 10,
+                    backgroundColor: 'var(--ept-accent)',
+                    color: '#fff',
+                    fontWeight: 600,
+                    fontSize: 14,
+                    border: 'none',
+                    cursor: leadSubmitting ? 'default' : 'pointer',
+                    opacity: leadSubmitting ? 0.7 : 1,
+                  }}
+                >
+                  {leadSubmitting ? 'Starting...' : 'Start Chatting'}
+                </button>
+              </form>
               <a href="/login" style={{
-                padding: '10px 24px',
-                borderRadius: 10,
-                backgroundColor: 'var(--ept-accent)',
-                color: '#fff',
-                fontWeight: 600,
-                fontSize: 14,
-                textDecoration: 'none',
+                color: 'var(--ept-text-muted)',
+                fontSize: 12,
+                textDecoration: 'underline',
               }}>
-                Sign In
+                Already have an account? Sign in
               </a>
             </div>
           )}

@@ -6,8 +6,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
-import { subscribe } from '../../lib/ept-api';
+// ept-api subscribe removed — checkout handles payment
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import SubscriptionGate from '../../components/SubscriptionGate';
 
 /* ─── Constants ────────────────────────────────────────────────────────── */
 
@@ -433,7 +434,7 @@ const TRUST_SIGNALS = [
   { icon: '🌍', label: 'GDPR / CCPA Compliant', desc: 'Full regulatory compliance with global privacy standards' },
 ];
 
-export default function ImmortalityVaultPage() {
+function ImmortalityVaultPageContent() {
   const { isDark } = useTheme();
   const { user, loading: authLoading, subscriptions } = useAuth();
   const router = useRouter();
@@ -461,15 +462,9 @@ export default function ImmortalityVaultPage() {
       router.push('/immortality-vault/app');
       return;
     }
-    // Subscribe to the service
-    setSubscribing(planName);
-    try {
-      await subscribe(['immortality-vault']);
-      router.push('/immortality-vault/app');
-    } catch (err) {
-      console.error('Subscribe failed:', err);
-      setSubscribing(null);
-    }
+    // Route to checkout
+    const tier = planName.toLowerCase();
+    router.push(`/checkout?service=${encodeURIComponent('immortality-vault')}&tier=${encodeURIComponent(tier)}`);
   };
 
   // Auto-redirect if user just logged in with a plan intent
@@ -977,4 +972,8 @@ export default function ImmortalityVaultPage() {
       </footer>
     </div>
   );
+}
+
+export default function ImmortalityVaultPage() {
+  return <SubscriptionGate serviceId="immortality-vault"><ImmortalityVaultPageContent /></SubscriptionGate>;
 }

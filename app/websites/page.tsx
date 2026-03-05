@@ -8,6 +8,7 @@ import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import SubscriptionGate from '../../components/SubscriptionGate';
 
 const TEMPLATES = [
   { name: 'SaaS Landing', preview: 'Modern SaaS product page with hero, features, pricing, and CTA sections', category: 'Business' },
@@ -32,7 +33,7 @@ const FEATURES = [
   { title: 'E-Commerce Ready', desc: 'Product catalogs, shopping carts, Stripe checkout, inventory management — all built in.' },
 ];
 
-export default function WebsitesPage() {
+function WebsitesPageContent() {
   const { user } = useAuth();
   const router = useRouter();
   const { isDark } = useTheme();
@@ -132,19 +133,116 @@ export default function WebsitesPage() {
         </div>
       </section>
 
+      {/* Portfolio — Sites We've Built */}
+      <section className="py-20 px-6" style={{ backgroundColor: 'var(--ept-surface)' }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium mb-4 border" style={{ backgroundColor: 'var(--ept-accent-glow)', borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)' }}>
+              Portfolio
+            </div>
+            <h2 className="text-3xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Sites we&apos;ve built</h2>
+            <p className="mt-3 text-sm max-w-xl mx-auto" style={{ color: 'var(--ept-text-muted)' }}>Real websites in production for real businesses. Every site is designed, built, and deployed by our team.</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                name: 'Pro Finish USA',
+                url: 'https://profinishusa.com',
+                industry: 'Construction Services',
+                desc: 'Full-service contractor website with bilingual support, AI chatbot, customer portal, invoicing, and receipt OCR.',
+                features: ['Bilingual EN/ES', 'AI Chatbot (Belle)', 'Customer Portal', 'Receipt OCR', 'Service Booking'],
+              },
+              {
+                name: 'Barking Lot',
+                url: 'https://barkinglot.org',
+                industry: 'Pet Services',
+                desc: 'Dog daycare and boarding facility website with online booking, photo galleries, and live cam integration.',
+                features: ['Online Booking', 'Photo Gallery', 'Service Plans', 'Pet Profiles', 'Contact Forms'],
+              },
+              {
+                name: 'Right at Home BnB',
+                url: 'https://rah-midland.com',
+                industry: 'Hospitality',
+                desc: 'Short-term rental property showcase with booking integration, property tours, and guest reviews.',
+                features: ['Property Showcase', 'Booking Integration', 'Photo Tours', 'Guest Reviews', 'Local Guide'],
+              },
+              {
+                name: 'Legacy Gaming Enterprises',
+                url: 'https://echo-lge.com',
+                industry: 'Gaming & Entertainment',
+                desc: 'Turnkey sweepstakes gaming platform with 50+ licensed games, player management, KYC compliance, and AI chatbot for business owners.',
+                features: ['50+ Licensed Games', 'AI Chatbot (Echo)', 'Payment Processing', 'Compliance Automation', 'Analytics Dashboard'],
+              },
+              {
+                name: "Bree's Gaming",
+                url: 'https://brees.echo-lge.com',
+                industry: 'Gaming Analytics',
+                desc: 'AI-powered gambling analytics platform with multi-screen OCR, swarm intelligence, pattern recognition, and real-time voice assistant.',
+                features: ['AI Swarm Analytics', 'Voice Assistant (Bree)', 'Multi-Screen OCR', '60+ Game Platforms', 'Real-Time Insights'],
+              },
+              {
+                name: 'Black Gold Asset Transfer',
+                url: 'https://bgat.echo-op.com',
+                industry: 'Oil & Gas Services',
+                desc: 'Veteran-owned oilfield chemical supplier with 3D animated showcase, product catalog, field services, and AI assistant for technical consulting.',
+                features: ['3D Oil Rig Animation', 'AI Assistant (Lanny)', 'Product Catalog', 'Field Services', 'Firebase Auth'],
+              },
+              {
+                name: 'Echo Omega Prime',
+                url: 'https://echo-op.com',
+                industry: 'AI Technology',
+                desc: 'Command center and operations dashboard for a distributed AI infrastructure with 30+ cloud services.',
+                features: ['Real-Time Dashboard', 'MoltBook Feed', 'Swarm Control', 'Mobile Context', 'Multi-AI Chat'],
+              },
+            ].map((site, i) => (
+              <a
+                key={i}
+                href={site.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group p-6 rounded-xl border transition-all hover:border-[var(--ept-accent)] hover:shadow-lg"
+                style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className="text-lg font-bold group-hover:underline" style={{ color: 'var(--ept-text)' }}>{site.name}</h3>
+                    <span className="text-xs font-medium" style={{ color: 'var(--ept-accent)' }}>{site.industry}</span>
+                  </div>
+                  <svg className="w-5 h-5 opacity-40 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--ept-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                </div>
+                <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>{site.desc}</p>
+                <div className="flex flex-wrap gap-2">
+                  {site.features.map((f, j) => (
+                    <span key={j} className="text-[10px] px-2 py-1 rounded-md font-medium" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-secondary)' }}>{f}</span>
+                  ))}
+                </div>
+                <div className="mt-4 pt-3 border-t text-xs font-mono" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>{site.url.replace('https://', '')}</div>
+              </a>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <p className="text-sm mb-4" style={{ color: 'var(--ept-text-secondary)' }}>Want a website like these? We design, build, and deploy custom websites for businesses of all sizes.</p>
+            <Link href="/pricing" className="inline-flex px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+              View Website Pricing
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Web Design Doctrine */}
       <section className="max-w-4xl mx-auto px-6 pb-12">
         <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
           <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Web Design Best Practices</h2>
           <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>Query UI/UX, web development, and digital commerce doctrine for design patterns and optimization strategies.</p>
           <EngineQueryPanel
-            domains={['WEBAPP', 'UIUX', 'DCOM']}
+            domains={['UIUX', 'WEBAPP']}
             title="Web Design Doctrine"
             placeholder="Ask about web design, UX patterns, SEO, conversion optimization..."
             exampleQueries={[
               'Mobile-first responsive design patterns',
               'Core Web Vitals optimization techniques',
-              'E-commerce conversion rate best practices',
+              'Conversion rate optimization for landing pages',
+              'SEO technical best practices',
             ]}
             showStats
           />
@@ -161,4 +259,8 @@ export default function WebsitesPage() {
       </section>
     </div>
   );
+}
+
+export default function WebsitesPage() {
+  return <SubscriptionGate serviceId="website-creation"><WebsitesPageContent /></SubscriptionGate>;
 }

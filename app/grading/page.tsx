@@ -7,6 +7,11 @@ import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import {
+  checkEbayConnection, getEbayAuthUrl, listOnEbay, bulkListOnEbay,
+  type ListingInput, type EbayListingResult, type EbayAuthStatus,
+} from '../../lib/ebay-api';
+import SubscriptionGate from '../../components/SubscriptionGate';
 
 /* ═══════════════════════════════════════════════════════════════
    CGC GRADING DATA
@@ -73,10 +78,149 @@ const getCollectibleIcon = (type: CollectibleType) => COLLECTIBLE_TYPES.find(t =
 const getCollectibleLabel = (type: CollectibleType) => COLLECTIBLE_TYPES.find(t => t.id === type)?.label || 'Collectible';
 
 const GRADE_MULTIPLIERS: Record<number, number> = {
-  10.0: 3.0, 9.9: 2.8, 9.8: 2.5, 9.6: 2.2, 9.4: 2.0, 9.2: 1.8, 9.0: 1.5, 8.5: 1.3, 8.0: 1.0,
-  7.5: 0.85, 7.0: 0.7, 6.5: 0.6, 6.0: 0.5, 5.5: 0.4, 5.0: 0.35, 4.5: 0.3, 4.0: 0.25,
-  3.5: 0.2, 3.0: 0.15, 2.5: 0.12, 2.0: 0.1, 1.8: 0.08, 1.5: 0.06, 1.0: 0.04, 0.5: 0.02,
+  10.0: 3.0, 9.9: 2.5, 9.8: 2.0, 9.6: 1.7, 9.4: 1.5, 9.2: 1.35, 9.0: 1.2, 8.5: 1.1, 8.0: 1.0,
+  7.5: 0.85, 7.0: 0.75, 6.5: 0.65, 6.0: 0.55, 5.5: 0.48, 5.0: 0.40, 4.5: 0.35, 4.0: 0.30,
+  3.5: 0.26, 3.0: 0.22, 2.5: 0.18, 2.0: 0.15, 1.8: 0.12, 1.5: 0.10, 1.0: 0.08, 0.5: 0.04,
 };
+
+/* ═══════════════════════════════════════════════════════════════
+   DEFECT GRADE IMPACTS — from P: drive models.py
+   Each defect has min/max grade penalty based on severity
+   ═══════════════════════════════════════════════════════════════ */
+
+const DEFECT_GRADE_IMPACTS: Record<string, { min: number; max: number }> = {
+  spine_stress:     { min: -0.3, max: -1.0 },
+  spine_roll:       { min: -1.0, max: -2.0 },
+  spine_split:      { min: -2.0, max: -4.0 },
+  cover_tear:       { min: -2.0, max: -4.0 },
+  cover_crease:     { min: -0.5, max: -2.0 },
+  cover_detached:   { min: -3.0, max: -5.0 },
+  page_yellowing:   { min: -0.3, max: -1.0 },
+  page_brittle:     { min: -2.0, max: -3.0 },
+  page_foxing:      { min: -0.5, max: -1.5 },
+  staple_rust:      { min: -0.5, max: -1.5 },
+  staple_migration: { min: -0.5, max: -2.0 },
+  staple_pop:       { min: -1.5, max: -3.0 },
+  corner_blunt:     { min: -0.2, max: -0.5 },
+  corner_bend:      { min: -0.2, max: -0.8 },
+  corner_chip:      { min: -0.5, max: -1.5 },
+  edge_wear:        { min: -0.3, max: -1.0 },
+  edge_tear:        { min: -0.5, max: -2.0 },
+  color_fading:     { min: -0.5, max: -2.0 },
+  color_break:      { min: -0.3, max: -1.0 },
+  water_damage:     { min: -3.0, max: -5.0 },
+  writing:          { min: -0.5, max: -2.0 },
+  stains:           { min: -0.5, max: -2.0 },
+  restoration:      { min: -1.0, max: -3.0 },
+  fold_marks:       { min: -1.5, max: -3.0 },
+  paper_loss:       { min: -3.0, max: -5.0 },
+  mold:             { min: -3.0, max: -5.0 },
+};
+
+const DEFECT_SEVERITY_MULTIPLIER: Record<string, number> = {
+  trace: 0.2, minor: 0.4, moderate: 0.6, major: 0.8, severe: 1.0,
+};
+
+function applyDefectImpacts(baseGrade: number, defects: string[], defectDetails?: Array<{ type: string; severity: string }>): number {
+  if (defects.length === 0) return baseGrade;
+  let totalPenalty = 0;
+  for (const defect of defects) {
+    const impact = DEFECT_GRADE_IMPACTS[defect];
+    if (!impact) continue;
+    const detail = defectDetails?.find(d => d.type === defect);
+    const severityMult = detail ? (DEFECT_SEVERITY_MULTIPLIER[detail.severity] || 0.6) : 0.6;
+    totalPenalty += impact.min + (impact.max - impact.min) * severityMult;
+  }
+  return Math.max(0.5, Math.round((baseGrade + totalPenalty) * 10) / 10);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ERA-SPECIFIC GRADING — from P: drive era_grading.py
+   6 comic eras with weight adjustments
+   ═══════════════════════════════════════════════════════════════ */
+
+interface EraConfig {
+  name: string;
+  yearRange: [number, number];
+  weightAdjustments: { paper: number; spine: number; cover: number; staples: number; color: number };
+  commonDefects: string[];
+  gradingNotes: string;
+  promptAddition: string;
+}
+
+const ERA_CONFIGS: Record<string, EraConfig> = {
+  platinum: {
+    name: 'Platinum Age', yearRange: [1897, 1937],
+    weightAdjustments: { paper: 0.5, spine: 0.8, cover: 1.0, staples: 0.6, color: 0.7 },
+    commonDefects: ['page_yellowing', 'page_brittle', 'spine_split', 'cover_detached'],
+    gradingNotes: 'Extremely old. Paper quality inherently degraded. Be lenient on yellowing and brittleness.',
+    promptAddition: 'Platinum Age book — grade more leniently on paper quality. Focus on structural integrity and completeness.',
+  },
+  golden: {
+    name: 'Golden Age', yearRange: [1938, 1955],
+    weightAdjustments: { paper: 0.6, spine: 0.9, cover: 1.0, staples: 0.7, color: 0.8 },
+    commonDefects: ['page_yellowing', 'staple_rust', 'spine_stress', 'edge_wear'],
+    gradingNotes: 'Paper is naturally tanned. Check for Marvel chipping. Assess staple rust carefully.',
+    promptAddition: 'Golden Age (1938-1955) — be lenient on paper quality and yellowing. Check for Marvel chipping on cover edges. Staple rust is common and expected. Focus on structural completeness.',
+  },
+  silver: {
+    name: 'Silver Age', yearRange: [1956, 1969],
+    weightAdjustments: { paper: 0.8, spine: 1.0, cover: 1.0, staples: 0.8, color: 1.0 },
+    commonDefects: ['spine_stress', 'corner_blunt', 'edge_wear', 'color_fading'],
+    gradingNotes: 'Cover gloss is a KEY differentiator. Check date stamps and value stamps.',
+    promptAddition: 'Silver Age (1956-1969) — cover gloss is the key differentiator between grades. Check for date stamps or arrival dates. Assess spine stress carefully.',
+  },
+  bronze: {
+    name: 'Bronze Age', yearRange: [1970, 1984],
+    weightAdjustments: { paper: 0.9, spine: 1.0, cover: 1.0, staples: 0.9, color: 1.0 },
+    commonDefects: ['spine_stress', 'corner_bend', 'color_break', 'stains'],
+    gradingNotes: 'Newsstand vs direct market matters. Spine stress lines are common. Check corner bends.',
+    promptAddition: 'Bronze Age (1970-1984) — distinguish newsstand vs direct edition. Spine stress lines very common. Corner bends from spinner rack display. Color breaking on spine is a key downgrade factor.',
+  },
+  copper: {
+    name: 'Copper Age', yearRange: [1985, 1991],
+    weightAdjustments: { paper: 1.0, spine: 1.0, cover: 1.0, staples: 1.0, color: 1.0 },
+    commonDefects: ['spine_stress', 'corner_blunt', 'edge_wear'],
+    gradingNotes: 'Higher print quality. Grading standards tighten. Newsprint to Baxter paper transition.',
+    promptAddition: 'Copper Age (1985-1991) — higher print quality era. Grading standards are stricter. Look for printing defects, alignment issues.',
+  },
+  modern: {
+    name: 'Modern Age', yearRange: [1992, 2099],
+    weightAdjustments: { paper: 1.0, spine: 1.0, cover: 1.2, staples: 1.0, color: 1.2 },
+    commonDefects: ['spine_stress', 'corner_bend', 'color_break'],
+    gradingNotes: 'Highest standards. Minor defects matter more. Scrutinize centering, bindery tears, printing defects.',
+    promptAddition: 'Modern Age — highest grading standards apply. Scrutinize even minor defects: centering, bindery tears, color shifts, spine ticks. A 9.8 must be nearly flawless.',
+  },
+};
+
+function detectEra(year: number): string {
+  if (year < 1938) return 'platinum';
+  if (year <= 1955) return 'golden';
+  if (year <= 1969) return 'silver';
+  if (year <= 1984) return 'bronze';
+  if (year <= 1991) return 'copper';
+  return 'modern';
+}
+
+function getEraConfig(year: number): EraConfig {
+  return ERA_CONFIGS[detectEra(year)] || ERA_CONFIGS.modern;
+}
+
+function applyEraWeightAdjustment(grade: number, era: EraConfig, defects: string[]): number {
+  let adj = 0;
+  const weights = era.weightAdjustments;
+  // If paper defects present but era is lenient on paper, give credit
+  if (defects.some(d => ['page_yellowing', 'page_brittle', 'page_foxing'].includes(d)) && weights.paper < 1.0) {
+    adj += (1.0 - weights.paper) * 0.5; // Partial credit for era-expected paper issues
+  }
+  if (defects.some(d => ['staple_rust', 'staple_migration'].includes(d)) && weights.staples < 1.0) {
+    adj += (1.0 - weights.staples) * 0.3;
+  }
+  if (defects.some(d => ['color_fading', 'color_break'].includes(d)) && weights.color < 1.0) {
+    adj += (1.0 - weights.color) * 0.3;
+  }
+  return Math.min(10.0, Math.round((grade + adj) * 10) / 10);
+}
 
 /* ═══════════════════════════════════════════════════════════════
    SWARM BRAIN + ENGINE RUNTIME API
@@ -91,6 +235,25 @@ function getComicImageUrl(title: string, issue: string): string {
   const safe = title.replace(/[^a-zA-Z0-9 \-_]/g, '').trim().replace(/\s+/g, '_').slice(0, 50);
   const num = issue.replace('#', '').trim();
   return `${R2_MEDIA_URL}/${safe}_${num}_front.jpg`;
+}
+
+async function fetchR2AsBase64(r2Key: string): Promise<string> {
+  try {
+    const url = `https://pub-68bd8f2b7ab147f6ac04c91aa5afedb8.r2.dev/comics/${r2Key}`;
+    const res = await fetch(url);
+    if (!res.ok) return '';
+    const blob = await res.blob();
+    return new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        resolve(result.split(',')[1] || '');
+      };
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return '';
+  }
 }
 
 interface TrinityGradeResult {
@@ -391,15 +554,22 @@ interface Comic {
   trinity_decision: TrinityDecision | null;
 }
 
-async function loadCollectionFromCortex(): Promise<Comic[]> {
+async function loadCollectionFromCortex(userId?: string): Promise<Comic[]> {
   try {
     const res = await fetch(`${MEMORY_CORTEX_URL}/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: '', memory_type: 'fact', limit: 500, min_strength: 0 }),
+      body: JSON.stringify({ query: 'comic collectible grade', limit: 500, min_strength: 0 }),
     });
     const data = await res.json();
-    const results = (data.results || []).filter((m: any) => m.source === 'collectibles-grading-app');
+    if (data.error) { console.error('Cortex search error:', data.error); return []; }
+    const results = (data.results || []).filter((m: any) => {
+      if (m.source !== 'collectibles-grading-app') return false;
+      if (!userId) return true;
+      const meta = typeof m.metadata === 'string' ? JSON.parse(m.metadata) : (m.metadata || {});
+      // Include comics owned by this user OR untagged comics (backward compat)
+      return !meta.user_id || meta.user_id === userId;
+    });
     return results.map((m: any, idx: number) => {
       const meta = typeof m.metadata === 'string' ? JSON.parse(m.metadata) : (m.metadata || {});
       const grade = meta.consensus_grade ? parseFloat(meta.consensus_grade) : null;
@@ -443,7 +613,7 @@ async function loadCollectionFromCortex(): Promise<Comic[]> {
   }
 }
 
-async function addComicToCortex(comic: Omit<Comic, 'id' | 'cortex_uid'>): Promise<string | null> {
+async function addComicToCortex(comic: Omit<Comic, 'id' | 'cortex_uid'>, userId?: string, userEmail?: string): Promise<string | null> {
   try {
     const content = `${comic.title} #${comic.issue.replace('#', '')} (${comic.publisher}, ${comic.year})${comic.grade ? ` - Grade: ${comic.grade} (${getGradeLabel(comic.grade)})` : ''}${comic.estimated_value ? ` - Value: $${comic.estimated_value}` : ''}${comic.era ? ` - Era: ${comic.era}` : ''}`;
     const res = await fetch(`${MEMORY_CORTEX_URL}/store`, {
@@ -453,7 +623,7 @@ async function addComicToCortex(comic: Omit<Comic, 'id' | 'cortex_uid'>): Promis
         content,
         memory_type: 'fact',
         source: 'collectibles-grading-app',
-        tags: ['comic', 'collection', comic.publisher.toLowerCase().replace(/\s+/g, '-')],
+        tags: ['comic', 'collection', comic.publisher.toLowerCase().replace(/\s+/g, '-'), ...(userId ? [`user:${userId}`] : [])],
         strength: 2.0,
         summary: `${comic.title} ${comic.issue} by ${comic.publisher} (${comic.year})`,
         metadata: {
@@ -462,6 +632,7 @@ async function addComicToCortex(comic: Omit<Comic, 'id' | 'cortex_uid'>): Promis
           grade_confidence: comic.consensus_confidence, consensus_price: comic.estimated_value,
           era: comic.era, key_issue: comic.key_issue, key_issue_reason: comic.key_issue_reason,
           writer: comic.writer, cover_artist: comic.cover_artist, grading_status: comic.status,
+          user_id: userId || null, user_email: userEmail || null,
         },
       }),
     });
@@ -475,6 +646,46 @@ async function deleteComicFromCortex(uid: string): Promise<boolean> {
     await fetch(`${MEMORY_CORTEX_URL}/memory/${uid}`, { method: 'DELETE' });
     return true;
   } catch { return false; }
+}
+
+async function migrateUntaggedComics(userId: string, userEmail: string) {
+  try {
+    const res = await fetch(`${MEMORY_CORTEX_URL}/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'comic collectible grade', limit: 500, min_strength: 0 }),
+    });
+    const data = await res.json();
+    const untagged = (data.results || []).filter((m: any) => {
+      if (m.source !== 'collectibles-grading-app') return false;
+      const meta = typeof m.metadata === 'string' ? JSON.parse(m.metadata) : (m.metadata || {});
+      return !meta.user_id && m.uid;
+    });
+    if (untagged.length === 0) return;
+    // Update each untagged comic with user_id via delete + re-store
+    for (const m of untagged) {
+      const meta = typeof m.metadata === 'string' ? JSON.parse(m.metadata) : (m.metadata || {});
+      const existingTags = Array.isArray(m.tags) ? m.tags : [];
+      await fetch(`${MEMORY_CORTEX_URL}/store`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: m.content,
+          memory_type: 'fact',
+          source: 'collectibles-grading-app',
+          tags: [...existingTags.filter((t: string) => !t.startsWith('user:')), `user:${userId}`],
+          strength: m.strength || 2.0,
+          summary: m.summary || '',
+          metadata: { ...meta, user_id: userId, user_email: userEmail },
+        }),
+      });
+      // Delete old untagged entry
+      if (m.uid) await fetch(`${MEMORY_CORTEX_URL}/memory/${m.uid}`, { method: 'DELETE' });
+    }
+    console.log(`Migrated ${untagged.length} comics to user ${userEmail}`);
+  } catch (err) {
+    console.error('Comic migration failed:', err);
+  }
 }
 
 const formatCurrency = (v: number) => v >= 1000000 ? `$${(v / 1000000).toFixed(1)}M` : v >= 1000 ? `$${(v / 1000).toFixed(1)}K` : `$${v}`;
@@ -497,6 +708,7 @@ async function uploadToR2(blob: Blob, comicId: string, side: CaptureSide): Promi
 }
 
 async function runVisionEnsemble(frontBase64: string, backBase64: string, comic: Comic): Promise<{ results: VisionModelResult[]; consensus: number; confidence: number; defects: string[] }> {
+  const era = getEraConfig(comic.year);
   try {
     const res = await fetch(`${SWARM_BRAIN_URL}/llm/hybrids/run`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -504,8 +716,11 @@ async function runVisionEnsemble(frontBase64: string, backBase64: string, comic:
         method: 'ensemble',
         prompt: `You are an expert CGC comic book grader. Grade this comic on the CGC 0.5-10.0 scale from the photographs.
 Comic: ${comic.title} ${comic.issue} (${comic.publisher}, ${comic.year})
+Era: ${era.name} (${era.yearRange[0]}-${era.yearRange[1]})
 Known defects reported by owner: ${comic.defects.length > 0 ? comic.defects.join(', ') : 'None reported'}
+${era.promptAddition}
 
+Grade the FRONT cover at 70% weight and BACK cover at 30% weight.
 RESPOND IN JSON: {"grade": number, "confidence": number, "defects": ["list"], "analysis": "2 sentences"}`,
         models: VISION_MODELS.map(m => m.model),
         images: [{ data: frontBase64, type: 'image/jpeg' }, ...(backBase64 ? [{ data: backBase64, type: 'image/jpeg' }] : [])],
@@ -698,6 +913,7 @@ async function getBreeCommentary(comic: Comic, grade: number, defects: string[],
 }
 
 async function playBreeVoice(text: string, emotion: string): Promise<void> {
+  // Try Bree's dedicated TTS endpoint first
   try {
     const res = await fetch('https://brees.echo-lge.com/api/tts', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -705,22 +921,36 @@ async function playBreeVoice(text: string, emotion: string): Promise<void> {
     });
     if (!res.ok) throw new Error(`TTS ${res.status}`);
     const blob = await res.blob();
+    if (blob.size < 100) throw new Error('Empty audio');
     const audio = new Audio(URL.createObjectURL(blob));
     audio.play();
     return;
-  } catch { /* ElevenLabs failed, try Cartesia */ }
+  } catch { /* Bree TTS failed, try Echo Speak Cloud */ }
+  // Try Echo Speak Cloud (3-tier TTS router with ElevenLabs + Cartesia + browser)
   try {
-    const res = await fetch('https://api.cartesia.ai/tts/bytes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Cartesia-Version': '2024-06-10' },
+    const res = await fetch('https://echo-speak-cloud.bmcii1976.workers.dev/tts', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model_id: 'sonic-3', transcript: text,
-        voice: { mode: 'id', id: 'f762e181-ddc7-486e-9a48-636bd7e229d4' },
-        output_format: { container: 'mp3', encoding: 'mp3', sample_rate: 44100 },
+        text: text.slice(0, 500),
+        voice_id: 'pzKXffibtCDxnrVO8d1U', // Bree's ElevenLabs voice
+        model: 'eleven_multilingual_v2',
+        stability: 0.3, similarity_boost: 0.8, style: 0.7,
       }),
     });
-    if (res.ok) { const blob = await res.blob(); new Audio(URL.createObjectURL(blob)).play(); }
-  } catch { /* silent fail — text commentary still visible */ }
+    if (res.ok) {
+      const blob = await res.blob();
+      if (blob.size > 100) { new Audio(URL.createObjectURL(blob)).play(); return; }
+    }
+  } catch { /* Echo Speak failed, try browser TTS */ }
+  // Final fallback: browser speech synthesis
+  try {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text.slice(0, 300));
+      utterance.rate = 1.1;
+      utterance.pitch = 1.2;
+      window.speechSynthesis.speak(utterance);
+    }
+  } catch { /* all TTS failed — text commentary still visible */ }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -813,20 +1043,38 @@ function blobToBase64(blob: Blob): Promise<string> {
 }
 
 function estimateValue(grade: number, year: number, keyIssue: boolean, issueNumber?: number): number {
-  // Base values by era — these are for COMMON, non-key issues at CGC 8.0
-  // Golden Age keys are worth millions, but common GA books are $50-500
+  // Base values at CGC 8.0 by era — calibrated against GoCollect/Heritage Auctions data (P: drive pricing engine)
   const isLowNumber = (issueNumber || 999) <= 10;
+  const isFirstIssue = (issueNumber || 999) === 1;
   let baseValue: number;
-  if (year < 1940)      baseValue = keyIssue ? 50000 : isLowNumber ? 2000 : 500;    // Early Golden Age
-  else if (year < 1956) baseValue = keyIssue ? 30000 : isLowNumber ? 1500 : 300;    // Golden Age
-  else if (year < 1970) baseValue = keyIssue ? 15000 : isLowNumber ? 800 : 150;     // Silver Age
-  else if (year < 1980) baseValue = keyIssue ? 5000 : isLowNumber ? 200 : 25;       // Bronze Age
-  else if (year < 1990) baseValue = keyIssue ? 2000 : isLowNumber ? 100 : 15;       // Copper Age
-  else if (year < 2000) baseValue = keyIssue ? 500 : 10;                             // Modern Age
-  else                  baseValue = keyIssue ? 200 : 8;                              // Contemporary
+  if (year < 1938) {
+    // Platinum Age — extremely rare
+    baseValue = keyIssue ? 75000 : isFirstIssue ? 5000 : isLowNumber ? 2500 : 800;
+  } else if (year < 1956) {
+    // Golden Age — scarcity premium
+    baseValue = keyIssue ? 40000 : isFirstIssue ? 3000 : isLowNumber ? 1500 : 350;
+  } else if (year < 1970) {
+    // Silver Age — most collected era
+    baseValue = keyIssue ? 20000 : isFirstIssue ? 1200 : isLowNumber ? 600 : 120;
+  } else if (year < 1985) {
+    // Bronze Age — solid collector market
+    baseValue = keyIssue ? 5000 : isFirstIssue ? 400 : isLowNumber ? 150 : 30;
+  } else if (year < 1992) {
+    // Copper Age — transitional
+    baseValue = keyIssue ? 2000 : isFirstIssue ? 200 : isLowNumber ? 80 : 18;
+  } else if (year < 2000) {
+    // Early Modern — speculator bust era, lower values
+    baseValue = keyIssue ? 500 : isFirstIssue ? 60 : 10;
+  } else if (year < 2010) {
+    // Modern — variant cover era
+    baseValue = keyIssue ? 300 : isFirstIssue ? 40 : 8;
+  } else {
+    // Contemporary — very common, low base values
+    baseValue = keyIssue ? 200 : isFirstIssue ? 30 : 6;
+  }
   const closest = Object.keys(GRADE_MULTIPLIERS).map(Number).reduce((a, b) => Math.abs(b - grade) < Math.abs(a - grade) ? b : a);
   const multiplier = GRADE_MULTIPLIERS[closest] || 0.5;
-  return Math.round(baseValue * multiplier);
+  return Math.round(baseValue * multiplier * 100) / 100;
 }
 
 // Sanity check: cap LLM-estimated values against reasonable era-based ceilings
@@ -897,7 +1145,7 @@ function WaveCanvas({ className }: { className?: string }) {
 /* ═══════════════════════════════════════════════════════════════
    MAIN PAGE
    ═══════════════════════════════════════════════════════════════ */
-export default function GradingPage() {
+function GradingPageContent() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const { isDark } = useTheme();
@@ -962,18 +1210,56 @@ export default function GradingPage() {
   const [collectionTags] = useState<string[]>(['All', 'For Sale', 'Grails', 'Reader', 'Wishlist']);
   const [activeTag, setActiveTag] = useState('All');
 
-  // Load collection from Memory Cortex on mount
+  // eBay Integration
+  const [ebayConnected, setEbayConnected] = useState(false);
+  const [ebayChecking, setEbayChecking] = useState(true);
+  const [showEbayModal, setShowEbayModal] = useState(false);
+  const [ebayListingComics, setEbayListingComics] = useState<Comic[]>([]);
+  const [ebayProgress, setEbayProgress] = useState<{ current: number; total: number; status: string } | null>(null);
+  const [ebayResults, setEbayResults] = useState<EbayListingResult[]>([]);
+  const [ebayPriceStrategy, setEbayPriceStrategy] = useState<'consensus' | 'markup' | 'fixed'>('consensus');
+  const [ebayMarkupPercent, setEbayMarkupPercent] = useState(15);
+  const [ebayFixedPrice, setEbayFixedPrice] = useState(9.99);
+  const [ebayListingType, setEbayListingType] = useState<'fixed_price' | 'auction'>('fixed_price');
+  const [ebayListedIds, setEbayListedIds] = useState<Set<number>>(new Set());
+  const [ebayListingUrls, setEbayListingUrls] = useState<Record<number, string>>({});
+
+  // Health checks on mount
   useEffect(() => {
     fetch(`${SWARM_BRAIN_URL}/health`).then(r => r.json()).then(d => setSwarmStatus(d.ok ? 'online' : 'offline')).catch(() => setSwarmStatus('offline'));
     fetch(`${MEMORY_CORTEX_URL}/status`).then(r => r.json()).then(d => {
-      setCortexStatus(d.status === 'operational' ? 'online' : 'offline');
-      setCortexStats({ total_memories: d.database?.total_memories || 0, recent_24h: d.database?.recent_24h || 0 });
+      // Handle multiple status response formats from Memory Cortex
+      const isOnline = d.status === 'operational' || d.status === 'ok' || d.ok === true || d.healthy === true;
+      setCortexStatus(isOnline ? 'online' : 'offline');
+      setCortexStats({
+        total_memories: d.database?.total_memories || d.stats?.total_memories || d.total_memories || d.count || 0,
+        recent_24h: d.database?.recent_24h || d.stats?.recent_24h || d.recent_24h || 0,
+      });
     }).catch(() => setCortexStatus('offline'));
-    loadCollectionFromCortex().then(loaded => {
+    // Check eBay connection
+    checkEbayConnection().then(status => {
+      setEbayConnected(status.connected && status.tokenValid);
+      setEbayChecking(false);
+    }).catch(() => setEbayChecking(false));
+    // Listen for eBay OAuth callback
+    const handleMessage = (e: MessageEvent) => { if (e.data?.type === 'ebay_connected') { setEbayConnected(true); } };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  // Load collection when user is authenticated
+  useEffect(() => {
+    if (loading || !user) return;
+    setCollectionLoading(true);
+    loadCollectionFromCortex(user.uid).then(loaded => {
+      // Migrate untagged comics to this user's account (one-time, idempotent)
+      if (loaded.length > 0) {
+        migrateUntaggedComics(user.uid, user.email || '');
+      }
       setComics(loaded);
       setCollectionLoading(false);
     }).catch(() => setCollectionLoading(false));
-  }, []);
+  }, [user, loading]);
 
   useEffect(() => {
     if (!loading && !user) router.push('/login');
@@ -1046,7 +1332,7 @@ export default function GradingPage() {
       bree_comment: null, bree_emotion: null, tags: [], notes: null,
       vision_grades: null, research_notes: null, engine_enrichment: null, debate_summary: null, trinity_decision: null,
     };
-    const uid = await addComicToCortex(newComic);
+    const uid = await addComicToCortex(newComic, user?.uid, user?.email || undefined);
     setComics(prev => [...prev, { ...newComic, id: prev.length + 1, cortex_uid: uid }]);
     setAddForm({ collectible_type: addForm.collectible_type, title: '', issue: '', publisher: '', year: '', era: '', buy_price: '', buy_date: '', buy_source: '', key_issue: false, key_issue_reason: '', writer: '', cover_artist: '' });
     setShowAddForm(false);
@@ -1287,28 +1573,47 @@ export default function GradingPage() {
     }
     updateStep('cache', { status: 'complete', endTime: Date.now(), detail: 'No cache hit' });
 
-    // Step 1: Upload images to R2 if we have them
+    // Step 1: Upload/fetch images — use LOCAL variables, NOT React state
     updateStep('upload', { status: 'running', startTime: Date.now() });
     setGradingStep('Processing images...'); setGradingProgress(10);
     const comicId = `${comic.title.replace(/\W/g, '_')}_${comic.issue.replace('#', '')}`.toLowerCase();
     let frontKey = comic.front_r2_key || '', backKey = comic.back_r2_key || '';
-    if (captureWorkflow.frontBlob) frontKey = await uploadToR2(captureWorkflow.frontBlob, comicId, 'front');
-    if (captureWorkflow.backBlob) backKey = await uploadToR2(captureWorkflow.backBlob, comicId, 'back');
-    updateStep('upload', { status: 'complete', endTime: Date.now(), detail: `${frontKey ? 'Front' : ''}${frontKey && backKey ? ' + ' : ''}${backKey ? 'Back' : ''} uploaded` });
+    // Use local vars for base64 — React state frontBase64 is ONLY set during camera capture
+    let localFrontB64 = frontBase64;
+    let localBackB64 = backBase64;
+    if (captureWorkflow.frontBlob) {
+      frontKey = await uploadToR2(captureWorkflow.frontBlob, comicId, 'front');
+    }
+    if (captureWorkflow.backBlob) {
+      backKey = await uploadToR2(captureWorkflow.backBlob, comicId, 'back');
+    }
+    // CRITICAL FIX: If no base64 from camera but comic has R2 images, fetch them
+    if (!localFrontB64 && comic.front_r2_key) {
+      setGradingStep('Fetching front image from R2...');
+      localFrontB64 = await fetchR2AsBase64(comic.front_r2_key);
+    }
+    if (!localBackB64 && comic.back_r2_key) {
+      localBackB64 = await fetchR2AsBase64(comic.back_r2_key);
+    }
+    updateStep('upload', { status: 'complete', endTime: Date.now(), detail: `${localFrontB64 ? 'Front' : ''}${localFrontB64 && localBackB64 ? ' + ' : ''}${localBackB64 ? 'Back' : ''} ready` });
 
-    // Step 2: Vision Ensemble (5 models) — only if we have images
+    // Detect era for era-specific grading
+    const eraConfig = getEraConfig(comic.year);
+    const eraName = detectEra(comic.year);
+
+    // Step 2: Vision Ensemble (5 models) — use LOCAL base64 variables
     updateStep('vision', { status: 'running', startTime: Date.now() });
     setGradingStep('Vision Ensemble — 5 models grading photos...'); setGradingProgress(20);
     let ensembleGrade = 0, ensembleConfidence = 0, ensembleDefects: string[] = [];
-    if (frontBase64) {
-      const visionResult = await runVisionEnsemble(frontBase64, backBase64, comic);
+    if (localFrontB64) {
+      const visionResult = await runVisionEnsemble(localFrontB64, localBackB64, comic);
       setVisionResults(visionResult.results);
       ensembleGrade = visionResult.consensus;
       ensembleConfidence = visionResult.confidence;
       ensembleDefects = visionResult.defects;
       updateStep('vision', { status: 'complete', endTime: Date.now(), detail: `Consensus: ${ensembleGrade} (${ensembleConfidence}% conf)` });
     } else {
-      // Fallback: text-only Trinity grading (legacy mode)
+      // Fallback: text-only Trinity grading (no images at all)
       setGradingStep('No images — falling back to Trinity text grading...');
       const [sage, nyx, thorne] = await Promise.all([consultTrinity('SAGE', comic), consultTrinity('NYX', comic), consultTrinity('THORNE', comic)]);
       setTrinityResults([sage, nyx, thorne]);
@@ -1316,6 +1621,17 @@ export default function GradingPage() {
       ensembleGrade = consensus.grade; ensembleConfidence = consensus.confidence; ensembleDefects = consensus.defects;
       updateStep('vision', { status: 'complete', endTime: Date.now(), detail: `Trinity text: ${ensembleGrade} (${ensembleConfidence}%)` });
     }
+
+    // Apply defect grade impacts from P: drive models
+    if (ensembleDefects.length > 0) {
+      const defectAdjustedGrade = applyDefectImpacts(ensembleGrade, ensembleDefects);
+      if (defectAdjustedGrade !== ensembleGrade) {
+        ensembleGrade = defectAdjustedGrade;
+      }
+    }
+
+    // Apply era-specific weight adjustments
+    ensembleGrade = applyEraWeightAdjustment(ensembleGrade, eraConfig, ensembleDefects);
 
     // Step 3: Research Swarm (50 agents)
     updateStep('research', { status: 'running', startTime: Date.now() });
@@ -1336,7 +1652,7 @@ export default function GradingPage() {
     // Step 5: Debate Hybrid (adversarial, 3 rounds)
     updateStep('debate', { status: 'running', startTime: Date.now() });
     setGradingStep('Debate Hybrid — Bull vs Bear vs Judge...'); setGradingProgress(65);
-    const debate = await runDebateHybrid(frontBase64, comic, ensembleGrade, ensembleDefects, research);
+    const debate = await runDebateHybrid(localFrontB64, comic, ensembleGrade, ensembleDefects, research);
     setDebateTranscript(debate.rounds);
     updateStep('debate', { status: 'complete', endTime: Date.now(), detail: `Adjusted: ${debate.adjustedGrade} (${debate.rounds.length} rounds)` });
 
@@ -1347,13 +1663,26 @@ export default function GradingPage() {
     setTrinityDecision(trinity);
     updateStep('trinity', { status: 'complete', endTime: Date.now(), detail: `Final: ${trinity.finalGrade}${trinity.dissent ? ' (DISSENT)' : ''}` });
 
-    // Step 7: Compute final value
+    // Step 7: Compute final value with era + defect adjustments
     updateStep('value', { status: 'running', startTime: Date.now() });
     setGradingStep('Computing market value...'); setGradingProgress(88);
-    const finalGrade = trinity.finalGrade;
+    let finalGrade = trinity.finalGrade;
+    // Apply defect impacts to final Trinity grade too
+    if (ensembleDefects.length > 0) {
+      finalGrade = applyDefectImpacts(finalGrade, ensembleDefects);
+      finalGrade = applyEraWeightAdjustment(finalGrade, eraConfig, ensembleDefects);
+    }
     const isKeyIssue = comic.key_issue || research.toLowerCase().includes('key issue') || research.toLowerCase().includes('first appearance');
     const issueNum = parseInt(comic.issue.replace(/[^0-9]/g, ''), 10) || 999;
-    const rawValue = enrichment.prb02?.value || estimateValue(finalGrade, comic.year, isKeyIssue, issueNum);
+    // Prefer PRB02 engine valuation, then FIN12 market data, then estimate
+    let rawValue = 0;
+    if (enrichment.prb02?.value && enrichment.prb02.value > 0) {
+      rawValue = enrichment.prb02.value;
+    } else if (enrichment.fin12?.range) {
+      const rangeMatch = enrichment.fin12.range.match(/\$?([\d,]+)/);
+      if (rangeMatch) rawValue = parseFloat(rangeMatch[1].replace(/,/g, ''));
+    }
+    if (rawValue <= 0) rawValue = estimateValue(finalGrade, comic.year, isKeyIssue, issueNum);
     const valueEstimate = sanityCheckValue(rawValue, finalGrade, comic.year, isKeyIssue);
     updateStep('value', { status: 'complete', endTime: Date.now(), detail: `$${valueEstimate.toLocaleString()}` });
 
@@ -1369,12 +1698,16 @@ export default function GradingPage() {
     updateStep('store', { status: 'running', startTime: Date.now() });
     setGradingStep('Storing to collection...'); setGradingProgress(96);
     await storeGradeToMemory(comic, trinityResults.length > 0 ? trinityResults : [{ voice: 'COUNCIL', grade: finalGrade, analysis: '', confidence: ensembleConfidence, defects: ensembleDefects, model_used: 'Trinity Council', tokens_used: 0 }], finalGrade, ensembleConfidence);
+    // Collect vision grades from current results (use pipeline-local visionResults via state)
+    const currentVisionResults = visionResults.length > 0 ? visionResults : [];
     setComics(prev => prev.map(c => c.id === comic.id ? {
       ...c, grade: finalGrade, estimated_value: valueEstimate, status: 'graded' as const,
       defects: ensembleDefects, consensus_confidence: ensembleConfidence, graded_at: new Date().toISOString(),
       front_r2_key: frontKey || c.front_r2_key, back_r2_key: backKey || c.back_r2_key,
       bree_comment: bree.text, bree_emotion: bree.emotion,
-      vision_grades: Object.fromEntries(visionResults.map(v => [v.label, v.grade])),
+      era: eraName || c.era,
+      key_issue: isKeyIssue || c.key_issue,
+      vision_grades: currentVisionResults.length > 0 ? Object.fromEntries(currentVisionResults.map(v => [v.label, v.grade])) : c.vision_grades,
       research_notes: research, engine_enrichment: enrichment,
       debate_summary: debate.transcript, trinity_decision: trinity,
     } : c));
@@ -1442,6 +1775,80 @@ export default function GradingPage() {
     setSelectedIds(new Set());
     setSelectionMode(false);
   }, [selectedIds, comics, gradeWithFullPipeline]);
+
+  // ─── eBay Listing Handlers ───
+
+  const comicToListingInput = useCallback((c: Comic, priceOverride?: number): ListingInput => {
+    let price = priceOverride || c.estimated_value || 9.99;
+    if (ebayPriceStrategy === 'markup') price = (c.estimated_value || 9.99) * (1 + ebayMarkupPercent / 100);
+    else if (ebayPriceStrategy === 'fixed') price = ebayFixedPrice;
+    return {
+      cortexUid: c.cortex_uid || undefined,
+      title: c.title, issue: c.issue, publisher: c.publisher,
+      year: c.year, grade: c.grade, gradeLabel: c.grade ? getGradeLabel(c.grade) : undefined,
+      confidence: c.consensus_confidence || undefined, defects: c.defects,
+      era: c.era || undefined, keyIssue: c.key_issue, keyIssueReason: c.key_issue_reason || undefined,
+      writer: c.writer || undefined, coverArtist: c.cover_artist || undefined,
+      frontR2Key: c.front_r2_key || undefined, backR2Key: c.back_r2_key || undefined,
+      collectibleType: c.collectible_type || 'comic',
+      price: Math.round(price * 100) / 100,
+      listingType: ebayListingType,
+    };
+  }, [ebayPriceStrategy, ebayMarkupPercent, ebayFixedPrice, ebayListingType]);
+
+  const handleEbayListSingle = useCallback(async (comic: Comic, priceOverride?: number) => {
+    setEbayProgress({ current: 0, total: 1, status: `Listing ${comic.title}...` });
+    try {
+      const result = await listOnEbay(comicToListingInput(comic, priceOverride));
+      if (result.success && result.ebayUrl) {
+        setEbayListedIds(prev => new Set([...prev, comic.id]));
+        setEbayListingUrls(prev => ({ ...prev, [comic.id]: result.ebayUrl! }));
+      }
+      setEbayResults([result]);
+    } catch (err) {
+      setEbayResults([{ success: false, error: err instanceof Error ? err.message : 'Unknown error' }]);
+    }
+    setEbayProgress(null);
+  }, [comicToListingInput]);
+
+  const handleEbayListBulk = useCallback(async (comicsToList: Comic[]) => {
+    if (!comicsToList.length) return;
+    setEbayProgress({ current: 0, total: comicsToList.length, status: 'Preparing listings...' });
+    setEbayResults([]);
+    const items = comicsToList.map(c => comicToListingInput(c));
+    // Process in batches of 25
+    const allResults: EbayListingResult[] = [];
+    for (let i = 0; i < items.length; i += 25) {
+      const batch = items.slice(i, i + 25);
+      const batchComics = comicsToList.slice(i, i + 25);
+      setEbayProgress({ current: i, total: comicsToList.length, status: `Listing batch ${Math.floor(i / 25) + 1}...` });
+      try {
+        const result = await bulkListOnEbay(batch, {
+          priceStrategy: ebayPriceStrategy, markupPercent: ebayMarkupPercent, fixedPrice: ebayFixedPrice,
+        });
+        allResults.push(...result.results);
+        // Track successful listings
+        result.results.forEach((r, idx) => {
+          if (r.success && r.ebayUrl) {
+            const comic = batchComics[idx];
+            setEbayListedIds(prev => new Set([...prev, comic.id]));
+            setEbayListingUrls(prev => ({ ...prev, [comic.id]: r.ebayUrl! }));
+          }
+        });
+      } catch (err) {
+        allResults.push(...batch.map(() => ({ success: false, error: err instanceof Error ? err.message : 'Batch failed' })));
+      }
+    }
+    setEbayResults(allResults);
+    setEbayProgress(null);
+  }, [comicToListingInput, ebayPriceStrategy, ebayMarkupPercent, ebayFixedPrice]);
+
+  const openEbayModal = useCallback((comicsToList: Comic[]) => {
+    setEbayListingComics(comicsToList);
+    setEbayResults([]);
+    setEbayProgress(null);
+    setShowEbayModal(true);
+  }, []);
 
   const handleBulkImport = useCallback(() => {
     if (!bulkImportText.trim()) return;
@@ -1653,6 +2060,21 @@ export default function GradingPage() {
                 )}
                 <button onClick={() => exportCollection('json')} className="px-3 py-2 rounded-lg text-xs font-medium" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text-muted)' }}>Export JSON</button>
                 <button onClick={() => exportCollection('csv')} className="px-3 py-2 rounded-lg text-xs font-medium" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text-muted)' }}>Export CSV</button>
+                {/* eBay Connection + List All */}
+                {ebayConnected ? (
+                  <>
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ backgroundColor: 'rgba(34,197,94,0.1)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.3)' }}>eBay Connected</span>
+                    {filteredComics.filter(c => c.grade !== null && !ebayListedIds.has(c.id)).length > 0 && (
+                      <button onClick={() => openEbayModal(filteredComics.filter(c => c.grade !== null && !ebayListedIds.has(c.id)))} className="px-4 py-2 rounded-lg text-xs font-bold" style={{ backgroundColor: '#3b82f6', color: '#fff' }}>
+                        List All on eBay ({filteredComics.filter(c => c.grade !== null && !ebayListedIds.has(c.id)).length})
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <button onClick={() => window.open(getEbayAuthUrl(), 'ebay_auth', 'width=600,height=700')} className="px-4 py-2 rounded-lg text-xs font-bold" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid #3b82f6', color: '#3b82f6' }}>
+                    {ebayChecking ? 'Checking...' : 'Connect eBay'}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -1672,6 +2094,11 @@ export default function GradingPage() {
                       <button onClick={handleBulkDelete} className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all" style={{ backgroundColor: '#ef4444', color: '#fff' }}>
                         Delete Selected ({selectedIds.size})
                       </button>
+                      {ebayConnected && (
+                        <button onClick={() => openEbayModal(comics.filter(c => selectedIds.has(c.id) && c.grade !== null))} className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all" style={{ backgroundColor: '#3b82f6', color: '#fff' }}>
+                          List on eBay ({comics.filter(c => selectedIds.has(c.id) && c.grade !== null).length})
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
@@ -1863,6 +2290,9 @@ export default function GradingPage() {
                       </div>
                       <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{c.publisher} &middot; {c.year}{c.era ? ` \u00B7 ${c.era}` : ''}</p>
                       {c.key_issue && <span className="inline-block mt-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase" style={{ backgroundColor: 'rgba(234,179,8,0.15)', color: '#eab308' }}>Key{c.collectible_type === 'comic' ? ' Issue' : ' / Rare'}</span>}
+                      {ebayListedIds.has(c.id) && (
+                        <a href={ebayListingUrls[c.id] || '#'} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="inline-block mt-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase no-underline" style={{ backgroundColor: 'rgba(59,130,246,0.1)', color: '#3b82f6' }} title="Listed on eBay">eBay</a>
+                      )}
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase" style={{ backgroundColor: c.status === 'graded' ? 'rgba(34,197,94,0.1)' : c.status === 'ungraded' ? 'var(--ept-surface)' : 'rgba(245,158,11,0.1)', color: c.status === 'graded' ? '#22c55e' : c.status === 'ungraded' ? 'var(--ept-text-muted)' : '#f59e0b' }}>
@@ -1896,49 +2326,202 @@ export default function GradingPage() {
                     </div>
                   )}
                   </div>
-                  {/* Hover Tooltip — Full Analytics */}
+                  {/* Rich Hover Tooltip — Full Analytics (P: drive style) */}
                   {hoveredComic === c.id && c.grade !== null && (
                     <div className="absolute left-0 right-0 bottom-full mb-2 z-40 pointer-events-none animate-fade-up" style={{ filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.5))' }}>
-                      <div className="mx-2 rounded-xl p-4 space-y-2" style={{ backgroundColor: 'var(--ept-bg)', border: '1px solid var(--ept-accent)' }}>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold" style={{ color: 'var(--ept-accent)' }}>{getCollectibleLabel(c.collectible_type || 'comic')}</span>
-                          <span className="text-xs font-mono" style={{ color: getGradeColor(c.grade!) }}>{c.grade} {getGradeLabel(c.grade!)}</span>
+                      <div className="mx-2 rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--ept-bg)', border: '1px solid var(--ept-accent)', maxHeight: '80vh', overflowY: 'auto' }}>
+                        {/* HEADER — Title + Grade Badge */}
+                        <div className="px-4 py-3 flex items-center justify-between" style={{ background: 'linear-gradient(135deg, var(--ept-accent-glow), transparent)', borderBottom: '1px solid var(--ept-border)' }}>
+                          <div>
+                            <p className="text-xs font-extrabold" style={{ color: 'var(--ept-text)' }}>{c.title} {c.issue}</p>
+                            <p className="text-[9px]" style={{ color: 'var(--ept-text-muted)' }}>{c.publisher} &middot; {c.year}</p>
+                          </div>
+                          <span className="px-3 py-1 rounded-full text-xs font-extrabold font-mono" style={{ backgroundColor: getGradeColor(c.grade!), color: '#fff' }}>{c.grade!.toFixed(1)}</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
-                          {c.year && <div><span style={{ color: 'var(--ept-text-muted)' }}>Year:</span> <span className="font-semibold">{c.year}</span></div>}
-                          {c.era && <div><span style={{ color: 'var(--ept-text-muted)' }}>Era:</span> <span className="font-semibold capitalize">{c.era}</span></div>}
-                          {c.writer && <div><span style={{ color: 'var(--ept-text-muted)' }}>{c.collectible_type === 'comic' ? 'Writer' : 'Creator'}:</span> <span className="font-semibold">{c.writer}</span></div>}
-                          {c.cover_artist && <div><span style={{ color: 'var(--ept-text-muted)' }}>{c.collectible_type === 'comic' ? 'Artist' : 'Variant'}:</span> <span className="font-semibold">{c.cover_artist}</span></div>}
-                          {c.key_issue && c.key_issue_reason && <div className="col-span-2"><span style={{ color: '#eab308' }}>Key:</span> <span className="font-semibold">{c.key_issue_reason}</span></div>}
-                          {c.characters && c.characters.length > 0 && <div className="col-span-2"><span style={{ color: 'var(--ept-text-muted)' }}>Characters:</span> <span className="font-semibold">{c.characters.slice(0, 5).join(', ')}</span></div>}
-                          {c.estimated_value && <div><span style={{ color: 'var(--ept-text-muted)' }}>Value:</span> <span className="font-bold gradient-text">{formatCurrency(c.estimated_value)}</span></div>}
-                          {c.buy_price && <div><span style={{ color: 'var(--ept-text-muted)' }}>Paid:</span> <span className="font-semibold">{formatCurrency(c.buy_price)}</span></div>}
-                          {c.consensus_confidence && <div><span style={{ color: 'var(--ept-text-muted)' }}>Confidence:</span> <span className="font-semibold">{c.consensus_confidence}%</span></div>}
-                          {c.buy_source && <div><span style={{ color: 'var(--ept-text-muted)' }}>Source:</span> <span className="font-semibold">{c.buy_source}</span></div>}
-                        </div>
-                        {/* Vision model grades if available */}
-                        {c.vision_grades && Object.keys(c.vision_grades).length > 0 && (
-                          <div className="pt-1" style={{ borderTop: '1px solid var(--ept-border)' }}>
-                            <p className="text-[9px] font-bold uppercase mb-1" style={{ color: 'var(--ept-text-muted)' }}>Model Grades</p>
-                            <div className="flex gap-2 flex-wrap">
-                              {Object.entries(c.vision_grades).map(([model, grade]) => {
-                                const vm = VISION_MODELS.find(v => v.model === model);
-                                return <span key={model} className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: 'var(--ept-surface)', color: vm?.color || 'var(--ept-text)' }}>{vm?.label?.split(' ').pop() || model.split('/').pop()}: {(grade as number).toFixed(1)}</span>;
-                              })}
+
+                        <div className="p-3 space-y-2">
+                          {/* SECTION 1 — Publication Info */}
+                          <div className="rounded-lg p-2.5" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+                            <p className="text-[9px] font-bold uppercase tracking-wider mb-1.5" style={{ color: 'var(--ept-accent)' }}>Publication Info</p>
+                            <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[10px]">
+                              <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Publisher</span> <span className="font-semibold" style={{ color: 'var(--ept-text)' }}>{c.publisher}</span></div>
+                              <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Year</span> <span className="font-semibold" style={{ color: 'var(--ept-text)' }}>{c.year || '—'}</span></div>
+                              {c.era && <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Era</span> <span className="font-semibold capitalize" style={{ color: 'var(--ept-text)' }}>{c.era}</span></div>}
+                              <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Grade</span> <span className="font-semibold" style={{ color: getGradeColor(c.grade!) }}>{getGradeLabel(c.grade!)}</span></div>
+                              {c.collectible_type && <div className="flex justify-between col-span-2"><span style={{ color: 'var(--ept-text-muted)' }}>Type</span> <span className="font-semibold capitalize" style={{ color: 'var(--ept-text)' }}>{c.collectible_type.replace('_', ' ')}</span></div>}
                             </div>
                           </div>
-                        )}
-                        {/* Trinity decision if available */}
-                        {c.trinity_decision && (
-                          <div className="flex gap-3 text-[9px] font-mono pt-1" style={{ borderTop: '1px solid var(--ept-border)' }}>
-                            <span style={{ color: '#8b5cf6' }}>SAGE: {(c.trinity_decision as TrinityDecision).sage.grade.toFixed(1)}</span>
-                            <span style={{ color: '#ec4899' }}>NYX: {(c.trinity_decision as TrinityDecision).nyx.grade.toFixed(1)}</span>
-                            <span style={{ color: '#f59e0b' }}>THORNE: {(c.trinity_decision as TrinityDecision).thorne.grade.toFixed(1)}</span>
+
+                          {/* SECTION 2 — Creative Team */}
+                          {(c.writer || c.cover_artist) && (
+                            <div className="rounded-lg p-2.5" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+                              <p className="text-[9px] font-bold uppercase tracking-wider mb-1.5" style={{ color: 'var(--ept-accent)' }}>Creative Team</p>
+                              <div className="space-y-0.5 text-[10px]">
+                                {c.writer && <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>{c.collectible_type === 'comic' ? 'Writer' : 'Creator'}</span> <span className="font-semibold" style={{ color: 'var(--ept-text)' }}>{c.writer}</span></div>}
+                                {c.cover_artist && <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>{c.collectible_type === 'comic' ? 'Cover Artist' : 'Variant'}</span> <span className="font-semibold" style={{ color: 'var(--ept-text)' }}>{c.cover_artist}</span></div>}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* SECTION 3 — Key Issue Info (gold highlight) */}
+                          {c.key_issue && (
+                            <div className="rounded-lg p-2.5" style={{ backgroundColor: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.25)' }}>
+                              <p className="text-[9px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#eab308' }}>Key Issue</p>
+                              <div className="space-y-0.5 text-[10px]">
+                                {c.key_issue_reason && (
+                                  <div><span style={{ color: 'var(--ept-text-muted)' }}>Reason: </span><span className="font-bold" style={{ color: '#eab308' }}>{c.key_issue_reason}</span></div>
+                                )}
+                                {c.characters && c.characters.length > 0 && (
+                                  <div><span style={{ color: 'var(--ept-text-muted)' }}>Characters: </span><span className="font-semibold" style={{ color: 'var(--ept-text)' }}>{c.characters.join(', ')}</span></div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* SECTION 4 — AI Vision Model Rollcall */}
+                          {c.vision_grades && Object.keys(c.vision_grades).length > 0 && (
+                            <div className="rounded-lg p-2.5" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+                              <p className="text-[9px] font-bold uppercase tracking-wider mb-1.5" style={{ color: 'var(--ept-accent)' }}>AI Vision Rollcall</p>
+                              <div className="space-y-1">
+                                {Object.entries(c.vision_grades).map(([model, grade]) => {
+                                  const vm = VISION_MODELS.find(v => v.model === model);
+                                  const g = grade as number;
+                                  const pct = Math.min(100, Math.max(0, g * 10));
+                                  return (
+                                    <div key={model} className="flex items-center gap-2">
+                                      <span className="text-[9px] font-semibold w-16 truncate" style={{ color: vm?.color || 'var(--ept-text)' }}>{vm?.label?.split(' ').pop() || model.split('/').pop()}</span>
+                                      <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--ept-border)' }}>
+                                        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: vm?.color || 'var(--ept-accent)' }} />
+                                      </div>
+                                      <span className="text-[9px] font-mono font-bold w-6 text-right" style={{ color: vm?.color || 'var(--ept-text)' }}>{g.toFixed(1)}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* SECTION 5 — Trinity Council */}
+                          {c.trinity_decision && (
+                            <div className="rounded-lg p-2.5" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+                              <p className="text-[9px] font-bold uppercase tracking-wider mb-1.5" style={{ color: 'var(--ept-accent)' }}>Trinity Council</p>
+                              <div className="space-y-1">
+                                {[
+                                  { name: 'SAGE', data: (c.trinity_decision as TrinityDecision).sage, color: '#8b5cf6', weight: '40%' },
+                                  { name: 'NYX', data: (c.trinity_decision as TrinityDecision).nyx, color: '#ec4899', weight: '35%' },
+                                  { name: 'THORNE', data: (c.trinity_decision as TrinityDecision).thorne, color: '#f59e0b', weight: '25%' },
+                                ].map(t => (
+                                  <div key={t.name} className="flex items-center gap-2">
+                                    <span className="text-[9px] font-bold w-14" style={{ color: t.color }}>{t.name} <span className="font-normal opacity-60">({t.weight})</span></span>
+                                    <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--ept-border)' }}>
+                                      <div className="h-full rounded-full" style={{ width: `${Math.min(100, t.data.grade * 10)}%`, backgroundColor: t.color }} />
+                                    </div>
+                                    <span className="text-[9px] font-mono font-bold w-6 text-right" style={{ color: t.color }}>{t.data.grade.toFixed(1)}</span>
+                                  </div>
+                                ))}
+                                {(c.trinity_decision as TrinityDecision).dissent && (
+                                  <p className="text-[8px] italic mt-1 line-clamp-2" style={{ color: 'var(--ept-text-muted)' }}>Dissent: {(c.trinity_decision as TrinityDecision).dissent}</p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* SECTION 6 — Defect Panel */}
+                          {c.defects.length > 0 && (
+                            <div className="rounded-lg p-2.5" style={{ backgroundColor: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.15)' }}>
+                              <p className="text-[9px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#ef4444' }}>Defects ({c.defects.length})</p>
+                              <div className="flex flex-wrap gap-1">
+                                {c.defects.map(d => {
+                                  const def = DEFECT_TYPES.find(dt => dt.key === d);
+                                  const sevColor = def?.severity === 'severe' ? '#dc2626' : def?.severity === 'major' ? '#ea580c' : def?.severity === 'moderate' ? '#f59e0b' : '#6b7280';
+                                  return (
+                                    <span key={d} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium" style={{ backgroundColor: `${sevColor}15`, color: sevColor, border: `1px solid ${sevColor}30` }}>
+                                      {def?.icon || ''} {def?.label || d.replace('_', ' ')}
+                                      <span className="text-[7px] uppercase opacity-70 ml-0.5">{def?.severity || ''}</span>
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* SECTION 7 — Market Pricing */}
+                          <div className="rounded-lg p-2.5" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.04), rgba(59,130,246,0.04))', border: '1px solid rgba(16,185,129,0.15)' }}>
+                            <p className="text-[9px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#10b981' }}>Market Pricing</p>
+                            <div className="space-y-0.5 text-[10px]">
+                              {c.estimated_value && (
+                                <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Estimated Value</span> <span className="font-extrabold" style={{ color: '#fbbf24' }}>{formatCurrency(c.estimated_value)}</span></div>
+                              )}
+                              {c.buy_price && (
+                                <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Purchase Price</span> <span className="font-semibold" style={{ color: 'var(--ept-text)' }}>{formatCurrency(c.buy_price)}</span></div>
+                              )}
+                              {c.buy_price && c.estimated_value && (
+                                <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>ROI</span> <span className="font-bold" style={{ color: c.estimated_value > c.buy_price ? '#10b981' : '#ef4444' }}>{c.estimated_value > c.buy_price ? '+' : ''}{(((c.estimated_value - c.buy_price) / c.buy_price) * 100).toFixed(0)}%</span></div>
+                              )}
+                              {c.engine_enrichment?.fin12?.range && (
+                                <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Market Range</span> <span className="font-semibold" style={{ color: '#3b82f6' }}>{c.engine_enrichment.fin12.range}</span></div>
+                              )}
+                              {c.engine_enrichment?.fin12?.trend && (
+                                <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Trend</span> <span className="font-semibold" style={{ color: c.engine_enrichment.fin12.trend.toLowerCase().includes('up') ? '#10b981' : c.engine_enrichment.fin12.trend.toLowerCase().includes('down') ? '#ef4444' : '#6b7280' }}>{c.engine_enrichment.fin12.trend}</span></div>
+                              )}
+                              {c.engine_enrichment?.prb02?.framework && (
+                                <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Valuation</span> <span className="font-semibold text-[9px]" style={{ color: 'var(--ept-text)' }}>{c.engine_enrichment.prb02.framework.slice(0, 40)}</span></div>
+                              )}
+                              {c.consensus_confidence && (
+                                <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Confidence</span> <span className="font-semibold" style={{ color: c.consensus_confidence >= 80 ? '#10b981' : c.consensus_confidence >= 60 ? '#f59e0b' : '#ef4444' }}>{c.consensus_confidence}%</span></div>
+                              )}
+                            </div>
                           </div>
-                        )}
-                        {c.research_notes && (
-                          <p className="text-[9px] leading-tight pt-1 line-clamp-3" style={{ color: 'var(--ept-text-muted)', borderTop: '1px solid var(--ept-border)' }}>{c.research_notes.slice(0, 200)}</p>
-                        )}
+
+                          {/* SECTION 8 — Engine Intelligence */}
+                          {c.engine_enrichment && (c.engine_enrichment.lg06 || c.engine_enrichment.hist) && (
+                            <div className="rounded-lg p-2.5" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+                              <p className="text-[9px] font-bold uppercase tracking-wider mb-1.5" style={{ color: 'var(--ept-accent)' }}>Intelligence</p>
+                              <div className="space-y-1 text-[9px]">
+                                {c.engine_enrichment.lg06?.significance && (
+                                  <div><span className="font-semibold" style={{ color: 'var(--ept-accent)' }}>IP: </span><span className="leading-tight" style={{ color: 'var(--ept-text-muted)' }}>{c.engine_enrichment.lg06.significance.slice(0, 120)}</span></div>
+                                )}
+                                {c.engine_enrichment.hist?.context && (
+                                  <div><span className="font-semibold" style={{ color: 'var(--ept-accent)' }}>History: </span><span className="leading-tight" style={{ color: 'var(--ept-text-muted)' }}>{c.engine_enrichment.hist.context.slice(0, 120)}</span></div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* SECTION 9 — Debate Summary */}
+                          {c.debate_summary && (
+                            <div className="rounded-lg p-2.5" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+                              <p className="text-[9px] font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--ept-accent)' }}>Bull/Bear Debate</p>
+                              <p className="text-[9px] leading-tight line-clamp-3" style={{ color: 'var(--ept-text-muted)' }}>{c.debate_summary.slice(0, 200)}</p>
+                            </div>
+                          )}
+
+                          {/* SECTION 10 — Research Notes */}
+                          {c.research_notes && (
+                            <div className="rounded-lg p-2.5" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+                              <p className="text-[9px] font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--ept-accent)' }}>Research</p>
+                              <p className="text-[9px] leading-tight line-clamp-3" style={{ color: 'var(--ept-text-muted)' }}>{c.research_notes.slice(0, 250)}</p>
+                            </div>
+                          )}
+
+                          {/* Purchase & Source info */}
+                          {(c.buy_source || c.buy_date || c.sold_price) && (
+                            <div className="rounded-lg p-2.5" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+                              <p className="text-[9px] font-bold uppercase tracking-wider mb-1.5" style={{ color: 'var(--ept-accent)' }}>Acquisition</p>
+                              <div className="space-y-0.5 text-[10px]">
+                                {c.buy_source && <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Source</span> <span className="font-semibold" style={{ color: 'var(--ept-text)' }}>{c.buy_source}</span></div>}
+                                {c.buy_date && <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Date</span> <span className="font-semibold" style={{ color: 'var(--ept-text)' }}>{c.buy_date}</span></div>}
+                                {c.sold_price && <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Sold For</span> <span className="font-bold" style={{ color: '#10b981' }}>{formatCurrency(c.sold_price)}</span></div>}
+                                {c.sold_date && <div className="flex justify-between"><span style={{ color: 'var(--ept-text-muted)' }}>Sold Date</span> <span className="font-semibold" style={{ color: 'var(--ept-text)' }}>{c.sold_date}</span></div>}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Graded timestamp */}
+                          {c.graded_at && (
+                            <p className="text-[8px] text-center" style={{ color: 'var(--ept-text-muted)' }}>Graded {new Date(c.graded_at).toLocaleDateString()}</p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -2584,6 +3167,159 @@ export default function GradingPage() {
       </main>
 
       {/* Comic Detail Modal */}
+      {/* ─── eBay Listing Modal ─── */}
+      {showEbayModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }} onClick={() => { if (!ebayProgress) setShowEbayModal(false); }}>
+          <div className="w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-2xl" style={{ backgroundColor: 'var(--ept-bg)' }} onClick={e => e.stopPropagation()}>
+            <div className="p-6 space-y-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-extrabold" style={{ color: 'var(--ept-text)' }}>List on eBay</h2>
+                  <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{ebayListingComics.length} item{ebayListingComics.length !== 1 ? 's' : ''} to list</p>
+                </div>
+                {!ebayProgress && <button onClick={() => setShowEbayModal(false)} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--ept-surface)' }}>&#10005;</button>}
+              </div>
+
+              {/* Items Preview */}
+              <div className="rounded-xl p-3 space-y-2 max-h-48 overflow-y-auto" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                {ebayListingComics.slice(0, 10).map(c => (
+                  <div key={c.id} className="flex items-center justify-between text-xs">
+                    <span style={{ color: 'var(--ept-text)' }}>{c.title} {c.issue}</span>
+                    <span className="font-bold" style={{ color: 'var(--ept-accent)' }}>{c.estimated_value ? `$${c.estimated_value.toFixed(2)}` : '—'}</span>
+                  </div>
+                ))}
+                {ebayListingComics.length > 10 && <p className="text-xs text-center" style={{ color: 'var(--ept-text-muted)' }}>...and {ebayListingComics.length - 10} more</p>}
+              </div>
+
+              {/* Listing Configuration */}
+              {!ebayResults.length && !ebayProgress && (
+                <div className="space-y-4">
+                  {/* Price Strategy */}
+                  <div>
+                    <p className="text-xs font-bold mb-2" style={{ color: 'var(--ept-text-muted)' }}>PRICING STRATEGY</p>
+                    <div className="flex gap-2">
+                      {([['consensus', 'Use AI Valuation'], ['markup', 'Markup %'], ['fixed', 'Fixed Price']] as const).map(([val, label]) => (
+                        <button key={val} onClick={() => setEbayPriceStrategy(val)} className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all" style={{
+                          backgroundColor: ebayPriceStrategy === val ? '#3b82f6' : 'var(--ept-surface)',
+                          color: ebayPriceStrategy === val ? '#fff' : 'var(--ept-text-muted)',
+                          border: `1px solid ${ebayPriceStrategy === val ? '#3b82f6' : 'var(--ept-border)'}`,
+                        }}>{label}</button>
+                      ))}
+                    </div>
+                    {ebayPriceStrategy === 'markup' && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Markup:</span>
+                        <input type="number" value={ebayMarkupPercent} onChange={e => setEbayMarkupPercent(parseInt(e.target.value) || 0)} className="w-20 px-2 py-1 rounded text-xs" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                        <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>%</span>
+                      </div>
+                    )}
+                    {ebayPriceStrategy === 'fixed' && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>$</span>
+                        <input type="number" step="0.01" value={ebayFixedPrice} onChange={e => setEbayFixedPrice(parseFloat(e.target.value) || 0)} className="w-24 px-2 py-1 rounded text-xs" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Listing Type */}
+                  <div>
+                    <p className="text-xs font-bold mb-2" style={{ color: 'var(--ept-text-muted)' }}>LISTING TYPE</p>
+                    <div className="flex gap-2">
+                      <button onClick={() => setEbayListingType('fixed_price')} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{
+                        backgroundColor: ebayListingType === 'fixed_price' ? '#3b82f6' : 'var(--ept-surface)',
+                        color: ebayListingType === 'fixed_price' ? '#fff' : 'var(--ept-text-muted)',
+                        border: `1px solid ${ebayListingType === 'fixed_price' ? '#3b82f6' : 'var(--ept-border)'}`,
+                      }}>Fixed Price</button>
+                      <button onClick={() => setEbayListingType('auction')} className="px-3 py-1.5 rounded-lg text-xs font-bold" style={{
+                        backgroundColor: ebayListingType === 'auction' ? '#3b82f6' : 'var(--ept-surface)',
+                        color: ebayListingType === 'auction' ? '#fff' : 'var(--ept-text-muted)',
+                        border: `1px solid ${ebayListingType === 'auction' ? '#3b82f6' : 'var(--ept-border)'}`,
+                      }}>Auction</button>
+                    </div>
+                  </div>
+
+                  {/* Summary */}
+                  <div className="rounded-xl p-4" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span style={{ color: 'var(--ept-text-muted)' }}>Items to list:</span>
+                      <span className="font-bold" style={{ color: 'var(--ept-text)' }}>{ebayListingComics.length}</span>
+                    </div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span style={{ color: 'var(--ept-text-muted)' }}>Total value:</span>
+                      <span className="font-bold gradient-text">
+                        ${ebayListingComics.reduce((sum, c) => {
+                          let p = c.estimated_value || 9.99;
+                          if (ebayPriceStrategy === 'markup') p = p * (1 + ebayMarkupPercent / 100);
+                          else if (ebayPriceStrategy === 'fixed') p = ebayFixedPrice;
+                          return sum + p;
+                        }, 0).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span style={{ color: 'var(--ept-text-muted)' }}>Est. eBay fees (~16%):</span>
+                      <span style={{ color: '#ef4444' }}>
+                        -${(ebayListingComics.reduce((sum, c) => {
+                          let p = c.estimated_value || 9.99;
+                          if (ebayPriceStrategy === 'markup') p = p * (1 + ebayMarkupPercent / 100);
+                          else if (ebayPriceStrategy === 'fixed') p = ebayFixedPrice;
+                          return sum + p;
+                        }, 0) * 0.16).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Confirm Button */}
+                  <button onClick={() => handleEbayListBulk(ebayListingComics)} className="w-full py-3 rounded-xl text-sm font-bold transition-all" style={{ backgroundColor: '#3b82f6', color: '#fff' }}>
+                    List {ebayListingComics.length} Item{ebayListingComics.length !== 1 ? 's' : ''} on eBay
+                  </button>
+                </div>
+              )}
+
+              {/* Progress */}
+              {ebayProgress && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#3b82f6' }} />
+                    <span className="text-sm font-bold" style={{ color: '#3b82f6' }}>{ebayProgress.status}</span>
+                    <span className="text-xs font-mono ml-auto" style={{ color: 'var(--ept-text-muted)' }}>{ebayProgress.current}/{ebayProgress.total}</span>
+                  </div>
+                  <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                    <div className="h-full rounded-full transition-all duration-500" style={{ backgroundColor: '#3b82f6', width: `${ebayProgress.total ? (ebayProgress.current / ebayProgress.total) * 100 : 0}%` }} />
+                  </div>
+                </div>
+              )}
+
+              {/* Results */}
+              {ebayResults.length > 0 && !ebayProgress && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">{ebayResults.filter(r => r.success).length === ebayResults.length ? '\u2705' : '\u26a0\ufe0f'}</span>
+                    <div>
+                      <p className="text-sm font-bold" style={{ color: 'var(--ept-text)' }}>
+                        {ebayResults.filter(r => r.success).length} of {ebayResults.length} listed successfully
+                      </p>
+                      {ebayResults.some(r => !r.success) && (
+                        <p className="text-xs" style={{ color: '#ef4444' }}>{ebayResults.filter(r => !r.success).length} failed</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-1 max-h-40 overflow-y-auto">
+                    {ebayResults.map((r, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs p-2 rounded-lg" style={{ backgroundColor: r.success ? 'rgba(34,197,94,0.05)' : 'rgba(239,68,68,0.05)' }}>
+                        <span style={{ color: r.success ? '#22c55e' : '#ef4444' }}>{r.success ? 'Listed' : 'Failed'}: {ebayListingComics[i]?.title || 'Unknown'}</span>
+                        {r.ebayUrl && <a href={r.ebayUrl} target="_blank" rel="noopener noreferrer" className="font-bold no-underline" style={{ color: '#3b82f6' }}>View</a>}
+                        {r.error && <span className="text-[10px]" style={{ color: '#ef4444' }}>{r.error.slice(0, 60)}</span>}
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => { setShowEbayModal(false); setEbayResults([]); }} className="w-full py-2 rounded-xl text-xs font-bold" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }}>Close</button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {comicDetailModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }} onClick={() => setComicDetailModal(null)}>
           <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl" style={{ backgroundColor: 'var(--ept-bg)' }} onClick={e => e.stopPropagation()}>
@@ -2600,6 +3336,12 @@ export default function GradingPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <button onClick={() => gradeWithFullPipeline(comicDetailModal)} disabled={isGrading} className="px-4 py-2 rounded-lg text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>{isGrading ? 'Re-grading...' : 'Re-grade'}</button>
+                  {ebayConnected && comicDetailModal.grade !== null && !ebayListedIds.has(comicDetailModal.id) && (
+                    <button onClick={() => { openEbayModal([comicDetailModal]); }} className="px-4 py-2 rounded-lg text-xs font-bold" style={{ backgroundColor: '#3b82f6', color: '#fff' }}>List on eBay</button>
+                  )}
+                  {ebayListedIds.has(comicDetailModal.id) && ebayListingUrls[comicDetailModal.id] && (
+                    <a href={ebayListingUrls[comicDetailModal.id]} target="_blank" rel="noopener noreferrer" className="px-4 py-2 rounded-lg text-xs font-bold no-underline" style={{ backgroundColor: 'rgba(34,197,94,0.1)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.3)' }}>View on eBay</a>
+                  )}
                   <button onClick={() => setComicDetailModal(null)} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--ept-surface)' }}>✕</button>
                 </div>
               </div>
@@ -2717,14 +3459,14 @@ export default function GradingPage() {
           <h3 className="text-base font-bold mb-1" style={{ color: 'var(--ept-text)' }}>Valuation &amp; Authentication Doctrine</h3>
           <p className="text-xs mb-4" style={{ color: 'var(--ept-text-muted)' }}>Query forensic and financial doctrine for collectible authentication, valuation methodology, and appraisal standards.</p>
           <EngineQueryPanel
-            domains={['FOREN', 'FIN']}
+            domains={['FOREN']}
             title="Collectible Doctrine Search"
-            placeholder="Ask about authentication standards, valuation methods, appraisal doctrine..."
+            placeholder="Ask about grading standards, authentication, valuation, appraisal doctrine..."
             exampleQueries={[
-              'Coin grading scale MS-60 to MS-70 criteria',
-              'Sports memorabilia authentication methods',
+              'Sheldon coin grading scale MS-60 to MS-70',
+              'PSA vs BGS sports card grading standards',
               'Fair market value determination for collectibles',
-              'Provenance verification best practices',
+              'Authentication and provenance verification',
             ]}
             showStats
           />
@@ -2739,4 +3481,180 @@ export default function GradingPage() {
       </footer>
     </div>
   );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PUBLIC LANDING PAGE — shown to non-authenticated visitors
+   ═══════════════════════════════════════════════════════════════ */
+function GradingLanding() {
+  const { isDark } = useTheme();
+  const TEAL = { gradient: 'linear-gradient(135deg, #0d9488, #14b8a6)', solid: 'var(--ept-accent)' };
+
+  const highlights = [
+    { icon: '\uD83E\uDD16', title: '5 AI Vision Models', desc: 'Claude Opus 4.6, GPT-4o, Gemini 2.5 Pro, Grok 4, and Qwen 2.5 VL — weighted ensemble for consensus grading.' },
+    { icon: '\uD83D\uDCCA', title: '19 Collectible Types', desc: 'Comics, baseball/football/basketball/hockey cards, Pokemon, Yu-Gi-Oh, MTG, coins, stamps, vinyl, video games, and more.' },
+    { icon: '\uD83D\uDCB0', title: 'eBay Integration', desc: 'One-click listing with AI-optimized titles, descriptions, and pricing. Bulk list your entire collection.' },
+    { icon: '\uD83C\uDFA4', title: 'Trinity Voice Consensus', desc: 'SAGE, NYX, and THORNE AI personalities debate each grade — like having 3 expert graders in one tool.' },
+    { icon: '\u26A1', title: 'Instant Results', desc: 'Upload a photo, get a professional-grade assessment in seconds. No shipping. No waiting weeks for CGC/PSA.' },
+    { icon: '\uD83D\uDCC8', title: 'Market Valuation', desc: 'Real-time pricing calibrated against GoCollect, Heritage Auctions, and live eBay comps. Track portfolio ROI.' },
+  ];
+
+  const tiers = [
+    { name: 'Hobby', price: 19, interval: 'month', features: ['50 gradings/month', '3 collectible types', 'Basic valuation', 'Collection tracking', 'Photo upload grading'], popular: false },
+    { name: 'Collector', price: 79, interval: 'month', features: ['500 gradings/month', 'All 19 collectible types', 'Trinity AI consensus', 'eBay integration', 'Market analytics', 'Portfolio tracking', 'Bulk grading'], popular: true },
+    { name: 'Dealer', price: 249, interval: 'month', features: ['Unlimited gradings', 'All 19 types + custom', 'Full Trinity + 5 vision models', 'eBay bulk listing', 'API access', 'Priority support', 'White-label reports', 'Advanced analytics'], popular: false },
+  ];
+
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      {/* Nav */}
+      <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
+        <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority /></Link>
+        <div className="flex items-center gap-4">
+          <Link href="/pricing" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Pricing</Link>
+          <Link href="/login" className="text-sm font-semibold px-4 py-2 rounded-lg text-white" style={{ background: TEAL.gradient }}>Get Started</Link>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section className="max-w-5xl mx-auto px-6 py-16 md:py-24 text-center">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: TEAL.solid }}>
+          EPOCGS v3.0 — AI Collectibles Grading
+        </div>
+        <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight" style={{ color: 'var(--ept-text)' }}>
+          Professional Grading<br />
+          <span className="gradient-text">Without the Wait</span>
+        </h1>
+        <p className="text-lg md:text-xl max-w-2xl mx-auto mb-8 leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
+          Upload a photo. Get an instant AI-powered grade from 5 vision models. List on eBay in one click. No shipping, no 3-month wait, no $50+ fees per item.
+        </p>
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <Link href="/signup" className="px-8 py-3.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90" style={{ background: TEAL.gradient }}>
+            Start Grading Free
+          </Link>
+          <Link href="#pricing" className="px-8 py-3.5 rounded-xl font-semibold text-sm transition-all" style={{ border: '1px solid var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+            View Pricing
+          </Link>
+        </div>
+        <div className="flex flex-wrap justify-center gap-6 text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+          <span>19 collectible types</span>
+          <span>5 AI vision models</span>
+          <span>eBay integration</span>
+          <span>CGC/PSA/NGC scales</span>
+        </div>
+      </section>
+
+      {/* Collectible Types Grid */}
+      <section className="max-w-5xl mx-auto px-6 py-12">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8" style={{ color: 'var(--ept-text)' }}>Grade Any Collectible</h2>
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-3">
+          {COLLECTIBLE_TYPES.filter(c => c.id !== 'other').map(c => (
+            <div key={c.id} className="p-3 rounded-xl text-center transition-all hover:scale-105" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
+              <div className="text-2xl mb-1">{c.icon}</div>
+              <div className="text-[10px] font-medium leading-tight" style={{ color: 'var(--ept-text-secondary)' }}>{c.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Highlights */}
+      <section className="max-w-5xl mx-auto px-6 py-12">
+        <div className="grid md:grid-cols-3 gap-6">
+          {highlights.map((h, i) => (
+            <div key={i} className="p-6 rounded-xl" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
+              <div className="text-3xl mb-3">{h.icon}</div>
+              <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{h.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>{h.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-10" style={{ color: 'var(--ept-text)' }}>How It Works</h2>
+        <div className="grid md:grid-cols-4 gap-6 text-center">
+          {[
+            { step: '1', title: 'Upload', desc: 'Take a photo of your collectible — front and back.' },
+            { step: '2', title: 'AI Analysis', desc: '5 vision models examine condition, defects, and authenticity.' },
+            { step: '3', title: 'Consensus Grade', desc: 'Trinity AI debates and assigns a professional-scale grade.' },
+            { step: '4', title: 'Sell or Hold', desc: 'Get market value and list on eBay in one click.' },
+          ].map((s, i) => (
+            <div key={i}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold mx-auto mb-3 text-white" style={{ background: TEAL.gradient }}>{s.step}</div>
+              <h4 className="font-bold mb-1" style={{ color: 'var(--ept-text)' }}>{s.title}</h4>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={{ color: 'var(--ept-text)' }}>Simple Pricing</h2>
+        <p className="text-sm text-center mb-10" style={{ color: 'var(--ept-text-muted)' }}>Start free. Upgrade when you need more.</p>
+        <div className="grid md:grid-cols-3 gap-6">
+          {tiers.map((t, i) => (
+            <div key={i} className="p-6 rounded-xl relative" style={{
+              backgroundColor: 'var(--ept-card-bg)',
+              border: t.popular ? `2px solid var(--ept-accent)` : '1px solid var(--ept-card-border)',
+              boxShadow: t.popular ? '0 0 40px rgba(20,184,166,0.1)' : 'none',
+            }}>
+              {t.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[10px] font-bold text-white" style={{ background: TEAL.gradient }}>MOST POPULAR</div>}
+              <h3 className="text-lg font-bold mb-1" style={{ color: 'var(--ept-text)' }}>{t.name}</h3>
+              <div className="flex items-baseline gap-1 mb-4">
+                <span className="text-3xl font-extrabold font-mono gradient-text">${t.price}</span>
+                <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>/{t.interval}</span>
+              </div>
+              <ul className="space-y-2 mb-6">
+                {t.features.map((f, j) => (
+                  <li key={j} className="flex items-start gap-2 text-sm" style={{ color: 'var(--ept-text-secondary)' }}>
+                    <span style={{ color: TEAL.solid }}>&#10003;</span>{f}
+                  </li>
+                ))}
+              </ul>
+              <Link href={`/checkout?service=collectibles-grading&tier=${t.name.toLowerCase()}`}
+                className="block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90"
+                style={{
+                  background: t.popular ? TEAL.gradient : 'transparent',
+                  color: t.popular ? '#fff' : 'var(--ept-accent)',
+                  border: t.popular ? 'none' : '1px solid var(--ept-accent)',
+                }}>
+                Get Started
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-3xl mx-auto px-6 py-16 text-center">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Stop Guessing. Start Grading.</h2>
+        <p className="text-sm mb-8 max-w-lg mx-auto" style={{ color: 'var(--ept-text-muted)' }}>
+          Join collectors, dealers, and shops who use AI grading to price accurately and sell faster.
+        </p>
+        <Link href="/signup" className="inline-block px-10 py-3.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90" style={{ background: TEAL.gradient }}>
+          Create Free Account
+        </Link>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t py-6" style={{ borderColor: 'var(--ept-border)' }}>
+        <div className="max-w-5xl mx-auto px-6 flex flex-wrap justify-between items-center gap-4">
+          <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>&copy; 2026 Echo Prime Technologies. EPOCGS v3.0</p>
+          <div className="flex gap-4 text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+            <Link href="/pricing" className="hover:underline" style={{ color: 'var(--ept-accent)' }}>All Pricing</Link>
+            <Link href="/sentinel" className="hover:underline" style={{ color: 'var(--ept-accent)' }}>Sentinel AI</Link>
+            <Link href="/" className="hover:underline" style={{ color: 'var(--ept-accent)' }}>Home</Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+export default function GradingPage() {
+  const { user, loading } = useAuth();
+  if (!loading && !user) return <GradingLanding />;
+  return <SubscriptionGate serviceId="collectibles-grading"><GradingPageContent /></SubscriptionGate>;
 }

@@ -17,12 +17,14 @@
 ```ts
 const NAV_ITEMS = [
   { label: 'Engines', href: '/engines' },
-  { label: 'Voice', href: '/voice' },
+  { label: 'Bots', href: '/bots' },
+  { label: 'Scrapers', href: '/scrapers' },
+  { label: 'Closer AI', href: '/closer' },
+  { label: 'Pipelines', href: '/pipelines' },
   { label: 'Security', href: '/security' },
-  { label: 'Services', href: '/services' },
-  { label: 'Tax Prep', href: '/tax-returns' },
+  { label: 'Title Intel', href: '/title-intelligence' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Sentinel AI', href: '/sentinel' },
+  { label: 'Sentinel AI', href: '/sentinel' }, // accent colored
 ];
 ```
 

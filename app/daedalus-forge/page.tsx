@@ -16,6 +16,7 @@ import {
   type ForgeStats,
   type Domain,
 } from '../../lib/daedalus-forge-api';
+import SubscriptionGate from '../../components/SubscriptionGate';
 
 // ── Types ──
 
@@ -43,7 +44,7 @@ function formatMarkdown(text: string): string {
 
 // ── Component ──
 
-export default function DaedalusForge() {
+function DaedalusForgeContent() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const { isDark } = useTheme();
@@ -380,6 +381,22 @@ export default function DaedalusForge() {
           />
         </div>
       </div>
+
+      {/* ─── CTA ─── */}
+      <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
+        <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>Build Physical Products with AI</h2>
+          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>50-stage manufacturing AI pipeline with CNC programming, stress analysis, and material optimization.</p>
+          <div className="flex items-center justify-center gap-4">
+            <Link href="/pricing" className="inline-block px-10 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>View Pricing</Link>
+            <Link href="/sentinel" className="inline-block px-10 py-3 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>Try Free Demo</Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
+}
+
+export default function DaedalusForge() {
+  return <SubscriptionGate serviceId="daedalus-forge"><DaedalusForgeContent /></SubscriptionGate>;
 }

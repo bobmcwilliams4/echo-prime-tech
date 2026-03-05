@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
-import { getServices, subscribe, Service } from '../../lib/ept-api';
+import { getServices, Service } from '../../lib/ept-api';
 
 export default function ServicesPage() {
   const router = useRouter();
@@ -14,7 +14,7 @@ export default function ServicesPage() {
   const { isDark } = useTheme();
   const [services, setServices] = useState<Service[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [saving, setSaving] = useState(false);
+  const newCount = Array.from(selected).filter(id => !subscriptions.includes(id)).length;
 
   useEffect(() => {
     if (!loading && !user) router.push('/login');
@@ -36,13 +36,19 @@ export default function ServicesPage() {
     });
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (selected.size === 0) return;
-    setSaving(true);
-    try {
-      await subscribe(Array.from(selected));
+    // Find the first newly-selected service (not already subscribed)
+    const newServices = Array.from(selected).filter(id => !subscriptions.includes(id));
+    if (newServices.length === 0) {
+      // All selected are already subscribed — just go to dashboard
       router.push(role === 'owner' ? '/admin' : '/dashboard');
-    } catch { setSaving(false); }
+      return;
+    }
+    // Route to checkout with the first new service
+    const svc = services.find(s => s.id === newServices[0]);
+    const tier = svc?.pricing?.[0]?.tier?.toLowerCase() || 'starter';
+    router.push(`/checkout?service=${encodeURIComponent(newServices[0])}&tier=${encodeURIComponent(tier)}`);
   };
 
   if (loading || !user) return (
@@ -98,8 +104,8 @@ export default function ServicesPage() {
         </div>
 
         <div className="text-center">
-          <button onClick={handleSave} disabled={selected.size === 0 || saving} className="px-10 py-4 rounded-xl font-semibold text-lg transition-all disabled:opacity-40" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
-            {saving ? 'Activating...' : `Activate ${selected.size} Service${selected.size !== 1 ? 's' : ''}`}
+          <button onClick={handleSave} disabled={selected.size === 0} className="px-10 py-4 rounded-xl font-semibold text-lg transition-all disabled:opacity-40" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+            {newCount > 0 ? `Continue to Checkout` : `Go to Dashboard`}
           </button>
           <p className="mt-4 text-xs" style={{ color: 'var(--ept-text-muted)' }}>
             <Link href="/pricing" className="underline hover:opacity-80">View detailed pricing</Link> for all services

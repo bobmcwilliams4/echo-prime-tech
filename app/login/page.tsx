@@ -15,6 +15,10 @@ export default function LoginPage() {
   const { user, loading } = useAuth();
   const { isDark } = useTheme();
   const [tab, setTab] = useState<AuthTab>('email');
+  const getRedirectUrl = () => {
+    if (typeof window === 'undefined') return '/dashboard';
+    return new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
+  };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
@@ -27,7 +31,7 @@ export default function LoginPage() {
   const recaptchaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!loading && user) router.push('/dashboard');
+    if (!loading && user) router.push(getRedirectUrl());
   }, [user, loading, router]);
 
   const handleEmail = async (e: React.FormEvent) => {
@@ -36,7 +40,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await signInWithEmail(email, password);
-      router.push('/dashboard');
+      router.push(getRedirectUrl());
     } catch (err: any) {
       const code = err?.code || '';
       if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
@@ -80,7 +84,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       const u = await verifySmsCode(smsCode);
-      if (u) router.push('/dashboard');
+      if (u) router.push(getRedirectUrl());
     } catch (err: any) {
       const code = err?.code || '';
       if (code === 'auth/invalid-verification-code') {
@@ -97,7 +101,7 @@ export default function LoginPage() {
     setError('');
     try {
       const u = await signInWithGoogle();
-      if (u) router.push('/dashboard');
+      if (u) router.push(getRedirectUrl());
     } catch {
       setError('Google sign-in failed.');
     }
@@ -107,7 +111,7 @@ export default function LoginPage() {
     setError('');
     try {
       const u = await signInWithApple();
-      if (u) router.push('/dashboard');
+      if (u) router.push(getRedirectUrl());
     } catch {
       setError('Apple sign-in failed.');
     }
@@ -280,7 +284,7 @@ export default function LoginPage() {
         {/* Sign up link */}
         <p className="text-center text-sm mt-6" style={{ color: 'var(--ept-text-muted)' }}>
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="font-semibold hover:underline" style={{ color: 'var(--ept-accent)' }}>Create one</Link>
+          <Link href={typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('redirect') ? `/signup?redirect=${encodeURIComponent(new URLSearchParams(window.location.search).get('redirect')!)}` : '/signup'} className="font-semibold hover:underline" style={{ color: 'var(--ept-accent)' }}>Create one</Link>
         </p>
 
         {/* Back to home */}

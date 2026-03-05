@@ -193,18 +193,8 @@ export default function EnginesPage() {
   };
 
   const handleCheckout = async (tier: string) => {
-    setUpgrading(tier);
-    try {
-      const { checkout_url } = await createCheckout(
-        tier.toLowerCase() as 'professional' | 'business' | 'enterprise',
-        `${window.location.origin}/sentinel?upgraded=true`,
-        window.location.href,
-      );
-      window.location.href = checkout_url;
-    } catch {
-      alert('Checkout failed. Please try again.');
-      setUpgrading(null);
-    }
+    // Route through proper checkout page with billing + invoice
+    window.location.href = `/checkout?service=sentinel-ai&tier=${tier.toLowerCase()}`;
   };
 
   return (
@@ -278,8 +268,40 @@ export default function EnginesPage() {
           />
         </div>
 
-        {/* Category Grid by Tier */}
-        {loading ? (
+        {/* Category Grid by Tier — Authenticated users only */}
+        {!user ? (
+          <div className="text-center py-16 rounded-2xl" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)' }}>
+            <div className="text-5xl mb-4">🔒</div>
+            <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Domain Catalog</h3>
+            <p className="text-sm mb-6 max-w-md mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
+              Sign in to explore {totalCategories} domain categories, engine capabilities, knowledge depth scores, and per-query pricing across all tiers.
+            </p>
+            <div className="flex justify-center gap-3">
+              <Link href="/login" className="px-6 py-2.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: '#6366f1', color: '#fff' }}>
+                Sign In
+              </Link>
+              <Link href="/signup" className="px-6 py-2.5 rounded-lg text-sm font-semibold" style={{ border: '1px solid #6366f1', color: '#818cf8' }}>
+                Create Account
+              </Link>
+            </div>
+            {/* Blurred preview */}
+            <div className="mt-8 mx-auto max-w-4xl select-none pointer-events-none" style={{ filter: 'blur(6px)', opacity: 0.4 }}>
+              <div className="grid md:grid-cols-3 gap-3 px-6">
+                {TIER_GROUPS.map(t => (
+                  <div key={t.label} className="p-4 rounded-xl" style={{ backgroundColor: 'var(--ept-surface)', border: `1px solid ${t.color}20` }}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: t.color }} />
+                      <span className="text-xs font-bold" style={{ color: t.color }}>{t.label} Tier</span>
+                    </div>
+                    <div className="h-2 rounded mb-1.5" style={{ backgroundColor: 'var(--ept-border)', width: '80%' }} />
+                    <div className="h-2 rounded mb-1.5" style={{ backgroundColor: 'var(--ept-border)', width: '60%' }} />
+                    <div className="h-2 rounded" style={{ backgroundColor: 'var(--ept-border)', width: '70%' }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : loading ? (
           <div className="text-center py-20" style={{ color: 'var(--ept-text-muted)' }}>
             <div className="inline-block w-8 h-8 rounded-full border-2 border-t-transparent animate-spin mb-4" style={{ borderColor: '#6366f1', borderTopColor: 'transparent' }} />
             <p>Loading engine catalog...</p>
@@ -366,8 +388,8 @@ export default function EnginesPage() {
           </div>
         )}
 
-        {/* ═══ Coming Soon / Under Construction ═══ */}
-        <div className="mt-12 rounded-2xl overflow-hidden" style={{ border: '1px solid #8b5cf620', backgroundColor: 'var(--ept-card-bg)' }}>
+        {/* ═══ Coming Soon / Under Construction — authenticated only ═══ */}
+        {user && <div className="mt-12 rounded-2xl overflow-hidden" style={{ border: '1px solid #8b5cf620', backgroundColor: 'var(--ept-card-bg)' }}>
           <div className="px-6 py-4" style={{ backgroundColor: '#8b5cf608' }}>
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: '#8b5cf6', boxShadow: '0 0 8px #8b5cf633' }} />
@@ -410,7 +432,7 @@ export default function EnginesPage() {
               </div>
             ))}
           </div>
-        </div>
+        </div>}
 
         {/* Domain Pricing Explainer */}
         <div className="mt-12 p-6 rounded-2xl" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
@@ -574,6 +596,26 @@ export default function EnginesPage() {
             <a href="mailto:bob@echo-op.com" className="inline-block px-8 py-3 rounded-lg text-sm font-semibold" style={{ backgroundColor: '#f59e0b', color: '#0a0a0f' }}>
               Contact Sales
             </a>
+          </div>
+        </div>
+
+        {/* Related Services */}
+        <div className="mt-16 mb-12">
+          <h2 className="text-2xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Powered by Intelligence Engines</h2>
+          <p className="text-center text-sm mb-10" style={{ color: 'var(--ept-text-muted)' }}>These products use our engine infrastructure under the hood</p>
+          <div className="grid md:grid-cols-4 gap-5">
+            {[
+              { title: 'Title Intel', desc: 'Chain of title AI for oil & gas. 80+ TX counties, 259K+ records.', href: '/title-intelligence', domain: 'LM' },
+              { title: 'Tax Prep', desc: 'AI tax preparation with 14 Tax Intelligence Engines.', href: '/tax-returns', domain: 'TX' },
+              { title: 'AI Closer', desc: 'Autonomous voice sales agent with domain-specific knowledge.', href: '/closer', domain: 'BIZ' },
+              { title: 'Cyber Defense', desc: 'AI threat detection powered by security engines.', href: '/security', domain: 'SEC' },
+            ].map((svc, i) => (
+              <Link key={i} href={svc.href} className="block p-5 rounded-xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <div className="text-xs font-mono font-bold mb-2 px-2 py-0.5 rounded inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>{svc.domain}</div>
+                <h3 className="text-sm font-bold mb-1" style={{ color: 'var(--ept-text)' }}>{svc.title}</h3>
+                <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{svc.desc}</p>
+              </Link>
+            ))}
           </div>
         </div>
 

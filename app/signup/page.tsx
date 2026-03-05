@@ -15,6 +15,10 @@ export default function SignupPage() {
   const { user, loading } = useAuth();
   const { isDark } = useTheme();
   const [tab, setTab] = useState<AuthTab>('email');
+  const getRedirectUrl = () => {
+    if (typeof window === 'undefined') return '/services';
+    return new URLSearchParams(window.location.search).get('redirect') || '/services';
+  };
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,7 +33,7 @@ export default function SignupPage() {
   const recaptchaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!loading && user) router.push('/dashboard');
+    if (!loading && user) router.push(getRedirectUrl());
   }, [user, loading, router]);
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -40,7 +44,7 @@ export default function SignupPage() {
     setSubmitting(true);
     try {
       await signUpWithEmail(email, password);
-      router.push('/services');
+      router.push(getRedirectUrl());
     } catch (err: any) {
       const code = err?.code || '';
       if (code === 'auth/email-already-in-use') {
@@ -84,7 +88,7 @@ export default function SignupPage() {
     setSubmitting(true);
     try {
       const u = await verifySmsCode(smsCode);
-      if (u) router.push('/services');
+      if (u) router.push(getRedirectUrl());
     } catch (err: any) {
       const code = err?.code || '';
       if (code === 'auth/invalid-verification-code') {
@@ -101,7 +105,7 @@ export default function SignupPage() {
     setError('');
     try {
       const u = await signInWithGoogle();
-      if (u) router.push('/services');
+      if (u) router.push(getRedirectUrl());
     } catch {
       setError('Google sign-in failed.');
     }
@@ -111,7 +115,7 @@ export default function SignupPage() {
     setError('');
     try {
       const u = await signInWithApple();
-      if (u) router.push('/services');
+      if (u) router.push(getRedirectUrl());
     } catch {
       setError('Apple sign-in failed.');
     }
