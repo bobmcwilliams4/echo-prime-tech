@@ -24,7 +24,8 @@ export default function DashboardPage() {
   const [engineProfile, setEngineProfile] = useState<EngineProfile | null>(null);
   const [commanderMode, setCommanderMode] = useState(false);
   const [viewMode, setViewMode] = useState<'admin' | 'user'>('admin');
-  const isAdmin = role === 'owner' || user?.email?.toLowerCase() === 'bmcii1976@gmail.com';
+  const ADMIN_EMAILS = ['bmcii1976@gmail.com', 'jonathon@blackgoldasset.com'];
+  const isAdmin = role === 'owner' || ADMIN_EMAILS.includes(user?.email?.toLowerCase() || '');
   const BGAT_BASE = 'https://bgat.echo-op.com';
 
   useEffect(() => {
