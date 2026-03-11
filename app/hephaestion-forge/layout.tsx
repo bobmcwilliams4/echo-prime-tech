@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Hephaestion Forge — AI Program Builder & Code Forge | Echo Prime Technologies',
-  description: '15 project archetypes, 13-stage build pipeline, 6 quality gates, multi-LLM swarm code generation. From concept to production-ready code in minutes. Conversational software engineering.',
-  keywords: ['code generation', 'AI programming', 'software forge', 'project builder', 'quality gates', 'multi-LLM', 'Hephaestion Forge', 'Echo Prime'],
+  title: 'Hephaestion Forge — AI Code Factory | Echo Prime Technologies',
+  description: 'AI code factory that builds complete applications from descriptions. 13-stage pipeline, 15 archetypes, multi-LLM validation, and quality gates. Production-ready code.',
+  keywords: ['AI code generation', 'code factory', 'AI software builder', 'automated coding', 'Hephaestion Forge'],
   openGraph: {
-    title: 'Hephaestion Forge — AI Program Builder & Code Forge',
-    description: '15 archetypes, 13-stage pipeline, 6 quality gates. Conversational software engineering at scale.',
+    title: 'Hephaestion Forge — AI Code Factory',
+    description: 'AI code factory: 13-stage pipeline, 15 archetypes, multi-LLM validation. Production-ready applications.',
     url: 'https://echo-ept.com/hephaestion-forge',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },

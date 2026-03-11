@@ -14,8 +14,10 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://echo-ept.com'),
   alternates: { canonical: '/' },
   icons: {
-    icon: '/logo-sym-night.png',
-    apple: '/logo-sym-night.png',
+    icon: [
+      { url: '/icon.png', type: 'image/png', sizes: '192x192' },
+    ],
+    apple: '/icon.png',
   },
   openGraph: {
     title: 'Echo Prime Technologies — AI Engines, Sales Agents & Enterprise Intelligence',

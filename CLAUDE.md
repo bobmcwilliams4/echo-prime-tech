@@ -17,14 +17,12 @@
 ```ts
 const NAV_ITEMS = [
   { label: 'Engines', href: '/engines' },
-  { label: 'Bots', href: '/bots' },
-  { label: 'Scrapers', href: '/scrapers' },
   { label: 'Closer AI', href: '/closer' },
-  { label: 'Pipelines', href: '/pipelines' },
+  { label: 'Bree AI', href: '/bree-assistant' },
+  { label: 'Websites', href: '/websites' },
   { label: 'Security', href: '/security' },
-  { label: 'Title Intel', href: '/title-intelligence' },
+  { label: 'Pipelines', href: '/pipelines' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Sentinel AI', href: '/sentinel' }, // accent colored
 ];
 ```
 
@@ -126,3 +124,44 @@ async function apiFetch(path: string, options: RequestInit = {}) {
 - `AuthProvider` + `ThemeProvider` — context wrappers
 
 Do NOT add these to individual pages.
+
+## SENTINEL AI PROTOCOL (LOCKED — Commander Approval Required for Changes)
+
+Sentinel (`/sentinel`) is the professional engine-backed intelligence interface. It is NOT a chatbot.
+
+**Routing Rules:**
+1. Sentinel requests (`site_id: 'echo-ept'`) route through `engine-router.ts` in echo-chat Worker FIRST
+2. Title chain requests auto-detected via `parseTitleChainRequest()` → Landman Pipeline (async, with clue loops)
+3. Tax/Legal/Cyber/Oilgas/Finance/Engineering/Medical queries → Engine Runtime doctrine blocks with IRC/case law/standards citations
+4. NEVER use Groq for Sentinel domain queries — only trained adapters or Azure GPT-4.1
+5. Only GENERAL queries may use trained adapters as primary source
+6. Every answer MUST include document references or authority citations
+7. Confidence stratification required: DEFENSIBLE / AGGRESSIVE / DISCLOSURE / HIGH_RISK
+
+**Response Format (engine-backed):**
+- Primary conclusion with confidence level
+- Supporting authority citations (IRC sections, case law, NIST frameworks, etc.)
+- Key factors and risk assessment
+- Counter-arguments where applicable
+
+**Title Chain Pipeline:**
+- `parseTitleChainRequest()` detects natural language title requests
+- Triggers `startAsyncInvestigation()` via landman-api.ts → async pipeline
+- Progress polled every 3s via `getJobProgress()`
+- Results rendered in `TitleChainReport` component (5 tabs: Summary, Run Sheet, Ownership, Gaps, Full Report)
+
+**Markdown Rendering:**
+- All assistant messages rendered via `MarkdownBlock` component with `sentinel-md` CSS class
+- CSS styles in `globals.css` under `.sentinel-md .md-*` selectors
+
+**Key Files:**
+| File | Purpose |
+|------|---------|
+| `app/sentinel/page.tsx` | Main Sentinel AI chat page |
+| `components/MarkdownBlock.tsx` | Markdown-to-HTML renderer |
+| `components/TitleChainReport.tsx` | Professional title chain report (5 tabs) |
+| `lib/sentinel-cloud-api.ts` | Echo Chat API client |
+| `lib/landman-api.ts` | Landman Pipeline API client |
+| `WORKERS/echo-chat/src/engine-router.ts` | Engine Runtime query + doctrine formatting |
+
+**NO modifications to Sentinel chat architecture without explicit Commander approval.**

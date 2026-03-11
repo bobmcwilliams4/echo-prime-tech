@@ -15,6 +15,15 @@ import {
   PERSONALITY_PROFILES,
   isCommander,
 } from '../../lib/sentinel-cloud-api';
+import MarkdownBlock from '../../components/MarkdownBlock';
+import TitleChainReport from '../../components/TitleChainReport';
+import {
+  startAsyncInvestigation,
+  getJobProgress,
+  type TractInput,
+  type AsyncJobProgress,
+  type PipelineResult,
+} from '../../lib/landman-api';
 
 // Lazy-load 3D scene (no SSR — WebGL)
 const NebulaCoreScene = dynamic(
@@ -125,6 +134,59 @@ function formatTime(ts: number): string {
   return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+/** Detect title chain / run sheet requests and extract tract info */
+function parseTitleChainRequest(message: string): TractInput | null {
+  const lower = message.toLowerCase();
+  const triggers = [
+    'title chain', 'chain of title', 'run sheet', 'mineral title',
+    'ownership history', 'title search', 'title opinion', 'title examination',
+    'who owns the minerals', 'ownership chain', 'title report', 'mineral ownership',
+    'run a title', 'investigate title', 'title analysis',
+  ];
+  if (!triggers.some(t => lower.includes(t))) return null;
+
+  // Extract county
+  const countyMatch = message.match(/(?:in\s+)?(\w+(?:\s+\w+)?)\s+county/i);
+  const county = countyMatch?.[1] || '';
+
+  // Extract section — handle typos (sectiom, seciton, secton) and shorthand (sec, s-)
+  const sectionMatch = message.match(/(?:sect?i?o[nm]|sec\.?|s[-.]\s*)\s*(\d+[A-Za-z]?)/i);
+  const section = sectionMatch?.[1] || '';
+
+  // Extract block — handle shorthand (blk, blck, b-)
+  const blockMatch = message.match(/(?:block|blk|blck|b[-.]\s*)\s*(\d+[A-Za-z]?)/i);
+  const block = blockMatch?.[1] || '';
+
+  // Extract lot(s)
+  const lotMatch = message.match(/lots?\s+([\d,\s&]+)/i);
+  const lot = lotMatch?.[1]?.trim() || '';
+
+  // Extract abstract
+  const abstractMatch = message.match(/abstract\s+(\d+[A-Za-z]?)/i);
+  const abstract = abstractMatch?.[1] || '';
+
+  // Extract party name
+  const partyMatch = message.match(/(?:for|party|grantor|grantee|owner)\s+["""]?([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})["""]?/i);
+  const party = partyMatch?.[1] || '';
+
+  // Need at least county to proceed
+  if (!county) return null;
+
+  const input: TractInput = { county, state: 'TX' };
+  if (section) input.section = section;
+  if (block) input.block = block;
+  if (lot) input.lot = lot;
+  if (abstract) input.abstract = abstract;
+  if (party) input.party = party;
+
+  return input;
+}
+
+function formatElapsed(ms: number): string {
+  const s = Math.floor(ms / 1000);
+  return s < 60 ? `${s}s` : `${Math.floor(s / 60)}m ${s % 60}s`;
+}
+
 // ── Main Component ──
 
 export default function SentinelPage() {
@@ -143,6 +205,12 @@ export default function SentinelPage() {
   const [lastSearchResults, setLastSearchResults] = useState<SearchResult[]>([]);
   const [lastToolsUsed, setLastToolsUsed] = useState<string[]>([]);
 
+  // Pipeline state (title chain async jobs)
+  const [pipelineJobId, setPipelineJobId] = useState<string | null>(null);
+  const [pipelineProgress, setPipelineProgress] = useState<AsyncJobProgress | null>(null);
+  const [pipelineResult, setPipelineResult] = useState<PipelineResult | null>(null);
+  const pipelineTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   // Voice state
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [voicePlaying, setVoicePlaying] = useState(false);
@@ -150,6 +218,120 @@ export default function SentinelPage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
+
+  // Ambient audio state
+  const [ambientEnabled, setAmbientEnabled] = useState(false);
+  const ambientCtxRef = useRef<AudioContext | null>(null);
+  const ambientGainRef = useRef<GainNode | null>(null);
+  const ambientNodesRef = useRef<OscillatorNode[]>([]);
+
+  // Start/stop ambient audio
+  useEffect(() => {
+    if (!ambientEnabled) {
+      // Stop ambient
+      ambientNodesRef.current.forEach(n => { try { n.stop(); } catch {} });
+      ambientNodesRef.current = [];
+      if (ambientCtxRef.current && ambientCtxRef.current.state !== 'closed') {
+        ambientCtxRef.current.close();
+      }
+      ambientCtxRef.current = null;
+      ambientGainRef.current = null;
+      return;
+    }
+    // Create ambient drone — ethereal choir pad
+    const ctx = new AudioContext();
+    ambientCtxRef.current = ctx;
+    const master = ctx.createGain();
+    master.gain.value = 0.06; // Very low volume
+    master.connect(ctx.destination);
+    ambientGainRef.current = master;
+
+    // Choir-like pad: layered detuned sine waves at harmonic intervals
+    const baseFreq = 110; // A2
+    const harmonics = [1, 1.5, 2, 2.5, 3, 4]; // octave, fifth, octave, etc
+    const detunes = [-8, -3, 0, 3, 5, 8]; // cents of detuning for chorus effect
+    const nodes: OscillatorNode[] = [];
+
+    harmonics.forEach((h, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = baseFreq * h;
+      osc.detune.value = detunes[i % detunes.length] + (Math.random() - 0.5) * 4;
+      const g = ctx.createGain();
+      // Higher harmonics quieter
+      g.gain.value = 0.3 / (1 + i * 0.5);
+      // Slow tremolo for ethereal feel
+      const lfo = ctx.createOscillator();
+      lfo.type = 'sine';
+      lfo.frequency.value = 0.1 + Math.random() * 0.15;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = g.gain.value * 0.3;
+      lfo.connect(lfoGain);
+      lfoGain.connect(g.gain);
+      lfo.start();
+      nodes.push(lfo as unknown as OscillatorNode);
+
+      osc.connect(g);
+      g.connect(master);
+      osc.start();
+      nodes.push(osc);
+    });
+
+    // Add filtered noise for breath/wind texture
+    const noiseLen = ctx.sampleRate * 2;
+    const noiseBuf = ctx.createBuffer(1, noiseLen, ctx.sampleRate);
+    const noiseData = noiseBuf.getChannelData(0);
+    for (let i = 0; i < noiseLen; i++) noiseData[i] = (Math.random() * 2 - 1) * 0.3;
+    const noiseSrc = ctx.createBufferSource();
+    noiseSrc.buffer = noiseBuf;
+    noiseSrc.loop = true;
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'bandpass';
+    noiseFilter.frequency.value = 400;
+    noiseFilter.Q.value = 0.5;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.value = 0.08;
+    noiseSrc.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(master);
+    noiseSrc.start();
+
+    ambientNodesRef.current = nodes;
+
+    return () => {
+      nodes.forEach(n => { try { n.stop(); } catch {} });
+      try { noiseSrc.stop(); } catch {}
+      if (ctx.state !== 'closed') ctx.close();
+    };
+  }, [ambientEnabled]);
+
+  // Lightning sound effect — short electric crackle via Web Audio
+  const playLightningSfx = useCallback(() => {
+    if (!ambientEnabled) return; // Only play if ambient audio is on
+    try {
+      const ctx = ambientCtxRef.current || new AudioContext();
+      const duration = 0.08 + Math.random() * 0.06;
+      const bufLen = Math.floor(ctx.sampleRate * duration);
+      const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      // White noise burst with exponential decay
+      for (let i = 0; i < bufLen; i++) {
+        const t = i / ctx.sampleRate;
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 30) * 0.4;
+      }
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = 2000 + Math.random() * 3000;
+      const gain = ctx.createGain();
+      gain.gain.value = 0.15;
+      src.connect(filter);
+      filter.connect(gain);
+      gain.connect(ambientGainRef.current || ctx.destination);
+      src.start();
+    } catch {}
+  }, [ambientEnabled]);
 
   // Refs
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -214,20 +396,75 @@ export default function SentinelPage() {
     recognitionRef.current = recognition;
   }, []);
 
+  // ── Pipeline polling ──
+  useEffect(() => {
+    if (!pipelineJobId) return;
+    const poll = async () => {
+      try {
+        const progress = await getJobProgress(pipelineJobId);
+        setPipelineProgress(progress);
+
+        if (progress.status === 'complete' && progress.result) {
+          setPipelineResult(progress.result);
+          setPipelineJobId(null);
+          setSending(false);
+          // Replace the progress system message with a completion message
+          setMessages(prev => {
+            const updated = prev.filter(m => m.id !== 'pipeline_progress');
+            return [...updated, {
+              id: generateId(),
+              role: 'system' as const,
+              content: `Title chain analysis complete — ${progress.records_found} records found, ${progress.gaps_found} gaps identified in ${formatElapsed(progress.elapsed_ms)}`,
+              timestamp: Date.now(),
+            }];
+          });
+        } else if (progress.status === 'failed') {
+          setPipelineJobId(null);
+          setSending(false);
+          setMessages(prev => {
+            const updated = prev.filter(m => m.id !== 'pipeline_progress');
+            return [...updated, {
+              id: generateId(),
+              role: 'assistant' as const,
+              content: `The title chain analysis encountered an error: ${progress.error || 'Unknown error'}. Please try again or refine your search criteria.`,
+              timestamp: Date.now(),
+              provider: 'landman-pipeline',
+            }];
+          });
+        } else {
+          // Update the progress system message in-place
+          setMessages(prev => prev.map(m =>
+            m.id === 'pipeline_progress'
+              ? { ...m, content: `__PIPELINE_PROGRESS__` }
+              : m
+          ));
+        }
+      } catch {
+        // Polling error — keep trying
+      }
+    };
+    poll(); // Immediate first poll
+    pipelineTimerRef.current = setInterval(poll, 3000);
+    return () => {
+      if (pipelineTimerRef.current) clearInterval(pipelineTimerRef.current);
+    };
+  }, [pipelineJobId]);
+
   // ── Voice playback ──
   const playVoice = useCallback(async (text: string, msgId: string) => {
     if (voicePlaying) return;
     setVoicePlaying(true);
     try {
-      const cleanText = text.replace(/```[\s\S]*?```/g, '').replace(/\[.*?\]/g, '').slice(0, 2000);
-      const res = await fetch(`${ECHO_CHAT_URL}/tts`, {
+      const cleanText = text.replace(/```[\s\S]*?```/g, '').replace(/\[.*?\]/g, '').replace(/[#*_~`>|]/g, '').slice(0, 2000);
+      const res = await fetch('https://echo-speak-cloud.bmcii1976.workers.dev/tts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Echo-API-Key': process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-forge-x-2026',
+        },
         body: JSON.stringify({
           text: cleanText,
-          personality: 'EP',
-          emotion: 'neutral',
-          provider: 'elevenlabs',
+          voice: 'echo',
         }),
       });
       if (!res.ok) throw new Error(`TTS error: ${res.status}`);
@@ -290,6 +527,34 @@ export default function SentinelPage() {
     };
 
     setMessages(prev => [...prev, userMsg]);
+
+    // ── Title Chain Pipeline Detection ──
+    const tractInput = parseTitleChainRequest(msg);
+    if (tractInput) {
+      try {
+        const job = await startAsyncInvestigation(tractInput);
+        setPipelineJobId(job.job_id);
+        setPipelineProgress(null);
+        setPipelineResult(null);
+        // Add a progress placeholder message
+        setMessages(prev => [...prev, {
+          id: 'pipeline_progress',
+          role: 'system' as const,
+          content: '__PIPELINE_PROGRESS__',
+          timestamp: Date.now(),
+        }]);
+        // Don't setSending(false) — pipeline polling will handle it
+        return;
+      } catch (err) {
+        // Pipeline failed to start — fall through to normal chat
+        setMessages(prev => [...prev, {
+          id: generateId(),
+          role: 'system' as const,
+          content: `Title chain pipeline unavailable — falling back to AI analysis. (${err instanceof Error ? err.message : 'Connection error'})`,
+          timestamp: Date.now(),
+        }]);
+      }
+    }
 
     const history = messages.slice(-10).map(m => ({
       role: m.role === 'user' ? 'user' : 'assistant',
@@ -497,6 +762,10 @@ export default function SentinelPage() {
   const clearChat = useCallback(() => {
     setMessages([]);
     localStorage.removeItem(STORAGE_KEY);
+    setPipelineJobId(null);
+    setPipelineProgress(null);
+    setPipelineResult(null);
+    if (pipelineTimerRef.current) clearInterval(pipelineTimerRef.current);
   }, []);
 
   // ── Handle keyboard ──
@@ -541,16 +810,19 @@ export default function SentinelPage() {
   const hasMessages = messages.length > 0;
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ backgroundColor: '#050508' }}>
-      {/* ── 3D Nebula Orb Background ── */}
+    <div className="min-h-screen flex flex-col relative" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      {/* ── Chat viewport (contains 3D scene, header, messages, input) ── */}
+      <div className="relative flex flex-col overflow-hidden" style={{ height: '100vh', minHeight: '100vh', backgroundColor: '#050508' }}>
+      {/* ── 3D Nebula Orb Background — confined to chat viewport ── */}
       <div className="absolute inset-0 z-0">
         <NebulaCoreScene
           isSpeaking={voicePlaying}
           isThinking={sending}
+          onLightning={playLightningSfx}
         />
       </div>
 
-      {/* ── Gradient overlay for readability ── */}
+      {/* ── Gradient overlay for readability — confined to chat viewport ── */}
       <div
         className="absolute inset-0 z-[1] pointer-events-none"
         style={{
@@ -672,6 +944,22 @@ export default function SentinelPage() {
               )}
             </svg>
           </button>
+          {/* Ambient audio toggle */}
+          <button
+            onClick={() => setAmbientEnabled(v => !v)}
+            className="p-2 rounded-lg transition-colors"
+            style={{
+              backgroundColor: ambientEnabled ? 'rgba(168,85,247,0.2)' : 'transparent',
+              color: ambientEnabled ? '#a855f7' : '#94a3b8',
+            }}
+            title={ambientEnabled ? 'Ambient Audio ON' : 'Ambient Audio OFF'}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 18V5l12-2v13" />
+              <circle cx="6" cy="18" r="3" />
+              <circle cx="18" cy="16" r="3" />
+            </svg>
+          </button>
           {/* Clear */}
           <button
             onClick={clearChat}
@@ -748,7 +1036,72 @@ export default function SentinelPage() {
               key={msg.id}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              {msg.role === 'system' ? (
+              {msg.role === 'system' && msg.content === '__PIPELINE_PROGRESS__' && pipelineProgress ? (
+                /* ── Pipeline Progress Bar ── */
+                <div
+                  className="w-full rounded-xl border p-4 space-y-3"
+                  style={{ backgroundColor: 'rgba(12,18,32,0.8)', borderColor: 'rgba(30,41,59,0.5)', backdropFilter: 'blur(12px)' }}
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-semibold" style={{ color: 'var(--ept-accent)' }}>
+                      Title Chain Analysis
+                    </span>
+                    <span style={{ color: '#64748b' }}>
+                      {formatElapsed(pipelineProgress.elapsed_ms)}
+                    </span>
+                  </div>
+                  {/* Progress bar */}
+                  <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(30,41,59,0.5)' }}>
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: `${pipelineProgress.progress_pct}%`,
+                        backgroundColor: 'var(--ept-accent)',
+                        boxShadow: '0 0 8px rgba(20,184,166,0.5)',
+                      }}
+                    />
+                  </div>
+                  {/* Step label */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span style={{ color: '#94a3b8' }}>
+                      {pipelineProgress.current_step_label || pipelineProgress.current_step || 'Initializing...'}
+                    </span>
+                    <span style={{ color: '#64748b' }}>
+                      {Math.round(pipelineProgress.progress_pct)}%
+                    </span>
+                  </div>
+                  {/* Stats row */}
+                  <div className="flex items-center gap-4 text-xs" style={{ color: '#64748b' }}>
+                    <span>{pipelineProgress.records_found} records found</span>
+                    {pipelineProgress.gaps_found > 0 && (
+                      <span>{pipelineProgress.gaps_found} gaps detected</span>
+                    )}
+                  </div>
+                  {/* Step list */}
+                  {pipelineProgress.steps && pipelineProgress.steps.length > 0 && (
+                    <div className="space-y-1 mt-1">
+                      {pipelineProgress.steps.map((step, i) => (
+                        <div key={i} className="flex items-center gap-2 text-[11px]">
+                          <span style={{
+                            color: step.status === 'complete' ? '#4ade80' :
+                                   step.status === 'running' ? 'var(--ept-accent)' :
+                                   '#64748b',
+                          }}>
+                            {step.status === 'complete' ? '✓' : step.status === 'running' ? '●' : '○'}
+                          </span>
+                          <span style={{
+                            color: step.status === 'complete' ? '#94a3b8' :
+                                   step.status === 'running' ? '#e2e8f0' :
+                                   '#64748b',
+                          }}>
+                            {step.label || step.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : msg.role === 'system' ? (
                 <div
                   className="w-full text-center text-xs py-2 px-4 rounded-lg"
                   style={{ backgroundColor: 'rgba(15,23,42,0.6)', color: '#64748b', backdropFilter: 'blur(8px)' }}
@@ -795,7 +1148,7 @@ export default function SentinelPage() {
                         <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: 'var(--ept-accent)', animationDelay: '0.4s' }} />
                       </div>
                     ) : (
-                      <div className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</div>
+                      <MarkdownBlock content={msg.content} className="sentinel-md" />
                     )}
                   </div>
                   {msg.content !== '...' && (
@@ -829,6 +1182,23 @@ export default function SentinelPage() {
               )}
             </div>
           ))}
+
+          {/* ── Title Chain Report (full-width, below messages) ── */}
+          {pipelineResult && (
+            <div
+              className="rounded-xl border overflow-hidden"
+              style={{
+                backgroundColor: 'rgba(12,18,32,0.85)',
+                borderColor: 'rgba(30,41,59,0.5)',
+                backdropFilter: 'blur(12px)',
+              }}
+            >
+              <TitleChainReport
+                result={pipelineResult}
+                onClose={() => setPipelineResult(null)}
+              />
+            </div>
+          )}
 
           {/* Search results panel — collapsible sources */}
           {lastSearchResults.length > 0 && (
@@ -992,9 +1362,12 @@ export default function SentinelPage() {
           </div>
         </div>
       </footer>
+      {/* ── ConvAI Voice Widget — "Talk to Echo" ── */}
+      <SentinelConvAI />
+      </div>{/* ── end chat viewport ── */}
 
       {/* ─── Upgrade Banner + Cross-Sell (below chat) ─── */}
-      <div className="px-4 pb-6 space-y-4" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <div className="relative z-20 px-4 pt-6 pb-6 space-y-4" style={{ backgroundColor: 'var(--ept-bg)' }}>
         {/* Upgrade CTA */}
         <div className="max-w-3xl mx-auto p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
           <p className="text-sm font-semibold mb-1" style={{ color: 'var(--ept-text)' }}>
@@ -1032,5 +1405,60 @@ export default function SentinelPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+/* ── Sentinel ConvAI Voice Widget ── */
+
+const SENTINEL_CONVAI_AGENT = 'agent_9201kk4sdqsrfbs8y2e304jtz6dg';
+
+function SentinelConvAI() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!loaded || !containerRef.current) return;
+    // Load ElevenLabs ConvAI widget script
+    if (!customElements.get('elevenlabs-convai')) {
+      const s = document.createElement('script');
+      s.src = 'https://elevenlabs.io/convai-widget/index.js';
+      s.async = true;
+      document.head.appendChild(s);
+    }
+    const el = document.createElement('elevenlabs-convai');
+    el.setAttribute('agent-id', SENTINEL_CONVAI_AGENT);
+    containerRef.current.replaceChildren(el);
+    return () => { if (containerRef.current) containerRef.current.replaceChildren(); };
+  }, [loaded]);
+
+  return (
+    <>
+      <div ref={containerRef} style={{ position: 'fixed', bottom: 80, right: 24, zIndex: 60 }} />
+      {!loaded && (
+        <button
+          onClick={() => setLoaded(true)}
+          style={{
+            position: 'fixed', bottom: 24, right: 24, zIndex: 60,
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '10px 18px', borderRadius: 14,
+            backgroundColor: 'rgba(20,184,166,0.9)', color: '#fff',
+            border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+            boxShadow: '0 4px 20px rgba(20,184,166,0.3)',
+            backdropFilter: 'blur(8px)',
+            transition: 'transform 0.15s, box-shadow 0.15s',
+          }}
+          onMouseOver={e => { e.currentTarget.style.transform = 'scale(1.05)'; }}
+          onMouseOut={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+          title="Talk to Echo via voice"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="9" y="2" width="6" height="11" rx="3" />
+            <path d="M5 10a7 7 0 0014 0" />
+            <line x1="12" y1="19" x2="12" y2="22" />
+          </svg>
+          Talk to Echo
+        </button>
+      )}
+    </>
   );
 }

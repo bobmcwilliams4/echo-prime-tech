@@ -97,6 +97,8 @@ export interface PipelineResult {
   gaps: GapEntry[];
   evidence_count: number;
   execution_log: string[];
+  professional_report?: string;
+  visual_chain_html?: string;
 }
 
 export interface GraphResult {
@@ -159,7 +161,7 @@ export async function investigateChainOfTitle(input: TractInput): Promise<Pipeli
     body: JSON.stringify({
       ...input,
       budget: input.budget ?? 200,
-      max_clue_iterations: input.max_clue_iterations ?? 2,
+      max_clue_iterations: input.max_clue_iterations ?? 15,
     }),
   });
 }
@@ -319,7 +321,7 @@ export async function startAsyncInvestigation(input: TractInput): Promise<{
     body: JSON.stringify({
       ...input,
       budget: input.budget ?? 200,
-      max_clue_iterations: input.max_clue_iterations ?? 2,
+      max_clue_iterations: input.max_clue_iterations ?? 15,
     }),
   });
 }

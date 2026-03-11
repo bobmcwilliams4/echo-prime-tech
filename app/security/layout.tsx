@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Cybersecurity — Autonomous Defense Systems | Echo Prime Technologies',
-  description: 'Enterprise cybersecurity powered by AI: threat intelligence, SIEM orchestration, zero-trust architecture, incident response automation, compliance monitoring, and adversarial defense across 16 security domains.',
-  keywords: ['cybersecurity', 'AI security', 'threat intelligence', 'SIEM', 'zero trust', 'incident response', 'Echo Prime'],
+  title: 'Cyber Defense & Security Monitoring | Echo Prime Technologies',
+  description: '24/7 threat monitoring, incident response, security architecture review, compliance assessment, and vulnerability management. Enterprise-grade cybersecurity. $499-$2,999/mo.',
+  keywords: ['cybersecurity', 'threat monitoring', 'incident response', 'penetration testing', 'security audit', 'vulnerability management'],
   openGraph: {
-    title: 'Cybersecurity — Autonomous Defense Systems',
-    description: 'Enterprise cybersecurity powered by AI across 16 security domains. Threat intelligence, SIEM, zero-trust, and more.',
+    title: 'Cyber Defense & Security Monitoring',
+    description: '24/7 threat monitoring, incident response, and vulnerability management. Enterprise-grade cybersecurity.',
     url: 'https://echo-ept.com/security',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },

@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   description: 'Echo Prime Technologies legal documents including privacy policy, terms of service, and acceptable use policy.',
   openGraph: {
     title: 'Legal — Echo Prime Technologies',
+    description: 'Echo Prime Technologies legal documents including privacy policy, terms of service, and acceptable use policy.',
     url: 'https://echo-ept.com/legal',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },

@@ -8,6 +8,7 @@ import { useTheme } from '../../lib/theme-context';
 // ─── Constants ───
 const TTS_API = 'https://tts.echo-op.com';
 const TTS_CLOUD_API = 'https://echo-speak-cloud.bmcii1976.workers.dev';
+const ECHO_API_KEY = process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-forge-x-2026';
 const MAX_CLONE_SIZE = 50 * 1024 * 1024;
 const MAX_TEXT_LENGTH = 50_000;
 const ENGINE_VERSION = '3.0.0';
@@ -21,7 +22,7 @@ async function ttsGenerate(text: string, voiceId: string, opts: Record<string, u
   try {
     const res = await fetch(`${TTS_CLOUD_API}/tts`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': ECHO_API_KEY },
       body: JSON.stringify({
         text,
         voice: voiceId,
@@ -44,7 +45,7 @@ async function ttsGenerate(text: string, voiceId: string, opts: Record<string, u
   try {
     const res = await fetch(`${TTS_CLOUD_API}/tts`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': ECHO_API_KEY },
       body: JSON.stringify({
         text,
         voice: voiceId,
@@ -545,10 +546,9 @@ function Projects({ voices, voiceId }: { voices: Voice[]; voiceId: string }) {
     if (!p.text.trim() || !activeProject || p.locked) return;
     updateParagraph(p.id, { status: 'generating' });
     try {
-      const body: Record<string, unknown> = { text: p.text.trim(), voice_id: p.voiceId, speed: p.speed, exaggeration: 0.3, cfg_weight: 0.5, output_format: 'wav' };
-      if (p.emotion && p.emotion !== 'neutral') body.instruct = p.emotion;
-      const res = await fetch(`${TTS_API}/tts`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+      const body: Record<string, unknown> = { text: p.text.trim(), voice: p.voiceId };
+      const res = await fetch(`${TTS_CLOUD_API}/tts`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': ECHO_API_KEY },
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(`Failed: ${res.status}`);
@@ -1070,10 +1070,9 @@ function SampleVoiceCards({ voices, setVoiceId, deleteVoice }: { voices: Voice[]
 
     try {
       const text = `Hi, I'm ${voiceName}. This is what I sound like when I speak.`;
-      // Use single /tts endpoint instead of /tts/chunked — eliminates choppy gaps between sentences
-      const res = await fetch(`${TTS_API}/tts`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, voice_id: voiceId, speed: 0.95, output_format: 'wav' }),
+      const res = await fetch(`${TTS_CLOUD_API}/tts`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': ECHO_API_KEY },
+        body: JSON.stringify({ text, voice: voiceId }),
         signal: ctrl.signal,
       });
       if (!res.ok) { setPreviewingId(null); return; }
@@ -1361,10 +1360,9 @@ function VoiceLibrary({ voices, voiceId, setVoiceId, onNavigate }: { voices: Voi
     abortRef.current = controller;
 
     try {
-      // Use single /tts endpoint — eliminates choppy gaps between sentence chunks
-      const res = await fetch(`${TTS_API}/tts`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: 'Hello, this is a preview of my voice. I can speak naturally and clearly.', voice_id: vid, speed: 0.95, output_format: 'wav' }),
+      const res = await fetch(`${TTS_CLOUD_API}/tts`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': ECHO_API_KEY },
+        body: JSON.stringify({ text: 'Hello, this is a preview of my voice. I can speak naturally and clearly.', voice: vid }),
         signal: controller.signal,
       });
       if (!res.ok) {
@@ -1463,10 +1461,9 @@ function SoundEffects() {
     if (!prompt.trim() || generating) return;
     setGenerating(true); setError(null);
     try {
-      // Use TTS as creative sound effect generator with description as text
-      const res = await fetch(`${TTS_API}/tts`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: prompt.trim(), voice_id: 'default', speed: 1.0, exaggeration: 0.8, cfg_weight: 0.3, output_format: 'wav' }),
+      const res = await fetch(`${TTS_CLOUD_API}/tts`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': ECHO_API_KEY },
+        body: JSON.stringify({ text: prompt.trim(), voice: 'echo' }),
       });
       if (!res.ok) throw new Error(`Failed (${res.status})`);
       const url = URL.createObjectURL(await res.blob());

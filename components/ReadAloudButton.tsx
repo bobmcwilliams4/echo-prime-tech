@@ -4,8 +4,7 @@ import { useTTS } from '../lib/use-tts';
 
 interface ReadAloudButtonProps {
   getText: () => string;
-  voiceId?: string;
-  speed?: number;
+  voice?: string;
   label?: string;
   className?: string;
   size?: 'sm' | 'md';
@@ -13,13 +12,12 @@ interface ReadAloudButtonProps {
 
 export default function ReadAloudButton({
   getText,
-  voiceId = 'default',
-  speed = 1.0,
+  voice = 'echo',
   label = 'Read Aloud',
   className = '',
   size = 'sm',
 }: ReadAloudButtonProps) {
-  const { isReading, startReading, stopReading, progress } = useTTS({ voiceId, speed });
+  const { isReading, startReading, stopReading, progress } = useTTS({ voice });
 
   const handleClick = () => {
     if (isReading) {

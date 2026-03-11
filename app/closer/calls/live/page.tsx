@@ -58,53 +58,6 @@ const SENTIMENT_CONFIG: Record<string, { color: string; label: string; icon: str
   very_negative: { color: '#ef4444', label: 'Very Negative', icon: '--' },
 };
 
-const DEMO_CALLS: ActiveCall[] = [
-  {
-    id: 'demo-call-001',
-    lead_id: 'lead-001',
-    lead_name: 'Sarah Johnson',
-    lead_phone: '+1 (432) 555-0142',
-    lead_email: 'sarah.johnson@petrocorp.com',
-    lead_company: 'PetroCorp Energy',
-    lead_status: 'qualified',
-    lead_priority: 'high',
-    lead_tags: ['enterprise', 'oil-gas', 'decision-maker'],
-    lead_notes: 'VP of Operations. Interested in automation suite. Budget approved for Q1.',
-    direction: 'outbound',
-    status: 'in_progress',
-    sentiment: 'positive',
-    script_state: 'QUALIFICATION',
-    created_at: new Date(Date.now() - 187000).toISOString(),
-  },
-  {
-    id: 'demo-call-002',
-    lead_id: 'lead-002',
-    lead_name: 'Mike Reynolds',
-    lead_phone: '+1 (915) 555-0298',
-    lead_email: 'mreynolds@basintech.io',
-    lead_company: 'Basin Technologies',
-    lead_status: 'new',
-    lead_priority: 'medium',
-    lead_tags: ['startup', 'saas'],
-    lead_notes: 'Inbound from website form. Wants pricing details.',
-    direction: 'inbound',
-    status: 'in_progress',
-    sentiment: 'neutral',
-    script_state: 'DISCOVERY',
-    created_at: new Date(Date.now() - 93000).toISOString(),
-  },
-];
-
-const DEMO_TRANSCRIPT: TranscriptLine[] = [
-  { id: 't-001', speaker: 'ai', text: 'Good afternoon, Sarah! This is Echo from Echo Prime Technologies. How are you doing today?', isFinal: true, timestamp: new Date(Date.now() - 180000).toISOString() },
-  { id: 't-002', speaker: 'lead', text: "Hi Echo! I'm doing well, thanks for calling back.", isFinal: true, timestamp: new Date(Date.now() - 172000).toISOString() },
-  { id: 't-003', speaker: 'ai', text: "Great to hear! I wanted to follow up on your interest in our automation platform. You mentioned you're looking at streamlining field operations for your West Texas sites. Is that still a priority for Q1?", isFinal: true, timestamp: new Date(Date.now() - 160000).toISOString() },
-  { id: 't-004', speaker: 'lead', text: "Absolutely. We've actually expanded the scope. We're now looking at 12 field sites instead of the original 5. Our COO approved additional budget last week.", isFinal: true, timestamp: new Date(Date.now() - 145000).toISOString() },
-  { id: 't-005', speaker: 'ai', text: "That's fantastic news! With 12 sites, you'd definitely benefit from our Enterprise tier which includes dedicated support, custom integrations, and priority SLA. Can I walk you through the Enterprise pricing structure?", isFinal: true, timestamp: new Date(Date.now() - 130000).toISOString() },
-  { id: 't-006', speaker: 'lead', text: 'Yes, please. Also, can you tell me about the implementation timeline? We need everything operational by end of March.', isFinal: true, timestamp: new Date(Date.now() - 118000).toISOString() },
-  { id: 't-007', speaker: 'ai', text: "For 12 sites, our typical Enterprise deployment takes 2-3 weeks with parallel site configuration. Given your March deadline, we could have you fully operational by March 15th if we start the onboarding process this week. I'll send over a detailed implementation timeline after our call.", isFinal: true, timestamp: new Date(Date.now() - 100000).toISOString() },
-  { id: 't-008', speaker: 'lead', text: "That works perfectly. What's the pricing looking like for the Enterprise tier at 12 sites?", isFinal: true, timestamp: new Date(Date.now() - 88000).toISOString() },
-];
 
 /* ─── Helpers ─── */
 function formatDuration(seconds: number): string {
@@ -435,7 +388,6 @@ export default function LiveCallMonitorPage() {
   const [endReason, setEndReason] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [usingDemo, setUsingDemo] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState<Record<string, number>>({});
 
   const wsRef = useRef<WebSocket | null>(null);
@@ -450,32 +402,14 @@ export default function LiveCallMonitorPage() {
     try {
       const data = await getCalls('status=active&status=in_progress');
       const list: ActiveCall[] = Array.isArray(data) ? data : data?.calls ?? data?.results ?? [];
-      if (list.length > 0) {
-        setActiveCalls(list);
-        setUsingDemo(false);
-        if (!selectedCallId || !list.find((c) => c.id === selectedCallId)) {
-          setSelectedCallId(list[0].id);
-        }
-      } else {
-        setActiveCalls(DEMO_CALLS);
-        setUsingDemo(true);
-        if (!selectedCallId) {
-          setSelectedCallId(DEMO_CALLS[0].id);
-          setTranscript(DEMO_TRANSCRIPT);
-          setCurrentState(DEMO_CALLS[0].script_state || 'GREETING');
-          setSentiment(DEMO_CALLS[0].sentiment || 'neutral');
-        }
+      setActiveCalls(list);
+      if (list.length > 0 && (!selectedCallId || !list.find((c) => c.id === selectedCallId))) {
+        setSelectedCallId(list[0].id);
       }
       setError(null);
     } catch {
-      setActiveCalls(DEMO_CALLS);
-      setUsingDemo(true);
-      if (!selectedCallId) {
-        setSelectedCallId(DEMO_CALLS[0].id);
-        setTranscript(DEMO_TRANSCRIPT);
-        setCurrentState(DEMO_CALLS[0].script_state || 'GREETING');
-        setSentiment(DEMO_CALLS[0].sentiment || 'neutral');
-      }
+      setActiveCalls([]);
+      setError('Failed to load calls');
     } finally {
       setLoading(false);
     }
@@ -505,7 +439,7 @@ export default function LiveCallMonitorPage() {
 
   /* ─── WebSocket connection ─── */
   useEffect(() => {
-    if (!selectedCallId || usingDemo) return;
+    if (!selectedCallId) return;
 
     if (wsRef.current) {
       wsRef.current.close();
@@ -591,7 +525,7 @@ export default function LiveCallMonitorPage() {
         wsRef.current = null;
       }
     };
-  }, [selectedCallId, usingDemo]);
+  }, [selectedCallId]);
 
   /* ─── Auto-scroll transcript ─── */
   useEffect(() => {
@@ -603,33 +537,23 @@ export default function LiveCallMonitorPage() {
   /* ─── Select a different call ─── */
   const handleSelectCall = useCallback((callId: string) => {
     setSelectedCallId(callId);
-    const call = [...activeCalls, ...DEMO_CALLS].find((c) => c.id === callId);
+    const call = activeCalls.find((c) => c.id === callId);
     if (call) {
       setCurrentState(call.script_state || 'GREETING');
       setSentiment(call.sentiment || 'neutral');
     }
-    if (usingDemo && callId === DEMO_CALLS[0].id) {
-      setTranscript(DEMO_TRANSCRIPT);
-    } else if (usingDemo) {
-      setTranscript([
-        { id: 'd-001', speaker: 'ai', text: 'Hello Mike! Thanks for reaching out to Echo Prime Technologies. I saw you submitted a request on our website. How can I help you today?', isFinal: true, timestamp: new Date(Date.now() - 90000).toISOString() },
-        { id: 'd-002', speaker: 'lead', text: "Hey, yeah. I'm looking for pricing on your engine platform. We're a small startup but growing fast.", isFinal: true, timestamp: new Date(Date.now() - 82000).toISOString() },
-        { id: 'd-003', speaker: 'ai', text: "That's great to hear about your growth! Let me learn a bit more about your needs so I can point you to the best plan. What industry are you in, and roughly how many team members would be using the platform?", isFinal: true, timestamp: new Date(Date.now() - 70000).toISOString() },
-      ]);
-    }
+    setTranscript([]);
     setCallEnded(false);
     setEndReason(null);
     setAiMuted(false);
-  }, [activeCalls, usingDemo]);
+  }, [activeCalls]);
 
   /* ─── Control handlers ─── */
   const handleWhisper = async () => {
     if (!selectedCallId || !whisperText.trim()) return;
     setWhisperSending(true);
     try {
-      if (!usingDemo) {
-        await whisperToAI(selectedCallId, whisperText.trim());
-      }
+      await whisperToAI(selectedCallId, whisperText.trim());
       const whisperLine: TranscriptLine = {
         id: `whisper-${Date.now()}`,
         speaker: 'ai',
@@ -649,9 +573,7 @@ export default function LiveCallMonitorPage() {
   const handleTakeover = async () => {
     if (!selectedCallId) return;
     try {
-      if (!usingDemo) {
-        await takeoverCall(selectedCallId);
-      }
+      await takeoverCall(selectedCallId);
       const line: TranscriptLine = {
         id: `sys-${Date.now()}`,
         speaker: 'ai',
@@ -669,9 +591,7 @@ export default function LiveCallMonitorPage() {
     if (!selectedCallId) return;
     const newMuted = !aiMuted;
     try {
-      if (!usingDemo) {
-        await muteAI(selectedCallId, newMuted);
-      }
+      await muteAI(selectedCallId, newMuted);
       setAiMuted(newMuted);
       const line: TranscriptLine = {
         id: `sys-${Date.now()}`,
@@ -689,9 +609,7 @@ export default function LiveCallMonitorPage() {
   const handleEndCall = async () => {
     if (!selectedCallId) return;
     try {
-      if (!usingDemo) {
-        await endCall(selectedCallId);
-      }
+      await endCall(selectedCallId);
       setCallEnded(true);
       setEndReason('Ended by agent');
     } catch {
@@ -752,7 +670,7 @@ export default function LiveCallMonitorPage() {
                 Live Call Monitor
               </h2>
               <p style={{ fontSize: 11, color: 'var(--ept-text-muted)', marginTop: 1 }}>
-                {usingDemo ? 'Demo mode \u2014 showing sample data' : `${activeCalls.length} active call${activeCalls.length !== 1 ? 's' : ''}`}
+                {`${activeCalls.length} active call${activeCalls.length !== 1 ? 's' : ''}`}
               </p>
             </div>
           </div>

@@ -116,6 +116,14 @@ const CAPABILITIES = [
     link: '/closer',
   },
   {
+    title: 'Bree AI Office Assistant',
+    description: 'Custom-trained AI office assistant with emotional intelligence, KYC customer memory, smart scheduling, dark humor on command, and voice conversations. Handles phones, books appointments, manages customer relationships, and keeps your team laughing. Fine-tuned on YOUR business — not a generic chatbot.',
+    stat: '14',
+    statLabel: 'AI Personalities',
+    icon: '💖',
+    link: '/bree-assistant',
+  },
+  {
     title: 'AI Collectibles Grading',
     description: 'EPOCGS v3.0 — the most thorough AI grading pipeline in existence. Camera capture with auto border detection, 5-model vision ensemble, 50-agent research swarm, 4 doctrine engines (USPAP valuation, IP analysis, market data, historical context), adversarial debate hybrid, Trinity Council final grade, and Bree roast commentary with voice. Comics Price Guide API integrated.',
     stat: '25+',
@@ -171,6 +179,110 @@ const CAPABILITIES = [
     icon: '🛡',
     link: '/immortality-vault',
   },
+  {
+    title: 'Bot Factory',
+    description: 'Custom AI bots for every platform — X/Twitter, LinkedIn, Telegram, Discord, WhatsApp, Reddit, Facebook, and Instagram. Social media automation, crypto trading bots, arbitrage engines, congress-watching alerts, customer support, and more. 14 AI personalities, cron scheduling, analytics dashboards.',
+    stat: '29',
+    statLabel: 'Bot Templates',
+    icon: '🤖',
+    link: '/bots',
+  },
+  {
+    title: 'Scraper & Harvester Factory',
+    description: 'Industrial-scale data extraction systems. Government records, court filings, real estate listings, job boards, e-commerce, social media, news, and academic research. Anti-detection, proxy rotation, auto-pagination, and structured output. Runs 24/7 on Cloudflare Workers.',
+    stat: '23',
+    statLabel: 'Scraper Templates',
+    icon: '🕷',
+    link: '/scrapers',
+  },
+  {
+    title: 'Dark Web Intelligence',
+    description: 'Continuous dark web monitoring, paste site surveillance, breach database scanning, and .onion crawling. AI-powered IOC extraction, threat scoring, and real-time alerting via Telegram, Discord, and webhooks. Protect your brand before threats surface.',
+    stat: '12',
+    statLabel: 'IOC Types',
+    icon: '🕸',
+    link: '/dark-web-intel',
+  },
+  {
+    title: 'Autonomous Crypto Trading',
+    description: 'AI-powered grid and momentum strategies across 6 major pairs on Coinbase Advanced Trade. Sub-50ms execution, comprehensive risk management with stop-loss, max drawdown, and circuit breakers. Full backtesting engine with Monte Carlo simulation. 24/7 autonomous operation on Cloudflare edge.',
+    stat: '24/7',
+    statLabel: 'Always Trading',
+    icon: '📈',
+    link: '/crypto-trading',
+  },
+  {
+    title: 'Price & Market Alerts',
+    description: 'Real-time price monitoring across crypto, stocks, commodities, and forex. Custom thresholds with instant delivery via SMS, Telegram, webhooks, and email. Never miss a market move.',
+    stat: '5+',
+    statLabel: 'Markets Tracked',
+    icon: '🔔',
+    link: '/price-alerts',
+  },
+  {
+    title: 'SEC Intelligence',
+    description: 'Automated SEC EDGAR monitoring with AI-powered analysis. Track 10-K, 10-Q, 8-K, and insider trading filings in real-time. Detect material changes, ownership shifts, and compliance signals before the market reacts.',
+    stat: '500K+',
+    statLabel: 'Filings Indexed',
+    icon: '📊',
+    link: '/sec-intel',
+  },
+  {
+    title: 'Surveillance Platform',
+    description: 'Location intelligence and asset tracking using cell tower triangulation, WiFi positioning, and IP geolocation. Real-time monitoring dashboards, geofence alerts, history playback, and fleet management. Privacy-compliant OSINT.',
+    stat: '3',
+    statLabel: 'Location Methods',
+    icon: '📡',
+    link: '/surveillance',
+  },
+  {
+    title: 'News Intelligence',
+    description: 'Monitor 10,000+ news sources in real-time with AI summarization, sentiment analysis, topic clustering, and trend detection. Custom keyword alerts delivered via Telegram, email, or webhook within minutes of publication.',
+    stat: '10K+',
+    statLabel: 'Sources Monitored',
+    icon: '📰',
+    link: '/news',
+  },
+  {
+    title: 'Reddit Intelligence',
+    description: 'Deep subreddit monitoring with sentiment tracking, trend detection, and community analytics. Track brand mentions, competitor activity, and emerging narratives across thousands of subreddits in real-time.',
+    stat: '∞',
+    statLabel: 'Subreddits',
+    icon: '💬',
+    link: '/reddit',
+  },
+  {
+    title: 'X/Twitter AI Bot',
+    description: 'Autonomous X/Twitter content engine with 14 AI personalities, AI image generation, engagement analytics, and intelligent scheduling. Posts original content, builds threads, and grows your audience 24/7.',
+    stat: '14',
+    statLabel: 'AI Personalities',
+    icon: '🐦',
+    link: '/x-bot',
+  },
+  {
+    title: 'eBay Automation',
+    description: 'AI-powered eBay listing optimization, dynamic repricing, inventory management, and competitor tracking. Auto-generate SEO descriptions, bulk operations, and analytics dashboards for serious sellers.',
+    stat: '∞',
+    statLabel: 'Listings Managed',
+    icon: '🛒',
+    link: '/ebay',
+  },
+  {
+    title: 'LinkedIn AI Engine',
+    description: 'AI-powered LinkedIn content creation, lead generation, and professional networking automation. Profile optimization, InMail campaigns, engagement analytics, and network growth strategies.',
+    stat: '24/7',
+    statLabel: 'Lead Generation',
+    icon: '💼',
+    link: '/linkedin',
+  },
+  {
+    title: 'Unified Payments',
+    description: 'Accept payments via Stripe, PayPal, and cryptocurrency through a single API. Subscription billing, revenue analytics, multi-currency support, and white-label checkout. Built for SaaS and e-commerce.',
+    stat: '3',
+    statLabel: 'Payment Rails',
+    icon: '💳',
+    link: '/payments',
+  },
 ];
 
 const FALLBACK_INDUSTRIES = [
@@ -204,12 +316,11 @@ export default function HomePage() {
           <div className="hidden md:flex items-center gap-6">
             {[
               { label: 'Engines', href: '/engines' },
-              { label: 'Bots', href: '/bots' },
-              { label: 'Scrapers', href: '/scrapers' },
               { label: 'Closer AI', href: '/closer' },
-              { label: 'Pipelines', href: '/pipelines' },
+              { label: 'Bree AI', href: '/bree-assistant' },
+              { label: 'Websites', href: '/websites' },
               { label: 'Security', href: '/security' },
-              { label: 'Title Intel', href: '/title-intelligence' },
+              { label: 'Pipelines', href: '/pipelines' },
               { label: 'Pricing', href: '/pricing' },
             ].map(item => (
               <Link key={item.href} href={item.href} className="text-sm font-medium transition-colors hover:opacity-100" style={{ color: 'var(--ept-text-secondary)' }}>{item.label}</Link>
@@ -506,6 +617,7 @@ export default function HomePage() {
                 {[
                   { label: 'Engine Catalog', href: '/engines' },
                   { label: 'AI Closer', href: '/closer' },
+                  { label: 'Bree AI Assistant', href: '/bree-assistant' },
                   { label: 'Data Pipelines', href: '/pipelines' },
                   { label: 'Title Intelligence', href: '/title-intelligence' },
                   { label: 'Tax Preparation', href: '/tax-returns' },
@@ -517,6 +629,19 @@ export default function HomePage() {
                   { label: 'Daedalus Forge', href: '/daedalus-forge' },
                   { label: 'Hephaestion Forge', href: '/hephaestion-forge' },
                   { label: 'Immortality Vault', href: '/immortality-vault' },
+                  { label: 'Bot Factory', href: '/bots' },
+                  { label: 'Scraper Factory', href: '/scrapers' },
+                  { label: 'Dark Web Intel', href: '/dark-web-intel' },
+                  { label: 'Crypto Trading', href: '/crypto-trading' },
+                  { label: 'Price Alerts', href: '/price-alerts' },
+                  { label: 'SEC Intelligence', href: '/sec-intel' },
+                  { label: 'Surveillance', href: '/surveillance' },
+                  { label: 'News Intel', href: '/news' },
+                  { label: 'Reddit Intel', href: '/reddit' },
+                  { label: 'X Bot', href: '/x-bot' },
+                  { label: 'eBay Automation', href: '/ebay' },
+                  { label: 'LinkedIn AI', href: '/linkedin' },
+                  { label: 'Payments', href: '/payments' },
                   { label: 'ShadowGlass', href: '/services' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
@@ -542,6 +667,7 @@ export default function HomePage() {
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-text-secondary)' }}>Company</h4>
               <div className="flex flex-col gap-2.5">
+                <Link href="/about" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>About Us</Link>
                 <a href="mailto:contact@echo-op.com" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>contact@echo-op.com</a>
                 <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Midland, Texas</span>
                 <Link href="/legal/privacy" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>Privacy Policy</Link>

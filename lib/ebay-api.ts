@@ -4,7 +4,7 @@
  */
 
 const EBAY_API_URL = 'https://echo-ebay.bmcii1976.workers.dev';
-const ECHO_API_KEY = 'echo-omega-prime-forge-x-2026';
+const ECHO_API_KEY = process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-forge-x-2026';
 
 async function ebayFetch<T = unknown>(path: string, options: RequestInit = {}): Promise<T> {
   const headers: Record<string, string> = {

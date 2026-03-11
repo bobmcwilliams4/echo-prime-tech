@@ -1,8 +1,56 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '../../../lib/auth-context';
 import { getLeads, createLead, updateLead, deleteLead, initiateCall } from '../../../lib/closer-api';
+import { Conversation } from '@11labs/client';
+
+// ─── ConvAI Widget — Browser-based voice via ElevenLabs SDK ─────────────────
+
+function ConvAIWidget({ agentId, userName, onEnd }: { agentId: string; userName: string; onEnd?: () => void }) {
+  const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const conversationRef = useRef<any>(null);
+  const startedRef = useRef(false);
+
+  const startCall = useCallback(async () => {
+    if (conversationRef.current || startedRef.current) return;
+    startedRef.current = true;
+    setStatus('connecting');
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      const conv = await Conversation.startSession({
+        agentId,
+        dynamicVariables: { user_name: userName || 'visitor' },
+        onConnect: () => { setStatus('connected'); },
+        onDisconnect: () => { setStatus('idle'); conversationRef.current = null; startedRef.current = false; onEnd?.(); },
+        onModeChange: (p: { mode: 'speaking' | 'listening' }) => { setIsSpeaking(p.mode === 'speaking'); },
+        onError: (msg: string) => { console.error('[ConvAI] Error:', msg); setStatus('error'); startedRef.current = false; },
+      } as any);
+      conversationRef.current = conv;
+    } catch (err: unknown) {
+      console.error('[ConvAI] Start failed:', err);
+      setStatus('error');
+      startedRef.current = false;
+    }
+  }, [agentId, userName, onEnd]);
+
+  // Auto-start on mount
+  useEffect(() => {
+    startCall();
+    return () => { conversationRef.current?.endSession?.(); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const statusColor = isSpeaking ? '#ef4444' : status === 'connected' ? '#22c55e' : status === 'connecting' ? '#eab308' : '#64748b';
+  const statusText = status === 'connecting' ? 'Connecting...' : status === 'connected' ? (isSpeaking ? 'AI Speaking...' : 'Listening — speak now') : status === 'error' ? 'Connection failed' : 'Starting...';
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0' }}>
+      <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: statusColor, display: 'inline-block', flexShrink: 0, animation: status === 'connected' && !isSpeaking ? 'pulse 2s infinite' : 'none' }} />
+      <span style={{ fontSize: 12, fontWeight: 600, color: statusColor }}>{statusText}</span>
+    </div>
+  );
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -214,6 +262,9 @@ export default function LeadsPage() {
   // Call state
   const [callingId, setCallingId] = useState<string | null>(null);
   const [callSuccess, setCallSuccess] = useState<string | null>(null);
+
+  // Browser voice call (ConvAI) state
+  const [browserCallLead, setBrowserCallLead] = useState<Lead | null>(null);
 
   // ─── Data Fetching ──────────────────────────────────────────────────────
 
@@ -1117,58 +1168,130 @@ export default function LeadsPage() {
                           </div>
                         )}
 
-                        {/* Call with AI Agent */}
+                        {/* AI Agent Voice Call */}
                         <div
                           style={{
                             padding: 16,
                             borderRadius: 10,
                             backgroundColor: 'var(--ept-surface)',
-                            border: '1px solid var(--ept-border)',
+                            border: browserCallLead?.id === lead.id ? '1px solid #22c55e' : '1px solid var(--ept-border)',
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                               <IconPhone />
                               <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--ept-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                                Call History
+                                AI Agent
                               </span>
                             </div>
-                            <button
-                              onClick={() => handleCallLead(lead)}
-                              disabled={callingId === lead.id || !lead.phone || lead.status === 'dnc'}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 6,
-                                padding: '6px 14px',
-                                fontSize: 11,
-                                fontWeight: 700,
-                                color: '#fff',
-                                backgroundColor: callingId === lead.id ? '#6b7280' : callSuccess === lead.id ? '#059669' : 'var(--ept-accent)',
-                                border: 'none',
-                                borderRadius: 8,
-                                cursor: callingId === lead.id || !lead.phone || lead.status === 'dnc' ? 'not-allowed' : 'pointer',
-                                opacity: !lead.phone || lead.status === 'dnc' ? 0.4 : 1,
-                                transition: 'all 0.2s',
-                              }}
-                              onMouseOver={(e) => { if (lead.phone && lead.status !== 'dnc' && callingId !== lead.id) e.currentTarget.style.opacity = '0.85'; }}
-                              onMouseOut={(e) => { e.currentTarget.style.opacity = !lead.phone || lead.status === 'dnc' ? '0.4' : '1'; }}
-                            >
-                              <IconPhone />
-                              {callingId === lead.id ? 'Dialing...' : callSuccess === lead.id ? 'Call Started!' : 'Call with AI Agent'}
-                            </button>
+                            <div style={{ display: 'flex', gap: 6 }}>
+                              {/* PRIMARY: Talk via Browser (ElevenLabs ConvAI — WORKS) */}
+                              {browserCallLead?.id === lead.id ? (
+                                <button
+                                  onClick={() => setBrowserCallLead(null)}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 6,
+                                    padding: '6px 14px',
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    color: '#fff',
+                                    backgroundColor: '#ef4444',
+                                    border: 'none',
+                                    borderRadius: 8,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                  }}
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" />
+                                  </svg>
+                                  End Call
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => { setBrowserCallLead(lead); }}
+                                  disabled={lead.status === 'dnc'}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 6,
+                                    padding: '6px 14px',
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    color: '#fff',
+                                    backgroundColor: '#22c55e',
+                                    border: 'none',
+                                    borderRadius: 8,
+                                    cursor: lead.status === 'dnc' ? 'not-allowed' : 'pointer',
+                                    opacity: lead.status === 'dnc' ? 0.4 : 1,
+                                    transition: 'all 0.2s',
+                                  }}
+                                  onMouseOver={(e) => { if (lead.status !== 'dnc') e.currentTarget.style.opacity = '0.85'; }}
+                                  onMouseOut={(e) => { e.currentTarget.style.opacity = lead.status === 'dnc' ? '0.4' : '1'; }}
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" /><path d="M19 10v2a7 7 0 01-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
+                                  </svg>
+                                  Talk via Browser
+                                </button>
+                              )}
+                              {/* SECONDARY: Phone call (Twilio outbound) */}
+                              <button
+                                onClick={() => handleCallLead(lead)}
+                                disabled={callingId === lead.id || !lead.phone || lead.status === 'dnc'}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 6,
+                                  padding: '6px 14px',
+                                  fontSize: 11,
+                                  fontWeight: 600,
+                                  color: callingId === lead.id ? '#fff' : callSuccess === lead.id ? '#fff' : 'var(--ept-text-secondary)',
+                                  backgroundColor: callingId === lead.id ? '#6b7280' : callSuccess === lead.id ? '#059669' : 'transparent',
+                                  border: callingId === lead.id || callSuccess === lead.id ? 'none' : '1px solid var(--ept-border)',
+                                  borderRadius: 8,
+                                  cursor: callingId === lead.id || !lead.phone || lead.status === 'dnc' ? 'not-allowed' : 'pointer',
+                                  opacity: !lead.phone || lead.status === 'dnc' ? 0.4 : 1,
+                                  transition: 'all 0.2s',
+                                }}
+                                onMouseOver={(e) => { if (lead.phone && lead.status !== 'dnc' && callingId !== lead.id) e.currentTarget.style.opacity = '0.85'; }}
+                                onMouseOut={(e) => { e.currentTarget.style.opacity = !lead.phone || lead.status === 'dnc' ? '0.4' : '1'; }}
+                              >
+                                <IconPhone />
+                                {callingId === lead.id ? 'Dialing...' : callSuccess === lead.id ? 'Called!' : 'Call Phone'}
+                              </button>
+                            </div>
                           </div>
-                          {!lead.phone && (
-                            <p style={{ fontSize: 11, color: '#f59e0b', margin: 0 }}>Add a phone number to enable calling.</p>
+                          {browserCallLead?.id === lead.id && (
+                            <div style={{ padding: '8px 0' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                                <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+                                <span style={{ fontSize: 12, fontWeight: 700, color: '#22c55e' }}>AI AGENT ACTIVE</span>
+                              </div>
+                              <p style={{ fontSize: 12, color: 'var(--ept-text-muted)', lineHeight: 1.5, margin: 0 }}>
+                                Click the microphone button below to start the voice conversation. The AI agent knows the lead&apos;s name and will qualify them.
+                              </p>
+                              <ConvAIWidget
+                                agentId="agent_7901khgqmsy8ey1rw38py5qxzxpa"
+                                userName={`${lead.first_name} ${lead.last_name}`.trim() || 'visitor'}
+                                onEnd={() => setBrowserCallLead(null)}
+                              />
+                            </div>
                           )}
-                          {lead.status === 'dnc' && lead.phone && (
-                            <p style={{ fontSize: 11, color: '#ef4444', margin: 0 }}>Lead is on Do Not Call list.</p>
-                          )}
-                          {lead.phone && lead.status !== 'dnc' && (
-                            <p style={{ fontSize: 12, color: 'var(--ept-text-muted)', lineHeight: 1.5, margin: 0 }}>
-                              AI agent will call {lead.phone} and follow the active script. Monitor the call in real-time on the Live Calls page.
-                            </p>
-                          )}
+                          {!browserCallLead || browserCallLead.id !== lead.id ? (
+                            <>
+                              {lead.status === 'dnc' && (
+                                <p style={{ fontSize: 11, color: '#ef4444', margin: 0 }}>Lead is on Do Not Call list.</p>
+                              )}
+                              {lead.status !== 'dnc' && (
+                                <p style={{ fontSize: 12, color: 'var(--ept-text-muted)', lineHeight: 1.5, margin: 0 }}>
+                                  Use &quot;Talk via Browser&quot; for instant voice conversation, or &quot;Call Phone&quot; to ring {lead.phone || 'their number'}.
+                                </p>
+                              )}
+                            </>
+                          ) : null}
                         </div>
 
                         {/* Detail Actions */}
@@ -1225,6 +1348,8 @@ export default function LeadsPage() {
           })}
         </div>
       )}
+
+      {/* ConvAI widget is now rendered inline inside each lead card when active */}
     </div>
   );
 }

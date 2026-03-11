@@ -65,14 +65,14 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
 ];
 
 const VOICE_PRESETS: VoicePreset[] = [
-  { id: 'prof_male', name: 'Professional Male', description: 'Authoritative and clear, ideal for B2B outreach', gender: 'male' },
-  { id: 'prof_female', name: 'Professional Female', description: 'Confident and polished, great for corporate sales', gender: 'female' },
-  { id: 'warm_male', name: 'Warm Male', description: 'Friendly and approachable, perfect for relationship building', gender: 'male' },
-  { id: 'warm_female', name: 'Warm Female', description: 'Conversational and genuine, builds trust quickly', gender: 'female' },
-  { id: 'energy_male', name: 'Energetic Male', description: 'High energy and motivating, great for event and promo calls', gender: 'male' },
-  { id: 'energy_female', name: 'Energetic Female', description: 'Upbeat and enthusiastic, ideal for appointment setting', gender: 'female' },
-  { id: 'calm_male', name: 'Calm Male', description: 'Measured and reassuring, suited for consultative selling', gender: 'male' },
-  { id: 'calm_female', name: 'Calm Female', description: 'Soothing and patient, excellent for complex discussions', gender: 'female' },
+  { id: 'prof_male', name: 'Echo - Professional Male', description: 'Authoritative and clear, ideal for B2B outreach', gender: 'male' },
+  { id: 'prof_female', name: 'Alice - Professional Female', description: 'Clear British accent, confident and polished, great for corporate sales', gender: 'female' },
+  { id: 'warm_male', name: 'Bobby - Warm Male', description: 'Friendly and approachable, perfect for relationship building', gender: 'male' },
+  { id: 'warm_female', name: 'Jessica - Warm Female', description: 'Playful, bright, and warm — builds trust quickly', gender: 'female' },
+  { id: 'energy_male', name: 'Prometheus - Energetic Male', description: 'High energy and motivating, great for event and promo calls', gender: 'male' },
+  { id: 'energy_female', name: 'Laura - Energetic Female', description: 'Upbeat and enthusiastic, ideal for appointment setting', gender: 'female' },
+  { id: 'calm_male', name: 'Echo - Calm Male', description: 'Measured and reassuring, suited for consultative selling', gender: 'male' },
+  { id: 'calm_female', name: 'Catherine - Calm Female', description: 'Welsh accent, soothing and patient, excellent for complex discussions', gender: 'female' },
 ];
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -85,14 +85,14 @@ const TIMEZONES = [
 const SPEAK_CLOUD_URL = 'https://echo-speak-cloud.bmcii1976.workers.dev';
 
 const VOICE_ID_MAP: Record<string, string> = {
-  prof_male: 'keDMh3sQlEXKM4EQxvvi',
-  prof_female: 'SOYHLrjzK2X1ezoPC6cr',
-  warm_male: 'B5SCR8VDENzUF0L4eZY8',
-  warm_female: 'pzKXffibtCDxnrVO8d1U',
-  energy_male: 'WSd8ZDUcldL8KQKxz1KN',
-  energy_female: 'pzKXffibtCDxnrVO8d1U',
-  calm_male: 'keDMh3sQlEXKM4EQxvvi',
-  calm_female: 'SOYHLrjzK2X1ezoPC6cr',
+  prof_male: 'keDMh3sQlEXKM4EQxvvi',      // Echo - sovereign AI commander
+  prof_female: 'Xb7hH8MSUJpSbSDYk0k2',     // Alice - clear British educator
+  warm_male: 'B5SCR8VDENzUF0L4eZY8',        // Bobby - Commander voice clone
+  warm_female: 'cgSgspJ2msm6clMCkdW9',      // Jessica - playful, bright, warm
+  energy_male: 'WSd8ZDUcldL8KQKxz1KN',      // Prometheus - security specialist
+  energy_female: 'FGY2WhTYpPnrIDTdsKH5',    // Laura - enthusiast, quirky
+  calm_male: 'keDMh3sQlEXKM4EQxvvi',        // Echo - measured, reassuring
+  calm_female: 'MbmnAUd2tPCEOBK6D9Qd',      // Catherine - CZJ Welsh clone
 };
 
 const DEFAULT_HOURS: Record<string, DaySchedule> = Object.fromEntries(
@@ -374,13 +374,41 @@ export default function CloserSettingsPage() {
       if (cloneFiles.length < 1) { showToast('Upload at least 1 audio sample'); return; }
       setCloneUploading(true);
       try {
-        // Send file metadata — actual audio processing happens server-side
-        const fileMeta = cloneFiles.map(f => ({ name: f.name, size: f.size, type: f.type }));
-        await save({ voice_clone_request: { files: fileMeta, status: 'requested', requested_at: new Date().toISOString() } });
-        showToast('Voice clone request submitted! Processing takes 5-10 minutes.');
+        // Convert files to base64 for upload
+        const filePayloads = await Promise.all(cloneFiles.map(f => new Promise<{ data: string; name: string; type: string }>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64 = (reader.result as string).split(',')[1];
+            resolve({ data: base64, name: f.name, type: f.type || 'audio/mpeg' });
+          };
+          reader.onerror = () => reject(new Error('Failed to read file'));
+          reader.readAsDataURL(f);
+        })));
+
+        const companyName = settings.business.company_name || 'Custom';
+        const cloneName = `${companyName} Voice Clone`;
+        const resp = await fetch(`${SPEAK_CLOUD_URL}/voices/clone`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': 'echo-omega-prime-forge-x-2026' },
+          body: JSON.stringify({ name: cloneName, description: `Voice clone for ${companyName}`, files: filePayloads }),
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ error: 'Clone failed' }));
+          throw new Error((err as { error?: string }).error || `Clone failed (${resp.status})`);
+        }
+
+        const result = await resp.json() as { voice_id: string; name: string };
+        // Save the cloned voice ID to settings
+        await save({
+          voice_clone_id: result.voice_id,
+          voice_clone_name: result.name,
+          voice_clone_request: { status: 'completed', voice_id: result.voice_id, completed_at: new Date().toISOString() },
+        });
+        showToast(`Voice cloned successfully! Voice ID: ${result.voice_id.substring(0, 8)}...`);
         setCloneFiles([]);
-      } catch {
-        showToast('Failed to submit voice clone request');
+      } catch (e) {
+        showToast(e instanceof Error ? e.message : 'Failed to clone voice');
       }
       setCloneUploading(false);
     };
@@ -793,10 +821,10 @@ export default function CloserSettingsPage() {
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   const tabContent: Record<TabId, React.ReactNode> = {
-    business: <BusinessTab />,
-    voice: <VoiceTab />,
-    calling: <CallingTab />,
-    integrations: <IntegrationsTab />,
+    business: BusinessTab(),
+    voice: VoiceTab(),
+    calling: CallingTab(),
+    integrations: IntegrationsTab(),
   };
 
   return (

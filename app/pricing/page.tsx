@@ -46,11 +46,101 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Professional', price: 399, interval: 'mo', features: ['25 pipelines', '100K records/day', 'AI enrichment', 'Multi-destination', 'Priority support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited pipelines', 'Custom transforms', 'On-prem connectors', 'SLA guarantee'], popular: false, custom: true },
   ] },
+  { id: 'dark-web-intel', name: 'Dark Web Intel', tagline: 'Deep & dark web monitoring and threat intelligence', pricing: [
+    { tier: 'Starter', price: 999, interval: 'mo', features: ['5 brand monitors', 'Paste site scanning', 'Weekly threat digest', 'IOC extraction'], popular: false },
+    { tier: 'Professional', price: 1999, interval: 'mo', features: ['25 brand monitors', 'Breach intelligence', 'Crypto forensics', 'Real-time Telegram alerts', 'Priority support'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited monitors', 'Custom .onion crawling', 'Dedicated threat analyst', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'crypto-trading', name: 'Crypto Trading', tagline: 'Autonomous AI-powered cryptocurrency trading', pricing: [
+    { tier: 'Starter', price: 99, interval: 'mo', features: ['1 trading pair', 'Grid strategy', 'Basic analytics', 'Email alerts'], popular: false },
+    { tier: 'Professional', price: 299, interval: 'mo', features: ['5 trading pairs', 'Grid + Momentum', 'Advanced analytics', 'API access', 'Priority support'], popular: true },
+    { tier: 'Enterprise', price: 999, interval: 'mo', features: ['Unlimited pairs', 'Custom strategies', 'Multi-exchange', 'Dedicated quant support', 'White-label'], popular: false },
+  ] },
+  { id: 'price-alerts', name: 'Price Alerts', tagline: 'Real-time price monitoring across markets', pricing: [
+    { tier: 'Free', price: 0, interval: 'mo', features: ['5 alerts', 'Email notifications', 'Crypto & stocks', 'Daily summary'], popular: false },
+    { tier: 'Pro', price: 19, interval: 'mo', features: ['Unlimited alerts', 'SMS + Telegram + webhook', 'Commodities & forex', 'Priority delivery'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Custom integrations', 'API access', 'Bulk alert management', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'sec-intel', name: 'SEC Intelligence', tagline: 'Real-time SEC EDGAR filing monitoring & analysis', pricing: [
+    { tier: 'Starter', price: 199, interval: 'mo', features: ['10 company monitors', '10-K/10-Q/8-K tracking', 'Email alerts', 'Filing summaries'], popular: false },
+    { tier: 'Professional', price: 499, interval: 'mo', features: ['50 company monitors', 'AI-powered analysis', 'Insider trading alerts', 'API access', 'Priority support'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited monitors', 'Custom screening rules', 'Bulk data exports', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'surveillance', name: 'Surveillance', tagline: 'Location intelligence and asset tracking platform', pricing: [
+    { tier: 'Starter', price: 499, interval: 'mo', features: ['10 assets tracked', 'Real-time location', 'Geofence alerts', 'History playback'], popular: false },
+    { tier: 'Professional', price: 999, interval: 'mo', features: ['50 assets tracked', 'Cell tower + WiFi', 'IP geolocation', 'API access', 'Priority support'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited assets', 'Custom integrations', 'Fleet management', 'Dedicated support'], popular: false, custom: true },
+  ] },
+  { id: 'news', name: 'News Intelligence', tagline: 'Real-time news monitoring, sentiment analysis, and trend detection', pricing: [
+    { tier: 'Starter', price: 149, interval: 'mo', features: ['50 keywords', '10 source feeds', 'Email digests', 'Sentiment scoring'], popular: false },
+    { tier: 'Professional', price: 399, interval: 'mo', features: ['Unlimited keywords', '100+ sources', 'Real-time Telegram alerts', 'AI summaries', 'API access'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Custom NLP models', 'Firehose API', 'White-label reports', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'reddit', name: 'Reddit Intelligence', tagline: 'Subreddit monitoring, trend detection, and community analytics', pricing: [
+    { tier: 'Starter', price: 99, interval: 'mo', features: ['10 subreddits', 'Keyword alerts', 'Daily digests', 'Sentiment tracking'], popular: false },
+    { tier: 'Professional', price: 299, interval: 'mo', features: ['Unlimited subreddits', 'Real-time alerts', 'Competitor tracking', 'API access', 'Historical data'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Custom ML models', 'Influencer mapping', 'Bulk exports', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'x-bot', name: 'X/Twitter Bot', tagline: 'AI-powered X/Twitter content engine with multi-personality posting', pricing: [
+    { tier: 'Starter', price: 199, interval: 'mo', features: ['3 posts/day', '5 AI personalities', 'Basic analytics', 'Content calendar'], popular: false },
+    { tier: 'Professional', price: 499, interval: 'mo', features: ['Unlimited posts', '14 personalities', 'AI image generation', 'Engagement analytics', 'Thread builder'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Multi-account', 'Custom personalities', 'White-label', 'API access'], popular: false, custom: true },
+  ] },
+  { id: 'ebay', name: 'eBay Automation', tagline: 'AI-powered eBay listing, repricing, and inventory management', pricing: [
+    { tier: 'Starter', price: 149, interval: 'mo', features: ['100 listings', 'Auto-repricer', 'Basic analytics', 'Template builder'], popular: false },
+    { tier: 'Professional', price: 399, interval: 'mo', features: ['Unlimited listings', 'AI descriptions', 'Competitor tracking', 'Bulk operations', 'Priority support'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Multi-store', 'Custom integrations', 'Warehouse sync', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'linkedin', name: 'LinkedIn AI', tagline: 'AI-powered LinkedIn content, lead generation, and professional networking', pricing: [
+    { tier: 'Starter', price: 199, interval: 'mo', features: ['3 posts/week', 'AI content generator', 'Basic analytics', 'Profile optimization'], popular: false },
+    { tier: 'Professional', price: 499, interval: 'mo', features: ['Daily posts', 'Lead generation', 'InMail automation', 'Engagement analytics', 'Network mapping'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Multi-profile', 'Custom AI voice', 'CRM integration', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'payments', name: 'Payments Platform', tagline: 'Unified payment processing with Stripe, PayPal, and crypto', pricing: [
+    { tier: 'Starter', price: 0, interval: 'mo', features: ['Stripe + PayPal', '2.9% + 30¢ per txn', 'Basic dashboard', 'Email receipts'], popular: false },
+    { tier: 'Professional', price: 49, interval: 'mo', features: ['+ Crypto payments', '2.5% + 30¢ per txn', 'Subscription billing', 'Revenue analytics', 'Webhook alerts'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Custom rates', 'Multi-currency', 'White-label checkout', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'voice', name: 'Voice Studio', tagline: 'AI voice synthesis, cloning, and speech-to-text', pricing: [
+    { tier: 'Starter', price: 49, interval: 'mo', features: ['6 AI voices', '10,000 characters/mo', 'MP3 export', 'Basic emotion tags'], popular: false },
+    { tier: 'Professional', price: 149, interval: 'mo', features: ['Custom voice cloning', '100,000 characters/mo', 'Streaming TTS', 'STT transcription', '19 emotion tags'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited characters', 'Multi-language', 'White-label API', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'websites', name: 'Website Builder', tagline: 'AI-powered Next.js websites with auto-deploy and edge hosting', pricing: [
+    { tier: 'Starter', price: 299, interval: 'mo', features: ['5-page website', 'Day/night themes', 'Mobile responsive', 'SSL + CDN'], popular: false },
+    { tier: 'Professional', price: 799, interval: 'mo', features: ['20+ pages', 'Custom design', 'CMS dashboard', 'Analytics', 'Priority support'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited pages', 'E-commerce', 'API integration', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'pentesting', name: 'Pen Testing', tagline: 'Automated penetration testing and vulnerability assessment', pricing: [
+    { tier: 'Starter', price: 499, interval: 'mo', features: ['Monthly scan', '1 domain', 'OWASP Top 10', 'PDF report'], popular: false },
+    { tier: 'Professional', price: 1499, interval: 'mo', features: ['Weekly scans', '10 domains', 'API testing', 'Remediation guidance', 'Priority support'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Continuous testing', 'Red team exercises', 'Compliance reporting', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'orchestration', name: 'AI Orchestration', tagline: 'Multi-model AI routing with automatic failover and cost optimization', pricing: [
+    { tier: 'Starter', price: 99, interval: 'mo', features: ['5 AI models', '10K requests/mo', 'Auto-failover', 'Basic analytics'], popular: false },
+    { tier: 'Professional', price: 299, interval: 'mo', features: ['30+ models', '100K requests/mo', 'Cost optimization', 'Custom routing rules', 'API access'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited requests', 'Private models', 'On-prem option', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'knowledge', name: 'Knowledge Systems', tagline: 'Enterprise knowledge graphs with semantic search and AI reasoning', pricing: [
+    { tier: 'Starter', price: 199, interval: 'mo', features: ['10K documents', 'Semantic search', 'Auto-categorization', 'API access'], popular: false },
+    { tier: 'Professional', price: 499, interval: 'mo', features: ['100K documents', 'Knowledge graph', 'Custom embeddings', 'RAG pipeline', 'Priority support'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited documents', 'Private deployment', 'Custom models', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+];
+
+// Commander emails — owner gets ALL services at Enterprise tier, no checkout ever
+const COMMANDER_EMAILS = [
+  'bobmcwilliams4@outlook.com',
+  'bobmcwilliams4@gmail.com',
+  'bobby@echo-op.com',
+  'bmcii1976@gmail.com',
+  'bobbymcwilliams@echo-op.com',
 ];
 
 export default function PricingPage() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const { isDark } = useTheme();
+  const isOwner = role === 'owner' || (user?.email && COMMANDER_EMAILS.some(e => e.toLowerCase() === user.email!.toLowerCase()));
   const [services, setServices] = useState<Service[]>([]);
   const [activeService, setActiveService] = useState<string | null>(null);
   const [checkingOut, setCheckingOut] = useState<string | null>(null);
@@ -76,6 +166,8 @@ export default function PricingPage() {
   const current = services.find(s => s.id === activeService);
 
   const handleCheckout = async (serviceId: string, tier: { tier: string; price: number | null; custom?: boolean }) => {
+    // Owner/Commander never pays — all services auto-granted at Enterprise
+    if (isOwner) return;
     if (tier.custom || tier.price === null) { window.location.href = `mailto:bob@echo-op.com?subject=Enterprise%20${encodeURIComponent(serviceId)}%20Inquiry`; return; }
     const checkoutUrl = `/checkout?service=${encodeURIComponent(serviceId)}&tier=${encodeURIComponent(tier.tier.toLowerCase())}`;
     if (!user) { window.location.href = `/signup?redirect=${encodeURIComponent(checkoutUrl)}`; return; }
@@ -222,14 +314,18 @@ export default function PricingPage() {
                       </li>
                     ))}
                   </ul>
-                  <button onClick={() => handleCheckout(current.id, tier)} disabled={checkingOut === `${current.id}-${tier.tier}`} className="w-full text-center py-3 rounded-lg font-semibold text-sm transition-all disabled:opacity-60" style={{
-                    backgroundColor: tier.popular ? 'var(--ept-accent)' : 'transparent',
-                    color: tier.popular ? '#fff' : 'var(--ept-accent)',
-                    border: tier.popular ? 'none' : '1px solid var(--ept-accent)',
+                  <button onClick={() => handleCheckout(current.id, tier)} disabled={isOwner || checkingOut === `${current.id}-${tier.tier}`} className="w-full text-center py-3 rounded-lg font-semibold text-sm transition-all disabled:opacity-60" style={{
+                    backgroundColor: isOwner ? '#059669' : tier.popular ? 'var(--ept-accent)' : 'transparent',
+                    color: isOwner ? '#fff' : tier.popular ? '#fff' : 'var(--ept-accent)',
+                    border: isOwner ? 'none' : tier.popular ? 'none' : '1px solid var(--ept-accent)',
+                    cursor: isOwner ? 'default' : undefined,
                   }}>
-                    {checkingOut === `${current.id}-${tier.tier}` ? 'Redirecting...' : tier.custom ? 'Contact Sales' : tier.price === 0 ? 'Start Free' : 'Get Started'}
+                    {isOwner ? 'Active — Enterprise' : checkingOut === `${current.id}-${tier.tier}` ? 'Redirecting...' : tier.custom ? 'Contact Sales' : tier.price === 0 ? 'Start Free' : 'Get Started'}
                   </button>
-                  {!tier.custom && tier.price !== null && tier.price > 0 && (
+                  {isOwner && (
+                    <p className="text-center text-[10px] mt-2" style={{ color: '#10b981' }}>Owner — all services included</p>
+                  )}
+                  {!isOwner && !tier.custom && tier.price !== null && tier.price > 0 && (
                     <p className="text-center text-[10px] mt-2" style={{ color: 'var(--ept-text-muted)' }}>30-day money-back guarantee</p>
                   )}
                 </div>
@@ -275,7 +371,7 @@ export default function PricingPage() {
               <tbody>
                 {[
                   { label: 'Starting Price', values: (svcs: Service[]) => svcs.map(s => { const p = s.pricing[0]?.price; return p === 0 ? 'Free' : p !== null ? `$${getDisplayPrice(p)}/mo` : 'Custom'; }) },
-                  { label: 'AI-Powered', values: (svcs: Service[]) => svcs.map(s => ['sentinel','engines','ai-closer','bots'].includes(s.id)) },
+                  { label: 'AI-Powered', values: (svcs: Service[]) => svcs.map(s => ['sentinel','engines','ai-closer','bots','dark-web-intel','crypto-trading','sec-intel','surveillance'].includes(s.id)) },
                   { label: 'REST API Access', values: (svcs: Service[]) => svcs.map(s => !['sentinel'].includes(s.id) || s.pricing.some(t => t.features.some(f => f.toLowerCase().includes('api')))) },
                   { label: 'Custom Integrations', values: (svcs: Service[]) => svcs.map(s => s.pricing.some(t => t.features.some(f => f.toLowerCase().includes('custom')))) },
                   { label: 'Analytics Dashboard', values: (svcs: Service[]) => svcs.map(s => s.pricing.some(t => t.features.some(f => f.toLowerCase().includes('analytics') || f.toLowerCase().includes('dashboard')))) },
@@ -332,7 +428,7 @@ export default function PricingPage() {
         <div className="max-w-3xl mx-auto mb-16 p-8 rounded-2xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-accent)' }}>
           <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>Need the full stack?</h2>
           <p className="text-sm mb-6 max-w-lg mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
-            Bundle Engines + Bots + Scrapers + Pipelines + Title Intelligence for a custom enterprise rate. Get everything at a steep discount.
+            Bundle Engines + Bots + Scrapers + Pipelines + Title Intelligence + Dark Web Intel + Crypto Trading for a custom enterprise rate. Get everything at a steep discount.
           </p>
           <a href="mailto:bob@echo-op.com?subject=Enterprise%20Bundle%20Inquiry" className="inline-block px-8 py-3 rounded-xl font-semibold text-sm" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
             Get Bundle Pricing

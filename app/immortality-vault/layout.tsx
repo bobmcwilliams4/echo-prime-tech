@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://echo-ept.com/immortality-vault',
   },
+  alternates: { canonical: '/immortality-vault' },
 };
 
 export default function IVLayout({ children }: { children: React.ReactNode }) {

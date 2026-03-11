@@ -43,12 +43,12 @@ const FEATURES = [
   {
     icon: '🏛️',
     title: 'Direct Courthouse Access',
-    description: 'ShadowGlass connects to 80+ Texas county clerk portals. Search GovOS, Tyler Technologies, TexasFile, and Odyssey systems — no middlemen, no third-party data vendors.',
+    description: 'ShadowGlass connects to 98 Texas county clerk portals. Search GovOS, Tyler Technologies, TexasFile, and Odyssey systems — no middlemen, no third-party data vendors.',
   },
   {
     icon: '🧠',
-    title: '2,632 Domain Engines',
-    description: 'Multi-domain intelligence across 210 categories with 202,751 doctrine blocks. From oil & gas lease interpretation to environmental compliance — every edge case has a doctrine.',
+    title: '2,635 Domain Engines',
+    description: 'Multi-domain intelligence across 210 categories with 395,135 doctrine blocks. From oil & gas lease interpretation to environmental compliance — every edge case has a doctrine.',
   },
 ];
 
@@ -56,7 +56,7 @@ const COMPARISON = [
   { metric: 'Time to complete', manual: '1-8 weeks', echo: '2-8 hours' },
   { metric: 'Cost per search', manual: '$2,000-$10,000', echo: '$200-$500' },
   { metric: 'Instrument types', manual: 'Varies by examiner', echo: '59+ classified' },
-  { metric: 'County coverage', manual: 'One at a time', echo: '80+ TX counties' },
+  { metric: 'County coverage', manual: 'One at a time', echo: '98 TX counties' },
   { metric: 'Probate resolution', manual: 'Manual genealogy', echo: 'AI-automated' },
   { metric: 'Gap detection', manual: 'Experience-dependent', echo: 'Algorithmic + AI' },
   { metric: 'Output format', manual: 'Word doc', echo: 'HTML + DOCX + API' },
@@ -73,7 +73,7 @@ const TIERS = [
       'HTML + DOCX report',
       'Gap analysis with curative recommendations',
       'Fractional interest calculation',
-      'Up to 80 county coverage',
+      '98-county coverage',
       '24-hour delivery SLA',
     ],
     cta: 'Run a Title Search',
@@ -125,7 +125,7 @@ const INSTRUMENT_CATEGORIES = [
 
 const WORKFLOW_STEPS = [
   { step: 1, title: 'Submit Query', desc: 'Enter property legal description, county, and section/block/survey. Or paste a raw legal description — our parser handles the rest.' },
-  { step: 2, title: 'Record Discovery', desc: 'AI searches 80+ county portals, 259K+ pre-indexed records, and supplemental databases. Every grantor and grantee name is searched systematically.' },
+  { step: 2, title: 'Record Discovery', desc: 'AI searches 98 county portals, 16M+ pre-indexed records, and supplemental databases. Every grantor and grantee name is searched systematically.' },
   { step: 3, title: 'Chain Assembly', desc: 'Knowledge graph constructs the chain from sovereignty to present. Graph traversal links instruments, resolves name variations, and identifies mineral/surface splits.' },
   { step: 4, title: 'Gap Analysis', desc: 'AI identifies breaks: missing probates, unrecorded transfers, overconveyances, and orphan instruments. Each gap gets a severity score and curative recommendation.' },
   { step: 5, title: 'Live Portal Search', desc: 'For unfilled gaps, the system scrapes live county portals in real-time — GovOS, Tyler Technologies, TexasFile — searching by name, date, and instrument type.' },
@@ -196,13 +196,14 @@ export default function TitleIntelligencePage() {
   const [hasSearched, setHasSearched] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
 
-  const runDemoSearch = async () => {
-    if (!searchQuery.trim()) return;
+  const runDemoSearch = async (override?: string) => {
+    const q = override || searchQuery;
+    if (!q.trim()) return;
     setSearchLoading(true);
     setSearchError('');
     setHasSearched(true);
     try {
-      const res = await fetch(`https://shadowglass-v8-warpspeed.bmcii1976.workers.dev/search?q=${encodeURIComponent(searchQuery.trim())}&limit=8`);
+      const res = await fetch(`https://shadowglass-v8-warpspeed.bmcii1976.workers.dev/search?q=${encodeURIComponent(q.trim())}&limit=8`);
       if (!res.ok) throw new Error(`Search failed (${res.status})`);
       const json = await res.json();
       const raw: DeedRecord[] = json.data || json.results || json.records || [];
@@ -248,7 +249,7 @@ export default function TitleIntelligencePage() {
             <span style={{ color: 'var(--ept-text)' }}>Built by AI, Not Guesswork</span>
           </h1>
           <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 leading-relaxed animate-fade-up-delay-1" style={{ color: 'var(--ept-text-secondary)' }}>
-            The world&apos;s first AI system that constructs complete mineral title chains from raw courthouse records. 59 instrument types. 80+ Texas counties. Probate resolution. Gap detection. Fractional interest math. In hours — not weeks.
+            The world&apos;s first AI system that constructs complete mineral title chains from raw courthouse records. 59 instrument types. 98 Texas counties. Probate resolution. Gap detection. Fractional interest math. In hours — not weeks.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up-delay-2">
             <Link href="/sentinel?preset=Landman+%2F+Title" className="px-8 py-4 rounded-xl font-semibold text-white text-base transition-transform hover:scale-105" style={{ backgroundColor: 'var(--ept-accent)' }}>
@@ -265,7 +266,7 @@ export default function TitleIntelligencePage() {
           <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-accent)', borderWidth: 2 }}>
             <div className="text-center mb-6">
               <div className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-widest mb-3" style={{ backgroundColor: isDark ? '#14b8a615' : '#0d737715', color: 'var(--ept-accent)' }}>
-                LIVE DEMO — 259,000+ REAL RECORDS
+                LIVE DEMO — 16M+ REAL RECORDS
               </div>
               <h2 className="text-2xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Search Real Courthouse Records</h2>
               <p className="text-sm mt-2" style={{ color: 'var(--ept-text-secondary)' }}>
@@ -278,13 +279,13 @@ export default function TitleIntelligencePage() {
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && runDemoSearch()}
+                onKeyDown={e => { if (e.key === 'Enter') runDemoSearch(); }}
                 placeholder='Try "Smith" or "Marathon Oil" or "Section 12 Block A"'
                 className="flex-1 px-4 py-3 rounded-xl text-sm border outline-none transition-colors"
                 style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
               />
               <button
-                onClick={runDemoSearch}
+                onClick={() => runDemoSearch()}
                 disabled={searchLoading || !searchQuery.trim()}
                 className="px-6 py-3 rounded-xl font-semibold text-sm text-white transition-all hover:scale-105 disabled:opacity-50"
                 style={{ backgroundColor: 'var(--ept-accent)' }}
@@ -351,7 +352,7 @@ export default function TitleIntelligencePage() {
                 {['Marathon Oil', 'Smith', 'Section 12', 'Chevron', 'Mineral Deed'].map(q => (
                   <button
                     key={q}
-                    onClick={() => { setSearchQuery(q); }}
+                    onClick={() => { setSearchQuery(q); runDemoSearch(q); }}
                     className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors hover:opacity-80"
                     style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}
                   >
@@ -367,10 +368,10 @@ export default function TitleIntelligencePage() {
         <section className="max-w-5xl mx-auto px-6 mb-20">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { value: '259K+', label: 'Records Indexed' },
-              { value: '80+', label: 'TX Counties' },
+              { value: '16M+', label: 'Records Indexed' },
+              { value: '98', label: 'TX Counties' },
               { value: '59', label: 'Instrument Types' },
-              { value: '2,632', label: 'AI Engines' },
+              { value: '2,635', label: 'AI Engines' },
             ].map(stat => (
               <div key={stat.label} className="text-center p-5 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
                 <div className="text-2xl md:text-3xl font-extrabold gradient-text">{stat.value}</div>

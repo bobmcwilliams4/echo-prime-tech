@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'AI Title Intelligence — Chain of Title Search | Echo Prime Technologies',
-  description: 'AI-powered chain of title analysis across 80+ Texas counties. 259,000+ indexed deed records, automated mineral rights tracing, gap detection, and fractional interest calculations. From $200/mo.',
-  keywords: ['title intelligence', 'chain of title', 'mineral rights', 'deed records', 'Texas county records', 'oil and gas title search', 'ShadowGlass', 'landman AI', 'Echo Prime'],
+  title: 'Title Intelligence — AI Chain of Title Search | Echo Prime Technologies',
+  description: 'AI-powered chain of title search across 80+ Texas counties with 259,000+ indexed deed records. Automated mineral rights analysis, gap detection, and fractional interest calculations.',
+  keywords: ['title intelligence', 'chain of title', 'mineral rights', 'deed search', 'oil and gas title', 'land records AI', 'Texas county records'],
   openGraph: {
-    title: 'AI Title Intelligence — Chain of Title Search',
-    description: '80+ Texas counties, 259K+ deed records. AI-powered mineral rights tracing, gap detection, and chain of title analysis.',
+    title: 'Title Intelligence — AI Chain of Title Search',
+    description: 'AI-powered title search across 80+ Texas counties. 259,000+ deed records. Gap detection and mineral rights analysis.',
     url: 'https://echo-ept.com/title-intelligence',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },

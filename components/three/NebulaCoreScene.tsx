@@ -27,6 +27,7 @@ const reactiveState = {
   isThinking: false,
   speechIntensity: 0,
   thinkIntensity: 0,
+  onLightning: null as (() => void) | null,
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -745,6 +746,9 @@ function LightningBolts() {
           birthTime: t,
           lifetime: 0.25 + Math.random() * 0.3,
         }
+
+        // Fire lightning sound callback
+        if (reactiveState.onLightning) reactiveState.onLightning()
       }
     }
 
@@ -836,11 +840,13 @@ function Scene() {
 interface NebulaCoreProps {
   isSpeaking?: boolean
   isThinking?: boolean
+  onLightning?: () => void
 }
 
-export default function NebulaCoreScene({ isSpeaking = false, isThinking = false }: NebulaCoreProps) {
+export default function NebulaCoreScene({ isSpeaking = false, isThinking = false, onLightning }: NebulaCoreProps) {
   reactiveState.isSpeaking = isSpeaking
   reactiveState.isThinking = isThinking
+  reactiveState.onLightning = onLightning || null
 
   return (
     <div className="absolute inset-0" style={{ zIndex: 0 }}>

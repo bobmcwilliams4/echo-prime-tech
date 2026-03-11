@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Autonomous Data Pipelines — Extract, Transform, Deliver | Echo Prime Technologies',
-  description: 'AI-powered data extraction systems that find, scrape, normalize, and deliver structured data from 50+ source types. County records, APIs, PDFs, web pages — all running 24/7. From $199/mo.',
-  keywords: ['data pipelines', 'data extraction', 'web scraping', 'ETL automation', 'county records', 'autonomous data', 'AI data processing', 'Echo Prime'],
+  title: 'Data Pipelines — Autonomous ETL & Real-Time Processing | Echo Prime Technologies',
+  description: 'Autonomous data extraction, transformation, and delivery from 50+ source types. Real-time processing, enrichment, and structured output. $199-$499/mo.',
+  keywords: ['data pipeline', 'ETL', 'data processing', 'data extraction', 'real-time data', 'data automation'],
   openGraph: {
-    title: 'Autonomous Data Pipelines — Extract, Transform, Deliver',
-    description: 'AI data extraction from 50+ source types running 24/7. County records, APIs, PDFs, web pages. From $199/mo.',
+    title: 'Data Pipelines — Autonomous ETL & Real-Time Processing',
+    description: 'Autonomous data extraction from 50+ source types. Real-time processing and structured output. $199-$499/mo.',
     url: 'https://echo-ept.com/pipelines',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },

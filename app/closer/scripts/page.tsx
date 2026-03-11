@@ -550,9 +550,9 @@ function ScriptUploadZone({ onComplete }: { onComplete: () => void }) {
       setProgress('Extracting text from PDF...');
       const arrayBuffer = await file.arrayBuffer();
       const pdfjsLib = await import('pdfjs-dist');
-      // Use bundled worker
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      // Disable worker to avoid CDN fetch issues in static export
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer), useWorkerFetch: false, isEvalSupported: false, useSystemFonts: true }).promise;
       const pages: string[] = [];
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
