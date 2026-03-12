@@ -230,7 +230,7 @@ export default function AnalyticsPage() {
   /* ──────────────────── Render ──────────────────── */
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div data-tutorial="analytics-page" className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
@@ -243,7 +243,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Date Range Selector */}
-        <div className="flex rounded-xl overflow-hidden border" style={{ borderColor: 'var(--ept-border)' }}>
+        <div data-tutorial="analytics-range" className="flex rounded-xl overflow-hidden border" style={{ borderColor: 'var(--ept-border)' }}>
           {DATE_RANGES.map((dr) => (
             <button
               key={dr.value}
@@ -273,7 +273,7 @@ export default function AnalyticsPage() {
       )}
 
       {/* KPI Stat Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div data-tutorial="analytics-kpis" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {kpis.map((kpi, i) => (
           <div
             key={i}
@@ -318,7 +318,7 @@ export default function AnalyticsPage() {
 
       {/* Cost Breakdown Section */}
       {(hasData || costLoading) && (
-        <div className="space-y-4">
+        <div data-tutorial="analytics-cost" className="space-y-4">
           <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--ept-text)' }}>
             Cost Breakdown
           </h2>

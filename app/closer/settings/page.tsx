@@ -279,6 +279,7 @@ export default function CloserSettingsPage() {
                   value={b[f.key]}
                   onChange={e => setSettings(prev => ({ ...prev, business: { ...prev.business, [f.key]: e.target.value } }))}
                   style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid var(--ept-border)', backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text)', fontSize: 14, outline: 'none' }}
+                  {...(f.key === 'company_name' ? { 'data-tutorial': 'settings-company-name' } : {})}
                 />
               ) : (
                 <span style={{ fontSize: 14, color: b[f.key] ? 'var(--ept-text)' : 'var(--ept-text-muted)', fontStyle: b[f.key] ? 'normal' : 'italic' }}>
@@ -295,6 +296,7 @@ export default function CloserSettingsPage() {
               style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid var(--ept-border)', backgroundColor: 'transparent', color: 'var(--ept-text-secondary)', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
             >Cancel</button>
             <button
+              data-tutorial="settings-save"
               disabled={saving}
               onClick={() => { save({ ...settings.business }); setEditingBusiness(false); }}
               style={{ padding: '8px 20px', borderRadius: 8, border: 'none', backgroundColor: 'var(--ept-accent)', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: saving ? 0.6 : 1 }}
@@ -418,7 +420,7 @@ export default function CloserSettingsPage() {
         <div>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 4 }}>Voice Presets</h2>
           <p style={{ fontSize: 13, color: 'var(--ept-text-muted)', marginBottom: 14 }}>Select an AI voice personality for outbound calls. Click the play button to preview.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
+          <div data-tutorial="settings-voice-preset" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
             {VOICE_PRESETS.map(p => {
               const selected = v.selected_preset === p.id;
               const isPlaying = playingVoice === p.id;
@@ -643,6 +645,7 @@ export default function CloserSettingsPage() {
               description="Record all outbound calls for quality review and compliance"
               value={c.recording_enabled}
               onChange={v => { updateCalling({ recording_enabled: v }); save({ recording_enabled: v }); }}
+              dataTutorial="settings-recording"
             />
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
@@ -668,6 +671,7 @@ export default function CloserSettingsPage() {
           <div style={{ marginBottom: 14 }}>
             <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--ept-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4, display: 'block' }}>Timezone</label>
             <select
+              data-tutorial="settings-timezone"
               value={c.timezone}
               onChange={e => { updateCalling({ timezone: e.target.value }); save({ timezone: e.target.value }); }}
               style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid var(--ept-border)', backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text)', fontSize: 13, outline: 'none', width: '100%', maxWidth: 300 }}
@@ -795,9 +799,9 @@ export default function CloserSettingsPage() {
 
   // ─── Toggle Row Component ─────────────────────────────────────────────────
 
-  function ToggleRow({ label, description, value, onChange }: { label: string; description: string; value: boolean; onChange: (v: boolean) => void }) {
+  function ToggleRow({ label, description, value, onChange, dataTutorial }: { label: string; description: string; value: boolean; onChange: (v: boolean) => void; dataTutorial?: string }) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+      <div data-tutorial={dataTutorial} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--ept-text)' }}>{label}</div>
           <div style={{ fontSize: 12, color: 'var(--ept-text-muted)', marginTop: 2, lineHeight: 1.4 }}>{description}</div>
@@ -840,6 +844,7 @@ export default function CloserSettingsPage() {
         {TABS.map(tab => (
           <button
             key={tab.id}
+            data-tutorial={tab.id === 'business' ? 'settings-tab-business' : tab.id === 'voice' ? 'settings-tab-voice' : tab.id === 'calling' ? 'settings-tab-calling' : undefined}
             onClick={() => setActiveTab(tab.id)}
             style={{
               display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px', fontSize: 13, fontWeight: 600,

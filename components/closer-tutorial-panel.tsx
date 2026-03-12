@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { TUTORIALS, QUICK_REFERENCE, CONTEXT_TRIGGERS, type Tutorial, type TutorialStep } from '../lib/closer-tutorial-data';
+import { useGuidedTutorial } from '../lib/guided-tutorial-context';
+import { getAvailableGuidedTutorials } from '../lib/guided-steps';
 
 // ─── localStorage helpers ───
 const STORAGE_KEY = 'closer_tutorial_progress';
@@ -326,14 +328,27 @@ function StepIllustration({ step }: { step: TutorialStep }) {
 }
 
 // ─── Main Component ───
+const GUIDED_TUTORIALS = getAvailableGuidedTutorials();
+
 export default function CloserTutorialPanel() {
   const pathname = usePathname();
+  const { startGuided, active: guidedActive } = useGuidedTutorial();
   const [open, setOpen] = useState(false);
   const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState<Record<string, number[]>>({});
   const [view, setView] = useState<'list' | 'quickref' | 'tutorial'>('list');
+  const [lightboxStep, setLightboxStep] = useState<TutorialStep | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  // Mobile detection
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   // Load progress
   useEffect(() => { setProgress(getProgress()); }, []);
@@ -439,12 +454,13 @@ export default function CloserTutorialPanel() {
         <div
           ref={panelRef}
           style={{
-            position: 'fixed', right: 0, top: 0, bottom: 0, width: 380,
+            position: 'fixed', right: 0, top: 0, bottom: 0,
+            width: isMobile ? '100%' : 380,
             zIndex: 9999, backgroundColor: 'var(--ept-bg)',
             borderLeft: '1px solid var(--ept-border)',
             display: 'flex', flexDirection: 'column',
             boxShadow: '-8px 0 30px rgba(0,0,0,0.15)',
-            animation: 'slideIn 0.2s ease-out',
+            animation: isMobile ? 'slideUp 0.25s ease-out' : 'slideIn 0.2s ease-out',
           }}
         >
           {/* Header */}
@@ -511,8 +527,22 @@ export default function CloserTutorialPanel() {
                       <div style={{ marginTop: 8, height: 3, borderRadius: 2, backgroundColor: 'var(--ept-surface)' }}>
                         <div style={{ height: '100%', borderRadius: 2, backgroundColor: complete ? '#10b981' : 'var(--ept-accent)', width: `${pct}%`, transition: 'width 0.3s' }} />
                       </div>
-                      <div style={{ fontSize: 9, color: 'var(--ept-text-muted)', marginTop: 4, display: 'flex', justifyContent: 'space-between' }}>
+                      <div style={{ fontSize: 9, color: 'var(--ept-text-muted)', marginTop: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span>{done.length}/{total} steps</span>
+                        {GUIDED_TUTORIALS.includes(tut.id) && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setOpen(false); startGuided(tut.id); }}
+                            disabled={guidedActive}
+                            style={{
+                              padding: '3px 8px', borderRadius: 4, fontSize: 9, fontWeight: 700,
+                              border: 'none', backgroundColor: 'var(--ept-accent)', color: '#fff',
+                              cursor: guidedActive ? 'not-allowed' : 'pointer',
+                              opacity: guidedActive ? 0.5 : 1,
+                            }}
+                          >
+                            Interactive
+                          </button>
+                        )}
                         <span>{tut.estimatedMinutes} min</span>
                       </div>
                     </button>
@@ -565,10 +595,12 @@ export default function CloserTutorialPanel() {
                 {/* Step title */}
                 <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--ept-text)', margin: '0 0 8px' }}>{step.title}</h3>
 
-                {/* Illustration */}
-                <IllFrame>
-                  <StepIllustration step={step} />
-                </IllFrame>
+                {/* Illustration (tap to enlarge) */}
+                <div onClick={() => setLightboxStep(step)} style={{ cursor: 'zoom-in' }} title="Tap to enlarge">
+                  <IllFrame>
+                    <StepIllustration step={step} />
+                  </IllFrame>
+                </div>
 
                 {/* Callout */}
                 <div style={{
@@ -636,8 +668,47 @@ export default function CloserTutorialPanel() {
         </div>
       )}
 
+      {/* Lightbox overlay */}
+      {lightboxStep && (
+        <div
+          onClick={() => setLightboxStep(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 10001,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 24, cursor: 'zoom-out',
+            animation: 'fadeIn 0.15s ease-out',
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              width: '100%', maxWidth: 600, maxHeight: '80vh',
+              overflowY: 'auto', borderRadius: 16,
+              backgroundColor: 'var(--ept-bg)',
+              border: '1px solid var(--ept-border)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+              cursor: 'default',
+            }}
+          >
+            <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--ept-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ept-text)' }}>{lightboxStep.title}</div>
+              <button onClick={() => setLightboxStep(null)} style={{ background: 'none', border: 'none', fontSize: 20, color: 'var(--ept-text-muted)', cursor: 'pointer', padding: '0 4px' }}>×</button>
+            </div>
+            <div style={{ padding: 20 }}>
+              <StepIllustration step={lightboxStep} />
+            </div>
+            <div style={{ padding: '12px 20px', borderTop: '1px solid var(--ept-border)' }}>
+              <div style={{ fontSize: 12, color: 'var(--ept-text-secondary)', lineHeight: 1.5 }}>{lightboxStep.callout}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         @keyframes slideIn { from { transform: translateX(380px); } to { transform: translateX(0); } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
       `}</style>

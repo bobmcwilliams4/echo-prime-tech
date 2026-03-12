@@ -480,6 +480,7 @@ export default function LeadsPage() {
           </span>
         </div>
         <button
+          data-tutorial="leads-add"
           onClick={() => { setShowAddForm(!showAddForm); setFormData({ ...EMPTY_FORM }); setFormError(null); }}
           style={{
             display: 'flex',
@@ -529,6 +530,7 @@ export default function LeadsPage() {
       {/* ── Add Lead Form ─────────────────────────────────────────────────── */}
       {showAddForm && (
         <form
+          data-tutorial="leads-form"
           onSubmit={handleCreateLead}
           style={{
             padding: 20,
@@ -547,13 +549,13 @@ export default function LeadsPage() {
 
           {/* Row 1: Name */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <FormField label="First Name" value={formData.first_name} onChange={(v) => setFormData({ ...formData, first_name: v })} placeholder="John" />
+            <FormField label="First Name" value={formData.first_name} onChange={(v) => setFormData({ ...formData, first_name: v })} placeholder="John" data-tutorial="leads-first-name" />
             <FormField label="Last Name" value={formData.last_name} onChange={(v) => setFormData({ ...formData, last_name: v })} placeholder="Doe" />
           </div>
 
           {/* Row 2: Phone + Email */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <FormField label="Phone *" value={formData.phone} onChange={(v) => setFormData({ ...formData, phone: v })} placeholder="+1 (555) 000-0000" required />
+            <FormField label="Phone *" value={formData.phone} onChange={(v) => setFormData({ ...formData, phone: v })} placeholder="+1 (555) 000-0000" required data-tutorial="leads-phone" />
             <FormField label="Email" value={formData.email} onChange={(v) => setFormData({ ...formData, email: v })} placeholder="john@example.com" type="email" />
           </div>
 
@@ -683,6 +685,7 @@ export default function LeadsPage() {
       >
         {/* Status Dropdown */}
         <select
+          data-tutorial="leads-status-filter"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as LeadStatus | 'all')}
           style={{
@@ -710,6 +713,7 @@ export default function LeadsPage() {
             <IconSearch />
           </div>
           <input
+            data-tutorial="leads-search"
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -1363,6 +1367,7 @@ function FormField({
   placeholder,
   required,
   type = 'text',
+  'data-tutorial': dataTutorial,
 }: {
   label: string;
   value: string;
@@ -1370,6 +1375,7 @@ function FormField({
   placeholder?: string;
   required?: boolean;
   type?: string;
+  'data-tutorial'?: string;
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -1382,6 +1388,7 @@ function FormField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
+        data-tutorial={dataTutorial}
         style={{
           padding: '8px 10px',
           fontSize: 13,

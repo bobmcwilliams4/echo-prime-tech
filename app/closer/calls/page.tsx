@@ -201,15 +201,18 @@ function FilterSelect({
   value,
   onChange,
   options,
+  'data-tutorial': dataTutorial,
 }: {
   value: string;
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
+  'data-tutorial'?: string;
 }) {
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      data-tutorial={dataTutorial}
       style={{
         backgroundColor: 'var(--ept-surface)',
         color: 'var(--ept-text)',
@@ -786,7 +789,7 @@ export default function CallHistoryPage() {
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div data-tutorial="calls-page" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         {/* ─── Header ─── */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
@@ -860,9 +863,9 @@ export default function CallHistoryPage() {
           >
             Filters
           </span>
-          <FilterSelect value={directionFilter} onChange={setDirectionFilter} options={DIRECTION_OPTIONS} />
-          <FilterSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_OPTIONS} />
-          <FilterSelect value={dateRange} onChange={setDateRange} options={DATE_RANGE_OPTIONS} />
+          <FilterSelect value={directionFilter} onChange={setDirectionFilter} options={DIRECTION_OPTIONS} data-tutorial="calls-direction-filter" />
+          <FilterSelect value={statusFilter} onChange={setStatusFilter} options={STATUS_OPTIONS} data-tutorial="calls-status-filter" />
+          <FilterSelect value={dateRange} onChange={setDateRange} options={DATE_RANGE_OPTIONS} data-tutorial="calls-date-filter" />
 
           {(directionFilter !== 'all' || statusFilter !== 'all' || dateRange !== 'all') && (
             <button
@@ -978,7 +981,7 @@ export default function CallHistoryPage() {
               const isLast = idx === calls.length - 1;
 
               return (
-                <div key={call.id}>
+                <div key={call.id} {...(idx === 0 ? { 'data-tutorial': 'calls-row' } : {})}>
                   <div
                     onClick={() => toggleExpand(call.id)}
                     role="button"
