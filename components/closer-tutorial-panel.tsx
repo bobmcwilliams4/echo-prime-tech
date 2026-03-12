@@ -295,7 +295,7 @@ function StepIllustration({ step }: { step: TutorialStep }) {
           <div style={{ display: 'flex', justifyContent: cfg.position === 'top-right' ? 'flex-end' : 'center', marginBottom: 8 }}>
             <div style={{ padding: '5px 12px', borderRadius: 6, fontSize: 10, fontWeight: 600, backgroundColor: 'var(--ept-accent)', color: '#fff', boxShadow: '0 0 12px rgba(20,184,166,0.4)' }}>{cfg.buttonText as string}</div>
           </div>
-          {cfg.context && <div style={{ fontSize: 9, color: 'var(--ept-text-secondary)', textAlign: 'center' }}>{cfg.context as string}</div>}
+          {cfg.context ? <div style={{ fontSize: 9, color: 'var(--ept-text-secondary)', textAlign: 'center' }}>{String(cfg.context)}</div> : null}
         </div>
       );
       if (type === 'notification') return <NotificationMockup message={cfg.message as string} icon={cfg.icon as string} />;
