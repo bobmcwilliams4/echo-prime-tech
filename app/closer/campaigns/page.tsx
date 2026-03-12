@@ -163,6 +163,7 @@ function SliderInput({
   step,
   unit,
   onChange,
+  'data-tutorial': dataTutorial,
 }: {
   label: string;
   value: number;
@@ -171,9 +172,10 @@ function SliderInput({
   step: number;
   unit: string;
   onChange: (v: number) => void;
+  'data-tutorial'?: string;
 }) {
   return (
-    <div>
+    <div data-tutorial={dataTutorial}>
       <div className="flex items-center justify-between mb-1.5">
         <label className="text-xs font-medium" style={{ color: 'var(--ept-text-muted)' }}>
           {label}
@@ -407,13 +409,17 @@ function NewCampaignForm({
   onSubmit,
   onCancel,
   submitting,
+  initialData,
+  isEditing,
 }: {
   scripts: Script[];
   onSubmit: (data: FormState) => void;
   onCancel: () => void;
   submitting: boolean;
+  initialData?: FormState;
+  isEditing?: boolean;
 }) {
-  const [form, setForm] = useState<FormState>(INITIAL_FORM);
+  const [form, setForm] = useState<FormState>(initialData || INITIAL_FORM);
 
   const updateField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -436,6 +442,7 @@ function NewCampaignForm({
 
   return (
     <form
+      data-tutorial="campaigns-form"
       onSubmit={handleSubmit}
       className="rounded-xl border overflow-hidden"
       style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-accent)', boxShadow: '0 0 24px var(--ept-accent-glow)' }}
@@ -446,7 +453,7 @@ function NewCampaignForm({
         style={{ borderColor: 'var(--ept-border)' }}
       >
         <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--ept-text)' }}>
-          New Campaign
+          {isEditing ? 'Edit Campaign' : 'New Campaign'}
         </h2>
         <button
           type="button"
@@ -467,6 +474,7 @@ function NewCampaignForm({
               Campaign Name
             </label>
             <input
+              data-tutorial="campaigns-name"
               type="text"
               value={form.name}
               onChange={(e) => updateField('name', e.target.value)}
@@ -487,6 +495,7 @@ function NewCampaignForm({
               Script
             </label>
             <select
+              data-tutorial="campaigns-script"
               value={form.script_id}
               onChange={(e) => updateField('script_id', e.target.value)}
               className="w-full px-3 py-2.5 rounded-lg border text-sm outline-none transition-colors appearance-none cursor-pointer"
@@ -553,6 +562,7 @@ function NewCampaignForm({
             step={5}
             unit="calls/hr"
             onChange={(v) => updateField('calls_per_hour', v)}
+            data-tutorial="campaigns-cph"
           />
         </div>
 
@@ -630,6 +640,7 @@ function NewCampaignForm({
         {/* Submit */}
         <div className="flex items-center gap-3 pt-2">
           <button
+            data-tutorial="campaigns-submit"
             type="submit"
             disabled={submitting || !form.name.trim()}
             className="px-6 py-2.5 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
@@ -638,10 +649,10 @@ function NewCampaignForm({
             {submitting ? (
               <span className="flex items-center gap-2">
                 <span className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                Creating...
+                {isEditing ? 'Saving...' : 'Creating...'}
               </span>
             ) : (
-              'Create Campaign'
+              isEditing ? 'Save Changes' : 'Create Campaign'
             )}
           </button>
           <button
@@ -711,6 +722,7 @@ export default function CampaignsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingCampaignId, setEditingCampaignId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -838,8 +850,37 @@ export default function CampaignsPage() {
   };
 
   /* ── Campaign actions (start, pause, resume, edit, stats, assign_leads) ── */
+  /* ── Edit campaign ── */
+  const handleEdit = async (formData: FormState) => {
+    if (!editingCampaignId) return;
+    setSubmitting(true);
+    try {
+      await updateCampaign(editingCampaignId, {
+        name: formData.name.trim(),
+        script_id: formData.script_id || null,
+        type: formData.type,
+        max_concurrent: formData.max_concurrent,
+        calls_per_hour: formData.calls_per_hour,
+        schedule_start: formData.schedule_start,
+        schedule_end: formData.schedule_end,
+        schedule_days: formData.schedule_days,
+      });
+      setEditingCampaignId(null);
+      setShowForm(false);
+      await loadCampaigns();
+    } catch (err: any) {
+      setError(err.message || 'Failed to update campaign');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleAction = async (campaignId: string, action: string) => {
     if (action === 'edit') {
+      const campaign = campaigns.find((c) => c.id === campaignId);
+      if (!campaign) return;
+      setEditingCampaignId(campaignId);
+      setShowForm(true);
       return;
     }
     if (action === 'stats') {
@@ -870,7 +911,7 @@ export default function CampaignsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div data-tutorial="campaigns-page" className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -883,7 +924,8 @@ export default function CampaignsPage() {
         </div>
         {!showForm && (
           <button
-            onClick={() => setShowForm(true)}
+            data-tutorial="campaigns-create"
+            onClick={() => { setEditingCampaignId(null); setShowForm(true); }}
             className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90"
             style={{ backgroundColor: 'var(--ept-accent)' }}
           >
@@ -915,13 +957,32 @@ export default function CampaignsPage() {
         </div>
       )}
 
-      {/* New Campaign Form */}
+      {/* Campaign Form (Create or Edit) */}
       {showForm && (
         <NewCampaignForm
           scripts={scripts}
-          onSubmit={handleCreate}
-          onCancel={() => setShowForm(false)}
+          onSubmit={editingCampaignId ? handleEdit : handleCreate}
+          onCancel={() => { setShowForm(false); setEditingCampaignId(null); }}
           submitting={submitting}
+          isEditing={!!editingCampaignId}
+          initialData={editingCampaignId ? (() => {
+            const c = campaigns.find((x) => x.id === editingCampaignId);
+            if (!c) return undefined;
+            return {
+              name: c.name || '',
+              script_id: c.script_id || '',
+              type: c.type || 'outbound',
+              max_concurrent: c.max_concurrent ?? 2,
+              calls_per_hour: c.calls_per_hour ?? 30,
+              schedule_start: c.schedule_start || '09:00',
+              schedule_end: c.schedule_end || '17:00',
+              schedule_days: Array.isArray(c.schedule_days)
+                ? c.schedule_days
+                : typeof c.schedule_days === 'string'
+                  ? JSON.parse(c.schedule_days)
+                  : ['mon', 'tue', 'wed', 'thu', 'fri'],
+            } as FormState;
+          })() : undefined}
         />
       )}
 

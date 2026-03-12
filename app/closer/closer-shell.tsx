@@ -5,8 +5,10 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
-import { chatWithEcho } from '../../lib/closer-api';
+import { chatWithEcho, submitBugReport } from '../../lib/closer-api';
 import CloserTutorialPanel from '../../components/closer-tutorial-panel';
+import { GuidedTutorialProvider } from '../../lib/guided-tutorial-context';
+import GuidedOverlay from '../../components/guided-overlay';
 
 /* ── Service Health Monitor ── */
 
@@ -153,6 +155,7 @@ export default function CloserShell({ children }: { children: React.ReactNode })
   const currentPage = NAV_ITEMS.find(n => n.exact ? pathname === n.href : pathname.startsWith(n.href) && n.href !== '/closer') || NAV_ITEMS[0];
 
   return (
+    <GuidedTutorialProvider>
     <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--ept-bg)' }}>
       <aside
         onMouseEnter={() => setSidebarOpen(true)}
@@ -240,6 +243,8 @@ export default function CloserShell({ children }: { children: React.ReactNode })
       <EchoPrimeCopilot />
       {/* Tutorial Side Panel — floating ? button on all authenticated pages */}
       <CloserTutorialPanel />
+      {/* Guided Tutorial Overlay — spotlight + tooltip + click-blocking */}
+      <GuidedOverlay />
 
       <style>{`
         @keyframes statusPing {
@@ -252,6 +257,7 @@ export default function CloserShell({ children }: { children: React.ReactNode })
         }
       `}</style>
     </div>
+    </GuidedTutorialProvider>
   );
 }
 
@@ -286,6 +292,11 @@ function EchoPrimeCopilot() {
       const data: any = await chatWithEcho(text);
       const reply = data?.response || data?.message || data?.content || 'No response.';
       setMessages(prev => [...prev, { role: 'assistant', content: reply, timestamp: new Date() }]);
+      // Bug report escalation detection
+      const escalationPhrases = /\b(report|escalat|technical team|filed a bug|bug report|support ticket|engineering team)\b/i;
+      if (escalationPhrases.test(reply)) {
+        submitBugReport(text, reply).catch(() => {});
+      }
     } catch (err: any) {
       setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${err.message}`, timestamp: new Date() }]);
     } finally {

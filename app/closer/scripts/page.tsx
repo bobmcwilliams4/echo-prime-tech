@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '../../../lib/auth-context';
-import { getScripts, createScript, updateScript, generateScripts } from '../../../lib/closer-api';
+import { getScripts, createScript, updateScript, deleteScript, generateScripts } from '../../../lib/closer-api';
 
 /* ──────────────────── Types ──────────────────── */
 
@@ -46,6 +46,16 @@ const INDUSTRIES = [
   { value: 'healthcare', label: 'Healthcare' },
   { value: 'solar', label: 'Solar' },
   { value: 'other', label: 'Other' },
+];
+
+const INSURANCE_TYPES = [
+  { value: '', label: 'Select type...' },
+  { value: 'home', label: 'Home Insurance' },
+  { value: 'auto', label: 'Auto Insurance' },
+  { value: 'health', label: 'Health Insurance' },
+  { value: 'life', label: 'Life Insurance' },
+  { value: 'commercial', label: 'Commercial Insurance' },
+  { value: 'bundle', label: 'Bundle (Multi-Policy)' },
 ];
 
 const INDUSTRY_COLORS: Record<string, { bg: string; text: string }> = {
@@ -754,6 +764,7 @@ export default function ScriptsPage() {
   const [createName, setCreateName] = useState('');
   const [createDesc, setCreateDesc] = useState('');
   const [createIndustry, setCreateIndustry] = useState('insurance');
+  const [createInsuranceType, setCreateInsuranceType] = useState('');
   const [createPersonality, setCreatePersonality] = useState('');
   const [createSteps, setCreateSteps] = useState<VisualStep[]>([]);
   const [creating, setCreating] = useState(false);
@@ -813,16 +824,22 @@ export default function ScriptsPage() {
     setCreating(true);
     setCreateError(null);
     try {
-      await createScript({
+      const scriptPayload: any = {
         name: createName.trim(),
         description: createDesc.trim(),
         industry: createIndustry,
         personality: createPersonality.trim(),
         states: stepsToStates(createSteps),
-      });
+      };
+      if (createIndustry === 'insurance' && createInsuranceType) {
+        scriptPayload.insurance_type = createInsuranceType;
+        scriptPayload.system_prompt_injection = `You are calling about ${createInsuranceType} insurance. Do NOT ask the prospect what type of insurance they need — you already know. Lead with ${createInsuranceType} insurance benefits and pricing.`;
+      }
+      await createScript(scriptPayload);
       setCreateName('');
       setCreateDesc('');
       setCreateIndustry('insurance');
+      setCreateInsuranceType('');
       setCreatePersonality('');
       setCreateSteps([]);
       setShowCreate(false);
@@ -896,6 +913,20 @@ export default function ScriptsPage() {
     }
   };
 
+  /* ── Delete Script ── */
+
+  const handleDeleteScript = async (script: Script) => {
+    if (!confirm(`Delete "${script.name}"? This cannot be undone.`)) return;
+    try {
+      await deleteScript(script.id);
+      setScripts((prev) => prev.filter((s) => s.id !== script.id));
+      if (editingId === script.id) setEditingId(null);
+    } catch (err: any) {
+      console.error('Failed to delete script:', err);
+      alert(err.message || 'Failed to delete script');
+    }
+  };
+
   /* ── Use Template ── */
 
   const useTemplate = () => {
@@ -910,7 +941,7 @@ export default function ScriptsPage() {
   /* ──────────────────── Render ──────────────────── */
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div data-tutorial="scripts-page" style={{ maxWidth: 900, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
@@ -922,6 +953,7 @@ export default function ScriptsPage() {
           </p>
         </div>
         <button
+          data-tutorial="scripts-create"
           onClick={() => setShowCreate(!showCreate)}
           style={{
             display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600,
@@ -941,6 +973,7 @@ export default function ScriptsPage() {
       {/* Create Script Form */}
       {showCreate && (
         <div
+          data-tutorial="scripts-form"
           style={{
             borderRadius: 12, border: '1px solid var(--ept-card-border)', padding: 24,
             backgroundColor: 'var(--ept-card-bg)', display: 'flex', flexDirection: 'column', gap: 20,
@@ -975,6 +1008,7 @@ export default function ScriptsPage() {
                 Script Name
               </label>
               <input
+                data-tutorial="scripts-name"
                 type="text"
                 value={createName}
                 onChange={(e) => setCreateName(e.target.value)}
@@ -992,6 +1026,7 @@ export default function ScriptsPage() {
                 Industry
               </label>
               <select
+                data-tutorial="scripts-industry"
                 value={createIndustry}
                 onChange={(e) => setCreateIndustry(e.target.value)}
                 style={{
@@ -1007,12 +1042,38 @@ export default function ScriptsPage() {
             </div>
           </div>
 
+          {/* Insurance Type (shown only when industry is insurance) */}
+          {createIndustry === 'insurance' && (
+            <div>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 600, color: 'var(--ept-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
+                Insurance Type <span style={{ color: 'var(--ept-accent)' }}>*</span>
+              </label>
+              <select
+                value={createInsuranceType}
+                onChange={(e) => setCreateInsuranceType(e.target.value)}
+                style={{
+                  width: '100%', padding: '8px 12px', fontSize: 13, color: createInsuranceType ? 'var(--ept-text)' : 'var(--ept-text-muted)',
+                  backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)',
+                  borderRadius: 8, outline: 'none',
+                }}
+              >
+                {INSURANCE_TYPES.map((t) => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
+                ))}
+              </select>
+              <p style={{ fontSize: 11, color: 'var(--ept-text-muted)', marginTop: 4 }}>
+                The AI agent will lead with this insurance type — it will NOT ask the prospect what type they need.
+              </p>
+            </div>
+          )}
+
           {/* Description */}
           <div>
             <label style={{ display: 'block', fontSize: 10, fontWeight: 600, color: 'var(--ept-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
               Description
             </label>
             <input
+              data-tutorial="scripts-description"
               type="text"
               value={createDesc}
               onChange={(e) => setCreateDesc(e.target.value)}
@@ -1081,6 +1142,7 @@ export default function ScriptsPage() {
               Cancel
             </button>
             <button
+              data-tutorial="scripts-next-btn"
               onClick={handleCreate}
               disabled={creating || !createName.trim()}
               style={{
@@ -1235,6 +1297,24 @@ export default function ScriptsPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
                           </svg>
                           Edit
+                        </button>
+                      )}
+
+                      {/* Delete Button */}
+                      {!isEditing && (
+                        <button
+                          onClick={() => handleDeleteScript(script)}
+                          title="Delete script"
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            width: 30, height: 30, borderRadius: 6,
+                            border: '1px solid var(--ept-border)', backgroundColor: 'transparent',
+                            color: 'var(--ept-text-muted)', cursor: 'pointer',
+                          }}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                          </svg>
                         </button>
                       )}
                     </div>

@@ -55,6 +55,7 @@ export const getScripts = () => closerFetch('/scripts');
 export const getScript = (id: string) => closerFetch(`/scripts/${id}`);
 export const createScript = (data: any) => closerFetch('/scripts', { method: 'POST', body: JSON.stringify(data) });
 export const updateScript = (id: string, data: any) => closerFetch(`/scripts/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const deleteScript = (id: string) => closerFetch(`/scripts/${id}`, { method: 'DELETE' });
 export const generateScripts = (text: string, filename: string): Promise<{ scripts: Array<{ id: string; name: string; states_count: number }>; total: number; filename: string }> =>
   closerFetch('/scripts/generate', { method: 'POST', body: JSON.stringify({ text, filename }) });
 
@@ -89,6 +90,10 @@ export const chatWithAce = (message: string) => closerFetch('/billy/chat', { met
 
 // --- Echo Prime AI Chat ---
 export const chatWithEcho = (message: string) => closerFetch('/chat', { method: 'POST', body: JSON.stringify({ message }) });
+
+// --- Bug Reports ---
+export const submitBugReport = (message: string, ai_response: string) =>
+  closerFetch('/bug-reports', { method: 'POST', body: JSON.stringify({ message, ai_response }) });
 
 // --- WebSocket URL ---
 export const VOICE_WS_URL = 'wss://billymc-voice.bmcii1976.workers.dev/voice/live';
