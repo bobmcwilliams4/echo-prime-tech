@@ -13,6 +13,7 @@ interface ChatMessage {
 }
 
 const ECHO_CHAT_API = 'https://echo-chat.bmcii1976.workers.dev';
+const SPEAK_CLOUD_API = 'https://echo-speak-cloud.bmcii1976.workers.dev';
 const EPT_API = 'https://ept-api.bmcii1976.workers.dev';
 const CHAT_STORAGE_KEY = 'ept_chat_history';
 const TRIAL_STORAGE_KEY = 'ept_trial_grants';
@@ -227,29 +228,58 @@ export default function EchoPrimeChat() {
 
     try {
       const token = await getToken();
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      // Echo Chat Worker — ElevenLabs v3 with full emotion range + ConvoAI fallback
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'X-Echo-API-Key': 'echo-omega-prime-forge-x-2026',
+      };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       const res = await fetch(`${ECHO_CHAT_API}/tts`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ text, emotion: em }),
+        body: JSON.stringify({
+          text,
+          personality: 'EP',
+          emotion: em,
+          provider: 'elevenlabs',
+          voice_id: 'keDMh3sQlEXKM4EQxvvi',
+        }),
       });
 
-      if (!res.ok) return;
+      if (!res.ok) {
+        // Fallback to echo-speak-cloud if echo-chat TTS fails
+        const fallbackRes = await fetch(`${SPEAK_CLOUD_API}/tts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Echo-API-Key': 'echo-omega-prime-forge-x-2026',
+          },
+          body: JSON.stringify({ text, voice: 'echo', emotion: em }),
+        });
+        if (!fallbackRes.ok) return;
+        const fallbackBlob = await fallbackRes.blob();
+        if (fallbackBlob.size < 100) return;
+        const fallbackUrl = URL.createObjectURL(fallbackBlob);
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        audioRef.current.src = fallbackUrl;
+        setTtsPlaying(true);
+        await audioRef.current.play();
+        audioRef.current.addEventListener('ended', () => URL.revokeObjectURL(fallbackUrl), { once: true });
+        return;
+      }
 
       const blob = await res.blob();
+      if (blob.size < 100) return;
       const url = URL.createObjectURL(blob);
 
-      // Stop any currently playing audio
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
-
       audioRef.current.src = url;
       setTtsPlaying(true);
       await audioRef.current.play();
 
-      // Clean up blob URL after playback
       audioRef.current.addEventListener('ended', () => URL.revokeObjectURL(url), { once: true });
     } catch {
       setTtsPlaying(false);

@@ -550,9 +550,8 @@ function ScriptUploadZone({ onComplete }: { onComplete: () => void }) {
       setProgress('Extracting text from PDF...');
       const arrayBuffer = await file.arrayBuffer();
       const pdfjsLib = await import('pdfjs-dist');
-      // Disable worker to avoid CDN fetch issues in static export
-      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
-      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer), useWorkerFetch: false, isEvalSupported: false, useSystemFonts: true }).promise;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+      const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
       const pages: string[] = [];
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
@@ -778,7 +777,9 @@ export default function ScriptsPage() {
     setError(null);
     try {
       const data: any = await getScripts();
-      const list = Array.isArray(data) ? data : data?.scripts ?? data?.data ?? [];
+      const raw = Array.isArray(data) ? data : data?.scripts ?? data?.data ?? [];
+      // Map D1 'active' (0/1) to frontend 'is_active' (boolean)
+      const list = raw.map((s: any) => ({ ...s, is_active: s.is_active ?? Boolean(s.active) }));
       setScripts(list);
     } catch (err: any) {
       setError(err.message || 'Failed to load scripts');
@@ -836,13 +837,19 @@ export default function ScriptsPage() {
   /* ── Toggle Active ── */
 
   const handleToggleActive = async (script: Script) => {
+    const newActive = !script.is_active;
+    // Optimistic update
+    setScripts((prev) =>
+      prev.map((s) => (s.id === script.id ? { ...s, is_active: newActive } : s))
+    );
     try {
-      await updateScript(script.id, { is_active: !script.is_active });
+      await updateScript(script.id, { active: newActive });
+    } catch (err) {
+      // Rollback on failure
       setScripts((prev) =>
-        prev.map((s) => (s.id === script.id ? { ...s, is_active: !s.is_active } : s))
+        prev.map((s) => (s.id === script.id ? { ...s, is_active: script.is_active } : s))
       );
-    } catch {
-      /* silently fail */
+      console.error('Failed to toggle script:', err);
     }
   };
 

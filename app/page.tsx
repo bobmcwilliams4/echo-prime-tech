@@ -16,9 +16,9 @@ interface LiveStats {
 }
 
 function useLiveStats(): LiveStats {
-  const [stats, setStats] = useState<LiveStats>({ engines: '800+', categories: '59', doctrines: '32K+', industries: [] });
+  const [stats, setStats] = useState<LiveStats>({ engines: '4,334+', categories: '865', doctrines: '524K+', industries: [] });
   useEffect(() => {
-    fetch('https://echo-engine-runtime.bmcii1976.workers.dev/stats')
+    fetch('https://echo-sdk-gateway.bmcii1976.workers.dev/engine/stats')
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((d: { ok?: boolean; total_engines?: number; total_doctrines?: number; categories?: { category: string; c: number }[] }) => {
         const e = d.total_engines || 0;
@@ -416,7 +416,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { title: 'AI Sales Agent', desc: 'Autonomous voice closer — STT, LLM reasoning, natural TTS. CRM with full lead pipeline. White-label SaaS.', price: '$299', interval: '/mo', href: '/closer', badge: 'Best Seller' },
-              { title: 'Intelligence Engines', desc: '2,632 domain-specific AI engines with embedded expertise. Tax, legal, oilfield, cyber — 210 verticals.', price: '$199', interval: '/mo', href: '/engines', badge: null },
+              { title: 'Intelligence Engines', desc: '4,334+ domain-specific AI engines with embedded expertise. Tax, legal, oilfield, cyber — 210 verticals.', price: '$199', interval: '/mo', href: '/engines', badge: null },
               { title: 'Title Intelligence', desc: 'AI chain of title across 80+ Texas counties. 259K+ deed records, mineral rights tracing, gap detection.', price: '$200', interval: '/mo', href: '/title-intelligence', badge: 'Oil & Gas' },
               { title: 'Sentinel AI', desc: 'Multi-domain AI assistant with web search, knowledge retrieval, and real-time analysis. 14 personalities.', price: 'Free', interval: ' tier', href: '/sentinel', badge: 'Try Free' },
             ].map((p, i) => (

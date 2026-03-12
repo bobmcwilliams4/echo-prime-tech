@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { chatWithEcho } from '../../lib/closer-api';
+import CloserTutorialPanel from '../../components/closer-tutorial-panel';
 
 /* ── Service Health Monitor ── */
 
@@ -237,6 +238,8 @@ export default function CloserShell({ children }: { children: React.ReactNode })
       </div>
       {/* Echo Prime AI Copilot Widget */}
       <EchoPrimeCopilot />
+      {/* Tutorial Side Panel — floating ? button on all authenticated pages */}
+      <CloserTutorialPanel />
 
       <style>{`
         @keyframes statusPing {
