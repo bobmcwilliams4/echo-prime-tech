@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from '../lib/auth-context';
 import { usePathname } from 'next/navigation';
+import { openclawEnrich } from '../lib/echo-sdk-client';
 
 interface ChatMessage {
   id: string;
@@ -72,6 +73,26 @@ const PAGE_LABELS: Record<string, string> = {
   '/support': 'Support',
   '/login': 'Login',
   '/signup': 'Sign Up',
+};
+
+/* Product-specific concierge capabilities — defines what the AI can help with per page */
+const CONCIERGE_CAPABILITIES: Record<string, string> = {
+  '/closer': 'You are the AI Sales Agent concierge. Help with: managing leads, creating campaigns, writing scripts, analyzing call performance, scheduling follow-ups, optimizing close rates, and managing the full sales pipeline.',
+  '/tax-returns': 'You are the Tax AI concierge. Help with: tax preparation questions, document upload guidance, deduction optimization, filing status advice, estimated tax calculations, IRS form explanations, and tax deadline reminders.',
+  '/office-ai': 'You are the Office AI concierge. Help with: scheduling appointments, managing invoices, payroll questions, expense tracking, employee management, customer bookings, inventory management, and accounting tasks.',
+  '/bree-assistant': 'You are the Bree AI concierge. Help with: appointment booking, service scheduling, customer inquiries, business hours, pricing questions, employee availability, maintenance scheduling, and general business operations.',
+  '/grading': 'You are the Collectibles Grading concierge. Help with: grading submissions, condition assessment questions, market valuations, CGC/PSA scale explanations, eBay listing guidance, and collection management.',
+  '/title-intelligence': 'You are the Title Intelligence concierge. Help with: chain of title searches, mineral rights questions, deed interpretation, county record lookups, fractional interest calculations, and Texas property law.',
+  '/security': 'You are the Cyber Defense concierge. Help with: threat assessments, security monitoring setup, incident response planning, compliance questions, vulnerability management, and security architecture review.',
+  '/pentesting': 'You are the Penetration Testing concierge. Help with: scoping engagements, methodology questions, report interpretation, remediation guidance, compliance requirements, and security assessment scheduling.',
+  '/payments': 'You are the Payments concierge. Help with: payment processing, invoice creation, PayPal/Stripe integration, billing questions, refund processing, and payment link generation.',
+  '/sentinel': 'You are the Sentinel AI concierge. Help with: domain-specific intelligence queries, engine routing, knowledge search, document analysis, and multi-domain research across 5,477 engines.',
+  '/engines': 'You are the Engine Catalog concierge. Help with: finding the right engine for a use case, understanding engine domains, doctrine explanations, API integration, and pricing questions.',
+  '/sdk': 'You are the SDK Gateway concierge. Help with: API integration, endpoint documentation, authentication setup, code examples, rate limits, and developer onboarding.',
+  '/voice': 'You are the Voice Studio concierge. Help with: text-to-speech setup, voice cloning questions, audio quality optimization, language support, and integration guidance.',
+  '/crypto-trading': 'You are the Crypto Trading concierge. Help with: trading strategies, market analysis, portfolio management, risk assessment, and exchange integration.',
+  '/ecommerce': 'You are the Ecommerce concierge. Help with: product listing, order management, inventory tracking, shipping setup, and storefront customization.',
+  '/immortality-vault': 'You are the Immortality Vault concierge. Help with: guided interviews, memory preservation, voice cloning setup, family sharing, and digital legacy planning.',
 };
 
 function getPageContext(pathname: string): { service: string; label: string; siteId: string; page: string } {
@@ -354,6 +375,17 @@ export default function EchoPrimeChat() {
       const userId = user?.uid || user?.email || leadInfo?.email || `anon_${Date.now()}`;
       const displayName = user?.displayName || leadInfo?.name || undefined;
       const trialGrants = getTrialGrants();
+
+      // OpenClaw enrichment — fetch brain/engine/knowledge context in parallel
+      const conciergePrompt = CONCIERGE_CAPABILITIES[pathname] || CONCIERGE_CAPABILITIES[`/${pathname.split('/')[1]}`] || '';
+      let enrichment: { brainContext: string[]; engineDoctrines: string[]; knowledgeChunks: string[] } = {
+        brainContext: [], engineDoctrines: [], knowledgeChunks: [],
+      };
+      try {
+        const oc = await openclawEnrich(text);
+        enrichment = { brainContext: oc.brainContext, engineDoctrines: oc.engineDoctrines, knowledgeChunks: oc.knowledgeChunks };
+      } catch { /* enrichment is optional — degrade gracefully */ }
+
       const body: Record<string, unknown> = {
         message: text,
         user_id: userId,
@@ -368,6 +400,11 @@ export default function EchoPrimeChat() {
           trial_history: Object.keys(trialGrants),
           service: ctx.service,
           lead_source: !user && leadInfo ? 'chat_widget' : undefined,
+          // OpenClaw enrichment context
+          concierge_system_prompt: conciergePrompt || undefined,
+          brain_context: enrichment.brainContext.length > 0 ? enrichment.brainContext : undefined,
+          engine_doctrines: enrichment.engineDoctrines.length > 0 ? enrichment.engineDoctrines : undefined,
+          knowledge_chunks: enrichment.knowledgeChunks.length > 0 ? enrichment.knowledgeChunks : undefined,
         },
       };
 
@@ -411,7 +448,7 @@ export default function EchoPrimeChat() {
     } finally {
       setLoading(false);
     }
-  }, [input, loading, ctx, user, leadInfo, subscriptions, sessionId, getToken, playTTS, handleTrialGrant]);
+  }, [input, loading, ctx, pathname, user, leadInfo, subscriptions, sessionId, getToken, playTTS, handleTrialGrant]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
