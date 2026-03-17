@@ -31,8 +31,14 @@ function generateId(): string {
 }
 
 function extractHtmlFromResponse(content: string): string | null {
+  // 1. Code fences: ```html ... ```
   const codeBlockMatch = content.match(/```html\s*([\s\S]*?)```/);
   if (codeBlockMatch) return codeBlockMatch[1].trim();
+  // 2. Full HTML document — return as-is so handleApplyHtml can extract body + CSS
+  if (/<!DOCTYPE\s+html/i.test(content) || /<html[\s>]/i.test(content)) {
+    return content.trim();
+  }
+  // 3. HTML fragment with block-level tags
   const htmlTagMatch = content.match(/(<(?:section|div|nav|header|footer|main|article|aside|form|table|ul|ol|h[1-6]|p)\b[\s\S]*>[\s\S]*<\/(?:section|div|nav|header|footer|main|article|aside|form|table|ul|ol|h[1-6]|p)>)/i);
   if (htmlTagMatch) return htmlTagMatch[1].trim();
   return null;
@@ -95,7 +101,10 @@ export default function AskEchoPrime({ onApplyHtml, currentHtml }: AskEchoPrimeP
 
         const response = await fetch(`${AI_WORKER_URL}/chat`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Echo-API-Key': 'echo-omega-prime-forge-x-2026',
+          },
           body: JSON.stringify(payload),
         });
 
@@ -124,19 +133,19 @@ export default function AskEchoPrime({ onApplyHtml, currentHtml }: AskEchoPrimeP
                 if (data === '[DONE]') continue;
                 try {
                   const parsed = JSON.parse(data);
-                  if (parsed.token) {
-                    accumulated += parsed.token;
+                  if (parsed.content || parsed.token) {
+                    accumulated += parsed.content || parsed.token;
                     setMessages((prev) =>
                       prev.map((m) =>
-                        m.id === assistantId
-                          ? { ...m, content: accumulated, html: extractHtmlFromResponse(accumulated) || undefined }
-                          : m,
+                        m.id === assistantId ? { ...m, content: accumulated } : m,
                       ),
                     );
                   }
-                  if (parsed.html) {
+                  if (parsed.type === 'done' && parsed.html) {
+                    // Done event — use the complete HTML from the worker
+                    const extractedHtml = extractHtmlFromResponse(parsed.html) || parsed.html;
                     setMessages((prev) =>
-                      prev.map((m) => (m.id === assistantId ? { ...m, html: parsed.html } : m)),
+                      prev.map((m) => (m.id === assistantId ? { ...m, html: extractedHtml } : m)),
                     );
                   }
                 } catch {
@@ -144,9 +153,7 @@ export default function AskEchoPrime({ onApplyHtml, currentHtml }: AskEchoPrimeP
                   accumulated += data;
                   setMessages((prev) =>
                     prev.map((m) =>
-                      m.id === assistantId
-                        ? { ...m, content: accumulated, html: extractHtmlFromResponse(accumulated) || undefined }
-                        : m,
+                      m.id === assistantId ? { ...m, content: accumulated } : m,
                     ),
                   );
                 }

@@ -16,9 +16,9 @@ interface LiveStats {
 }
 
 function useLiveStats(): LiveStats {
-  const [stats, setStats] = useState<LiveStats>({ engines: '4,334+', categories: '865', doctrines: '524K+', industries: [] });
+  const [stats, setStats] = useState<LiveStats>({ engines: '5,400+', categories: '210+', doctrines: '619K+', industries: [] });
   useEffect(() => {
-    fetch('https://echo-sdk-gateway.bmcii1976.workers.dev/engine/stats')
+    fetch('https://echo-engine-runtime.bmcii1976.workers.dev/stats')
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((d: { ok?: boolean; total_engines?: number; total_doctrines?: number; categories?: { category: string; c: number }[] }) => {
         const e = d.total_engines || 0;
@@ -260,14 +260,6 @@ const CAPABILITIES = [
     link: '/x-bot',
   },
   {
-    title: 'eBay Automation',
-    description: 'AI-powered eBay listing optimization, dynamic repricing, inventory management, and competitor tracking. Auto-generate SEO descriptions, bulk operations, and analytics dashboards for serious sellers.',
-    stat: '∞',
-    statLabel: 'Listings Managed',
-    icon: '🛒',
-    link: '/ebay',
-  },
-  {
     title: 'LinkedIn AI Engine',
     description: 'AI-powered LinkedIn content creation, lead generation, and professional networking automation. Profile optimization, InMail campaigns, engagement analytics, and network growth strategies.',
     stat: '24/7',
@@ -282,6 +274,70 @@ const CAPABILITIES = [
     statLabel: 'Payment Rails',
     icon: '💳',
     link: '/payments',
+  },
+  {
+    title: 'REVENG Scanner',
+    description: 'Full-spectrum reconnaissance and vulnerability scanner. Subdomain enumeration, port scanning, SSL/TLS analysis, DNS intelligence, web technology fingerprinting, HTTP header auditing, and automated vulnerability detection. Professional-grade OSINT in a single interface.',
+    stat: '10+',
+    statLabel: 'Scan Modules',
+    icon: '🔍',
+    link: '/scanner',
+  },
+  {
+    title: 'Office AI Platform',
+    description: 'AI-powered office management with smart scheduling, document processing, email automation, meeting transcription, task delegation, and team analytics. Integrates with Google Workspace, Microsoft 365, and Slack. Your AI chief of staff.',
+    stat: '24/7',
+    statLabel: 'AI Office Manager',
+    icon: '🏢',
+    link: '/office-ai',
+  },
+  {
+    title: 'Ecommerce Store',
+    description: 'Full-featured AI-powered storefront with product catalog, cart, checkout, inventory management, dynamic pricing, SEO optimization, and integrated payment processing. Launch a professional online store in hours, not months.',
+    stat: '∞',
+    statLabel: 'Products Listed',
+    icon: '🏪',
+    link: '/ecommerce',
+  },
+  {
+    title: 'SDK & Developer Portal',
+    description: 'Access every Echo Prime capability through a unified REST API. OpenAPI spec, interactive playground, code samples in 6 languages, webhook support, and usage analytics. Build on top of 6,500+ engines and 700K+ knowledge blocks.',
+    stat: '17+',
+    statLabel: 'API Endpoints',
+    icon: '🔗',
+    link: '/sdk',
+  },
+  {
+    title: 'Penetration Testing',
+    description: 'Automated security assessment with network scanning, web application testing, API fuzzing, credential testing, and compliance reporting. OWASP Top 10 coverage, NIST framework mapping, and actionable remediation guidance.',
+    stat: 'OWASP',
+    statLabel: 'Top 10 Coverage',
+    icon: '🛡',
+    link: '/pentesting',
+  },
+  {
+    title: 'Voice Studio',
+    description: 'Text-to-speech with 6 AI voices, 19 emotional expressions, instant voice cloning from audio samples, speech-to-text transcription, and real-time voice conversations. ElevenLabs-powered with Edge TTS fallback. Sub-second latency.',
+    stat: '6',
+    statLabel: 'AI Voices',
+    icon: '🎙',
+    link: '/voice',
+  },
+  {
+    title: 'Title Intelligence',
+    description: 'AI chain-of-title analysis across 80+ Texas counties. 259K+ deed records, mineral rights tracing, gap detection, runsheet generation, and TitleHound AI for automated investigation. Built for landmen, attorneys, and oil & gas operators.',
+    stat: '259K+',
+    statLabel: 'Deed Records',
+    icon: '📜',
+    link: '/title-intelligence',
+  },
+  {
+    title: 'Data Pipelines',
+    description: 'Enterprise ETL/ELT pipelines with 50+ source connectors, real-time streaming, change data capture, data quality scoring, and automated enrichment. Runs on Cloudflare edge with zero infrastructure management.',
+    stat: '50+',
+    statLabel: 'Connectors',
+    icon: '🔄',
+    link: '/pipelines',
   },
 ];
 
@@ -316,11 +372,9 @@ export default function HomePage() {
           <div className="hidden md:flex items-center gap-6">
             {[
               { label: 'Engines', href: '/engines' },
-              { label: 'Closer AI', href: '/closer' },
-              { label: 'Bree AI', href: '/bree-assistant' },
-              { label: 'Websites', href: '/websites' },
+              { label: 'Store', href: '/ecommerce' },
+              { label: 'Services', href: '/services' },
               { label: 'Security', href: '/security' },
-              { label: 'Pipelines', href: '/pipelines' },
               { label: 'Pricing', href: '/pricing' },
             ].map(item => (
               <Link key={item.href} href={item.href} className="text-sm font-medium transition-colors hover:opacity-100" style={{ color: 'var(--ept-text-secondary)' }}>{item.label}</Link>
@@ -416,7 +470,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { title: 'AI Sales Agent', desc: 'Autonomous voice closer — STT, LLM reasoning, natural TTS. CRM with full lead pipeline. White-label SaaS.', price: '$299', interval: '/mo', href: '/closer', badge: 'Best Seller' },
-              { title: 'Intelligence Engines', desc: '4,334+ domain-specific AI engines with embedded expertise. Tax, legal, oilfield, cyber — 210 verticals.', price: '$199', interval: '/mo', href: '/engines', badge: null },
+              { title: 'Intelligence Engines', desc: '6,500+ domain-specific AI engines with embedded expertise. Tax, legal, oilfield, cyber — 1,000+ verticals.', price: '$199', interval: '/mo', href: '/engines', badge: null },
               { title: 'Title Intelligence', desc: 'AI chain of title across 80+ Texas counties. 259K+ deed records, mineral rights tracing, gap detection.', price: '$200', interval: '/mo', href: '/title-intelligence', badge: 'Oil & Gas' },
               { title: 'Sentinel AI', desc: 'Multi-domain AI assistant with web search, knowledge retrieval, and real-time analysis. 14 personalities.', price: 'Free', interval: ' tier', href: '/sentinel', badge: 'Try Free' },
             ].map((p, i) => (
@@ -618,6 +672,7 @@ export default function HomePage() {
                   { label: 'Engine Catalog', href: '/engines' },
                   { label: 'AI Closer', href: '/closer' },
                   { label: 'Bree AI Assistant', href: '/bree-assistant' },
+                  { label: 'Business Manager', href: '/business-manager' },
                   { label: 'Data Pipelines', href: '/pipelines' },
                   { label: 'Title Intelligence', href: '/title-intelligence' },
                   { label: 'Tax Preparation', href: '/tax-returns' },
@@ -629,8 +684,10 @@ export default function HomePage() {
                   { label: 'Daedalus Forge', href: '/daedalus-forge' },
                   { label: 'Hephaestion Forge', href: '/hephaestion-forge' },
                   { label: 'Immortality Vault', href: '/immortality-vault' },
+                  { label: 'SDK Gateway', href: '/sdk' },
                   { label: 'Bot Factory', href: '/bots' },
                   { label: 'Scraper Factory', href: '/scrapers' },
+                  { label: 'REVENG Scanner', href: '/scanner' },
                   { label: 'Dark Web Intel', href: '/dark-web-intel' },
                   { label: 'Crypto Trading', href: '/crypto-trading' },
                   { label: 'Price Alerts', href: '/price-alerts' },
@@ -643,6 +700,7 @@ export default function HomePage() {
                   { label: 'LinkedIn AI', href: '/linkedin' },
                   { label: 'Payments', href: '/payments' },
                   { label: 'ShadowGlass', href: '/services' },
+                  { label: 'Store', href: '/ecommerce' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}
@@ -669,6 +727,7 @@ export default function HomePage() {
               <div className="flex flex-col gap-2.5">
                 <Link href="/about" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>About Us</Link>
                 <a href="mailto:contact@echo-op.com" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>contact@echo-op.com</a>
+                <a href="tel:+14325276112" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>(432) 527-6112 — Customer Service</a>
                 <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Midland, Texas</span>
                 <Link href="/legal/privacy" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>Privacy Policy</Link>
                 <Link href="/legal/terms" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>Terms of Service</Link>

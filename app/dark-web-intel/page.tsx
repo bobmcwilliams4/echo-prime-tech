@@ -7,6 +7,7 @@ import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 const SERVICE_ID = 'dark-web-intel';
 
@@ -252,7 +253,7 @@ export default function DarkWebIntelPage() {
       </nav>
 
       {/* --- Hero --- */}
-      <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+      <section data-tutorial="darkweb-hero" className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-6 border" style={{ borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)', backgroundColor: 'var(--ept-accent-glow)' }}>
           <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#ef4444' }} /> Dark Web Intelligence &bull; Threat Monitoring &bull; IOC Extraction
         </div>
@@ -290,7 +291,7 @@ export default function DarkWebIntelPage() {
       </section>
 
       {/* --- Feature Grid (expandable) --- */}
-      <section className="max-w-7xl mx-auto px-6 pb-20">
+      <section data-tutorial="darkweb-monitor" className="max-w-7xl mx-auto px-6 pb-20">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold" style={{ color: 'var(--ept-text)' }}>8 Intelligence Layers</h2>
           <p className="mt-3 text-sm max-w-2xl mx-auto" style={{ color: 'var(--ept-text-muted)' }}>
@@ -331,7 +332,7 @@ export default function DarkWebIntelPage() {
       </section>
 
       {/* --- Intelligence Sources --- */}
-      <section className="max-w-6xl mx-auto px-6 pb-20">
+      <section data-tutorial="darkweb-alerts" className="max-w-6xl mx-auto px-6 pb-20">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold" style={{ color: 'var(--ept-text)' }}>Intelligence Sources</h2>
           <p className="mt-3 text-sm max-w-2xl mx-auto" style={{ color: 'var(--ept-text-muted)' }}>Comprehensive coverage across the dark web ecosystem &mdash; automated, categorized, and continuously expanding.</p>
@@ -367,7 +368,7 @@ export default function DarkWebIntelPage() {
       </section>
 
       {/* --- Pricing --- */}
-      <section className="max-w-5xl mx-auto px-6 pb-20">
+      <section data-tutorial="darkweb-pricing" className="max-w-5xl mx-auto px-6 pb-20">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Pricing</h2>
         <p className="text-center text-sm mb-12" style={{ color: 'var(--ept-text-muted)' }}>Continuous dark web intelligence tailored to your threat surface</p>
         <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -524,6 +525,7 @@ export default function DarkWebIntelPage() {
           Questions? <a href="mailto:bob@echo-op.com" className="underline" style={{ color: 'var(--ept-accent)' }}>Contact us</a> | <Link href="/security" className="underline" style={{ color: 'var(--ept-accent)' }}>Cyber Defense</Link> | <Link href="/pentesting" className="underline" style={{ color: 'var(--ept-accent)' }}>Pen Testing</Link> | <Link href="/pricing" className="underline" style={{ color: 'var(--ept-accent)' }}>All Pricing</Link> | <Link href="/" className="underline" style={{ color: 'var(--ept-accent)' }}>Home</Link>
         </p>
       </footer>
+      <ProductTutorialButton tutorialId="dark-web-intel" productName="Dark Web Intel" />
     </div>
   );
 }

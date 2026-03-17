@@ -7,6 +7,7 @@ import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { getServices, Service, createCheckout } from '../../lib/ept-api';
 import ReadAloudButton from '../../components/ReadAloudButton';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 const SERVICE_ID = 'multi-model-ai';
 
@@ -52,7 +53,7 @@ export default function OrchestrationPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+    <div data-tutorial="orch-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority /></Link>
         <div className="flex items-center gap-3">
@@ -67,7 +68,7 @@ export default function OrchestrationPage() {
 
       {/* Hero */}
       <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
-        <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Multi-Model Orchestration</div>
+        <div data-tutorial="orch-code" className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Multi-Model Orchestration</div>
         <h1 className="text-4xl md:text-6xl font-extrabold leading-tight" style={{ color: 'var(--ept-text)' }}>One API.<br />30+ AI Models.<br /><span className="gradient-text">Zero Waste.</span></h1>
         <p className="mt-6 text-lg max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
           Intelligent routing across GPT, Claude, Llama, DeepSeek, and more. Automatic failover, cost optimization, and model selection tuned per query type.
@@ -82,7 +83,7 @@ export default function OrchestrationPage() {
       {/* Feature Grid */}
       <section className="max-w-6xl mx-auto px-6 pb-20">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Why Orchestration?</h2>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div data-tutorial="orch-features" className="grid md:grid-cols-3 gap-6">
           {FEATURES.map((f, i) => (
             <div key={i} className="p-6 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
               <div className="text-3xl mb-4">{f.icon}</div>
@@ -112,7 +113,7 @@ export default function OrchestrationPage() {
       {/* Pricing */}
       {service && (
         <section className="max-w-5xl mx-auto px-6 pb-20">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Pricing</h2>
+          <h2 data-tutorial="orch-pricing" className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Pricing</h2>
           <p className="text-center text-sm mb-12" style={{ color: 'var(--ept-text-muted)' }}>{service.tagline}</p>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {service.pricing.map((tier, i) => (
@@ -170,6 +171,7 @@ export default function OrchestrationPage() {
           Questions? <a href="mailto:bob@echo-op.com" className="underline" style={{ color: 'var(--ept-accent)' }}>Contact us</a> | <Link href="/pricing" className="underline" style={{ color: 'var(--ept-accent)' }}>All Pricing</Link> | <Link href="/" className="underline" style={{ color: 'var(--ept-accent)' }}>Home</Link>
         </p>
       </footer>
+      <ProductTutorialButton tutorialId="orchestration" productName="Orchestration" />
     </div>
   );
 }

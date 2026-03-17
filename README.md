@@ -10,7 +10,7 @@
 ![License](https://img.shields.io/badge/License-Proprietary-red?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Production-brightgreen?style=flat-square)
 
-> The customer-facing commercial storefront for Echo Prime Technologies. 49 pages showcasing 2,632 AI intelligence engines, security tools, voice synthesis, manufacturing AI, tax returns, title intelligence, and enterprise SaaS products -- with day/night theme, Firebase auth, 3D visualizations, and deep Cloudflare Worker integrations.
+> The customer-facing commercial storefront for Echo Prime Technologies. 49 pages showcasing 6,500+ AI intelligence engines, security tools, voice synthesis, manufacturing AI, tax returns, title intelligence, and enterprise SaaS products -- with day/night theme, Firebase auth, 3D visualizations, and deep Cloudflare Worker integrations.
 
 **Live at:** [echo-ept.com](https://echo-ept.com)
 
@@ -46,7 +46,7 @@ Every page connects to live Cloudflare Worker backends for real-time engine quer
 +---------+-------+  +-----------+---------+  +------------+------+
 | echo-engine-    |  | echo-chat           |  | ept-api           |
 | runtime         |  | (14 AI personas)    |  | (users/subs/roles)|
-| 2,632 engines   |  | Sentinel, Trinity   |  | Firebase admin    |
+| 6,500+ engines  |  | Sentinel, Trinity   |  | Firebase admin    |
 +-----------------+  +---------------------+  +-------------------+
           |                       |                        |
 +---------+-------+  +-----------+---------+  +------------+------+
@@ -65,7 +65,7 @@ Every page connects to live Cloudflare Worker backends for real-time engine quer
 
 ### Product Pages
 
-- **Engines Marketplace** -- Browse, search, and query 2,632 AI intelligence engines across 200+ domains with live stats, pricing tiers, and interactive query panel
+- **Engines Marketplace** -- Browse, search, and query 6,500+ AI intelligence engines across 1,000+ domains with live stats, pricing tiers, and interactive query panel
 - **Bots** -- Social media bot showcase (X/Twitter, LinkedIn, Telegram, Discord)
 - **Scrapers** -- Data extraction and web scraping service catalog
 - **Pipelines** -- Autonomous data pipeline orchestration tools
@@ -274,7 +274,7 @@ Pre-build validation runs `scripts/verify-site.js` to enforce site identity.
 
 | Worker | Purpose |
 |--------|---------|
-| echo-engine-runtime | 2,632 intelligence engines across 200+ domains |
+| echo-engine-runtime | 6,500+ intelligence engines across 1,000+ domains |
 | echo-chat | 14 AI personality conversations (Sentinel AI) |
 | ept-api | User management, subscriptions, roles |
 | billymc-api | AI sales agent and Closer platform |
@@ -286,7 +286,7 @@ Pre-build validation runs `scripts/verify-site.js` to enforce site identity.
 
 ## Part of ECHO OMEGA PRIME
 
-This is the **commercial storefront** for **[ECHO OMEGA PRIME](https://echo-op.com)** -- a distributed autonomous AI platform spanning 31+ Cloudflare Workers, 4 compute nodes, 2,632 intelligence engines, and 312K+ knowledge graph nodes.
+This is the **commercial storefront** for **[ECHO OMEGA PRIME](https://echo-op.com)** -- a distributed autonomous AI platform spanning 31+ Cloudflare Workers, 4 compute nodes, 6,500+ intelligence engines, and 312K+ knowledge graph nodes.
 
 All products and services available at echo-ept.com are powered by the ECHO OMEGA PRIME infrastructure.
 

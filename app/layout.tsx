@@ -4,12 +4,15 @@ import { AuthProvider } from '../lib/auth-context';
 import { ThemeProvider } from '../lib/theme-context';
 import EchoPrimeChat from '../components/echo-prime-chat';
 import { ParticleBackground } from '../components/ParticleBackground';
+import ComingSoonGuard from '../components/ComingSoonGuard';
+import { GuidedTutorialProvider } from '../lib/guided-tutorial-context';
+import GuidedOverlay from '../components/guided-overlay';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   title: 'Echo Prime Technologies | AI Intelligence Engines, Sales Agents & Enterprise AI',
-  description: '4,334+ AI engines across 865 domains. AI sales agents, title intelligence, data pipelines, tax preparation, cybersecurity, and autonomous systems. Production-grade AI for industries that demand precision.',
+  description: '6,500+ AI engines across 1,000+ domains. AI sales agents, title intelligence, data pipelines, tax preparation, cybersecurity, and autonomous systems. Production-grade AI for industries that demand precision.',
   keywords: ['AI engines', 'AI sales agent', 'title intelligence', 'data pipelines', 'enterprise AI', 'autonomous systems', 'tax AI', 'cybersecurity AI', 'Echo Prime Technologies', 'oil and gas AI'],
   metadataBase: new URL('https://echo-ept.com'),
   alternates: { canonical: '/' },
@@ -21,7 +24,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Echo Prime Technologies — AI Engines, Sales Agents & Enterprise Intelligence',
-    description: '4,334+ AI engines, autonomous sales agents, title intelligence, data pipelines, tax prep, and cybersecurity. Production-grade AI.',
+    description: '6,500+ AI engines, autonomous sales agents, title intelligence, data pipelines, tax prep, and cybersecurity. Production-grade AI.',
     type: 'website',
     url: 'https://echo-ept.com',
     siteName: 'Echo Prime Technologies',
@@ -30,7 +33,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Echo Prime Technologies — AI Engines & Enterprise Intelligence',
-    description: '4,334+ AI engines across 865 domains. Sales agents, title intelligence, data pipelines, tax prep, and cybersecurity.',
+    description: '6,500+ AI engines across 1,000+ domains. Sales agents, title intelligence, data pipelines, tax prep, and cybersecurity.',
     images: ['/logo-day.png'],
   },
   robots: { index: true, follow: true },
@@ -80,7 +83,7 @@ const jsonLd = {
       name: 'Sentinel AI',
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web',
-      description: 'Multi-domain AI intelligence system with 4,334+ engines, web search, knowledge retrieval, and real-time analysis across 865 domains.',
+      description: 'Multi-domain AI intelligence system with 6,500+ engines, web search, knowledge retrieval, and real-time analysis across 1,000+ domains.',
       url: 'https://echo-ept.com/sentinel',
       provider: { '@id': 'https://echo-ept.com/#organization' },
     },
@@ -109,7 +112,7 @@ const jsonLd = {
       name: 'Intelligence Engines',
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web',
-      description: 'Purpose-built AI reasoning systems with deep domain expertise across 865+ verticals. 4,632 engines with embedded knowledge blocks.',
+      description: 'Purpose-built AI reasoning systems with deep domain expertise across 1,000+ verticals. 6,500+ engines with embedded knowledge blocks.',
       url: 'https://echo-ept.com/engines',
       offers: { '@type': 'AggregateOffer', lowPrice: '199', highPrice: '499', priceCurrency: 'USD', offerCount: 3 },
       provider: { '@id': 'https://echo-ept.com/#organization' },
@@ -136,6 +139,22 @@ const jsonLd = {
       description: 'Enterprise security operations: 24/7 threat monitoring, incident response, security architecture review, compliance assessment, and vulnerability management.',
       url: 'https://echo-ept.com/security',
       offers: { '@type': 'AggregateOffer', lowPrice: '499', highPrice: '2999', priceCurrency: 'USD', offerCount: 3 },
+      provider: { '@id': 'https://echo-ept.com/#organization' },
+    },
+    {
+      '@type': 'SoftwareApplication',
+      name: 'Echo SDK Gateway',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Web',
+      description: 'One API, 6,500+ intelligence engines. Query domain-specific AI reasoning, search infinite memory, and access 12,000+ knowledge documents through a single authenticated endpoint.',
+      url: 'https://echo-ept.com/sdk',
+      offers: {
+        '@type': 'AggregateOffer',
+        lowPrice: '0',
+        highPrice: '299',
+        priceCurrency: 'USD',
+        offerCount: 3,
+      },
       provider: { '@id': 'https://echo-ept.com/#organization' },
     },
     {
@@ -169,7 +188,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <ThemeProvider>
             <ParticleBackground />
-            {children}
+            <GuidedTutorialProvider>
+              <ComingSoonGuard>
+                {children}
+              </ComingSoonGuard>
+              <GuidedOverlay />
+            </GuidedTutorialProvider>
             <EchoPrimeChat />
           </ThemeProvider>
         </AuthProvider>

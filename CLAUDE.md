@@ -17,11 +17,8 @@
 ```ts
 const NAV_ITEMS = [
   { label: 'Engines', href: '/engines' },
-  { label: 'Closer AI', href: '/closer' },
-  { label: 'Bree AI', href: '/bree-assistant' },
-  { label: 'Websites', href: '/websites' },
+  { label: 'Services', href: '/services' },
   { label: 'Security', href: '/security' },
-  { label: 'Pipelines', href: '/pipelines' },
   { label: 'Pricing', href: '/pricing' },
 ];
 ```

@@ -17,6 +17,7 @@ import {
   type Domain,
 } from '../../lib/daedalus-forge-api';
 import SubscriptionGate from '../../components/SubscriptionGate';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 // ── Types ──
 
@@ -181,7 +182,7 @@ function DaedalusForgeContent() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--ept-bg)' }}>
       {/* Nav Bar */}
-      <nav className="border-b px-6 py-4 flex items-center justify-between flex-shrink-0"
+      <nav data-tutorial="daedalus-hero" className="border-b px-6 py-4 flex items-center justify-between flex-shrink-0"
            style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <div className="flex items-center gap-4">
           <Link href="/">
@@ -213,7 +214,7 @@ function DaedalusForgeContent() {
 
       {/* Info Panel */}
       {showInfo && (
-        <div className="border-b px-6 py-4 animate-fade-up" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
+        <div data-tutorial="daedalus-guilds" className="border-b px-6 py-4 animate-fade-up" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
           <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { label: 'Guilds', value: stats?.guilds || 15 },
@@ -241,7 +242,7 @@ function DaedalusForgeContent() {
       )}
 
       {/* Chat Area */}
-      <div ref={chatRef} className="flex-1 overflow-y-auto px-4 md:px-6 py-6" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+      <div data-tutorial="daedalus-consult" ref={chatRef} className="flex-1 overflow-y-auto px-4 md:px-6 py-6" style={{ maxHeight: 'calc(100vh - 200px)' }}>
         <div className="max-w-3xl mx-auto space-y-4">
           {messages.map(msg => (
             <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-up`}>
@@ -383,7 +384,7 @@ function DaedalusForgeContent() {
       </div>
 
       {/* ─── CTA ─── */}
-      <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
+      <section data-tutorial="daedalus-pricing" className="max-w-3xl mx-auto px-6 pb-20 text-center">
         <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
           <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>Build Physical Products with AI</h2>
           <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>50-stage manufacturing AI pipeline with CNC programming, stress analysis, and material optimization.</p>
@@ -393,6 +394,7 @@ function DaedalusForgeContent() {
           </div>
         </div>
       </section>
+      <ProductTutorialButton tutorialId="daedalus-forge" productName="Daedalus Forge" />
     </div>
   );
 }

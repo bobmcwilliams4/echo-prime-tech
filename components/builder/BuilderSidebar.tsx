@@ -27,6 +27,7 @@ const TABS: TabDef[] = [
   { id: 'ai', label: 'Echo Prime', icon: '\u2728' },
   { id: 'sections', label: 'Sections', icon: '\u25A6' },
   { id: 'templates', label: 'Templates', icon: '\u2B1A' },
+  { id: 'assets', label: 'Assets', icon: '\u{1F5BC}' },
   { id: 'pages', label: 'Pages', icon: '\u{1F4C4}' },
   { id: 'settings', label: 'Settings', icon: '\u2699' },
 ];
@@ -119,6 +120,7 @@ export default function BuilderSidebar({ activeTab, onTabChange, children }: Bui
           {activeTab === 'ai' && 'Describe what you want, Echo Prime builds it.'}
           {activeTab === 'sections' && 'Drag pre-built sections onto your canvas.'}
           {activeTab === 'templates' && 'Start from a complete website template.'}
+          {activeTab === 'assets' && 'Upload and manage images for your site.'}
           {activeTab === 'pages' && 'Manage pages and navigation.'}
           {activeTab === 'settings' && 'Site settings, colors, and fonts.'}
         </p>

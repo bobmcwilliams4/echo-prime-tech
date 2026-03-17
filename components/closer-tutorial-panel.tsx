@@ -7,7 +7,7 @@ import { useGuidedTutorial } from '../lib/guided-tutorial-context';
 import { getAvailableGuidedTutorials } from '../lib/guided-steps';
 
 // ─── localStorage helpers ───
-const STORAGE_KEY = 'closer_tutorial_progress';
+const STORAGE_KEY = 'ept_tutorial_progress';
 const DISMISSED_KEY = 'closer_tutorial_dismissed';
 const CONTEXT_SEEN_KEY = 'closer_context_seen';
 

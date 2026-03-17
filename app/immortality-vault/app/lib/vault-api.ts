@@ -147,6 +147,98 @@ export interface VaultStats {
   chat_sessions: number;
 }
 
+/* ─── Consciousness Engine Types ────────────────────────────────────── */
+
+export type ConsciousnessStateType = 'DORMANT' | 'LEARNING' | 'ACTIVE' | 'INTERVIEWING' | 'CONVERSING';
+
+export type MemoryType = 'biography' | 'conversation' | 'event' | 'emotion' | 'wisdom' | 'relationship' | 'achievement';
+
+export type TraitCategory =
+  | 'communication_style'
+  | 'emotional_disposition'
+  | 'values_beliefs'
+  | 'humor_style'
+  | 'decision_making'
+  | 'social_behavior'
+  | 'intellectual_traits'
+  | 'lifestyle_preferences';
+
+export interface ConsciousnessScoreBreakdown {
+  personality_confidence: number;
+  trait_coverage: number;
+  session_depth: number;
+  memory_richness: number;
+  overall: number;
+}
+
+export interface ConsciousnessStateResponse {
+  user_id: string;
+  state: ConsciousnessStateType;
+  personality_confidence: number;
+  total_samples: number;
+  total_traits: number;
+  total_sessions: number;
+  last_interaction: string;
+  score: ConsciousnessScoreBreakdown;
+}
+
+export interface PersonalityTrait {
+  trait_name: string;
+  value: number;
+  confidence: number;
+}
+
+export interface VoicePattern {
+  formality: number;
+  uses_contractions: boolean;
+  avg_sentence_length: number;
+  favorite_phrases: string[];
+  filler_words: string[];
+  speech_pace: 'slow' | 'moderate' | 'fast';
+}
+
+export interface EmotionalProfile {
+  baseline_mood: string;
+  emotional_range: number;
+  triggers: Record<string, string>;
+  coping_style: string;
+}
+
+export interface PersonalityProfileResponse {
+  user_id: string;
+  traits: Record<TraitCategory, PersonalityTrait[]>;
+  voice_pattern: VoicePattern;
+  emotional_profile: EmotionalProfile;
+  confidence_score: number;
+  sample_count: number;
+}
+
+export interface TypedMemory {
+  id: string;
+  user_id: string;
+  content: string;
+  memory_type: MemoryType;
+  category: string;
+  emotion: string;
+  importance: number;
+  keywords: string;
+  source: string;
+  linked_memory_ids: string;
+  created_at: string;
+}
+
+export interface TypedMemoryStoreResult {
+  id: string;
+  memoryType: MemoryType;
+  importance: number;
+  keywords: string[];
+}
+
+export interface ConsolidationResult {
+  consolidated: number;
+  links_created: number;
+}
+
 /* ─── Fetch Wrapper ──────────────────────────────────────────────────── */
 
 async function vaultFetch<T = unknown>(path: string, options: RequestInit = {}): Promise<T> {
@@ -179,6 +271,16 @@ export async function createUser(id: string, name: string, email: string): Promi
 
 export async function getUser(userId: string): Promise<VaultUser> {
   return vaultFetch(`/users/${userId}`);
+}
+
+export async function updateUser(
+  userId: string,
+  updates: Partial<{ name: string; email: string; tier: string }>,
+): Promise<VaultUser> {
+  return vaultFetch(`/users/${userId}`, {
+    method: 'PUT',
+    body: JSON.stringify(updates),
+  });
 }
 
 export async function getStats(): Promise<VaultStats> {
@@ -351,4 +453,73 @@ export async function submitBiometric(videoId: string, captures: { capture_type:
 
 export async function getFaceTimeReadiness(userId: string): Promise<FaceTimeReadiness> {
   return vaultFetch(`/video/facetime-readiness/${userId}`);
+}
+
+/* ─── Consciousness Engine ──────────────────────────────────────────── */
+
+export async function getConsciousnessState(userId: string): Promise<ConsciousnessStateResponse> {
+  return vaultFetch(`/consciousness/${userId}`);
+}
+
+export async function setConsciousnessState(userId: string, state: ConsciousnessStateType): Promise<{ updated: true }> {
+  return vaultFetch(`/consciousness/${userId}/state`, {
+    method: 'PUT',
+    body: JSON.stringify({ state }),
+  });
+}
+
+/* ─── Personality Profile ───────────────────────────────────────────── */
+
+export async function getPersonalityProfile(userId: string): Promise<PersonalityProfileResponse> {
+  return vaultFetch(`/personality/${userId}`);
+}
+
+export async function updatePersonalityTraits(
+  userId: string,
+  traits: { trait_category: TraitCategory; trait_name: string; value: number; confidence: number; source?: string; evidence?: string }[],
+): Promise<{ stored: number }> {
+  return vaultFetch(`/personality/${userId}/traits`, {
+    method: 'POST',
+    body: JSON.stringify({ traits }),
+  });
+}
+
+export async function extractTraits(
+  userId: string,
+  text: string,
+  source: 'interview' | 'chat' | 'manual' = 'manual',
+): Promise<{ extracted: number; traits: { trait_category: string; trait_name: string; value: number }[] }> {
+  return vaultFetch(`/personality/${userId}/extract`, {
+    method: 'POST',
+    body: JSON.stringify({ text, source }),
+  });
+}
+
+/* ─── Typed Memories ────────────────────────────────────────────────── */
+
+export async function storeTypedMemory(
+  userId: string,
+  content: string,
+  opts: { memoryType?: MemoryType; category?: string; emotion?: string; importance?: number; source?: string } = {},
+): Promise<TypedMemoryStoreResult> {
+  return vaultFetch('/memories/typed', {
+    method: 'POST',
+    body: JSON.stringify({ user_id: userId, content, ...opts }),
+  });
+}
+
+export async function getTypedMemories(
+  userId: string,
+  opts: { memoryType?: MemoryType; category?: string; limit?: number } = {},
+): Promise<{ memories: TypedMemory[] }> {
+  const params = new URLSearchParams();
+  if (opts.memoryType) params.set('type', opts.memoryType);
+  if (opts.category) params.set('category', opts.category);
+  if (opts.limit) params.set('limit', String(opts.limit));
+  const qs = params.toString();
+  return vaultFetch(`/memories/typed/${userId}${qs ? `?${qs}` : ''}`);
+}
+
+export async function consolidateMemories(userId: string): Promise<ConsolidationResult> {
+  return vaultFetch(`/memories/consolidate/${userId}`, { method: 'POST' });
 }

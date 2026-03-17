@@ -109,7 +109,7 @@ export default function BuilderTopBar({ gjs, onPublish }: BuilderTopBarProps) {
       {/* Left */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <Link href="/websites" style={{ color: COLORS.muted, textDecoration: 'none', fontSize: '14px' }}>
-          \u2190 Back
+          {'← Back'}
         </Link>
         <span
           style={{
@@ -146,13 +146,13 @@ export default function BuilderTopBar({ gjs, onPublish }: BuilderTopBarProps) {
         ))}
         <div style={{ width: '1px', height: '24px', backgroundColor: COLORS.border, margin: '0 4px' }} />
         <button onClick={handleUndo} style={btnBase} title="Undo">
-          \u21A9
+          {'↩'}
         </button>
         <button onClick={handleRedo} style={btnBase} title="Redo">
-          \u21AA
+          {'↪'}
         </button>
         <button onClick={handleClear} style={{ ...btnBase, color: '#ef4444' }} title="Clear Canvas">
-          \u2715
+          {'✕'}
         </button>
       </div>
 

@@ -7,6 +7,7 @@ import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 const SERVICE_ID = 'crypto-trading';
 
@@ -236,7 +237,7 @@ export default function CryptoTradingPage() {
       </nav>
 
       {/* --- Hero --- */}
-      <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+      <section data-tutorial="crypto-hero" className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-6 border" style={{ borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)', backgroundColor: 'var(--ept-accent-glow)' }}>
           <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#22c55e' }} /> Grid Trading &bull; Momentum Strategy &bull; 24/7 Autonomous
         </div>
@@ -262,7 +263,7 @@ export default function CryptoTradingPage() {
       </section>
 
       {/* --- Stats Grid --- */}
-      <section className="max-w-6xl mx-auto px-6 pb-16">
+      <section data-tutorial="crypto-dashboard" className="max-w-6xl mx-auto px-6 pb-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {STATS.map((s, i) => (
             <div key={i} className="text-center p-4 rounded-xl border backdrop-blur-sm" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
@@ -274,7 +275,7 @@ export default function CryptoTradingPage() {
       </section>
 
       {/* --- Feature Grid (expandable) --- */}
-      <section className="max-w-7xl mx-auto px-6 pb-20">
+      <section data-tutorial="crypto-strategies" className="max-w-7xl mx-auto px-6 pb-20">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold" style={{ color: 'var(--ept-text)' }}>8 Trading Capabilities</h2>
           <p className="mt-3 text-sm max-w-2xl mx-auto" style={{ color: 'var(--ept-text-muted)' }}>
@@ -357,7 +358,7 @@ export default function CryptoTradingPage() {
       </section>
 
       {/* --- Pricing --- */}
-      <section className="max-w-5xl mx-auto px-6 pb-20">
+      <section data-tutorial="crypto-pricing" className="max-w-5xl mx-auto px-6 pb-20">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Pricing</h2>
         <p className="text-center text-sm mb-12" style={{ color: 'var(--ept-text-muted)' }}>Autonomous crypto trading tailored to your risk profile and capital size</p>
         <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -480,7 +481,7 @@ export default function CryptoTradingPage() {
           {[
             { title: 'Bot Factory', desc: 'Custom AI bots for Telegram, Discord, and social platforms. Automated alerts, congress-watching, arbitrage signals, and market monitoring bots.', href: '/bots', price: 'From $499' },
             { title: 'Data Pipelines', desc: 'Autonomous data extraction, transformation, and delivery. Real-time market feeds, on-chain analytics, and custom data aggregation.', href: '/pipelines', price: 'From $199/mo' },
-            { title: 'Intelligence Engines', desc: '2,632 domain-specific AI engines including crypto, DeFi, finance, and trading verticals with embedded expert reasoning.', href: '/engines', price: 'From $199/mo' },
+            { title: 'Intelligence Engines', desc: '6,500+ domain-specific AI engines including crypto, DeFi, finance, and trading verticals with embedded expert reasoning.', href: '/engines', price: 'From $199/mo' },
           ].map((svc, i) => (
             <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
               <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{svc.title}</h3>
@@ -510,6 +511,7 @@ export default function CryptoTradingPage() {
           Questions? <a href="mailto:bob@echo-op.com" className="underline" style={{ color: 'var(--ept-accent)' }}>Contact us</a> | <Link href="/bots" className="underline" style={{ color: 'var(--ept-accent)' }}>Bot Factory</Link> | <Link href="/pipelines" className="underline" style={{ color: 'var(--ept-accent)' }}>Pipelines</Link> | <Link href="/pricing" className="underline" style={{ color: 'var(--ept-accent)' }}>All Pricing</Link> | <Link href="/" className="underline" style={{ color: 'var(--ept-accent)' }}>Home</Link>
         </p>
       </footer>
+      <ProductTutorialButton tutorialId="crypto-trading" productName="Crypto Trading" />
     </div>
   );
 }

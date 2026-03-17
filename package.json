@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@11labs/client": "^0.2.0",
+    "@paypal/react-paypal-js": "^9.0.1",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@react-three/postprocessing": "^3.0.4",
@@ -18,10 +19,12 @@
     "@vercel/analytics": "^1.6.1",
     "@vercel/speed-insights": "^1.3.1",
     "firebase": "^12.9.0",
+    "lucide-react": "^0.577.0",
     "mammoth": "^1.11.0",
     "next": "^15.3.0",
     "pdfjs-dist": "^5.5.207",
     "postprocessing": "^6.38.3",
+    "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "three": "^0.183.2"

@@ -12,7 +12,7 @@ import { TUTORIALS, QUICK_REFERENCE, type Tutorial } from '../../../lib/closer-t
    ═══════════════════════════════════════════════════════════════════════════ */
 
 // ── localStorage progress ──
-const STORAGE_KEY = 'closer_tutorial_progress';
+const STORAGE_KEY = 'ept_tutorial_progress';
 function getProgress(): Record<string, number[]> {
   if (typeof window === 'undefined') return {};
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }

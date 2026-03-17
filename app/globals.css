@@ -338,3 +338,156 @@ body {
 .sentinel-md .md-link:hover { opacity: 0.8; }
 .sentinel-md .md-p { margin: 0.25rem 0; color: #e2e8f0; }
 .sentinel-md .md-block { font-size: 0.875rem; line-height: 1.7; }
+
+/* ═══════════════════════════════════════════════════════════════
+   BUSINESS MANAGER — Dashboard Utility Classes
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Status color variables ─── */
+:root {
+  --ept-success: #22c55e;
+  --ept-success-bg: rgba(34,197,94,0.12);
+  --ept-warning: #eab308;
+  --ept-warning-bg: rgba(234,179,8,0.12);
+  --ept-danger: #ef4444;
+  --ept-danger-bg: rgba(239,68,68,0.12);
+  --ept-info: #3b82f6;
+  --ept-info-bg: rgba(59,130,246,0.12);
+  --ept-purple: #a855f7;
+  --ept-purple-bg: rgba(168,85,247,0.12);
+  --ept-sidebar-bg: var(--ept-card-bg);
+}
+
+/* ─── Glass card (glassmorphism) ─── */
+.glass-card {
+  background: var(--ept-card-bg);
+  border: 1px solid var(--ept-card-border);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ─── Sidebar link ─── */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ept-text-secondary);
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
+}
+.sidebar-link:hover {
+  background: var(--ept-accent-glow);
+  color: var(--ept-text);
+}
+.sidebar-link.active {
+  background: var(--ept-accent-glow);
+  color: var(--ept-accent);
+  font-weight: 600;
+}
+
+/* ─── Badges ─── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.badge-success { background: var(--ept-success-bg); color: var(--ept-success); }
+.badge-warning { background: var(--ept-warning-bg); color: var(--ept-warning); }
+.badge-danger  { background: var(--ept-danger-bg);  color: var(--ept-danger); }
+.badge-info    { background: var(--ept-info-bg);    color: var(--ept-info); }
+.badge-purple  { background: var(--ept-purple-bg);  color: var(--ept-purple); }
+.badge-neutral {
+  background: var(--ept-surface);
+  color: var(--ept-text-muted);
+}
+
+/* ─── Data table ─── */
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.875rem;
+}
+.data-table thead th {
+  text-align: left;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ept-text-muted);
+  border-bottom: 1px solid var(--ept-border);
+}
+.data-table tbody td {
+  padding: 0.625rem 0.75rem;
+  color: var(--ept-text);
+  border-bottom: 1px solid var(--ept-border);
+  vertical-align: middle;
+}
+.data-table tbody tr:hover td {
+  background: var(--ept-accent-glow);
+}
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ─── Buttons ─── */
+.btn-glow {
+  background: var(--ept-accent);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+.btn-glow:hover {
+  box-shadow: 0 0 20px var(--ept-accent-glow);
+  transform: translateY(-1px);
+}
+.btn-glow:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.btn-outline {
+  background: transparent;
+  color: var(--ept-text-secondary);
+  border: 1px solid var(--ept-border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-outline:hover {
+  background: var(--ept-surface);
+  color: var(--ept-text);
+}
+
+/* ─── Print ─── */
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .glass-card { background: #fff !important; border-color: #e5e7eb !important; }
+}
+
+/* ─── Font display alias ─── */
+.font-display { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-weight: 700; }
+
+/* ─── Scrollbar hide for mobile nav ─── */
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }

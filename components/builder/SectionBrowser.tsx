@@ -138,8 +138,26 @@ export default function SectionBrowser({ onInsertSection }: SectionBrowserProps)
                 height: '72px',
                 background: section.thumbnail,
                 borderBottom: `1px solid ${COLORS.border}`,
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-            />
+            >
+              {/* Visible overlay so dark gradients aren't invisible */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: 'linear-gradient(135deg, rgba(201,169,78,0.12) 0%, rgba(20,184,166,0.08) 100%)',
+                borderBottom: `1px solid ${COLORS.border}`,
+              }} />
+              <span style={{
+                position: 'relative', zIndex: 1,
+                fontSize: 20, opacity: 0.5,
+                color: COLORS.accent,
+              }}>
+                {section.category === 'hero' ? '◆' : section.category === 'navigation' ? '☰' : section.category === 'features' ? '⬡' : section.category === 'pricing' ? '$' : section.category === 'testimonials' ? '❝' : section.category === 'cta' ? '→' : section.category === 'contact' ? '✉' : section.category === 'footer' ? '▬' : section.category === 'faq' ? '?' : section.category === 'team' ? '👤' : section.category === 'stats' ? '#' : section.category === 'gallery' ? '▦' : section.category === 'blog' ? '✎' : '◇'}
+              </span>
+            </div>
             {/* Info */}
             <div style={{ padding: '8px 10px' }}>
               <div style={{ fontSize: '12px', fontWeight: 600, color: COLORS.text, marginBottom: '4px' }}>

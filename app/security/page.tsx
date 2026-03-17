@@ -9,6 +9,7 @@ import { getServices, Service, createCheckout } from '../../lib/ept-api';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import SubscriptionGate from '../../components/SubscriptionGate';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 const SERVICE_ID = 'cyber-defense';
 
@@ -214,7 +215,7 @@ function SecurityPageContent() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+    <div data-tutorial="security-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
       {/* ─── Nav ─── */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority /></Link>
@@ -367,9 +368,9 @@ function SecurityPageContent() {
       {/* ─── Pricing ─── */}
       {service && (
         <section className="max-w-5xl mx-auto px-6 pb-20">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Pricing</h2>
+          <h2 data-tutorial="security-pricing" className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Pricing</h2>
           <p className="text-center text-sm mb-12" style={{ color: 'var(--ept-text-muted)' }}>{service.tagline}</p>
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div data-tutorial="security-services" className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {service.pricing.map((tier, i) => (
               <div key={i} className="relative p-8 rounded-2xl border transition-all" style={{
                 backgroundColor: 'var(--ept-card-bg)',
@@ -476,7 +477,7 @@ function SecurityPageContent() {
         <div className="grid md:grid-cols-3 gap-6">
           {[
             { title: 'Penetration Testing', desc: 'Offensive security engagements. Our red team has never failed to breach a target. Find vulnerabilities before attackers do.', href: '/pentesting', price: 'From $2,500' },
-            { title: 'Intelligence Engines', desc: 'AI-powered threat intelligence across 210 domains. Correlate indicators of compromise with deep contextual analysis.', href: '/engines', price: 'From $199/mo' },
+            { title: 'Intelligence Engines', desc: 'AI-powered threat intelligence across 1,000+ domains. Correlate indicators of compromise with deep contextual analysis.', href: '/engines', price: 'From $199/mo' },
             { title: 'Sentinel AI', desc: 'Real-time security monitoring with natural language queries. Ask your data questions in plain English.', href: '/sentinel', price: 'Free tier available' },
           ].map((svc, i) => (
             <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
@@ -503,6 +504,7 @@ function SecurityPageContent() {
           Questions? <a href="mailto:bob@echo-op.com" className="underline" style={{ color: 'var(--ept-accent)' }}>Contact us</a> | <Link href="/pentesting" className="underline" style={{ color: 'var(--ept-accent)' }}>Penetration Testing</Link> | <Link href="/pricing" className="underline" style={{ color: 'var(--ept-accent)' }}>All Pricing</Link> | <Link href="/" className="underline" style={{ color: 'var(--ept-accent)' }}>Home</Link>
         </p>
       </footer>
+      <ProductTutorialButton tutorialId="security" productName="Cyber Defense" />
     </div>
   );
 }

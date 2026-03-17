@@ -279,11 +279,11 @@ export const TUTORIALS: Tutorial[] = [
   // ─── TUTORIAL 4: Leads ───
   {
     id: 'leads',
-    title: 'Adding Your Leads',
-    subtitle: 'Give the AI people to call',
+    title: 'Adding & Organizing Leads',
+    subtitle: 'Add leads, categorize them, and filter by group',
     route: '/closer/leads',
     icon: '👥',
-    estimatedMinutes: 6,
+    estimatedMinutes: 7,
     steps: [
       {
         title: 'Add a Lead Manually',
@@ -316,11 +316,11 @@ export const TUTORIALS: Tutorial[] = [
         },
       },
       {
-        title: 'CSV Import',
-        callout: 'Have a list of leads in a spreadsheet? Click "CSV Import" to upload hundreds at once. Your CSV needs at minimum a "phone" column. Name, email, and company columns are optional but recommended.',
+        title: 'Import a Lead List',
+        callout: 'Have a list of leads? Click the "Import" button next to "Add Lead" to upload a JSON or CSV file. Drag and drop your file onto the upload zone, or click "browse files" to select one. You\'ll see a preview table before importing — the system auto-maps columns like first_name, phone, email, and company. Every lead needs at least a phone number.',
         illustrationType: 'modal',
         illustrationConfig: {
-          title: 'Import Leads from CSV',
+          title: 'Import Leads',
           content: 'upload',
           sampleHeaders: ['first_name', 'last_name', 'phone', 'email', 'company'],
           sampleRow: ['Marcus', 'Johnson', '(432) 555-0192', 'marcus@acme.com', 'Acme Corp'],
@@ -341,16 +341,29 @@ export const TUTORIALS: Tutorial[] = [
         },
       },
       {
+        title: 'Categorize Your Leads',
+        callout: 'When creating or editing a lead, type a category like "Enterprise", "SMB", "VIP", or "Cold List". Categories are free-text — type whatever label makes sense for your business. Once a category exists, it appears in the filter dropdown so you can slice your leads by group.',
+        illustrationType: 'form',
+        illustrationConfig: {
+          fields: [
+            { label: 'Company', value: 'Acme Corp', type: 'text' },
+            { label: 'Source', value: 'Referral', type: 'select' },
+            { label: 'Category', value: 'Enterprise', type: 'text', required: false },
+          ],
+          highlight: 2,
+        },
+      },
+      {
         title: 'Search and Filter',
-        callout: 'Use the status filter dropdown to see only your hot leads, only uncontacted leads, or only those with appointments. The search bar finds leads by name, phone, or company.',
+        callout: 'Use the status and category dropdowns to narrow your list. For example, show only "VIP" leads that are "New", then search within those results by name or phone. Reset any filter to "All" to see everything again.',
         illustrationType: 'table',
         illustrationConfig: {
-          filterLabel: 'All Statuses',
-          headers: ['Name', 'Company', 'Phone', 'Status', 'Last Contact'],
+          filterLabel: 'All Categories',
+          headers: ['Name', 'Company', 'Phone', 'Status', 'Category'],
           rows: [
-            ['Marcus Johnson', 'Acme Corp', '(432) 555-0192', 'Appointment Set', '2 hours ago'],
-            ['Sarah Mitchell', 'Solar Plus', '(432) 555-0283', 'Contacted', 'Yesterday'],
-            ['David Thompson', 'Thompson LLC', '(432) 555-0374', 'New', '—'],
+            ['Marcus Johnson', 'Acme Corp', '(432) 555-0192', 'Appointment Set', 'Enterprise'],
+            ['Sarah Mitchell', 'Solar Plus', '(432) 555-0283', 'Contacted', 'SMB'],
+            ['David Thompson', 'Thompson LLC', '(432) 555-0374', 'New', 'VIP'],
           ],
         },
       },
@@ -419,16 +432,16 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Assign Leads',
-        callout: 'Click "Assign Leads" and check which leads go into this campaign. You can assign leads to multiple campaigns. The AI will call each lead once per campaign unless you reset them.',
+        callout: 'Click "Assign Leads" and check which leads go into this campaign. Use the Category and Tag dropdowns at the top of the modal to filter by group — for example, select "Enterprise" to see only enterprise leads, then check the ones you want. You can assign leads to multiple campaigns.',
         illustrationType: 'modal',
         illustrationConfig: {
           title: 'Assign Leads to Campaign',
           content: 'checklist',
           items: [
-            { name: 'Marcus Johnson — Acme Corp', checked: true },
-            { name: 'Sarah Mitchell — Solar Plus', checked: true },
-            { name: 'David Thompson — Thompson LLC', checked: false },
-            { name: 'Lisa Williams — Williams & Co', checked: false },
+            { name: 'Marcus Johnson — Acme Corp (Enterprise)', checked: true },
+            { name: 'Sarah Mitchell — Solar Plus (SMB)', checked: true },
+            { name: 'David Thompson — Thompson LLC (VIP)', checked: false },
+            { name: 'Lisa Williams — Williams & Co (Cold List)', checked: false },
           ],
           actionButton: 'Assign 2 Leads',
         },
@@ -670,7 +683,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Step 3: Add Your Leads',
-        callout: 'Go to Leads and add at least 5-10 leads. You can type them in one at a time or upload a CSV file. Make sure every lead has a phone number.',
+        callout: 'Go to Leads and add at least 5-10 leads. Type them in one at a time with "Add Lead", or click "Import" to drag-and-drop a JSON or CSV file with hundreds of leads at once. Make sure every lead has a phone number.',
         target: '/closer/leads',
         illustrationType: 'flow',
         illustrationConfig: { steps: [{ label: 'Leads', icon: '👥', desc: '5-10 contacts minimum', color: 'var(--ept-accent)' }], linkTo: 'leads' },
@@ -761,7 +774,8 @@ export const TUTORIALS: Tutorial[] = [
 
 export const QUICK_REFERENCE = [
   { action: 'Create a script', where: 'Scripts tab', howTo: 'Click "Create Script" top-right' },
-  { action: 'Add leads', where: 'Leads tab', howTo: 'Click "Add Lead" or "CSV Import"' },
+  { action: 'Add leads', where: 'Leads tab', howTo: 'Click "Add Lead" or "Import" (drag-and-drop JSON/CSV)' },
+  { action: 'Categorize leads', where: 'Leads tab', howTo: 'Type a category (e.g. Enterprise, VIP) when creating or editing a lead, then filter by it' },
   { action: 'Create campaign', where: 'Campaigns tab', howTo: 'Click "Create Campaign"' },
   { action: 'Start calling', where: 'Campaigns tab', howTo: 'Toggle campaign to Active' },
   { action: 'Watch live calls', where: 'Calls tab', howTo: '"Live Calls" section at top' },

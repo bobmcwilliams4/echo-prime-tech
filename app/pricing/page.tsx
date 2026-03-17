@@ -12,18 +12,18 @@ const ANNUAL_DISCOUNT = 0.20; // 20% off annual
 
 const FALLBACK_SERVICES: Service[] = [
   { id: 'ai-closer', name: 'AI Sales Agent', tagline: 'Autonomous voice closer with full CRM', pricing: [
-    { tier: 'Starter', price: 299, interval: 'mo', features: ['1 AI closer agent', '500 calls/mo', 'CRM dashboard', 'Email follow-ups'], popular: false },
-    { tier: 'Growth', price: 499, interval: 'mo', features: ['3 AI closer agents', '2,000 calls/mo', 'Custom scripts', 'Analytics dashboard', 'Priority support'], popular: true },
+    { tier: 'Starter', price: 349, interval: 'mo', features: ['1 AI closer agent', '500 calls/mo', 'CRM dashboard', 'Email follow-ups'], popular: false },
+    { tier: 'Growth', price: 599, interval: 'mo', features: ['3 AI closer agents', '2,000 calls/mo', 'Custom scripts', 'Analytics dashboard', 'Priority support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited agents', 'Unlimited calls', 'White-label', 'Dedicated account manager', 'Custom integrations'], popular: false, custom: true },
   ] },
-  { id: 'engines', name: 'Intelligence Engines', tagline: '2,632 domain-specific AI engines', pricing: [
+  { id: 'engines', name: 'Intelligence Engines', tagline: '6,500+ domain-specific AI engines', pricing: [
     { tier: 'API Access', price: 199, interval: 'mo', features: ['100 queries/day', 'All engine categories', 'REST API', 'JSON responses'], popular: false },
     { tier: 'Professional', price: 499, interval: 'mo', features: ['1,000 queries/day', 'Priority routing', 'Webhook callbacks', 'Custom doctrines', 'Dedicated support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited queries', 'Private deployment', 'Custom engines', 'SLA guarantee', 'On-premises option'], popular: false, custom: true },
   ] },
   { id: 'title-intelligence', name: 'Title Intelligence', tagline: 'AI chain of title across 80+ Texas counties', pricing: [
-    { tier: 'Starter', price: 200, interval: 'mo', features: ['100 searches/mo', '80+ counties', 'Grantor/Grantee index', 'Export to CSV'], popular: false },
-    { tier: 'Professional', price: 500, interval: 'mo', features: ['Unlimited searches', 'AI gap detection', 'Chain of title reports', 'API access', 'Priority support'], popular: true },
+    { tier: 'Starter', price: 199, interval: 'mo', features: ['100 searches/mo', '80+ counties', 'Grantor/Grantee index', 'Export to CSV'], popular: false },
+    { tier: 'Professional', price: 499, interval: 'mo', features: ['Unlimited searches', 'AI gap detection', 'Chain of title reports', 'API access', 'Priority support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Bulk operations', 'Custom integrations', 'Dedicated account', 'On-site training'], popular: false, custom: true },
   ] },
   { id: 'sentinel', name: 'Sentinel AI', tagline: 'Multi-domain AI assistant', pricing: [
@@ -37,8 +37,8 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited bots', 'Custom trading algos', 'White-label', 'Dedicated engineer'], popular: false, custom: true },
   ] },
   { id: 'scrapers', name: 'Data Scrapers', tagline: 'Industrial-scale web scraping & data harvesting', pricing: [
-    { tier: 'Starter', price: 399, interval: 'mo', features: ['1 scraper', 'Up to 10K records/mo', 'CSV/JSON export', 'Email delivery'], popular: false },
-    { tier: 'Professional', price: 1299, interval: 'mo', features: ['3 scrapers', '100K records/mo', 'API access', 'Anti-detection', 'Priority support'], popular: true },
+    { tier: 'Starter', price: 449, interval: 'mo', features: ['1 scraper', 'Up to 10K records/mo', 'CSV/JSON export', 'Email delivery'], popular: false },
+    { tier: 'Professional', price: 1199, interval: 'mo', features: ['3 scrapers', '100K records/mo', 'API access', 'Anti-detection', 'Priority support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited scrapers', 'Custom pipelines', 'Dedicated infra', 'SLA guarantee'], popular: false, custom: true },
   ] },
   { id: 'pipelines', name: 'Data Pipelines', tagline: 'Automated ETL, transforms & delivery', pricing: [
@@ -47,14 +47,14 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited pipelines', 'Custom transforms', 'On-prem connectors', 'SLA guarantee'], popular: false, custom: true },
   ] },
   { id: 'dark-web-intel', name: 'Dark Web Intel', tagline: 'Deep & dark web monitoring and threat intelligence', pricing: [
-    { tier: 'Starter', price: 999, interval: 'mo', features: ['5 brand monitors', 'Paste site scanning', 'Weekly threat digest', 'IOC extraction'], popular: false },
-    { tier: 'Professional', price: 1999, interval: 'mo', features: ['25 brand monitors', 'Breach intelligence', 'Crypto forensics', 'Real-time Telegram alerts', 'Priority support'], popular: true },
+    { tier: 'Starter', price: 2499, interval: 'mo', features: ['5 brand monitors', 'Paste site scanning', 'Weekly threat digest', 'IOC extraction'], popular: false },
+    { tier: 'Professional', price: 4999, interval: 'mo', features: ['25 brand monitors', 'Breach intelligence', 'Crypto forensics', 'Real-time Telegram alerts', 'Priority support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited monitors', 'Custom .onion crawling', 'Dedicated threat analyst', 'SLA guarantee'], popular: false, custom: true },
   ] },
   { id: 'crypto-trading', name: 'Crypto Trading', tagline: 'Autonomous AI-powered cryptocurrency trading', pricing: [
     { tier: 'Starter', price: 99, interval: 'mo', features: ['1 trading pair', 'Grid strategy', 'Basic analytics', 'Email alerts'], popular: false },
     { tier: 'Professional', price: 299, interval: 'mo', features: ['5 trading pairs', 'Grid + Momentum', 'Advanced analytics', 'API access', 'Priority support'], popular: true },
-    { tier: 'Enterprise', price: 999, interval: 'mo', features: ['Unlimited pairs', 'Custom strategies', 'Multi-exchange', 'Dedicated quant support', 'White-label'], popular: false },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited pairs', 'Custom strategies', 'Multi-exchange', 'Dedicated quant support', 'White-label'], popular: false, custom: true },
   ] },
   { id: 'price-alerts', name: 'Price Alerts', tagline: 'Real-time price monitoring across markets', pricing: [
     { tier: 'Free', price: 0, interval: 'mo', features: ['5 alerts', 'Email notifications', 'Crypto & stocks', 'Daily summary'], popular: false },
@@ -102,18 +102,28 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Custom rates', 'Multi-currency', 'White-label checkout', 'SLA guarantee'], popular: false, custom: true },
   ] },
   { id: 'voice', name: 'Voice Studio', tagline: 'AI voice synthesis, cloning, and speech-to-text', pricing: [
-    { tier: 'Starter', price: 49, interval: 'mo', features: ['6 AI voices', '10,000 characters/mo', 'MP3 export', 'Basic emotion tags'], popular: false },
-    { tier: 'Professional', price: 149, interval: 'mo', features: ['Custom voice cloning', '100,000 characters/mo', 'Streaming TTS', 'STT transcription', '19 emotion tags'], popular: true },
+    { tier: 'Starter', price: 49, interval: 'mo', features: ['6 AI voices', '50,000 characters/mo', 'MP3 export', 'Basic emotion tags'], popular: false },
+    { tier: 'Professional', price: 149, interval: 'mo', features: ['Custom voice cloning', '500,000 characters/mo', 'Streaming TTS', 'STT transcription', '19 emotion tags'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited characters', 'Multi-language', 'White-label API', 'SLA guarantee'], popular: false, custom: true },
   ] },
   { id: 'websites', name: 'Website Builder', tagline: 'AI-powered Next.js websites with auto-deploy and edge hosting', pricing: [
-    { tier: 'Starter', price: 299, interval: 'mo', features: ['5-page website', 'Day/night themes', 'Mobile responsive', 'SSL + CDN'], popular: false },
-    { tier: 'Professional', price: 799, interval: 'mo', features: ['20+ pages', 'Custom design', 'CMS dashboard', 'Analytics', 'Priority support'], popular: true },
+    { tier: 'Starter', price: 149, interval: 'mo', features: ['5-page website', 'Day/night themes', 'Mobile responsive', 'SSL + CDN'], popular: false },
+    { tier: 'Professional', price: 399, interval: 'mo', features: ['20+ pages', 'Custom design', 'CMS dashboard', 'Analytics', 'Priority support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited pages', 'E-commerce', 'API integration', 'SLA guarantee'], popular: false, custom: true },
   ] },
+  { id: 'business-manager', name: 'Business Manager', tagline: 'All-in-one autonomous business management — bookings, invoicing, payroll, inventory', pricing: [
+    { tier: 'Starter', price: 99, interval: 'mo', features: ['Dashboard + Analytics', 'Customers & Bookings', 'Basic Invoicing', 'Up to 3 users', 'Email support'], popular: false },
+    { tier: 'Professional', price: 249, interval: 'mo', features: ['Everything in Starter', 'Full Invoicing + AR/AP', 'Expense Tracking', 'Inventory Management', 'Employee + Hours + Payroll', 'Reviews Management', 'Up to 15 users', 'Priority support'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Everything in Professional', 'Unlimited users', 'AI Receipt Scanning', 'Custom integrations', 'White-label option', 'Dedicated account manager', 'API access', '24/7 phone support'], popular: false, custom: true },
+  ] },
+  { id: 'office-ai', name: 'Echo Office AI', tagline: 'AI-powered office management — invoicing, bookings, customers & analytics', pricing: [
+    { tier: 'Starter', price: 79, interval: 'mo', features: ['1 business', '5 users', 'Invoicing & bookings', 'Customer directory', 'Expense tracking', 'Basic AI assistant'], popular: false },
+    { tier: 'Professional', price: 199, interval: 'mo', features: ['3 businesses', '25 users', 'Route optimization', 'Fleet management', 'Document generation', 'Analytics dashboard', 'Priority support'], popular: true },
+    { tier: 'Enterprise', price: 499, interval: 'mo', features: ['Unlimited businesses', 'Unlimited users', 'White-label branding', 'Custom domain', 'API access', 'Dedicated manager', 'SLA guarantee'], popular: false },
+  ] },
   { id: 'pentesting', name: 'Pen Testing', tagline: 'Automated penetration testing and vulnerability assessment', pricing: [
-    { tier: 'Starter', price: 499, interval: 'mo', features: ['Monthly scan', '1 domain', 'OWASP Top 10', 'PDF report'], popular: false },
-    { tier: 'Professional', price: 1499, interval: 'mo', features: ['Weekly scans', '10 domains', 'API testing', 'Remediation guidance', 'Priority support'], popular: true },
+    { tier: 'Starter', price: 999, interval: 'mo', features: ['Monthly scan', '1 domain', 'OWASP Top 10', 'PDF report'], popular: false },
+    { tier: 'Professional', price: 2999, interval: 'mo', features: ['Weekly scans', '10 domains', 'API testing', 'Remediation guidance', 'Priority support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Continuous testing', 'Red team exercises', 'Compliance reporting', 'SLA guarantee'], popular: false, custom: true },
   ] },
   { id: 'orchestration', name: 'AI Orchestration', tagline: 'Multi-model AI routing with automatic failover and cost optimization', pricing: [
@@ -338,7 +348,7 @@ export default function PricingPage() {
         <div className="mt-20 mb-12">
           <div className="grid md:grid-cols-4 gap-6 text-center">
             {[
-              { value: '2,632', label: 'AI Engines', sub: 'Domain-specific intelligence' },
+              { value: '6,500+', label: 'AI Engines', sub: 'Domain-specific intelligence' },
               { value: '259K+', label: 'Records Indexed', sub: '80+ Texas counties' },
               { value: '99.9%', label: 'Uptime SLA', sub: 'Enterprise reliability' },
               { value: '<200ms', label: 'Avg Response', sub: 'Doctrine cache layer' },

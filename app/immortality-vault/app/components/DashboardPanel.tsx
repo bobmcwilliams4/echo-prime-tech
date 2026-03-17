@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ACCENT, GOLD, BG_CARD, BORDER, LEVEL_THRESHOLDS } from '../lib/constants';
-import { getGamificationStats, checkAchievements, type GamificationStats } from '../lib/vault-api';
+import { getGamificationStats, checkAchievements, getConsciousnessState, type GamificationStats, type ConsciousnessStateResponse } from '../lib/vault-api';
 
 interface Props {
   userId: string;
@@ -12,13 +12,15 @@ interface Props {
 
 export default function DashboardPanel({ userId, stats, onNavigate }: Props) {
   const [gamification, setGamification] = useState<GamificationStats | null>(null);
+  const [consciousness, setConsciousness] = useState<ConsciousnessStateResponse | null>(null);
 
   useEffect(() => {
     getGamificationStats(userId).then(setGamification).catch(() => {});
     checkAchievements(userId).catch(() => {});
+    getConsciousnessState(userId).then(setConsciousness).catch(() => {});
   }, [userId]);
 
-  const score = gamification?.consciousness_score ?? Math.min(100, Math.round(((stats?.memories || 0) + (stats?.interviews || 0) * 3) / 2));
+  const score = consciousness?.score?.overall ?? gamification?.consciousness_score ?? Math.min(100, Math.round(((stats?.memories || 0) + (stats?.interviews || 0) * 3) / 2));
   const level = gamification?.level ?? LEVEL_THRESHOLDS.filter(l => score >= l.min).pop()?.label ?? 'Newcomer';
   const levelColor = LEVEL_THRESHOLDS.filter(l => score >= l.min).pop()?.color ?? '#94a3b8';
   const points = gamification?.total_points ?? 0;
@@ -46,10 +48,10 @@ export default function DashboardPanel({ userId, stats, onNavigate }: Props) {
   const achievePct = Math.min(100, (points / 500) * 100);
 
   const breakdownBars = [
-    { label: 'Interviews (40%)', pct: interviewPct, color: '#60a5fa' },
-    { label: 'Memories (30%)', pct: memoryPct, color: ACCENT },
-    { label: 'Voice Clone (20%)', pct: voicePct, color: '#34d399' },
-    { label: 'Achievements (10%)', pct: achievePct, color: GOLD },
+    { label: 'Personality Confidence (40%)', pct: consciousness?.score?.personality_confidence ?? interviewPct, color: '#60a5fa' },
+    { label: 'Trait Coverage (30%)', pct: consciousness?.score?.trait_coverage ?? memoryPct, color: ACCENT },
+    { label: 'Session Depth (20%)', pct: consciousness?.score?.session_depth ?? voicePct, color: '#34d399' },
+    { label: 'Memory Richness (10%)', pct: consciousness?.score?.memory_richness ?? achievePct, color: GOLD },
   ];
 
   return (

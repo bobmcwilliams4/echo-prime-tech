@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../../lib/auth-context';
-import { getCampaigns, createCampaign, updateCampaign, getScripts, getLeads, assignLeadsToCampaign } from '../../../lib/closer-api';
+import { getCampaigns, createCampaign, updateCampaign, deleteCampaign, getScripts, getLeads, assignLeadsToCampaign, getLeadCategories } from '../../../lib/closer-api';
 
 /* ──────────────────── Types ──────────────────── */
 
@@ -375,6 +375,16 @@ function CampaignCard({
         >
           Stats
         </button>
+        <button
+          onClick={() => onAction(campaign.id, 'delete')}
+          disabled={isLoading}
+          className="px-3 py-2 rounded-lg text-xs font-semibold transition-opacity hover:opacity-70 disabled:opacity-50"
+          style={{ color: '#ef4444' }}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+          </svg>
+        </button>
       </div>
     </div>
   );
@@ -732,7 +742,12 @@ export default function CampaignsPage() {
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
   const [leadSearch, setLeadSearch] = useState('');
+  const [leadCategoryFilter, setLeadCategoryFilter] = useState('');
+  const [leadTagFilter, setLeadTagFilter] = useState('');
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [assigning, setAssigning] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   /* ── Fetch campaigns ── */
   const loadCampaigns = useCallback(async () => {
@@ -802,11 +817,18 @@ export default function CampaignsPage() {
     setAssignCampaignId(campaignId);
     setSelectedLeadIds(new Set());
     setLeadSearch('');
+    setLeadCategoryFilter('');
+    setLeadTagFilter('');
     setLeadsLoading(true);
     try {
-      const data: any = await getLeads();
-      const list = Array.isArray(data) ? data : data?.leads ?? data?.results ?? [];
+      const [leadsData, catData]: any[] = await Promise.all([
+        getLeads('limit=1000'),
+        getLeadCategories().catch(() => ({ categories: [], tags: [] })),
+      ]);
+      const list = Array.isArray(leadsData) ? leadsData : leadsData?.leads ?? leadsData?.results ?? [];
       setAllLeads(list);
+      setAvailableCategories(catData?.categories || []);
+      setAvailableTags(catData?.tags || []);
     } catch {
       setAllLeads([]);
     } finally {
@@ -875,12 +897,29 @@ export default function CampaignsPage() {
     }
   };
 
+  const handleDelete = async (campaignId: string) => {
+    setDeleteConfirmId(null);
+    setActionLoading(campaignId);
+    try {
+      await deleteCampaign(campaignId);
+      await loadCampaigns();
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete campaign');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleAction = async (campaignId: string, action: string) => {
     if (action === 'edit') {
       const campaign = campaigns.find((c) => c.id === campaignId);
       if (!campaign) return;
       setEditingCampaignId(campaignId);
       setShowForm(true);
+      return;
+    }
+    if (action === 'delete') {
+      setDeleteConfirmId(campaignId);
       return;
     }
     if (action === 'stats') {
@@ -1004,6 +1043,54 @@ export default function CampaignsPage() {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmId && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 50,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)', padding: 20,
+          }}
+          onClick={() => setDeleteConfirmId(null)}
+        >
+          <div
+            style={{
+              width: '100%', maxWidth: 400, padding: 24,
+              backgroundColor: 'var(--ept-card-bg)', borderRadius: 14,
+              border: '1px solid var(--ept-card-border)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--ept-text)', margin: '0 0 8px' }}>Delete Campaign?</h3>
+            <p style={{ fontSize: 13, color: 'var(--ept-text-muted)', margin: '0 0 20px' }}>
+              This will permanently delete &ldquo;{campaigns.find((c) => c.id === deleteConfirmId)?.name}&rdquo; and unassign all its leads. This cannot be undone.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                style={{
+                  padding: '8px 16px', fontSize: 13, fontWeight: 500, borderRadius: 8,
+                  border: '1px solid var(--ept-border)', backgroundColor: 'transparent',
+                  color: 'var(--ept-text-muted)', cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirmId)}
+                style={{
+                  padding: '8px 20px', fontSize: 13, fontWeight: 600,
+                  color: '#fff', backgroundColor: '#ef4444', border: 'none', borderRadius: 8,
+                  cursor: 'pointer',
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Lead Assignment Modal */}
       {assignCampaignId && (
         <div
@@ -1041,22 +1128,71 @@ export default function CampaignsPage() {
               </button>
             </div>
 
-            {/* Search + Select All */}
-            <div style={{ padding: '12px 20px', borderBottom: '1px solid var(--ept-border)', display: 'flex', gap: 10, alignItems: 'center' }}>
-              <input
-                type="text"
-                value={leadSearch}
-                onChange={(e) => setLeadSearch(e.target.value)}
-                placeholder="Search leads by name, phone, company..."
-                style={{
-                  flex: 1, padding: '8px 12px', fontSize: 13, color: 'var(--ept-text)',
-                  backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)',
-                  borderRadius: 8, outline: 'none',
-                }}
-              />
-              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ept-accent)', whiteSpace: 'nowrap' }}>
-                {selectedLeadIds.size} selected
-              </span>
+            {/* Search + Filters + Select Count */}
+            <div style={{ padding: '12px 20px', borderBottom: '1px solid var(--ept-border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="text"
+                  value={leadSearch}
+                  onChange={(e) => setLeadSearch(e.target.value)}
+                  placeholder="Search leads by name, phone, company..."
+                  style={{
+                    flex: 1, padding: '8px 12px', fontSize: 13, color: 'var(--ept-text)',
+                    backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)',
+                    borderRadius: 8, outline: 'none',
+                  }}
+                />
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--ept-accent)', whiteSpace: 'nowrap' }}>
+                  {selectedLeadIds.size} selected
+                </span>
+              </div>
+              {(availableCategories.length > 0 || availableTags.length > 0) && (
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {availableCategories.length > 0 && (
+                    <select
+                      value={leadCategoryFilter}
+                      onChange={(e) => setLeadCategoryFilter(e.target.value)}
+                      style={{
+                        padding: '6px 10px', fontSize: 12, color: leadCategoryFilter ? 'var(--ept-text)' : 'var(--ept-text-muted)',
+                        backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)',
+                        borderRadius: 6, outline: 'none', cursor: 'pointer',
+                      }}
+                    >
+                      <option value="">All Categories</option>
+                      {availableCategories.map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  )}
+                  {availableTags.length > 0 && (
+                    <select
+                      value={leadTagFilter}
+                      onChange={(e) => setLeadTagFilter(e.target.value)}
+                      style={{
+                        padding: '6px 10px', fontSize: 12, color: leadTagFilter ? 'var(--ept-text)' : 'var(--ept-text-muted)',
+                        backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)',
+                        borderRadius: 6, outline: 'none', cursor: 'pointer',
+                      }}
+                    >
+                      <option value="">All Tags</option>
+                      {availableTags.map((tag) => (
+                        <option key={tag} value={tag}>{tag}</option>
+                      ))}
+                    </select>
+                  )}
+                  {(leadCategoryFilter || leadTagFilter) && (
+                    <button
+                      onClick={() => { setLeadCategoryFilter(''); setLeadTagFilter(''); }}
+                      style={{
+                        padding: '6px 10px', fontSize: 11, fontWeight: 600,
+                        color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer',
+                      }}
+                    >
+                      Clear Filters
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Lead List */}
@@ -1068,6 +1204,12 @@ export default function CampaignsPage() {
               ) : (() => {
                 const q = leadSearch.toLowerCase().trim();
                 const filtered = allLeads.filter((l: any) => {
+                  if (leadCategoryFilter && (l.category || '') !== leadCategoryFilter) return false;
+                  if (leadTagFilter) {
+                    let tags: string[] = [];
+                    try { tags = typeof l.tags === 'string' ? JSON.parse(l.tags) : Array.isArray(l.tags) ? l.tags : []; } catch {}
+                    if (!tags.includes(leadTagFilter)) return false;
+                  }
                   if (!q) return true;
                   const full = `${l.first_name || ''} ${l.last_name || ''} ${l.phone || ''} ${l.company || ''} ${l.email || ''}`.toLowerCase();
                   return full.includes(q);
@@ -1125,13 +1267,23 @@ export default function CampaignsPage() {
                               {lead.phone || 'No phone'} {lead.company ? `· ${lead.company}` : ''}
                             </div>
                           </div>
-                          <span style={{
-                            fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em',
-                            padding: '2px 6px', borderRadius: 4,
-                            backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-muted)',
-                          }}>
-                            {lead.status || 'new'}
-                          </span>
+                          <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>
+                            {lead.category && (
+                              <span style={{
+                                fontSize: 9, fontWeight: 600, padding: '2px 6px', borderRadius: 4,
+                                backgroundColor: 'rgba(13,115,119,0.1)', color: 'var(--ept-accent)',
+                              }}>
+                                {lead.category}
+                              </span>
+                            )}
+                            <span style={{
+                              fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em',
+                              padding: '2px 6px', borderRadius: 4,
+                              backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-muted)',
+                            }}>
+                              {lead.status || 'new'}
+                            </span>
+                          </div>
                         </div>
                       );
                     })}

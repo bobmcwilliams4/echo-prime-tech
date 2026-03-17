@@ -103,8 +103,24 @@ export default function TemplateGallery({ onSelectTemplate }: TemplateGalleryPro
                 height: '90px',
                 background: tmpl.thumbnail,
                 position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
+              {/* Visible overlay so dark gradients aren't invisible */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: 'linear-gradient(135deg, rgba(201,169,78,0.15) 0%, rgba(20,184,166,0.10) 100%)',
+                borderBottom: `1px solid ${COLORS.border}`,
+              }} />
+              <span style={{
+                position: 'relative', zIndex: 1,
+                fontSize: 28, opacity: 0.4,
+                color: COLORS.accent,
+              }}>
+                {tmpl.category === 'business' ? '◆' : tmpl.category === 'professional' ? '▬' : tmpl.category === 'creative' ? '✎' : tmpl.category === 'ecommerce' ? '$' : tmpl.category === 'personal' ? '👤' : tmpl.category === 'saas' ? '⬡' : '◇'}
+              </span>
               <span
                 style={{
                   position: 'absolute',
@@ -116,6 +132,7 @@ export default function TemplateGallery({ onSelectTemplate }: TemplateGalleryPro
                   color: '#e2e8f0',
                   fontSize: '10px',
                   fontWeight: 600,
+                  zIndex: 2,
                 }}
               >
                 {TEMPLATE_CATEGORY_LABELS[tmpl.category]}

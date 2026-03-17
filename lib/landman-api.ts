@@ -477,3 +477,124 @@ export async function analyzeTitleHound(input: {
 export async function getTitleHoundStatus(): Promise<TitleHoundStatus> {
   return apiFetch<TitleHoundStatus>('/titlehound/status');
 }
+
+// ── Regional Database Search (Permian Basin, East Texas, Central Texas) ──
+
+export interface RegionalSearchParams {
+  query?: string;
+  county?: string;
+  grantor?: string;
+  grantee?: string;
+  doc_type?: string;
+  year_from?: number;
+  year_to?: number;
+  region?: 'permian' | 'east_texas' | 'central_texas';
+  limit?: number;
+  offset?: number;
+}
+
+export interface RegionalDocument {
+  doc_id: string;
+  county: string;
+  region: string;
+  doc_type: string;
+  instrument_number?: string;
+  book?: string;
+  page?: string;
+  filing_date?: string;
+  recording_date?: string;
+  grantor?: string;
+  grantee?: string;
+  legal_description?: string;
+  consideration?: string;
+  volume?: string;
+  source?: string;
+  parties?: { name: string; role: string }[];
+  legals?: { section: string; block: string; survey: string; abstract: string; description: string }[];
+}
+
+export interface RegionalCounty {
+  county: string;
+  region: string;
+  total_documents: number;
+  total_parties: number;
+  total_legals: number;
+  doc_types: Record<string, number>;
+}
+
+export interface RegionalStats {
+  total_documents: number;
+  total_parties: number;
+  total_legals: number;
+  regions: {
+    region: string;
+    database: string;
+    counties: number;
+    documents: number;
+    parties: number;
+    legals: number;
+  }[];
+  counties: { county: string; region: string; documents: number }[];
+}
+
+export interface PartySearchParams {
+  name: string;
+  role?: 'grantor' | 'grantee';
+  county?: string;
+  region?: 'permian' | 'east_texas' | 'central_texas';
+  limit?: number;
+  offset?: number;
+}
+
+export interface RegionalSearchResult {
+  total: number;
+  documents: RegionalDocument[];
+  query: RegionalSearchParams;
+}
+
+export interface PartySearchResult {
+  total: number;
+  results: {
+    doc_id: string;
+    county: string;
+    region: string;
+    party_name: string;
+    party_role: string;
+    doc_type: string;
+    filing_date?: string;
+    grantor?: string;
+    grantee?: string;
+  }[];
+}
+
+/** Search regional deed records across all 3 D1 databases (~2M+ docs) */
+export async function searchRegionalRecords(params: RegionalSearchParams): Promise<RegionalSearchResult> {
+  return apiFetch<RegionalSearchResult>('/regional/search', {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+}
+
+/** Get a specific document by ID from any regional database */
+export async function getRegionalDocument(docId: string): Promise<RegionalDocument> {
+  return apiFetch<RegionalDocument>(`/regional/document/${encodeURIComponent(docId)}`);
+}
+
+/** Get county list with stats across all regions */
+export async function getRegionalCounties(): Promise<RegionalCounty[]> {
+  const res = await apiFetch<{ counties: RegionalCounty[] }>('/regional/counties');
+  return res.counties;
+}
+
+/** Search by grantor/grantee name across all regional databases */
+export async function searchRegionalParties(params: PartySearchParams): Promise<PartySearchResult> {
+  return apiFetch<PartySearchResult>('/regional/party-search', {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+}
+
+/** Get aggregate stats for all regional databases */
+export async function getRegionalStats(): Promise<RegionalStats> {
+  return apiFetch<RegionalStats>('/regional/stats');
+}

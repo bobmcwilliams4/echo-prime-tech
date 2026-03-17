@@ -1,8 +1,8 @@
 /**
- * Engine Runtime API — Direct access to 2,632 intelligence engines
+ * Engine Runtime API — Direct access to 6,500+ intelligence engines
  *
  * Connects to https://echo-engine-runtime.bmcii1976.workers.dev
- * 210 domain categories, 186K+ doctrines, 7.17M lines of engine code
+ * 1,000+ domain categories, 521K+ doctrines
  *
  * This is the RAW doctrine/engine data backend.
  * For customer billing/Stripe, see engine-cloud-api.ts instead.

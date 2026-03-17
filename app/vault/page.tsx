@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 import {
   vaultCredentials,
   vaultCredential,
@@ -135,13 +136,14 @@ export default function VaultPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0a0a0f', color: '#e0e0e0' }}>
+      <ProductTutorialButton tutorialId="vault" productName="Digital Vault" />
       {/* Top bar */}
-      <nav className="border-b px-6 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a2e', backgroundColor: '#0d0d14' }}>
+      <nav data-tutorial="dvault-hero" className="border-b px-6 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a2e', backgroundColor: '#0d0d14' }}>
         <div className="flex items-center gap-4">
           <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[120px] h-auto" style={{ mixBlendMode: 'screen' }} priority /></Link>
           <span className="text-xs font-mono px-2 py-1 rounded" style={{ backgroundColor: '#00ff8820', color: '#00ff88' }}>VAULT</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div data-tutorial="dvault-sharing" className="flex items-center gap-3">
           <span className="text-xs font-mono text-gray-500">{user.email}</span>
           <button onClick={handleLock} className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-900/40 text-red-400 hover:bg-red-900/60 transition-all">
             &#128274; Lock
@@ -150,7 +152,7 @@ export default function VaultPage() {
       </nav>
 
       {/* Tabs */}
-      <div className="border-b px-6 py-2 flex gap-1 overflow-x-auto" style={{ borderColor: '#1a1a2e' }}>
+      <div data-tutorial="dvault-upload" className="border-b px-6 py-2 flex gap-1 overflow-x-auto" style={{ borderColor: '#1a1a2e' }}>
         {TABS.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)} className="px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap" style={{
             backgroundColor: tab === t.id ? '#00ff8820' : 'transparent',
@@ -162,7 +164,7 @@ export default function VaultPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div data-tutorial="dvault-browser" className="max-w-7xl mx-auto px-6 py-8">
         {tab === 'credentials' && <CredentialsTab masterPassword={masterPassword} />}
         {tab === 'keychain' && <KeychainTab masterPassword={masterPassword} />}
         {tab === 'backups' && <BackupsTab masterPassword={masterPassword} />}
@@ -357,7 +359,7 @@ function StatsTab({ masterPassword }: { masterPassword: string }) {
   ];
 
   return (
-    <div>
+    <div data-tutorial="dvault-pricing">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {statCards.map((s, i) => (
           <div key={i} className="p-5 rounded-xl border text-center" style={{ backgroundColor: '#111118', borderColor: '#1a1a2e' }}>

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ACCENT, GOLD, BG_CARD, BORDER, BG_DARK } from '../lib/constants';
-import { synthesizeSpeech, getVoiceProfiles, type VoiceProfile } from '../lib/vault-api';
+import { synthesizeSpeech, getVoiceProfiles, createVoiceProfile, getCloneStatus, type VoiceProfile } from '../lib/vault-api';
 import { startAudioStream, stopCamera, createMediaRecorder, createAnalyser, drawWaveform, formatDuration, playAudioBlob, type RecorderHandle } from '../lib/media';
 
 interface Props {
@@ -30,6 +30,8 @@ export default function VoicePanel({ userId }: Props) {
   const [profiles, setProfiles] = useState<VoiceProfile[]>([]);
   const [testText, setTestText] = useState('');
   const [testPlaying, setTestPlaying] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [cloneStatus, setCloneStatus] = useState<{ status: string; quality_score?: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const streamRef = useRef<MediaStream | null>(null);
@@ -98,6 +100,50 @@ export default function VoicePanel({ userId }: Props) {
       setCurrentIdx(currentIdx + 1);
     }
   };
+
+  /* ── GAP 1: Upload all recorded samples to backend ─────────────── */
+  const submitSamples = async () => {
+    if (uploading || samples.size < 3) return;
+    setUploading(true);
+    setError(null);
+    try {
+      const blobs: Blob[] = [];
+      const promptIds: string[] = [];
+      samples.forEach((blob, id) => { blobs.push(blob); promptIds.push(id); });
+      const profile = await createVoiceProfile(userId, blobs, promptIds);
+      setProfiles(prev => [profile, ...prev]);
+      setCloneStatus({ status: profile.clone_status });
+      // Start polling clone status
+      pollCloneStatus(profile.voice_id || profile.id);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to upload voice samples.');
+    }
+    setUploading(false);
+  };
+
+  /* ── GAP 2: Poll clone status until active or failed ─────────── */
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const pollCloneStatus = useCallback((voiceId: string) => {
+    if (pollRef.current) clearInterval(pollRef.current);
+    pollRef.current = setInterval(async () => {
+      try {
+        const s = await getCloneStatus(voiceId);
+        setCloneStatus(s);
+        if (s.status === 'active' || s.status === 'failed' || s.status === 'error') {
+          if (pollRef.current) clearInterval(pollRef.current);
+          pollRef.current = null;
+          // Refresh profiles list
+          getVoiceProfiles(userId).then(d => setProfiles(d.profiles)).catch(() => {});
+        }
+      } catch {
+        // Silently retry — polling is best-effort
+      }
+    }, 5000);
+  }, [userId]);
+
+  // Cleanup polling on unmount
+  useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
 
   const testVoice = async () => {
     if (testPlaying) return;
@@ -209,6 +255,59 @@ export default function VoicePanel({ userId }: Props) {
           )}
         </div>
       </div>
+
+      {/* Submit Voice Samples */}
+      {completedCount >= 3 && (
+        <div className="p-5 rounded-xl text-center" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+          <h3 className="text-sm font-bold text-white mb-2">
+            {completedCount === VOICE_PROMPTS.length ? 'All Samples Recorded!' : `${completedCount} Samples Ready`}
+          </h3>
+          <p className="text-xs text-gray-400 mb-4">
+            {completedCount < VOICE_PROMPTS.length
+              ? `You can submit now or record the remaining ${VOICE_PROMPTS.length - completedCount} for better quality.`
+              : 'Submit your voice samples to begin cloning.'}
+          </p>
+
+          {cloneStatus && (
+            <div className="mb-4 flex items-center justify-center gap-2 text-sm">
+              <span className="w-2 h-2 rounded-full" style={{
+                background: cloneStatus.status === 'active' ? '#34d399'
+                  : cloneStatus.status === 'failed' || cloneStatus.status === 'error' ? '#ef4444'
+                  : '#fbbf24',
+                animation: cloneStatus.status === 'pending' || cloneStatus.status === 'processing' ? 'pulse 1.5s infinite' : 'none',
+              }} />
+              <span style={{
+                color: cloneStatus.status === 'active' ? '#34d399'
+                  : cloneStatus.status === 'failed' || cloneStatus.status === 'error' ? '#ef4444'
+                  : GOLD,
+              }}>
+                {cloneStatus.status === 'active' ? 'Voice Clone Active'
+                  : cloneStatus.status === 'processing' ? 'Processing voice clone...'
+                  : cloneStatus.status === 'pending' ? 'Queued for processing...'
+                  : cloneStatus.status === 'failed' || cloneStatus.status === 'error' ? 'Clone failed — try re-recording'
+                  : cloneStatus.status}
+              </span>
+              {cloneStatus.quality_score != null && (
+                <span className="text-xs text-gray-500 ml-1">
+                  Quality: {Math.round(cloneStatus.quality_score * 100)}%
+                </span>
+              )}
+            </div>
+          )}
+
+          <button
+            onClick={submitSamples}
+            disabled={uploading || cloneStatus?.status === 'processing' || cloneStatus?.status === 'active'}
+            className="px-8 py-3 rounded-full text-sm font-bold text-white transition hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
+            style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})`, boxShadow: '0 0 20px rgba(124,58,237,0.3)' }}
+          >
+            {uploading ? 'Uploading Samples...'
+              : cloneStatus?.status === 'processing' ? 'Processing...'
+              : cloneStatus?.status === 'active' ? 'Clone Active'
+              : `Submit ${completedCount} Voice Samples`}
+          </button>
+        </div>
+      )}
 
       {/* Test Voice */}
       {completedCount >= 3 && (

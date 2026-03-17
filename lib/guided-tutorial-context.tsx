@@ -295,9 +295,9 @@ export function GuidedTutorialProvider({ children }: { children: React.ReactNode
         // Mark completed in localStorage
         if (tutorialId) {
           try {
-            const progress = JSON.parse(localStorage.getItem('closer_tutorial_progress') || '{}');
+            const progress = JSON.parse(localStorage.getItem('ept_tutorial_progress') || '{}');
             progress[tutorialId] = { completed: true, completedAt: new Date().toISOString() };
-            localStorage.setItem('closer_tutorial_progress', JSON.stringify(progress));
+            localStorage.setItem('ept_tutorial_progress', JSON.stringify(progress));
           } catch {}
         }
         return 0;

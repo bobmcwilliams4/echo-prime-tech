@@ -6,15 +6,16 @@ import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 
 const SUPPORT_CHANNELS = [
+  { title: 'Phone Support', desc: 'Talk to Bree — our AI customer service rep. Real conversations, real answers.', detail: '(432) 527-6112', href: 'tel:+14325276112', icon: 'P' },
   { title: 'Email Support', desc: 'Get help from our team within 24 hours.', detail: 'support@echo-ept.com', href: 'mailto:support@echo-ept.com', icon: 'M' },
-  { title: 'Sentinel AI', desc: 'Ask our AI assistant anything — instant answers across 210+ domains.', detail: 'Available 24/7', href: '/sentinel', icon: 'S' },
+  { title: 'Sentinel AI', desc: 'Ask our AI assistant anything — instant answers across 1,000+ domains.', detail: 'Available 24/7', href: '/sentinel', icon: 'S' },
   { title: 'Documentation', desc: 'Guides, API references, and integration docs.', detail: 'Self-service', href: '/knowledge', icon: 'D' },
 ];
 
 const FAQ = [
   { q: 'How do I get started?', a: 'Sign up at echo-ept.com/signup and explore the dashboard. Most services include a free tier to get started.' },
   { q: 'What payment methods do you accept?', a: 'We accept all major credit cards via Stripe. Enterprise customers can request invoicing.' },
-  { q: 'How do Intelligence Engines work?', a: 'Our 2,600+ engines embed real domain expertise — tax law, oilfield operations, cybersecurity, and 210+ more domains. They produce doctrine-backed responses with authority citations, not generic AI output.' },
+  { q: 'How do Intelligence Engines work?', a: 'Our 6,500+ engines embed real domain expertise — tax law, oilfield operations, cybersecurity, and 1,000+ more domains. They produce doctrine-backed responses with authority citations, not generic AI output.' },
   { q: 'Can I integrate your services into my own application?', a: 'Yes. All services are available via REST API with Bearer token authentication. See the API documentation in your dashboard after signing up.' },
   { q: 'What is your uptime guarantee?', a: 'We run on Cloudflare\'s global edge network with zero cold starts. Our infrastructure delivers 99.9%+ uptime across all services.' },
   { q: 'How do I cancel my subscription?', a: 'You can cancel anytime from your dashboard under Settings. No contracts, no cancellation fees.' },
@@ -57,7 +58,7 @@ export default function SupportPage() {
         </div>
 
         {/* Support Channels */}
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {SUPPORT_CHANNELS.map((ch) => (
             <Link key={ch.title} href={ch.href} className="p-6 rounded-xl border transition-all hover:opacity-90 card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
               <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg mb-4" style={{ backgroundColor: 'var(--ept-accent)' }}>{ch.icon}</div>

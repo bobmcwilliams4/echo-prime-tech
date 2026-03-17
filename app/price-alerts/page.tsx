@@ -7,6 +7,7 @@ import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 const SERVICE_ID = 'price-alerts';
 
@@ -191,7 +192,7 @@ export default function PriceAlertsPage() {
       </nav>
 
       {/* --- Hero --- */}
-      <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+      <section data-tutorial="alerts-hero" className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-6 border" style={{ borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)', backgroundColor: 'var(--ept-accent-glow)' }}>
           <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#22c55e' }} /> Real-Time Alerts &bull; AI Analysis &bull; Multi-Exchange
         </div>
@@ -229,7 +230,7 @@ export default function PriceAlertsPage() {
       </section>
 
       {/* --- Feature Grid (expandable) --- */}
-      <section className="max-w-7xl mx-auto px-6 pb-20">
+      <section data-tutorial="alerts-config" className="max-w-7xl mx-auto px-6 pb-20">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold" style={{ color: 'var(--ept-text)' }}>6 Alert Intelligence Layers</h2>
           <p className="mt-3 text-sm max-w-2xl mx-auto" style={{ color: 'var(--ept-text-muted)' }}>
@@ -270,7 +271,7 @@ export default function PriceAlertsPage() {
       </section>
 
       {/* --- How It Works --- */}
-      <section className="max-w-4xl mx-auto px-6 pb-20">
+      <section data-tutorial="alerts-active" className="max-w-4xl mx-auto px-6 pb-20">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>How It Works</h2>
         <div className="space-y-6">
           {HOW_IT_WORKS.map((s, i) => (
@@ -384,6 +385,7 @@ export default function PriceAlertsPage() {
           Questions? <a href="mailto:bob@echo-op.com" className="underline" style={{ color: 'var(--ept-accent)' }}>Contact us</a> | <Link href="/crypto-trading" className="underline" style={{ color: 'var(--ept-accent)' }}>Crypto Trading</Link> | <Link href="/sec-intel" className="underline" style={{ color: 'var(--ept-accent)' }}>SEC Intel</Link> | <Link href="/pricing" className="underline" style={{ color: 'var(--ept-accent)' }}>All Pricing</Link> | <Link href="/" className="underline" style={{ color: 'var(--ept-accent)' }}>Home</Link>
         </p>
       </footer>
+      <ProductTutorialButton tutorialId="price-alerts" productName="Price Alerts" />
     </div>
   );
 }

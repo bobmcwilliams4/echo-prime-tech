@@ -12,9 +12,14 @@ export default function FamilyPanel({ userId }: Props) {
   const [members, setMembers] = useState<FamilyMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [newRelation, setNewRelation] = useState('');
   const [newBio, setNewBio] = useState('');
+  const [newBirthDate, setNewBirthDate] = useState('');
+  const [newDeathDate, setNewDeathDate] = useState('');
 
   useEffect(() => {
     getFamilyMembers(userId)
@@ -25,27 +30,40 @@ export default function FamilyPanel({ userId }: Props) {
 
   const addMember = async () => {
     if (!newName.trim() || !newRelation.trim()) return;
+    setSubmitting(true);
+    setError(null);
     try {
       const data = await addFamilyMember(userId, {
         name: newName.trim(),
         relationship: newRelation.trim(),
         bio: newBio.trim() || undefined,
+        birth_date: newBirthDate || undefined,
+        death_date: newDeathDate || undefined,
       });
       setMembers(prev => [...prev, data]);
       setNewName('');
       setNewRelation('');
       setNewBio('');
+      setNewBirthDate('');
+      setNewDeathDate('');
       setShowAdd(false);
     } catch (err) {
-      console.error('Failed to add member:', err);
+      setError(err instanceof Error ? err.message : 'Failed to add family member');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const removeMember = async (id: string) => {
+    setDeletingId(id);
     try {
       await deleteFamilyMember(id);
       setMembers(prev => prev.filter(m => m.id !== id));
-    } catch { /* empty */ }
+    } catch {
+      setError('Failed to remove member');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -61,22 +79,55 @@ export default function FamilyPanel({ userId }: Props) {
         </button>
       </div>
 
+      {error && (
+        <div className="px-4 py-3 rounded-lg text-sm text-red-300 border border-red-500/30" style={{ background: 'rgba(239,68,68,0.08)' }}>
+          {error}
+          <button onClick={() => setError(null)} className="ml-2 text-red-400 hover:text-red-300">&times;</button>
+        </div>
+      )}
+
       {showAdd && (
         <div className="p-5 rounded-xl space-y-3" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
           <input
             value={newName}
             onChange={e => setNewName(e.target.value)}
-            placeholder="Full name"
+            placeholder="Full name *"
             className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none"
             style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }}
+            disabled={submitting}
           />
           <input
             value={newRelation}
             onChange={e => setNewRelation(e.target.value)}
-            placeholder="Relationship (e.g., Grandfather, Mother, Son)"
+            placeholder="Relationship (e.g., Grandfather, Mother, Son) *"
             className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none"
             style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }}
+            disabled={submitting}
           />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Birth Date</label>
+              <input
+                type="date"
+                value={newBirthDate}
+                onChange={e => setNewBirthDate(e.target.value)}
+                className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none"
+                style={{ background: '#0a0a0f', border: `1px solid ${BORDER}`, colorScheme: 'dark' }}
+                disabled={submitting}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Death Date</label>
+              <input
+                type="date"
+                value={newDeathDate}
+                onChange={e => setNewDeathDate(e.target.value)}
+                className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none"
+                style={{ background: '#0a0a0f', border: `1px solid ${BORDER}`, colorScheme: 'dark' }}
+                disabled={submitting}
+              />
+            </div>
+          </div>
           <textarea
             value={newBio}
             onChange={e => setNewBio(e.target.value)}
@@ -84,10 +135,25 @@ export default function FamilyPanel({ userId }: Props) {
             className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none resize-none"
             style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }}
             rows={3}
+            disabled={submitting}
           />
-          <button onClick={addMember} className="px-5 py-2 rounded-full text-sm font-bold text-white" style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}>
-            Save Member
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={addMember}
+              disabled={submitting || !newName.trim() || !newRelation.trim()}
+              className="px-5 py-2 rounded-full text-sm font-bold text-white transition disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}
+            >
+              {submitting ? 'Saving...' : 'Save Member'}
+            </button>
+            <button
+              onClick={() => { setShowAdd(false); setError(null); }}
+              className="px-4 py-2 rounded-full text-sm text-gray-400 hover:text-white transition"
+              disabled={submitting}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       )}
 
@@ -106,9 +172,14 @@ export default function FamilyPanel({ userId }: Props) {
             <div key={m.id} className="p-5 rounded-xl group relative" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
               <button
                 onClick={() => removeMember(m.id)}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs text-gray-600 hover:text-red-400 hover:bg-red-400/10 opacity-0 group-hover:opacity-100 transition"
+                disabled={deletingId === m.id}
+                className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs text-gray-600 hover:text-red-400 hover:bg-red-400/10 opacity-0 group-hover:opacity-100 transition disabled:opacity-50"
               >
-                &times;
+                {deletingId === m.id ? (
+                  <span className="w-3 h-3 rounded-full border border-gray-500 border-t-transparent animate-spin inline-block" />
+                ) : (
+                  <span>&times;</span>
+                )}
               </button>
               <div className="w-12 h-12 rounded-full mb-3 flex items-center justify-center text-xl" style={{ background: '#1e1e2e', border: `2px solid ${BORDER}` }}>
                 {'\u{1F464}'}

@@ -9,6 +9,7 @@ import { useAuth } from '../../lib/auth-context';
 // ept-api subscribe removed — checkout handles payment
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import SubscriptionGate from '../../components/SubscriptionGate';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 /* ─── Constants ────────────────────────────────────────────────────────── */
 
@@ -167,7 +168,7 @@ function DemoChat() {
   };
 
   return (
-    <div style={{ background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: 16 }} className="overflow-hidden max-w-xl mx-auto">
+    <div data-tutorial="iv-hero" style={{ background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: 16 }} className="overflow-hidden max-w-xl mx-auto">
       <div style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)' }} className="px-4 py-3 flex items-center gap-2">
         <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
         <span className="text-white font-semibold text-sm">Consciousness Active — Demo Mode</span>
@@ -493,7 +494,7 @@ function ImmortalityVaultPageContent() {
             <Image src={isDark ? '/logo-sym-night.png' : '/logo-sym-day.png'} alt="EPT" width={28} height={28} />
             <span className="text-sm font-semibold text-gray-300 group-hover:text-white transition">Echo Prime Technologies</span>
           </Link>
-          <div className="flex items-center gap-4">
+          <div data-tutorial="iv-voice" className="flex items-center gap-4">
             <Link href="/engines" className="text-xs text-gray-400 hover:text-white transition hidden sm:block">Engines</Link>
             <Link href="/voice" className="text-xs text-gray-400 hover:text-white transition hidden sm:block">Voice</Link>
             <Link href="/pricing" className="text-xs text-gray-400 hover:text-white transition hidden sm:block">Pricing</Link>
@@ -561,7 +562,7 @@ function ImmortalityVaultPageContent() {
           </div>
 
           {/* Stats bar */}
-          <div className="flex flex-wrap justify-center gap-8 mt-12">
+          <div data-tutorial="iv-interview" className="flex flex-wrap justify-center gap-8 mt-12">
             {[
               { value: 216, suffix: '+', label: 'Interview Questions' },
               { value: 12, suffix: '', label: 'Life Categories' },
@@ -642,7 +643,7 @@ function ImmortalityVaultPageContent() {
       </section>
 
       {/* ─── Live Demo ──────────────────────────────────────────────────── */}
-      <section
+      <section data-tutorial="iv-memories"
         id="demo"
         ref={demoRef.ref}
         className={`py-20 px-4 transition-all duration-1000 ${demoRef.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
@@ -970,6 +971,7 @@ function ImmortalityVaultPageContent() {
           <span className="text-xs text-gray-600">&copy; 2026 Echo Prime Technologies</span>
         </div>
       </footer>
+      <ProductTutorialButton tutorialId="immortality-vault" productName="Immortality Vault" />
     </div>
   );
 }

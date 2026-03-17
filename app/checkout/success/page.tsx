@@ -11,7 +11,10 @@ function SuccessContent() {
   const params = useSearchParams();
   const method = params.get('method') || 'stripe';
   const invoiceId = params.get('invoice_id');
+  const orderId = params.get('order_id');
+  const captureId = params.get('capture_id');
   const amount = params.get('amount');
+  const status = params.get('status');
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
@@ -31,12 +34,20 @@ function SuccessContent() {
         <p className="text-sm mb-2" style={{ color: 'var(--ept-text-secondary)' }}>
           {method === 'invoice'
             ? 'A detailed invoice has been sent to your email via PayPal. Payment is due within 30 days.'
-            : 'Your subscription is now active. You have full access to your selected services.'}
+            : method === 'paypal'
+              ? 'Your PayPal payment has been processed. Your subscription is now active.'
+              : 'Your subscription is now active. You have full access to your selected services.'}
         </p>
 
         {invoiceId && (
           <p className="text-xs font-mono mb-4" style={{ color: 'var(--ept-text-muted)' }}>
             Invoice ID: {invoiceId}
+          </p>
+        )}
+
+        {orderId && (
+          <p className="text-xs font-mono mb-1" style={{ color: 'var(--ept-text-muted)' }}>
+            Order: {orderId}{captureId ? ` | Capture: ${captureId}` : ''}{status ? ` | Status: ${status}` : ''}
           </p>
         )}
 

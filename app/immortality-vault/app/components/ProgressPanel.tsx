@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ACCENT, GOLD, BG_CARD, BORDER, CATEGORIES } from '../lib/constants';
-import { getCoverage, getGaps, getGamificationStats, type CoverageCategory, type GapQuestion, type GamificationStats } from '../lib/vault-api';
+import { getCoverage, getGaps, getGamificationStats, getConsciousnessState, type CoverageCategory, type GapQuestion, type GamificationStats, type ConsciousnessStateResponse } from '../lib/vault-api';
 
 interface Props {
   userId: string;
@@ -20,6 +20,7 @@ export default function ProgressPanel({ userId, onNavigate }: Props) {
   const [coverage, setCoverage] = useState<CoverageCategory[]>([]);
   const [gaps, setGaps] = useState<GapQuestion[]>([]);
   const [gamification, setGamification] = useState<GamificationStats | null>(null);
+  const [consciousness, setConsciousness] = useState<ConsciousnessStateResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,6 +28,7 @@ export default function ProgressPanel({ userId, onNavigate }: Props) {
       getCoverage(userId).then(d => setCoverage(d.categories || [])).catch(() => {}),
       getGaps(userId).then(d => setGaps(d.gaps || [])).catch(() => {}),
       getGamificationStats(userId).then(setGamification).catch(() => {}),
+      getConsciousnessState(userId).then(setConsciousness).catch(() => {}),
     ]).finally(() => setLoading(false));
   }, [userId]);
 
@@ -52,12 +54,12 @@ export default function ProgressPanel({ userId, onNavigate }: Props) {
           <div
             className="w-full h-full rounded-full flex items-center justify-center"
             style={{
-              background: `conic-gradient(${ACCENT} ${overallPct * 3.6}deg, #1e1e2e ${overallPct * 3.6}deg)`,
+              background: `conic-gradient(${ACCENT} ${(consciousness?.score?.overall ?? overallPct) * 3.6}deg, #1e1e2e ${(consciousness?.score?.overall ?? overallPct) * 3.6}deg)`,
             }}
           >
             <div className="w-32 h-32 rounded-full flex flex-col items-center justify-center" style={{ background: BG_CARD }}>
-              <div className="text-3xl font-black" style={{ color: ACCENT }}>{overallPct}%</div>
-              <div className="text-[10px] text-gray-500">Interview Coverage</div>
+              <div className="text-3xl font-black" style={{ color: ACCENT }}>{consciousness?.score?.overall ?? overallPct}%</div>
+              <div className="text-[10px] text-gray-500">Consciousness Score</div>
             </div>
           </div>
         </div>
@@ -111,7 +113,7 @@ export default function ProgressPanel({ userId, onNavigate }: Props) {
         {[
           { label: 'Total Interviews', value: gamification?.total_interviews ?? totalAnswered, icon: '\u{1F399}\u{FE0F}' },
           { label: 'Memories', value: gamification?.total_memories ?? 0, icon: '\u{1F9E0}' },
-          { label: 'Consciousness', value: `${gamification?.consciousness_score ?? 0}%`, icon: '\u{2728}' },
+          { label: 'Consciousness', value: `${consciousness?.score?.overall ?? gamification?.consciousness_score ?? 0}%`, icon: '\u{2728}' },
           { label: 'Achievements', value: gamification?.achievements?.length ?? 0, icon: '\u{1F3C6}' },
         ].map(s => (
           <div key={s.label} className="p-3 rounded-lg text-center" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>

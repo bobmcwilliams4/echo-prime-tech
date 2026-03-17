@@ -12,6 +12,7 @@ import {
   type ListingInput, type EbayListingResult, type EbayAuthStatus,
 } from '../../lib/ebay-api';
 import SubscriptionGate from '../../components/SubscriptionGate';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 /* ═══════════════════════════════════════════════════════════════
    CGC GRADING DATA
@@ -1891,7 +1892,7 @@ function GradingPageContent() {
   }, [bulkImportText, comics, addForm.collectible_type]);
 
   if (loading || !user) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--ept-bg)' }}>
+    <div data-tutorial="grading-hero" className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--ept-bg)' }}>
       <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'var(--ept-accent)', borderTopColor: 'transparent' }} />
     </div>
   );
@@ -1964,7 +1965,7 @@ function GradingPageContent() {
             </div>
 
             {/* Hero Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div data-tutorial="grading-grade-scale" className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: 'Total Items', value: String(stats.total), sub: `${stats.graded} graded, ${stats.ungraded} ungraded` },
                 { label: 'Collection Value', value: formatCurrency(stats.totalValue), sub: `${stats.publisherCount} brands/publishers` },
@@ -2020,7 +2021,7 @@ function GradingPageContent() {
               </div>
               <div className="divide-y" style={{ borderColor: 'var(--ept-border)' }}>
                 {comics.filter(c => c.status === 'graded').slice(0, 5).map(c => (
-                  <div key={c.id} className="px-5 py-3 flex items-center justify-between hover:bg-[var(--ept-surface-hover)] transition-colors cursor-pointer" onClick={() => { setSelectedComic(c); setActiveTab('collection'); }}>
+                  <div data-tutorial="grading-type-select" key={c.id} className="px-5 py-3 flex items-center justify-between hover:bg-[var(--ept-surface-hover)] transition-colors cursor-pointer" onClick={() => { setSelectedComic(c); setActiveTab('collection'); }}>
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>{getCollectibleIcon(c.collectible_type || 'comic')}</div>
                       <div>
@@ -2319,7 +2320,7 @@ function GradingPageContent() {
                     </div>
                   )}
                   {c.defects.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-3">
+                    <div data-tutorial="grading-defects" className="flex flex-wrap gap-1 mt-3">
                       {c.defects.map(d => (
                         <span key={d} className="px-2 py-0.5 rounded text-[10px]" style={{ backgroundColor: 'rgba(239,68,68,0.08)', color: '#ef4444' }}>{d.replace('_', ' ')}</span>
                       ))}
@@ -3573,7 +3574,7 @@ function GradingLanding() {
       {/* How It Works */}
       <section className="max-w-4xl mx-auto px-6 py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-10" style={{ color: 'var(--ept-text)' }}>How It Works</h2>
-        <div className="grid md:grid-cols-4 gap-6 text-center">
+        <div data-tutorial="grading-upload" className="grid md:grid-cols-4 gap-6 text-center">
           {[
             { step: '1', title: 'Upload', desc: 'Take a photo of your collectible — front and back.' },
             { step: '2', title: 'AI Analysis', desc: '5 vision models examine condition, defects, and authenticity.' },
@@ -3649,6 +3650,7 @@ function GradingLanding() {
           </div>
         </div>
       </footer>
+      <ProductTutorialButton tutorialId="grading" productName="AI Collectibles Grading" />
     </div>
   );
 }

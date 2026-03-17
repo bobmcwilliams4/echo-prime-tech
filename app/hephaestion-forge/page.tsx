@@ -23,6 +23,7 @@ import {
   type ForgeStats,
 } from '../../lib/hephaestion-forge-api';
 import SubscriptionGate from '../../components/SubscriptionGate';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 // ── Types ──
 
@@ -547,7 +548,7 @@ function HephaestionForgeContent() {
 
   // Loading
   if (loading || !user) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--ept-bg)' }}>
+    <div data-tutorial="heph-hero" className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--ept-bg)' }}>
       <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
            style={{ borderColor: 'var(--ept-accent)', borderTopColor: 'transparent' }} />
     </div>
@@ -598,7 +599,7 @@ function HephaestionForgeContent() {
       {/* ── Nav Bar ── */}
       <nav className="border-b px-6 py-4 flex items-center justify-between flex-shrink-0"
            style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
-        <div className="flex items-center gap-4">
+        <div data-tutorial="heph-chat" className="flex items-center gap-4">
           <Link href="/">
             <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT"
                    width={400} height={260} className="w-[120px] md:w-[160px] h-auto"
@@ -636,7 +637,7 @@ function HephaestionForgeContent() {
       {/* ── Info Panel ── */}
       {showInfo && (
         <div className="border-b px-6 py-4 animate-fade-up" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
-          <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div data-tutorial="heph-stages" className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { label: 'Archetypes', value: stats?.archetypes?.length || 15 },
               { label: 'Pipeline Stages', value: stats?.pipeline_stages || 13 },
@@ -789,7 +790,7 @@ function HephaestionForgeContent() {
                       }}
                     />
                     {isCurrent && (
-                      <div className="absolute inset-0 rounded-full animate-ping"
+                      <div data-tutorial="heph-guilds" className="absolute inset-0 rounded-full animate-ping"
                            style={{ backgroundColor: 'var(--ept-accent)', opacity: 0.3 }} />
                     )}
                     {/* Guild badge */}
@@ -1035,7 +1036,7 @@ function HephaestionForgeContent() {
                        color: msg.role === 'user' ? '#fff' : 'var(--ept-text)',
                        border: msg.role === 'user' ? 'none' : '1px solid var(--ept-card-border)',
                      }}>
-                  <div className="text-sm leading-relaxed"
+                  <div data-tutorial="heph-mode" className="text-sm leading-relaxed"
                        dangerouslySetInnerHTML={{ __html: formatMarkdown(msg.content) }} />
                   {msg.model && msg.model !== 'system' && msg.role === 'assistant' && (
                     <div className="mt-2 text-[10px] opacity-50">{msg.model}</div>
@@ -1246,6 +1247,7 @@ function HephaestionForgeContent() {
           </div>
         </div>
       </section>
+      <ProductTutorialButton tutorialId="hephaestion-forge" productName="Hephaestion Forge" />
     </div>
   );
 }

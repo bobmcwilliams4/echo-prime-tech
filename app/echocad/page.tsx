@@ -15,6 +15,7 @@ import {
   type Material, type HealthResponse, type StatsResponse, type StressResult, type DFMResult,
 } from '../../lib/echocad-api';
 import SubscriptionGate from '../../components/SubscriptionGate';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 // ── Constants ──
 
@@ -71,7 +72,7 @@ const fmt = (n: number, d = 2) => typeof n === 'number' ? n.toFixed(d) : '—';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function ResultCard({ title, data, color }: { title: string; data: Record<string, any>; color?: string }) {
   return (
-    <div style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: 12, padding: 20, marginTop: 16 }}>
+    <div data-tutorial="echocad-hero" style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: 12, padding: 20, marginTop: 16 }}>
       <div style={{ fontSize: 14, fontWeight: 700, color: color || 'var(--ept-accent)', marginBottom: 12 }}>{title}</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8 }}>
         {Object.entries(data).filter(([,v]) => v !== undefined && v !== null).map(([k, v]) => (
@@ -337,7 +338,7 @@ function EchoCADPageContent() {
         ))}
         <div style={{ marginTop: 24, padding: '12px', borderRadius: 8, background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', fontSize: 11 }}>
           <StatusBadge ok={health?.status === 'ok'} label={health ? 'API Online' : 'Checking...'} />
-          <div style={{ marginTop: 8, color: 'var(--ept-text-muted)' }}>
+          <div data-tutorial="echocad-materials" style={{ marginTop: 8, color: 'var(--ept-text-muted)' }}>
             {stats ? `${stats.materials} materials | ${stats.primitiveTypes?.length || 15} primitives` : 'Loading...'}
           </div>
           <div style={{ marginTop: 4, color: 'var(--ept-text-muted)' }}>
@@ -356,7 +357,7 @@ function EchoCADPageContent() {
             <p style={{ color: 'var(--ept-text-muted)', fontSize: 14, marginBottom: 32 }}>AI-native parametric CAD engine with 38 materials, 15 primitives, 12 calculators, and manufacturing intelligence.</p>
 
             {/* Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
+            <div data-tutorial="echocad-calculator" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
               {[
                 { label: 'Materials', value: stats?.materials || 38, icon: '⬡', color: '#3b82f6' },
                 { label: 'Primitives', value: stats?.primitiveTypes?.length || 15, icon: '△', color: '#8b5cf6' },
@@ -422,7 +423,7 @@ function EchoCADPageContent() {
         {/* ═══ MATERIALS TAB ═══ */}
         {activeTab === 'materials' && (
           <div>
-            <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 8 }}>Materials Database</h2>
+            <h2 data-tutorial="echocad-tabs" style={{ fontSize: 22, fontWeight: 700, color: 'var(--ept-text)', marginBottom: 8 }}>Materials Database</h2>
             <p style={{ color: 'var(--ept-text-muted)', fontSize: 13, marginBottom: 20 }}>38 engineering alloys with 17 properties each. Click to expand, select up to 4 for comparison.</p>
 
             {/* Filters */}
@@ -569,7 +570,7 @@ function EchoCADPageContent() {
               <div style={{ background: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)', borderRadius: 12, padding: 20 }}>
                 <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--ept-text)', marginBottom: 16 }}>Workspace Parts ({createdParts.length})</h3>
                 {createdParts.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: 40, color: 'var(--ept-text-muted)', fontSize: 13 }}>
+                  <div data-tutorial="echocad-primitives" style={{ textAlign: 'center', padding: 40, color: 'var(--ept-text-muted)', fontSize: 13 }}>
                     No parts yet. Create primitives to build your design.
                   </div>
                 ) : (
@@ -890,6 +891,7 @@ function EchoCADPageContent() {
           </div>
         </div>
       </section>
+      <ProductTutorialButton tutorialId="echocad" productName="EchoCAD" />
     </div>
   );
 }

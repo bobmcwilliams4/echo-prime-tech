@@ -22,6 +22,7 @@ import {
 } from '../../lib/tax-return-api';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import SubscriptionGate from '../../components/SubscriptionGate';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 // ===============================================================
 // TYPES
@@ -481,7 +482,7 @@ function TaxReturnPageContent() {
   // ===============================================================
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+    <div data-tutorial="tax-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
       {/* NAV */}
       <nav className="sticky top-0 z-50 border-b px-6 py-3 flex items-center justify-between backdrop-blur-xl" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-nav-bg)' }}>
         <div className="flex items-center gap-6">
@@ -496,7 +497,7 @@ function TaxReturnPageContent() {
               priority
             />
           </Link>
-          <div className="h-6 w-px" style={{ backgroundColor: 'var(--ept-border)' }} />
+          <div data-tutorial="tax-tab-overview" className="h-6 w-px" style={{ backgroundColor: 'var(--ept-border)' }} />
           <span className="text-sm font-bold tracking-widest uppercase gradient-text">Tax Return Preparation</span>
         </div>
         <div className="flex items-center gap-1">
@@ -562,7 +563,7 @@ function TaxReturnPageContent() {
             </div>
 
             {/* Features */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div data-tutorial="tax-deductions" className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
                 { title: 'AI-Powered Analysis', desc: '14 specialized tax engines analyze every aspect of your return \u2014 from standard deductions to oil & gas taxation.', icon: '\u{1F9E0}' },
                 { title: 'Optimization Engine', desc: 'Our TX engines identify deductions, credits, and strategies you might miss. Average savings of $2,400+ per complex return.', icon: '\u{1F4B0}' },
@@ -660,7 +661,7 @@ function TaxReturnPageContent() {
                 />
               ))}
             </div>
-            <div className="text-sm mb-2" style={{ color: 'var(--ept-text-muted)' }}>Step {intakeStep} of 3</div>
+            <div data-tutorial="tax-tab-intake" className="text-sm mb-2" style={{ color: 'var(--ept-text-muted)' }}>Step {intakeStep} of 3</div>
 
             {/* Step 1: Personal Info */}
             {intakeStep === 1 && (
@@ -918,7 +919,7 @@ function TaxReturnPageContent() {
         {/* ======= DOCUMENTS TAB ======= */}
         {tab === 'documents' && (
           <div className="max-w-2xl mx-auto space-y-6 animate-fade-up">
-            <h3 className="text-2xl font-bold" style={{ color: 'var(--ept-text)' }}>Document Upload</h3>
+            <h3 data-tutorial="tax-doc-upload" className="text-2xl font-bold" style={{ color: 'var(--ept-text)' }}>Document Upload</h3>
             {!taxReturn ? (
               <div className="p-6 rounded-xl text-center" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
                 <p style={{ color: 'var(--ept-text-muted)' }}>Complete the intake form first to upload documents.</p>
@@ -1101,7 +1102,7 @@ function TaxReturnPageContent() {
                       <div key={i} className="flex items-center gap-3">
                         <span className="text-xs w-12 text-right font-mono" style={{ color: 'var(--ept-accent)' }}>{(b.rate * 100).toFixed(0)}%</span>
                         <div className="flex-1 rounded-full h-4 overflow-hidden" style={{ backgroundColor: 'var(--ept-surface)' }}>
-                          <div
+                          <div data-tutorial="tax-income-categories"
                             className="h-full rounded-full"
                             style={{
                               width: `${Math.min(100, (b.taxable_in_bracket / calculation.taxable_income) * 100)}%`,
@@ -1957,7 +1958,7 @@ function TaxReturnPageContent() {
         <p className="text-center text-sm mb-10" style={{ color: 'var(--ept-text-muted)' }}>Pair AI tax preparation with these services for full-spectrum financial intelligence</p>
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { title: 'Intelligence Engines', desc: '2,632 domain-specific AI engines including 14 tax law, MACRS depreciation, QBI, and oil & gas IDC engines.', href: '/engines', price: 'From $199/mo' },
+            { title: 'Intelligence Engines', desc: '6,500+ domain-specific AI engines including 14 tax law, MACRS depreciation, QBI, and oil & gas IDC engines.', href: '/engines', price: 'From $199/mo' },
             { title: 'Title Intelligence', desc: 'AI chain of title for oil & gas mineral rights. Perfect for clients with royalty income and depletion deductions.', href: '/title-intelligence', price: 'From $200/mo' },
             { title: 'Data Pipelines', desc: 'Automated extraction of W-2s, 1099s, K-1s, and financial documents. Feeds directly into tax preparation workflow.', href: '/pipelines', price: 'From $199/mo' },
           ].map((svc, i) => (
@@ -1975,6 +1976,7 @@ function TaxReturnPageContent() {
         <p>Echo Prime Technologies | Tax Return Preparation Service | Powered by 14 TX Engines</p>
         <p className="mt-1">Preparer: Bobby Don McWilliams II | Midland, TX</p>
       </footer>
+      <ProductTutorialButton tutorialId="tax-returns" productName="AI Tax Returns" />
     </div>
   );
 }

@@ -358,6 +358,33 @@ export default function AdminPage() {
                 ))}
               </div>
             </div>
+
+            <div className="mt-8">
+              <h3 className="font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Integrations</h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                <Link href="/admin/zoho" className="card-hover p-5 rounded-xl border flex items-center gap-4" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold" style={{ backgroundColor: isDark ? '#1a2332' : '#f0f4f8', color: 'var(--ept-accent)' }}>Z</div>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>Zoho CRM</p>
+                    <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Lead sync, intelligence, analytics</p>
+                  </div>
+                </Link>
+                <Link href="/admin/payments" className="card-hover p-5 rounded-xl border flex items-center gap-4" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold" style={{ backgroundColor: isDark ? '#1a2332' : '#f0f4f8', color: 'var(--ept-accent)' }}>$</div>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>PayPal / Stripe</p>
+                    <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Payments, invoices, subscriptions</p>
+                  </div>
+                </Link>
+                <Link href="/admin/invoices" className="card-hover p-5 rounded-xl border flex items-center gap-4" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold" style={{ backgroundColor: isDark ? '#1a2332' : '#f0f4f8', color: 'var(--ept-accent)' }}>&#x1F4C4;</div>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>Invoices</p>
+                    <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Generate, send, track invoices</p>
+                  </div>
+                </Link>
+              </div>
+            </div>
           </div>
         )}
 

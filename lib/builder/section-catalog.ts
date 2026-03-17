@@ -566,7 +566,7 @@ const statsCounter = sec(
   'linear-gradient(180deg, #1a1f2e 0%, #0f1219 100%)',
   `<section style="padding:60px 24px;background:#1a1f2e">
   <div style="max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;text-align:center">
-    <div><div style="font-size:48px;font-weight:900;color:#C9A94E;margin-bottom:4px">2,600+</div><div style="font-size:14px;color:#9ca3af;font-weight:500">AI Engines</div></div>
+    <div><div style="font-size:48px;font-weight:900;color:#C9A94E;margin-bottom:4px">6,500+</div><div style="font-size:14px;color:#9ca3af;font-weight:500">AI Engines</div></div>
     <div><div style="font-size:48px;font-weight:900;color:#14b8a6;margin-bottom:4px">99.9%</div><div style="font-size:14px;color:#9ca3af;font-weight:500">Uptime</div></div>
     <div><div style="font-size:48px;font-weight:900;color:#a855f7;margin-bottom:4px">&lt;50ms</div><div style="font-size:14px;color:#9ca3af;font-weight:500">Response Time</div></div>
     <div><div style="font-size:48px;font-weight:900;color:#ef4444;margin-bottom:4px">10K+</div><div style="font-size:14px;color:#9ca3af;font-weight:500">Users Worldwide</div></div>

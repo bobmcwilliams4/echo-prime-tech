@@ -15,6 +15,7 @@ import {
   type PricingTier,
   type EngineCategory,
 } from '../../lib/engine-cloud-api';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 // ── Domain metadata: full names, descriptions, capabilities, pricing tier ──
 
@@ -152,10 +153,10 @@ export default function EnginesPage() {
     ]).finally(() => setLoading(false));
   }, []);
 
-  const totalEngines = catalog?.total_engines || 932;
-  const totalDoctrines = catalog?.total_doctrines || 35331;
+  const totalEngines = catalog?.total_engines || 5464;
+  const totalDoctrines = catalog?.total_doctrines || 616693;
   const categories = catalog?.categories || [];
-  const totalCategories = categories.length || 65;
+  const totalCategories = categories.length || 210;
 
   // Group categories by tier
   const grouped = useMemo(() => {
@@ -198,7 +199,7 @@ export default function EnginesPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+    <div data-tutorial="engines-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">
@@ -213,7 +214,7 @@ export default function EnginesPage() {
 
       {/* Hero */}
       <div className="relative overflow-hidden" style={{ background: isDark ? 'linear-gradient(180deg, #0f0f1a 0%, #0a0a0f 100%)' : 'linear-gradient(180deg, #f0f4ff 0%, #fff 100%)' }}>
-        <div className="max-w-6xl mx-auto px-6 py-20 text-center relative z-10">
+        <div data-tutorial="engines-tier-filter" className="max-w-6xl mx-auto px-6 py-20 text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-6" style={{ backgroundColor: '#6366f120', color: '#818cf8', border: '1px solid #6366f140' }}>
             Engine Intelligence Catalog
           </div>
@@ -223,17 +224,17 @@ export default function EnginesPage() {
             </span>{' '}
             Engines
             <span className="text-lg md:text-2xl font-bold ml-3" style={{ color: 'var(--ept-text-muted)' }}>
-              3,279 planned
+              10,000+ planned
             </span>
           </h1>
           <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8" style={{ color: 'var(--ept-text-secondary)' }}>
             {totalCategories} live domains. {totalDoctrines.toLocaleString()} pre-compiled doctrine blocks. Court-defensible. Zero hallucination.
             Every response grounded in expert knowledge with deterministic audit trails.
           </p>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-10">
+          <div data-tutorial="engines-domain-card" className="flex flex-wrap justify-center gap-4 md:gap-6 mb-10">
             {[
               { label: 'Live Engines', value: totalEngines.toLocaleString(), icon: '⚡' },
-              { label: 'Planned Total', value: '3,279', icon: '🚀' },
+              { label: 'Planned Total', value: '10,000+', icon: '🚀' },
               { label: 'Domains', value: String(totalCategories), icon: '🏛️' },
               { label: 'Doctrines', value: totalDoctrines.toLocaleString(), icon: '📋' },
               { label: 'Encryption', value: 'AES-256', icon: '🔒' },
@@ -363,7 +364,7 @@ export default function EnginesPage() {
                               ))}
                             </div>
                             <div className="flex items-center justify-between">
-                              <div className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>
+                              <div data-tutorial="engines-pricing" className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>
                                 <span title="Enterprise price">${info.perQuery.enterprise}</span>
                                 <span className="mx-1">—</span>
                                 <span title="Professional price">${info.perQuery.professional}</span>
@@ -395,14 +396,14 @@ export default function EnginesPage() {
               <div className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: '#8b5cf6', boxShadow: '0 0 8px #8b5cf633' }} />
               <span className="text-lg font-bold" style={{ color: 'var(--ept-text)' }}>Under Construction</span>
               <span className="text-xs px-2 py-0.5 rounded-full font-mono" style={{ backgroundColor: '#8b5cf620', color: '#8b5cf6' }}>
-                2,347 engines planned
+                3,500+ engines planned
               </span>
             </div>
             <p className="text-xs mt-2 ml-6" style={{ color: 'var(--ept-text-muted)' }}>
-              Actively building toward 3,279 engines across 178 domains. New engines deploy daily via automated build pipeline.
+              Actively building toward 10,000+ engines across 1,000+ domains. New engines deploy daily via automated build pipeline.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 p-6">
+          <div data-tutorial="engines-search" className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 p-6">
             {[
               { code: 'NUC', name: 'Nuclear Engineering', desc: 'Reactor design, radiation safety, fuel cycle analysis, and nuclear waste management.', engines: 15 },
               { code: 'MINE', name: 'Mining Engineering', desc: 'Mine planning, extraction methods, mineral processing, and mine safety.', engines: 15 },
@@ -631,6 +632,7 @@ export default function EnginesPage() {
           </div>
         </div>
       </div>
+      <ProductTutorialButton tutorialId="engines" productName="Intelligence Engines" />
     </div>
   );
 }

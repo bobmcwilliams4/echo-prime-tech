@@ -7,7 +7,8 @@ import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { getServices, createCheckout, Service } from '../../lib/ept-api';
-import { createOrder, createInvoice } from '../../lib/paypal-api';
+import { createInvoice } from '../../lib/paypal-api';
+import PayPalCheckoutButtons from '../../components/PayPalCheckoutButtons';
 
 // ── Tax rates by US state (simplified — major states) ──
 const STATE_TAX_RATES: Record<string, number> = {
@@ -231,6 +232,9 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
     return null;
   };
 
+  // B2B invoice flow (company name or tax ID present)
+  const isB2BInvoice = !!(billing.companyName || billing.taxId);
+
   const handleCheckout = async () => {
     const validationError = validateBilling();
     if (validationError) { setError(validationError); return; }
@@ -243,48 +247,45 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
       if (payMethod === 'stripe') {
         const { url } = await createCheckout(initialServiceId, selectedTier.tier.toLowerCase());
         window.location.href = url;
-      } else {
-        if (billing.companyName || billing.taxId) {
-          const result = await createInvoice({
-            customer_email: billing.email,
-            customer_name: billing.companyName || billing.contactName,
-            items: [{
-              name: `${selectedService.name} — ${selectedTier.tier} Plan`,
-              quantity: 1,
-              unit_price: invoice.subtotal,
-              description: `${selectedTier.interval === 'month' ? 'Monthly' : 'Annual'} subscription. ${selectedTier.features?.join(', ') || ''}`,
-            },
-            ...(invoice.taxAmount > 0 ? [{
-              name: `Sales Tax (${invoice.taxRateDisplay} — ${invoice.stateName})`,
-              quantity: 1,
-              unit_price: invoice.taxAmount,
-              description: 'Applicable state sales tax',
-            }] : []),
-            ],
-            note: `Invoice for ${billing.companyName || billing.contactName}${billing.taxId ? ` | Tax ID: ${billing.taxId}` : ''}`,
-            auto_send: true,
-          });
-          if (result.success) {
-            router.push(`/checkout/success?method=invoice&invoice_id=${result.invoice_id}&amount=${invoice.total}`);
-          }
-        } else {
-          const result = await createOrder({
-            amount: invoice.total,
-            currency: 'USD',
-            description: `${selectedService.name} — ${selectedTier.tier} Plan`,
-            return_url: `${window.location.origin}/checkout/success?method=paypal`,
-            cancel_url: window.location.href,
-          });
-          if (result.approval_url) {
-            window.location.href = result.approval_url;
-          }
+      } else if (payMethod === 'paypal' && isB2BInvoice) {
+        // B2B: Send PayPal invoice
+        const result = await createInvoice({
+          customer_email: billing.email,
+          customer_name: billing.companyName || billing.contactName,
+          items: [{
+            name: `${selectedService.name} — ${selectedTier.tier} Plan`,
+            quantity: 1,
+            unit_price: invoice.subtotal,
+            description: `${selectedTier.interval === 'month' ? 'Monthly' : 'Annual'} subscription. ${selectedTier.features?.join(', ') || ''}`,
+          },
+          ...(invoice.taxAmount > 0 ? [{
+            name: `Sales Tax (${invoice.taxRateDisplay} — ${invoice.stateName})`,
+            quantity: 1,
+            unit_price: invoice.taxAmount,
+            description: 'Applicable state sales tax',
+          }] : []),
+          ],
+          note: `Invoice for ${billing.companyName || billing.contactName}${billing.taxId ? ` | Tax ID: ${billing.taxId}` : ''}`,
+          auto_send: true,
+        });
+        if (result.success) {
+          router.push(`/checkout/success?method=invoice&invoice_id=${result.invoice_id}&amount=${invoice.total}`);
         }
       }
+      // B2C PayPal: handled by PayPalCheckoutButtons component below (not this handler)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Checkout failed. Please try again.');
     } finally {
       setProcessing(false);
     }
+  };
+
+  const handlePayPalSuccess = (details: { order_id: string; capture_id?: string; payer?: string; status: string }) => {
+    router.push(`/checkout/success?method=paypal&order_id=${details.order_id}&capture_id=${details.capture_id || ''}&status=${details.status}`);
+  };
+
+  const handlePayPalError = (errorMsg: string) => {
+    setError(errorMsg);
   };
 
   if (authLoading || loading || !user) {
@@ -425,24 +426,39 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
                   {error}
                 </div>
               )}
-              <button
-                onClick={handleCheckout}
-                disabled={processing || !invoice}
-                className="w-full mt-6 py-3 rounded-lg font-bold text-sm transition-all disabled:opacity-50"
-                style={{ backgroundColor: 'var(--ept-accent)', color: '#fff', cursor: processing ? 'wait' : 'pointer' }}
-              >
-                {processing
-                  ? 'Processing...'
-                  : payMethod === 'stripe'
-                    ? `Pay $${invoice?.total.toLocaleString() || '0'} with Card`
-                    : (billing.companyName || billing.taxId)
-                      ? `Send Invoice \u2014 $${invoice?.total.toLocaleString() || '0'}`
-                      : `Pay $${invoice?.total.toLocaleString() || '0'} with PayPal`
-                }
-              </button>
+
+              {/* PayPal SDK Smart Buttons (B2C — no company/taxId) */}
+              {payMethod === 'paypal' && !isB2BInvoice && invoice ? (
+                <div className="mt-6">
+                  <PayPalCheckoutButtons
+                    amount={invoice.total}
+                    currency="USD"
+                    description={`${selectedService.name} — ${selectedTier.tier} Plan`}
+                    invoiceNumber={invoiceNumber}
+                    billingEmail={billing.email}
+                    onSuccess={handlePayPalSuccess}
+                    onError={handlePayPalError}
+                    onCancel={() => setError('')}
+                  />
+                </div>
+              ) : (
+                <button
+                  onClick={handleCheckout}
+                  disabled={processing || !invoice}
+                  className="w-full mt-6 py-3 rounded-lg font-bold text-sm transition-all disabled:opacity-50"
+                  style={{ backgroundColor: 'var(--ept-accent)', color: '#fff', cursor: processing ? 'wait' : 'pointer' }}
+                >
+                  {processing
+                    ? 'Processing...'
+                    : payMethod === 'stripe'
+                      ? `Pay $${invoice?.total.toLocaleString() || '0'} with Card`
+                      : `Send Invoice \u2014 $${invoice?.total.toLocaleString() || '0'}`
+                  }
+                </button>
+              )}
 
               <p className="text-[10px] mt-3 text-center" style={{ color: 'var(--ept-text-muted)' }}>
-                {payMethod === 'stripe' ? 'Secure payment via Stripe. Your card details are never stored on our servers.' : (billing.companyName || billing.taxId) ? 'A PayPal invoice will be sent to your email. Pay within 30 days.' : 'You will be redirected to PayPal to complete payment.'}
+                {payMethod === 'stripe' ? 'Secure payment via Stripe. Your card details are never stored on our servers.' : isB2BInvoice ? 'A PayPal invoice will be sent to your email. Pay within 30 days.' : 'Secure payment via PayPal. Pay with your PayPal balance, Venmo, credit/debit card, or Pay Later.'}
               </p>
 
               <div className="mt-4 pt-4 text-[10px] space-y-1" style={{ borderTop: '1px solid var(--ept-border)', color: 'var(--ept-text-muted)' }}>

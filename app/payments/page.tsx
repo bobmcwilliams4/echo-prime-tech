@@ -1,9 +1,227 @@
 'use client'
 
+import { useState } from 'react'
 import { useTheme } from '../../lib/theme-context'
 import { useAuth } from '../../lib/auth-context'
 import Image from 'next/image'
 import Link from 'next/link'
+import { QRCodeSVG } from 'qrcode.react'
+import { createPaymentLink } from '../../lib/paypal-api'
+import ProductTutorialButton from '../../components/product-tutorial-button'
+
+/* ─── Payment Link Generator ─────────────────────────────────────────────── */
+
+function PaymentLinkGenerator() {
+  const { isDark } = useTheme()
+  const [amount, setAmount] = useState('')
+  const [description, setDescription] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [link, setLink] = useState<{ url: string; orderId: string; amount: number } | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  async function handleGenerate() {
+    const num = parseFloat(amount)
+    if (!num || num < 1) { setError('Enter an amount of at least $1.00'); return }
+    setLoading(true)
+    setError('')
+    setLink(null)
+    try {
+      const result = await createPaymentLink({ amount: num, description: description || undefined })
+      setLink({ url: result.payment_url, orderId: result.order_id, amount: result.amount })
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to create payment link')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleCopy() {
+    if (!link) return
+    navigator.clipboard.writeText(link.url)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="p-8 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+      <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>
+        Payment Link Generator
+      </h3>
+      <p className="text-sm mb-6" style={{ color: 'var(--ept-text-secondary)' }}>
+        Create a shareable payment link. Your customer clicks the link, pays via PayPal, Venmo, or card — you get paid instantly.
+      </p>
+
+      <div className="grid md:grid-cols-2 gap-8">
+        {/* Form */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--ept-text-secondary)' }}>Amount (USD)</label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-lg font-bold" style={{ color: 'var(--ept-text-muted)' }}>$</span>
+              <input
+                type="number"
+                min="1"
+                step="0.01"
+                placeholder="0.00"
+                value={amount}
+                onChange={e => setAmount(e.target.value)}
+                className="w-full pl-8 pr-4 py-3 rounded-lg text-lg font-mono"
+                style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--ept-text-secondary)' }}>Description (optional)</label>
+            <input
+              type="text"
+              placeholder="e.g. Invoice #1234, Consulting Fee"
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg"
+              style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text)' }}
+            />
+          </div>
+          <button
+            onClick={handleGenerate}
+            disabled={loading || !amount}
+            className="w-full py-3 rounded-lg font-semibold text-sm disabled:opacity-50"
+            style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
+          >
+            {loading ? 'Generating...' : 'Generate Payment Link'}
+          </button>
+          {error && (
+            <div className="p-3 rounded-lg text-sm" style={{ backgroundColor: '#ef444415', color: '#ef4444', border: '1px solid #ef444430' }}>
+              {error}
+            </div>
+          )}
+        </div>
+
+        {/* Result / QR Code */}
+        <div className="flex flex-col items-center justify-center min-h-[280px] rounded-lg p-6"
+          style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+          {link ? (
+            <>
+              <div className="p-3 rounded-xl mb-4" style={{ backgroundColor: '#fff' }}>
+                <QRCodeSVG
+                  value={link.url}
+                  size={180}
+                  bgColor="#ffffff"
+                  fgColor="#0d7377"
+                  level="H"
+                  includeMargin={false}
+                />
+              </div>
+              <p className="text-xs font-mono text-center break-all mb-3 max-w-[260px]" style={{ color: 'var(--ept-text-muted)' }}>
+                {link.url}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCopy}
+                  className="px-4 py-2 rounded-lg text-xs font-semibold"
+                  style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
+                >
+                  {copied ? 'Copied!' : 'Copy Link'}
+                </button>
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-lg text-xs font-semibold border"
+                  style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}
+                >
+                  Open
+                </a>
+              </div>
+              <p className="text-[10px] mt-3" style={{ color: 'var(--ept-text-muted)' }}>
+                Order: {link.orderId} | ${link.amount.toFixed(2)} USD
+              </p>
+            </>
+          ) : (
+            <div className="text-center">
+              <svg className="w-16 h-16 mx-auto mb-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--ept-text-muted)' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+              </svg>
+              <p className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>
+                Enter an amount to generate a QR code and payment link
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-6 grid grid-cols-3 gap-4 text-center">
+        {[
+          { label: 'PayPal', desc: 'Balance or linked bank' },
+          { label: 'Venmo', desc: 'Send via Venmo app' },
+          { label: 'Card', desc: 'Visa, Mastercard, Amex' },
+        ].map((m, i) => (
+          <div key={i} className="p-3 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+            <p className="font-semibold text-sm" style={{ color: 'var(--ept-text)' }}>{m.label}</p>
+            <p className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>{m.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* ─── Quick Amount Cards ─────────────────────────────────────────────────── */
+
+function QuickPayLinks() {
+  const [links, setLinks] = useState<Record<number, { url: string; loading: boolean; error: string }>>({})
+
+  async function generateQuick(amount: number, desc: string) {
+    setLinks(prev => ({ ...prev, [amount]: { url: '', loading: true, error: '' } }))
+    try {
+      const result = await createPaymentLink({ amount, description: desc })
+      setLinks(prev => ({ ...prev, [amount]: { url: result.payment_url, loading: false, error: '' } }))
+    } catch (e) {
+      setLinks(prev => ({ ...prev, [amount]: { url: '', loading: false, error: e instanceof Error ? e.message : 'Failed' } }))
+    }
+  }
+
+  const quickAmounts = [
+    { amount: 25, label: '$25', desc: 'Quick consultation' },
+    { amount: 50, label: '$50', desc: 'Standard support' },
+    { amount: 100, label: '$100', desc: 'Priority support' },
+    { amount: 250, label: '$250', desc: 'Deep analysis session' },
+    { amount: 500, label: '$500', desc: 'Custom integration' },
+    { amount: 1000, label: '$1,000', desc: 'Enterprise setup' },
+  ]
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      {quickAmounts.map(q => {
+        const state = links[q.amount]
+        return (
+          <div key={q.amount} className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <p className="text-2xl font-bold mb-1" style={{ color: 'var(--ept-accent)' }}>{q.label}</p>
+            <p className="text-[10px] mb-3" style={{ color: 'var(--ept-text-muted)' }}>{q.desc}</p>
+            {state?.url ? (
+              <a href={state.url} target="_blank" rel="noopener noreferrer"
+                className="block px-3 py-1.5 rounded-lg text-[10px] font-semibold"
+                style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+                Pay Now
+              </a>
+            ) : (
+              <button
+                onClick={() => generateQuick(q.amount, q.desc)}
+                disabled={state?.loading}
+                className="w-full px-3 py-1.5 rounded-lg text-[10px] font-semibold border disabled:opacity-50"
+                style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+                {state?.loading ? '...' : 'Generate'}
+              </button>
+            )}
+            {state?.error && <p className="text-[9px] mt-1 text-red-400">{state.error}</p>}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/* ─── Main Page ──────────────────────────────────────────────────────────── */
 
 export default function PaymentsPage() {
   const { isDark } = useTheme()
@@ -65,11 +283,11 @@ export default function PaymentsPage() {
       )
     },
     {
-      title: 'Payment Links',
-      description: 'Shareable checkout links, embeddable widgets, QR code generation',
+      title: 'Payment Links & QR Codes',
+      description: 'Shareable checkout links, embeddable widgets, QR code generation for in-person or remote payments',
       icon: (
         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
         </svg>
       )
     },
@@ -92,7 +310,7 @@ export default function PaymentsPage() {
       popular: false,
       features: [
         'Basic checkout pages',
-        'Payment links',
+        'Payment links & QR codes',
         'Invoice generation',
         'Email receipts',
         'Standard reporting',
@@ -135,52 +353,38 @@ export default function PaymentsPage() {
   ]
 
   const steps = [
-    {
-      number: '01',
-      title: 'Connect Gateways',
-      description: 'Link your Stripe and PayPal accounts in minutes'
-    },
-    {
-      number: '02',
-      title: 'Configure Plans',
-      description: 'Set up pricing tiers, subscription intervals, tax rules'
-    },
-    {
-      number: '03',
-      title: 'Accept Payments',
-      description: 'Share payment links, embed checkout, process transactions'
-    },
-    {
-      number: '04',
-      title: 'Track Revenue',
-      description: 'Monitor MRR, analyze cohorts, forecast growth'
-    }
+    { number: '01', title: 'Connect Gateways', description: 'Link your Stripe and PayPal accounts in minutes' },
+    { number: '02', title: 'Configure Plans', description: 'Set up pricing tiers, subscription intervals, tax rules' },
+    { number: '03', title: 'Accept Payments', description: 'Share payment links, embed checkout, process transactions' },
+    { number: '04', title: 'Track Revenue', description: 'Monitor MRR, analyze cohorts, forecast growth' }
   ]
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <ProductTutorialButton tutorialId="payments" productName="Payment Processing" />
       {/* Navigation */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/" className="flex items-center gap-3">
           <Image
             src={isDark ? '/logo-night.png' : '/logo-day.png'}
             alt="Echo Prime Technologies"
-            width={40}
-            height={40}
+            width={400}
+            height={260}
+            className="w-[160px] md:w-[200px] h-auto"
             style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }}
+            priority
           />
-          <span className="font-bold text-xl" style={{ color: 'var(--ept-text)' }}>Echo Prime Technologies</span>
         </Link>
         <div className="flex items-center gap-4">
-          <Link href="/pricing" className="px-4 py-2 rounded-lg" style={{ color: 'var(--ept-text-secondary)' }}>
+          <Link href="/pricing" className="px-4 py-2 rounded-lg text-sm" style={{ color: 'var(--ept-text-secondary)' }}>
             Pricing
           </Link>
           {user ? (
-            <Link href="/dashboard" className="px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+            <Link href="/dashboard" className="px-6 py-3 rounded-xl font-semibold text-sm" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
               Dashboard
             </Link>
           ) : (
-            <Link href="/signup" className="px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+            <Link href="/signup" className="px-6 py-3 rounded-xl font-semibold text-sm" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
               Get Started
             </Link>
           )}
@@ -188,13 +392,20 @@ export default function PaymentsPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-6 py-20 text-center">
+      <section data-tutorial="payments-hero" className="max-w-6xl mx-auto px-6 py-20 text-center">
         <h1 className="gradient-text font-extrabold text-5xl md:text-6xl mb-6">
           Unified Payments Platform
         </h1>
-        <p className="text-xl mb-8 max-w-3xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
+        <p className="text-xl mb-4 max-w-3xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
           Accept payments, manage subscriptions, automate invoicing, and track revenue — all from one powerful dashboard. Multi-gateway processing with automatic routing and failover.
         </p>
+        <div className="flex flex-wrap gap-3 justify-center mb-8">
+          {['PayPal', 'Venmo', 'Credit Card', 'Debit Card', 'Pay Later', 'QR Code'].map(m => (
+            <span key={m} className="px-3 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+              {m}
+            </span>
+          ))}
+        </div>
         <div className="flex gap-4 justify-center">
           <Link
             href="/checkout?service=payments&tier=starter"
@@ -203,22 +414,39 @@ export default function PaymentsPage() {
           >
             Start Free
           </Link>
-          <Link
-            href="/pricing"
+          <a
+            href="#payment-links"
             className="px-8 py-4 rounded-xl font-semibold text-lg border"
             style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
           >
-            View Pricing
-          </Link>
+            Try Payment Links
+          </a>
+        </div>
+      </section>
+
+      {/* Payment Links & QR Code Generator */}
+      <section id="payment-links" data-tutorial="payments-providers" className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-3xl font-bold text-center mb-3" style={{ color: 'var(--ept-text)' }}>
+          Payment Links & QR Codes
+        </h2>
+        <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
+          Generate a payment link in seconds. Share it via email, text, or social media — or print the QR code for in-person payments. Customers pay with PayPal, Venmo, or any card.
+        </p>
+        <PaymentLinkGenerator />
+
+        {/* Quick Pay Amounts */}
+        <div className="mt-10">
+          <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Quick Pay Amounts</h3>
+          <QuickPayLinks />
         </div>
       </section>
 
       {/* Features Grid */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section data-tutorial="payments-subscriptions" className="max-w-7xl mx-auto px-6 py-20">
         <h2 className="text-4xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>
           Everything You Need to Get Paid
         </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div data-tutorial="payments-analytics" className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, idx) => (
             <div
               key={idx}
@@ -231,7 +459,7 @@ export default function PaymentsPage() {
               <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>
                 {feature.title}
               </h3>
-              <p style={{ color: 'var(--ept-text-secondary)' }}>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>
                 {feature.description}
               </p>
             </div>
@@ -239,8 +467,33 @@ export default function PaymentsPage() {
         </div>
       </section>
 
+      {/* How It Works */}
+      <section className="max-w-6xl mx-auto px-6 py-20">
+        <h2 className="text-4xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>
+          How It Works
+        </h2>
+        <div className="grid md:grid-cols-4 gap-8">
+          {steps.map((step, idx) => (
+            <div key={idx} className="text-center">
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold"
+                style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
+              >
+                {step.number}
+              </div>
+              <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>
+                {step.title}
+              </h3>
+              <p style={{ color: 'var(--ept-text-secondary)' }}>
+                {step.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Pricing */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section data-tutorial="payments-pricing" className="max-w-7xl mx-auto px-6 py-20">
         <h2 className="text-4xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>
           Simple, Transparent Pricing
         </h2>
@@ -285,7 +538,7 @@ export default function PaymentsPage() {
                     <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="var(--ept-accent)">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span style={{ color: 'var(--ept-text-secondary)' }}>{feature}</span>
+                    <span className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -305,26 +558,31 @@ export default function PaymentsPage() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="text-4xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>
-          How It Works
+      {/* Accepted Payment Methods */}
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-3xl font-bold text-center mb-8" style={{ color: 'var(--ept-text)' }}>
+          Accepted Payment Methods
         </h2>
-        <div className="grid md:grid-cols-4 gap-8">
-          {steps.map((step, idx) => (
-            <div key={idx} className="text-center">
-              <div
-                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold"
-                style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
-              >
-                {step.number}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {[
+            { name: 'PayPal', color: '#003087' },
+            { name: 'Venmo', color: '#3D95CE' },
+            { name: 'Visa', color: '#1A1F71' },
+            { name: 'Mastercard', color: '#EB001B' },
+            { name: 'Amex', color: '#006FCF' },
+            { name: 'Discover', color: '#FF6000' },
+            { name: 'Apple Pay', color: '#000000' },
+            { name: 'Google Pay', color: '#4285F4' },
+            { name: 'Pay Later', color: '#003087' },
+            { name: 'ACH / Bank', color: '#2E7D32' },
+            { name: 'Wire Transfer', color: '#5C6BC0' },
+            { name: 'Crypto (BTC)', color: '#F7931A' },
+          ].map((pm) => (
+            <div key={pm.name} className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: pm.color }}>
+                {pm.name.slice(0, 2).toUpperCase()}
               </div>
-              <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>
-                {step.title}
-              </h3>
-              <p style={{ color: 'var(--ept-text-secondary)' }}>
-                {step.description}
-              </p>
+              <p className="text-xs font-semibold" style={{ color: 'var(--ept-text)' }}>{pm.name}</p>
             </div>
           ))}
         </div>

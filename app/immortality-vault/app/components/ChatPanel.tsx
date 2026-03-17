@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ACCENT, BG_CARD, BORDER, EMOTION_ICONS } from '../lib/constants';
-import { sendChat, synthesizeSpeech, type ChatMessage } from '../lib/vault-api';
+import { sendChat, synthesizeSpeech, getConsciousnessState, type ChatMessage, type ConsciousnessStateType } from '../lib/vault-api';
 import { playAudioBlob } from '../lib/media';
 
 interface Props {
@@ -14,49 +14,98 @@ export default function ChatPanel({ userId }: Props) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [playingIdx, setPlayingIdx] = useState<number | null>(null);
+  const [autoPlay, setAutoPlay] = useState(false);
+  const [consciousnessState, setConsciousnessState] = useState<ConsciousnessStateType>('DORMANT');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const audioCacheRef = useRef<Map<number, Blob>>(new Map());
 
-  const send = useCallback(async () => {
-    const msg = input.trim();
-    if (!msg || loading) return;
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: msg }]);
-    setLoading(true);
+  const speakFromBlob = useCallback(async (blob: Blob, idx: number) => {
+    if (playingIdx !== null) return;
+    setPlayingIdx(idx);
     try {
-      const data = await sendChat(userId, msg);
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: data.response || "I'm reflecting on what you've shared. Could you tell me more?",
-        emotion: data.emotion,
-      }]);
+      await playAudioBlob(blob);
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: "I'm having trouble connecting. Please try again." }]);
+      // playback failed — silent
     }
-    setLoading(false);
-  }, [input, loading, userId]);
+    setPlayingIdx(null);
+  }, [playingIdx]);
 
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
-  }, [messages]);
-
-  const speakMessage = async (text: string, emotion: string | undefined, idx: number) => {
+  const generateAndSpeak = useCallback(async (text: string, emotion: string | undefined, idx: number) => {
+    const cached = audioCacheRef.current.get(idx);
+    if (cached) {
+      await speakFromBlob(cached, idx);
+      return;
+    }
     if (playingIdx !== null) return;
     setPlayingIdx(idx);
     try {
       const blob = await synthesizeSpeech(text, emotion);
+      audioCacheRef.current.set(idx, blob);
       await playAudioBlob(blob);
     } catch {
       // TTS unavailable — silent fail
     }
     setPlayingIdx(null);
-  };
+  }, [playingIdx, speakFromBlob]);
+
+  const send = useCallback(async () => {
+    const msg = input.trim();
+    if (!msg || loading) return;
+    setInput('');
+    const userIdx = messages.length;
+    setMessages(prev => [...prev, { role: 'user', content: msg }]);
+    setLoading(true);
+    try {
+      const data = await sendChat(userId, msg);
+      const responseText = data.response || "I'm reflecting on what you've shared. Could you tell me more?";
+      const emotion = data.emotion;
+      const assistantIdx = userIdx + 1;
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: responseText,
+        emotion,
+      }]);
+      // Auto-play TTS for the new assistant message if enabled
+      if (autoPlay) {
+        synthesizeSpeech(responseText, emotion)
+          .then(blob => {
+            audioCacheRef.current.set(assistantIdx, blob);
+            return playAudioBlob(blob);
+          })
+          .catch(() => {});
+      }
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: "I'm having trouble connecting. Please try again." }]);
+    }
+    setLoading(false);
+  }, [input, loading, userId, messages.length, autoPlay]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+  }, [messages]);
+
+  useEffect(() => {
+    getConsciousnessState(userId).then(d => setConsciousnessState(d.state)).catch(() => {});
+  }, [userId]);
 
   return (
     <div className="flex flex-col h-[calc(100vh-120px)]">
-      <div className="flex items-center gap-2 px-4 py-3 rounded-t-xl" style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)' }}>
-        <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
-        <span className="text-white font-semibold text-sm">Consciousness Active</span>
-      </div>
+      {(() => {
+        const stateConfig: Record<ConsciousnessStateType, { color: string; pulse: boolean; label: string; gradient: string }> = {
+          DORMANT: { color: '#94a3b8', pulse: false, label: 'Consciousness Dormant', gradient: 'linear-gradient(135deg, #475569, #64748b)' },
+          LEARNING: { color: '#fbbf24', pulse: true, label: 'Learning...', gradient: 'linear-gradient(135deg, #b45309, #f59e0b)' },
+          ACTIVE: { color: '#4ade80', pulse: true, label: 'Consciousness Active', gradient: 'linear-gradient(135deg, #7c3aed, #a855f7)' },
+          INTERVIEWING: { color: '#60a5fa', pulse: true, label: 'Interview Mode', gradient: 'linear-gradient(135deg, #1d4ed8, #3b82f6)' },
+          CONVERSING: { color: '#c084fc', pulse: true, label: 'In Conversation', gradient: 'linear-gradient(135deg, #7c3aed, #a855f7)' },
+        };
+        const cfg = stateConfig[consciousnessState];
+        return (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-t-xl" style={{ background: cfg.gradient }}>
+            <div className={`w-3 h-3 rounded-full ${cfg.pulse ? 'animate-pulse' : ''}`} style={{ background: cfg.color }} />
+            <span className="text-white font-semibold text-sm">{cfg.label}</span>
+          </div>
+        );
+      })()}
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-4 space-y-3"
@@ -81,7 +130,7 @@ export default function ChatPanel({ userId }: Props) {
                 </div>
                 {m.role === 'assistant' && (
                   <button
-                    onClick={() => speakMessage(m.content, m.emotion, i)}
+                    onClick={() => generateAndSpeak(m.content, m.emotion, i)}
                     disabled={playingIdx !== null}
                     className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition hover:bg-white/10"
                     title="Listen"
@@ -105,7 +154,23 @@ export default function ChatPanel({ userId }: Props) {
           </div>
         )}
       </div>
-      <div className="flex gap-2 p-3 rounded-b-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+      <div className="flex flex-col gap-2 p-3 rounded-b-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+        <div className="flex items-center gap-2 px-1">
+          <button
+            onClick={() => setAutoPlay(p => !p)}
+            className="flex items-center gap-1.5 text-[11px] rounded-full px-2.5 py-1 transition"
+            style={{
+              background: autoPlay ? '#7c3aed22' : 'transparent',
+              border: `1px solid ${autoPlay ? '#7c3aed' : BORDER}`,
+              color: autoPlay ? '#c084fc' : '#64748b',
+            }}
+            title={autoPlay ? 'Auto-play TTS is ON' : 'Auto-play TTS is OFF'}
+          >
+            <span className="text-xs">{autoPlay ? '\u{1F50A}' : '\u{1F507}'}</span>
+            Auto-play voice
+          </button>
+        </div>
+        <div className="flex gap-2">
         <input
           value={input}
           onChange={e => setInput(e.target.value)}
@@ -122,6 +187,7 @@ export default function ChatPanel({ userId }: Props) {
         >
           Send
         </button>
+        </div>
       </div>
     </div>
   );

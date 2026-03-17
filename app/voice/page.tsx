@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useTheme } from '../../lib/theme-context';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 // ─── Constants ───
 const TTS_API = 'https://tts.echo-op.com';
@@ -81,7 +82,7 @@ function Slider({ label, value, onChange, min, max, step, unit, description }: {
   label: string; value: number; onChange: (v: number) => void; min: number; max: number; step: number; unit?: string; description?: string;
 }) {
   return (
-    <div className="space-y-1.5">
+    <div data-tutorial="voice-hero" className="space-y-1.5">
       <div className="flex items-center justify-between">
         <label className="text-xs font-medium" style={{ color: 'var(--ept-text-secondary)' }}>{label}</label>
         <span className="text-xs font-mono font-semibold" style={{ color: 'var(--ept-accent)' }}>{value.toFixed(step < 1 ? (step < 0.1 ? 2 : 1) : 0)}{unit || ''}</span>
@@ -147,7 +148,7 @@ function Sidebar({ active, onSelect, health }: { active: Section; onSelect: (s: 
     <aside className="w-[220px] min-h-screen border-r flex flex-col shrink-0" style={{ backgroundColor: 'var(--ept-bg-alt)', borderColor: 'var(--ept-border)' }}>
       <div className="flex-1 py-3">
         <div className="px-4 mb-4">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.15em]" style={{ color: 'var(--ept-text-muted)' }}>Voice Studio</div>
+          <div data-tutorial="voice-text-input" className="text-[10px] font-semibold uppercase tracking-[0.15em]" style={{ color: 'var(--ept-text-muted)' }}>Voice Studio</div>
         </div>
         {SECTIONS.map(s => (
           <button key={s.id} onClick={() => onSelect(s.id)}
@@ -362,7 +363,7 @@ function TextToSpeech({ voices, voiceId, setVoiceId, history, setHistory }: {
       <div className="space-y-4">
         <div className="rounded-xl border p-4" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
           <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Voice Settings</span>
-          <div className="mt-4 space-y-4">
+          <div data-tutorial="voice-sliders" className="mt-4 space-y-4">
             <Slider label="Stability" value={stability} onChange={setStability} min={0} max={1} step={0.05} description="Higher = more consistent, Lower = more expressive" />
             <Slider label="Clarity + Similarity" value={similarity} onChange={setSimilarity} min={0} max={1} step={0.05} description="How closely to match the voice style" />
             <Slider label="Style Exaggeration" value={style} onChange={setStyle} min={0} max={1} step={0.05} description="Amplify the voice style. Higher = more dramatic" />
@@ -371,7 +372,7 @@ function TextToSpeech({ voices, voiceId, setVoiceId, history, setHistory }: {
         </div>
         <div className="rounded-xl border p-4" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
           <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Presets</span>
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <div data-tutorial="voice-section-tabs" className="mt-3 flex flex-wrap gap-1.5">
             {[
               { name: 'Natural', stab: 0.5, sim: 0.75, sty: 0.35, spd: 0.9 },
               { name: 'Stable', stab: 0.8, sim: 0.8, sty: 0.15, spd: 0.9 },
@@ -1261,7 +1262,7 @@ function VoiceCloning({ voices, setVoices, setVoiceId }: { voices: Voice[]; setV
             {cloneFiles.length > 0 ? (
               <div className="text-center w-full">
                 <svg className="w-6 h-6 mx-auto mb-1" style={{ color: 'var(--ept-accent)' }} viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg>
-                <div className="text-sm font-medium" style={{ color: 'var(--ept-text)' }}>{cloneFiles.length} file{cloneFiles.length > 1 ? 's' : ''} selected</div>
+                <div data-tutorial="voice-select" className="text-sm font-medium" style={{ color: 'var(--ept-text)' }}>{cloneFiles.length} file{cloneFiles.length > 1 ? 's' : ''} selected</div>
                 <div className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>{(cloneFiles.reduce((s, f) => s + f.size, 0) / 1024 / 1024).toFixed(1)} MB total — click to add more</div>
               </div>
             ) : (
@@ -2123,7 +2124,7 @@ function SpeechToSpeech({ voices, voiceId, setVoiceId }: { voices: Voice[]; voic
           </div>
           <div className="rounded-xl border p-4" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
             <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>How It Works</span>
-            <div className="mt-3 space-y-1.5 text-[11px]" style={{ color: 'var(--ept-text-secondary)' }}>
+            <div data-tutorial="voice-generate" className="mt-3 space-y-1.5 text-[11px]" style={{ color: 'var(--ept-text-secondary)' }}>
               {['Upload source speech or record live', 'Select any voice as the target', 'AI regenerates speech in the target voice', 'Preserves rhythm and emotional tone', 'Works with cloned voices too'].map((t, i) => (
                 <div key={i} className="flex items-start gap-2"><span style={{ color: 'var(--ept-accent)' }}>{'\u2713'}</span><span>{t}</span></div>
               ))}
@@ -2734,7 +2735,7 @@ export default function VoicePage() {
         <div className="grid md:grid-cols-3 gap-6">
           {[
             { title: 'AI Sales Agent', desc: 'Autonomous voice closer with real-time STT, LLM reasoning, and natural TTS. Full CRM and lead pipeline.', href: '/closer', price: 'From $299/mo' },
-            { title: 'Sentinel AI', desc: 'Multi-domain intelligence assistant with voice output. Ask anything across 210 domains, hear the answer.', href: '/sentinel', price: 'Free tier available' },
+            { title: 'Sentinel AI', desc: 'Multi-domain intelligence assistant with voice output. Ask anything across 1,000+ domains, hear the answer.', href: '/sentinel', price: 'Free tier available' },
             { title: 'Immortality Vault', desc: 'Preserve your voice for generations. Voice cloning + guided life story interviews + AI conversational recall.', href: '/immortality-vault', price: 'Coming soon' },
           ].map((svc, i) => (
             <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
@@ -2752,6 +2753,7 @@ export default function VoicePage() {
           &copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved.
         </p>
       </footer>
+      <ProductTutorialButton tutorialId="voice" productName="Voice Studio" />
     </div>
   );
 }

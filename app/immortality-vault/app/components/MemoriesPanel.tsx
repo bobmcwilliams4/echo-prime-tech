@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { ACCENT, GOLD, BG_CARD, BORDER, CATEGORIES, EMOTION_ICONS } from '../lib/constants';
-import { getMemories, createMemory, type Memory } from '../lib/vault-api';
+import { getTypedMemories, storeTypedMemory, consolidateMemories, type TypedMemory, type MemoryType } from '../lib/vault-api';
 
 interface Props {
   userId: string;
 }
 
 export default function MemoriesPanel({ userId }: Props) {
-  const [memories, setMemories] = useState<Memory[]>([]);
+  const [memories, setMemories] = useState<TypedMemory[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -18,24 +18,27 @@ export default function MemoriesPanel({ userId }: Props) {
   const [newCategory, setNewCategory] = useState('early_life');
   const [newEmotion, setNewEmotion] = useState('');
   const [saving, setSaving] = useState(false);
+  const [newMemoryType, setNewMemoryType] = useState<MemoryType>('biography');
+  const [typeFilter, setTypeFilter] = useState<MemoryType | null>(null);
+  const [consolidating, setConsolidating] = useState(false);
 
   const loadMemories = async () => {
     setLoading(true);
     try {
-      const data = await getMemories(userId, filter || undefined, 100);
+      const data = await getTypedMemories(userId, { memoryType: typeFilter || undefined, category: filter || undefined, limit: 100 });
       setMemories(data.memories || []);
     } catch { /* empty */ }
     setLoading(false);
   };
 
-  useEffect(() => { loadMemories(); }, [userId, filter]);
+  useEffect(() => { loadMemories(); }, [userId, filter, typeFilter]);
 
   const addMemory = async () => {
     if (!newContent.trim()) return;
     setSaving(true);
     try {
-      const mem = await createMemory(userId, newContent.trim(), newCategory, newEmotion || undefined);
-      setMemories(prev => [mem, ...prev]);
+      await storeTypedMemory(userId, newContent.trim(), { memoryType: newMemoryType, category: newCategory, emotion: newEmotion || undefined });
+      await loadMemories();
       setNewContent('');
       setNewEmotion('');
       setShowAdd(false);
@@ -46,7 +49,7 @@ export default function MemoriesPanel({ userId }: Props) {
   // Group by month
   const grouped = memories
     .filter(m => !search || m.content.toLowerCase().includes(search.toLowerCase()))
-    .reduce<Record<string, Memory[]>>((acc, m) => {
+    .reduce<Record<string, TypedMemory[]>>((acc, m) => {
       const key = new Date(m.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
       (acc[key] = acc[key] || []).push(m);
       return acc;
@@ -58,13 +61,23 @@ export default function MemoriesPanel({ userId }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-white">Memories</h2>
-        <button
-          onClick={() => setShowAdd(!showAdd)}
-          className="px-4 py-2 rounded-full text-sm font-semibold text-white transition hover:scale-[1.02]"
-          style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}
-        >
-          + Add Memory
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={async () => { setConsolidating(true); try { await consolidateMemories(userId); await loadMemories(); } catch {} setConsolidating(false); }}
+            disabled={consolidating}
+            className="px-4 py-2 rounded-full text-sm font-semibold text-white transition hover:scale-[1.02] disabled:opacity-40"
+            style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
+          >
+            {consolidating ? 'Consolidating...' : 'Consolidate'}
+          </button>
+          <button
+            onClick={() => setShowAdd(!showAdd)}
+            className="px-4 py-2 rounded-full text-sm font-semibold text-white transition hover:scale-[1.02]"
+            style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}
+          >
+            + Add Memory
+          </button>
+        </div>
       </div>
 
       {/* Add Memory Form */}
@@ -87,6 +100,16 @@ export default function MemoriesPanel({ userId }: Props) {
             >
               {CATEGORIES.map(c => (
                 <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+              ))}
+            </select>
+            <select
+              value={newMemoryType}
+              onChange={e => setNewMemoryType(e.target.value as MemoryType)}
+              className="p-2 rounded-lg text-sm text-white outline-none"
+              style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }}
+            >
+              {(['biography','conversation','event','emotion','wisdom','relationship','achievement'] as MemoryType[]).map(t => (
+                <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
               ))}
             </select>
             <div className="flex gap-1.5">
@@ -185,11 +208,28 @@ export default function MemoriesPanel({ userId }: Props) {
                             {EMOTION_ICONS[m.emotion] || ''} {m.emotion}
                           </span>
                         )}
+                        {'memory_type' in m && m.memory_type && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded font-mono" style={{ background: '#7c3aed20', color: ACCENT }}>
+                            {m.memory_type}
+                          </span>
+                        )}
+                        {'importance' in m && m.importance > 0 && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded font-mono" style={{ background: m.importance >= 8 ? '#fbbf2420' : '#ffffff10', color: m.importance >= 8 ? GOLD : '#94a3b8' }}>
+                            imp:{m.importance}
+                          </span>
+                        )}
                         <span className="text-[10px] text-gray-600 ml-auto">
                           {new Date(m.created_at).toLocaleDateString()}
                         </span>
                       </div>
                       <p className="text-sm text-gray-300 leading-relaxed">{m.content}</p>
+                      {'keywords' in m && m.keywords && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {m.keywords.split(',').filter(Boolean).slice(0, 8).map((kw: string) => (
+                            <span key={kw} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: '#1e1e2e', color: '#94a3b8' }}>{kw.trim()}</span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })}

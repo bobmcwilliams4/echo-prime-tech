@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { getServices, Service } from '../../lib/ept-api';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 export default function ServicesPage() {
   const router = useRouter();
@@ -59,6 +60,7 @@ export default function ServicesPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <ProductTutorialButton tutorialId="services" productName="Professional Services" />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority /></Link>
         <div className="flex items-center gap-3">
@@ -68,12 +70,12 @@ export default function ServicesPage() {
       </nav>
 
       <div className="max-w-5xl mx-auto px-6 py-12">
-        <div className="text-center mb-12">
+        <div data-tutorial="services-hero" className="text-center mb-12">
           <h1 className="text-3xl md:text-5xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Choose Your Services</h1>
           <p className="mt-4 text-lg" style={{ color: 'var(--ept-text-secondary)' }}>Select the services you want to activate. You can change these anytime from your dashboard.</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4 mb-10">
+        <div data-tutorial="services-grid" className="grid md:grid-cols-2 gap-4 mb-10">
           {services.map(svc => {
             const isSelected = selected.has(svc.id);
             return (
@@ -103,7 +105,7 @@ export default function ServicesPage() {
           })}
         </div>
 
-        <div className="text-center">
+        <div data-tutorial="services-contact" className="text-center">
           <button onClick={handleSave} disabled={selected.size === 0} className="px-10 py-4 rounded-xl font-semibold text-lg transition-all disabled:opacity-40" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
             {newCount > 0 ? `Continue to Checkout` : `Go to Dashboard`}
           </button>

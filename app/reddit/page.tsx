@@ -4,6 +4,7 @@ import { useTheme } from '../../lib/theme-context'
 import { useAuth } from '../../lib/auth-context'
 import Image from 'next/image'
 import Link from 'next/link'
+import ProductTutorialButton from '../../components/product-tutorial-button'
 
 export default function RedditPage() {
   const { isDark } = useTheme()
@@ -140,7 +141,7 @@ export default function RedditPage() {
   ]
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+    <div data-tutorial="reddit-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/" className="flex items-center gap-3">
@@ -194,7 +195,7 @@ export default function RedditPage() {
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-12" style={{ color: 'var(--ept-text)' }}>
           Complete Reddit Monitoring Suite
         </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div data-tutorial="reddit-features" className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, idx) => (
             <div key={idx} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
               <div className="mb-4" style={{ color: 'var(--ept-accent)' }}>
@@ -229,7 +230,7 @@ export default function RedditPage() {
 
       {/* Pricing */}
       <section className="px-6 py-16 max-w-7xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>
+        <h2 data-tutorial="reddit-pricing" className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>
           Transparent Pricing
         </h2>
         <p className="text-center mb-12 text-lg" style={{ color: 'var(--ept-text-secondary)' }}>
@@ -305,6 +306,7 @@ export default function RedditPage() {
           </p>
         </div>
       </section>
+    <ProductTutorialButton tutorialId="reddit" productName="Reddit Intelligence" />
     </div>
   )
 }

@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 const SANDBOX_API = 'https://echo-security-sandbox.bmcii1976.workers.dev';
 
@@ -171,7 +172,8 @@ export default function SandboxPage() {
   const completionPct = challenges.length > 0 ? Math.round((solved.length / challenges.length) * 100) : 0;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0e17', color: '#e5e7eb', fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace" }}>
+    <div data-tutorial="sandbox-hero" style={{ minHeight: '100vh', background: '#0a0e17', color: '#e5e7eb', fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace" }}>
+      <ProductTutorialButton tutorialId="sandbox" productName="AI Sandbox" />
       {/* ─── Top Bar ─── */}
       <div style={{ background: 'linear-gradient(90deg, #0f1724, #111d2e)', borderBottom: '1px solid #1e3a5f', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -199,7 +201,7 @@ export default function SandboxPage() {
       </div>
 
       {/* ─── Tab Bar ─── */}
-      <div style={{ display: 'flex', gap: 2, padding: '0 24px', background: '#0d1117', borderBottom: '1px solid #1e293b' }}>
+      <div data-tutorial="sandbox-models" style={{ display: 'flex', gap: 2, padding: '0 24px', background: '#0d1117', borderBottom: '1px solid #1e293b' }}>
         {(['challenges', 'defense', 'logs'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)} style={{
             padding: '10px 24px', background: tab === t ? '#111827' : 'transparent', color: tab === t ? '#00ff88' : '#64748b',
@@ -212,7 +214,7 @@ export default function SandboxPage() {
       </div>
 
       {tab === 'challenges' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr 1fr', height: 'calc(100vh - 100px)', overflow: 'hidden' }}>
+        <div data-tutorial="sandbox-editor" style={{ display: 'grid', gridTemplateColumns: '220px 1fr 1fr', height: 'calc(100vh - 100px)', overflow: 'hidden' }}>
           {/* ─── Category Sidebar ─── */}
           <div style={{ background: '#0d1117', borderRight: '1px solid #1e293b', overflowY: 'auto', padding: '12px 0' }}>
             {categories.map(cat => {
@@ -264,7 +266,7 @@ export default function SandboxPage() {
           </div>
 
           {/* ─── Right Panel: Challenge Detail + HTTP Builder ─── */}
-          <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div data-tutorial="sandbox-output" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             {selectedChallenge ? (
               <>
                 {/* Challenge Info */}
@@ -354,7 +356,7 @@ export default function SandboxPage() {
       )}
 
       {tab === 'defense' && (
-        <div style={{ padding: 24, maxWidth: 1000, margin: '0 auto' }}>
+        <div data-tutorial="sandbox-pricing" style={{ padding: 24, maxWidth: 1000, margin: '0 auto' }}>
           <h2 style={{ color: '#38bdf8', margin: '0 0 8px 0', fontSize: 22 }}>🛡️ Defense Scanner</h2>
           <p style={{ color: '#64748b', margin: '0 0 20px 0', fontSize: 14 }}>Test your infrastructure security posture. Scan any URL for vulnerabilities, misconfigurations, and security header issues.</p>
 

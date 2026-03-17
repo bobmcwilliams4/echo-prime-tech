@@ -207,6 +207,20 @@ export async function getStats(): Promise<PayPalStats> {
   return paypalFetch('/stats');
 }
 
+// ─── Payment Link APIs ───
+
+export async function createPaymentLink(data: {
+  amount: number;
+  currency?: string;
+  description?: string;
+}): Promise<{ success: boolean; payment_url: string; order_id: string; amount: number; currency: string }> {
+  return paypalFetch('/payment-links', { method: 'POST', body: JSON.stringify(data) });
+}
+
+export async function getPayPalConfig(): Promise<{ client_id: string; mode: string; currency: string }> {
+  return paypalFetch('/config');
+}
+
 // ─── Customer APIs ───
 
 export async function listCustomers(limit = 50): Promise<{ customers: PayPalCustomer[]; count: number }> {

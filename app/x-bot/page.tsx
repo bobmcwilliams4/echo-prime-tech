@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useTheme } from '../../lib/theme-context'
 import { useAuth } from '../../lib/auth-context'
+import ProductTutorialButton from '../../components/product-tutorial-button'
 
 export default function XBotPage() {
   const { isDark } = useTheme()
@@ -184,7 +185,7 @@ export default function XBotPage() {
       </nav>
 
       {/* Hero */}
-      <section className="px-6 py-24 text-center max-w-5xl mx-auto">
+      <section data-tutorial="xbot-hero" className="px-6 py-24 text-center max-w-5xl mx-auto">
         <h1 className="gradient-text font-extrabold text-5xl md:text-7xl mb-6">
           X/Twitter AI Content Engine
         </h1>
@@ -201,7 +202,7 @@ export default function XBotPage() {
       </section>
 
       {/* Features Grid */}
-      <section className="px-6 py-16 max-w-7xl mx-auto">
+      <section data-tutorial="xbot-feed" className="px-6 py-16 max-w-7xl mx-auto">
         <h2 className="text-4xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>
           Everything You Need to Dominate X
         </h2>
@@ -227,7 +228,7 @@ export default function XBotPage() {
       </section>
 
       {/* How It Works */}
-      <section className="px-6 py-16 max-w-6xl mx-auto">
+      <section data-tutorial="xbot-config" className="px-6 py-16 max-w-6xl mx-auto">
         <h2 className="text-4xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>
           How It Works
         </h2>
@@ -252,7 +253,7 @@ export default function XBotPage() {
       </section>
 
       {/* Pricing */}
-      <section className="px-6 py-16 max-w-7xl mx-auto">
+      <section data-tutorial="xbot-analytics" className="px-6 py-16 max-w-7xl mx-auto">
         <h2 className="text-4xl font-bold text-center mb-8" style={{ color: 'var(--ept-text)' }}>
           Simple, Transparent Pricing
         </h2>
@@ -348,6 +349,7 @@ export default function XBotPage() {
       <footer className="border-t px-6 py-8 text-center" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
         <p>&copy; 2026 Echo Prime Technologies. All rights reserved.</p>
       </footer>
+      <ProductTutorialButton tutorialId="x-bot" productName="X/Twitter Bot" />
     </div>
   )
 }

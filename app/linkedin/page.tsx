@@ -5,6 +5,7 @@ import { useAuth } from '../../lib/auth-context'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import ProductTutorialButton from '../../components/product-tutorial-button'
 
 export default function LinkedInPage() {
   const { isDark } = useTheme()
@@ -199,7 +200,7 @@ export default function LinkedInPage() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-7xl mx-auto px-6 py-24">
+      <section data-tutorial="linkedin-hero" className="max-w-7xl mx-auto px-6 py-24">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="gradient-text font-extrabold text-5xl md:text-6xl mb-6">
             LinkedIn AI Growth Engine
@@ -218,7 +219,7 @@ export default function LinkedInPage() {
       </section>
 
       {/* Features Grid */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
+      <section data-tutorial="linkedin-content" className="max-w-7xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold mb-12 text-center">Everything You Need to Dominate LinkedIn</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, i) => (
@@ -234,7 +235,7 @@ export default function LinkedInPage() {
       </section>
 
       {/* How It Works */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
+      <section data-tutorial="linkedin-config" className="max-w-7xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold mb-12 text-center">How It Works</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, i) => (
@@ -248,7 +249,7 @@ export default function LinkedInPage() {
       </section>
 
       {/* Pricing */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
+      <section data-tutorial="linkedin-analytics" className="max-w-7xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold mb-12 text-center">Simple, Transparent Pricing</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {tiers.map((tier, i) => (
@@ -318,6 +319,7 @@ export default function LinkedInPage() {
       <footer className="border-t px-6 py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
         <p>&copy; 2026 Echo Prime Technologies. All rights reserved.</p>
       </footer>
+      <ProductTutorialButton tutorialId="linkedin-bot" productName="LinkedIn Bot" />
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 // ════════════════════════════════════════════════════════════════
 // ECHO PRIME TECHNOLOGIES — Title Intelligence Product Page
@@ -47,8 +48,8 @@ const FEATURES = [
   },
   {
     icon: '🧠',
-    title: '2,635 Domain Engines',
-    description: 'Multi-domain intelligence across 210 categories with 395,135 doctrine blocks. From oil & gas lease interpretation to environmental compliance — every edge case has a doctrine.',
+    title: '6,500+ Domain Engines',
+    description: 'Multi-domain intelligence across 1,000+ categories with 521K+ doctrine blocks. From oil & gas lease interpretation to environmental compliance — every edge case has a doctrine.',
   },
 ];
 
@@ -218,7 +219,7 @@ export default function TitleIntelligencePage() {
   };
 
   return (
-    <div className="min-h-screen transition-colors duration-500" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+    <div data-tutorial="title-hero" className="min-h-screen transition-colors duration-500" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
       {/* ─── Nav ─── */}
       <nav className="fixed top-0 w-full z-50 backdrop-blur-2xl border-b transition-colors duration-500" style={{ backgroundColor: 'var(--ept-nav-bg)', borderColor: 'var(--ept-border)' }}>
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -240,7 +241,7 @@ export default function TitleIntelligencePage() {
       <div className="pt-24 pb-20">
         {/* ─── Hero ─── */}
         <section className="max-w-5xl mx-auto px-6 text-center mb-16">
-          <div className="inline-block px-4 py-1 rounded-full text-xs font-semibold tracking-widest mb-6 animate-fade-up" style={{ backgroundColor: isDark ? '#0d948815' : '#0d737715', color: 'var(--ept-accent)', border: '1px solid var(--ept-accent)' }}>
+          <div data-tutorial="title-chain" className="inline-block px-4 py-1 rounded-full text-xs font-semibold tracking-widest mb-6 animate-fade-up" style={{ backgroundColor: isDark ? '#0d948815' : '#0d737715', color: 'var(--ept-accent)', border: '1px solid var(--ept-accent)' }}>
             FIRST-TO-MARKET AI TITLE INTELLIGENCE
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6 animate-fade-up">
@@ -265,10 +266,10 @@ export default function TitleIntelligencePage() {
         <section className="max-w-5xl mx-auto px-6 mb-16">
           <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-accent)', borderWidth: 2 }}>
             <div className="text-center mb-6">
-              <div className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-widest mb-3" style={{ backgroundColor: isDark ? '#14b8a615' : '#0d737715', color: 'var(--ept-accent)' }}>
+              <div data-tutorial="title-run-search" className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-widest mb-3" style={{ backgroundColor: isDark ? '#14b8a615' : '#0d737715', color: 'var(--ept-accent)' }}>
                 LIVE DEMO — 16M+ REAL RECORDS
               </div>
-              <h2 className="text-2xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Search Real Courthouse Records</h2>
+              <h2 data-tutorial="title-search" className="text-2xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Search Real Courthouse Records</h2>
               <p className="text-sm mt-2" style={{ color: 'var(--ept-text-secondary)' }}>
                 Try a grantor name, grantee, or legal description. Results are from live Texas county databases.
               </p>
@@ -371,7 +372,7 @@ export default function TitleIntelligencePage() {
               { value: '16M+', label: 'Records Indexed' },
               { value: '98', label: 'TX Counties' },
               { value: '59', label: 'Instrument Types' },
-              { value: '2,635', label: 'AI Engines' },
+              { value: '6,500+', label: 'AI Engines' },
             ].map(stat => (
               <div key={stat.label} className="text-center p-5 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
                 <div className="text-2xl md:text-3xl font-extrabold gradient-text">{stat.value}</div>
@@ -513,7 +514,7 @@ export default function TitleIntelligencePage() {
                     ))}
                   </ul>
                   <Link
-                    href={tier.name === 'Enterprise' ? '/support' : '/sentinel?preset=Landman+%2F+Title'}
+                    href={tier.name === 'Enterprise' ? '/bree-assistant?context=title-intelligence-enterprise' : '/sentinel?preset=Landman+%2F+Title'}
                     className="w-full py-3 rounded-xl font-semibold text-center block text-sm"
                     style={{
                       backgroundColor: tier.accent ? 'var(--ept-accent)' : 'transparent',
@@ -576,10 +577,10 @@ export default function TitleIntelligencePage() {
         <section className="max-w-5xl mx-auto px-6 mt-20">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Complete Your Land &amp; Title Stack</h2>
           <p className="text-center text-sm mb-10" style={{ color: 'var(--ept-text-muted)' }}>Pair title intelligence with these services for end-to-end mineral rights operations</p>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div data-tutorial="title-county" className="grid md:grid-cols-3 gap-6">
             {[
               { title: 'Data Pipelines', desc: 'Automated extraction from county clerk websites, RRC filings, and tax assessor records. Feed fresh data directly into title analysis.', href: '/pipelines', price: 'From $199/mo' },
-              { title: 'Intelligence Engines', desc: '2,632 domain-specific AI engines including 22 landman engines for lease analysis, easements, water rights, and ROW acquisition.', href: '/engines', price: 'From $199/mo' },
+              { title: 'Intelligence Engines', desc: '6,500+ domain-specific AI engines including 22 landman engines for lease analysis, easements, water rights, and ROW acquisition.', href: '/engines', price: 'From $199/mo' },
               { title: 'AI Sales Agent', desc: 'Automate mineral rights outreach to surface owners and lessors. AI handles cold calls, scheduling, and lead qualification 24/7.', href: '/closer', price: 'From $299/mo' },
             ].map((svc, i) => (
               <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
@@ -603,7 +604,7 @@ export default function TitleIntelligencePage() {
             <Link href="/sentinel?preset=Landman+%2F+Title" className="px-8 py-4 rounded-xl font-semibold text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>
               Start Free Title Search
             </Link>
-            <Link href="/support" className="px-8 py-4 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+            <Link href="/bree-assistant?context=title-intelligence-sales" className="px-8 py-4 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
               Talk to Sales
             </Link>
           </div>
@@ -616,6 +617,7 @@ export default function TitleIntelligencePage() {
           </p>
         </footer>
       </div>
+      <ProductTutorialButton tutorialId="title-intelligence" productName="Title Intelligence" />
     </div>
   );
 }

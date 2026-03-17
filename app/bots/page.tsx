@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useTheme } from '../../lib/theme-context';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 /* ── Bot Categories ── */
 
@@ -109,6 +110,7 @@ export default function BotsPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <ProductTutorialButton tutorialId="bots" productName="Custom Bots" />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/" className="flex items-center gap-3">
@@ -124,7 +126,7 @@ export default function BotsPage() {
 
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Hero */}
-        <div className="text-center mb-16 animate-fade-up">
+        <div data-tutorial="bots-hero" className="text-center mb-16 animate-fade-up">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6" style={{ backgroundColor: 'rgba(20,184,166,0.1)', color: 'var(--ept-accent)' }}>
             <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: 'var(--ept-accent)' }} />
             {BOT_CATEGORIES.reduce((t, c) => t + c.bots.length, 0)} Bot Templates Available
@@ -169,7 +171,7 @@ export default function BotsPage() {
         </div>
 
         {/* Bot Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+        <div data-tutorial="bots-templates" className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
           {currentCategory.bots.map(bot => (
             <div
               key={bot.name}
@@ -201,7 +203,7 @@ export default function BotsPage() {
         </div>
 
         {/* Tech Stack */}
-        <div className="rounded-2xl border p-8 mb-16" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+        <div data-tutorial="bots-features" className="rounded-2xl border p-8 mb-16" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
           <h2 className="text-2xl font-extrabold text-center mb-8" style={{ color: 'var(--ept-text)' }}>
             How We Build Your Bot
           </h2>
@@ -224,7 +226,7 @@ export default function BotsPage() {
         </div>
 
         {/* Pricing */}
-        <div className="mb-16">
+        <div data-tutorial="bots-pricing" className="mb-16">
           <h2 className="text-2xl font-extrabold text-center mb-2" style={{ color: 'var(--ept-text)' }}>Bot Build Pricing</h2>
           <p className="text-center text-sm mb-8" style={{ color: 'var(--ept-text-muted)' }}>One-time build fee. Hosting included on Cloudflare Workers (free tier covers most bots).</p>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">

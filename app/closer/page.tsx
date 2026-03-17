@@ -8,6 +8,7 @@ import { useTheme } from '../../lib/theme-context';
 import { closerFetch, getDashboardStats } from '../../lib/closer-api';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import SubscriptionGate from '../../components/SubscriptionGate';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 /* ══════════════════════════════════════════════════════════════════════
    CONVAI WIDGET — ElevenLabs Voice AI Demo
@@ -132,6 +133,7 @@ function CloserLandingPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <ProductTutorialButton tutorialId="settings" productName="Closer AI" />
       {/* Nav */}
       <nav
         className="border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40"
@@ -567,7 +569,7 @@ function CloserLandingPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { title: 'Data Pipelines', desc: 'Feed fresh leads directly into Closer. Autonomous extraction from 50+ data sources, running 24/7.', href: '/pipelines', price: 'From $199/mo' },
-              { title: 'Intelligence Engines', desc: '2,632 AI engines with deep domain knowledge. Arm your AI closer with industry-specific expertise.', href: '/engines', price: 'From $199/mo' },
+              { title: 'Intelligence Engines', desc: '6,500+ AI engines with deep domain knowledge. Arm your AI closer with industry-specific expertise.', href: '/engines', price: 'From $199/mo' },
               { title: 'Sentinel AI', desc: 'Monitor call quality, track lead conversion, and get real-time alerts on sales performance.', href: '/sentinel', price: 'Free tier available' },
             ].map((svc, i) => (
               <a key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>

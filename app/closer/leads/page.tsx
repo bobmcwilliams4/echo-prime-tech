@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '../../../lib/auth-context';
-import { getLeads, createLead, updateLead, deleteLead, initiateCall } from '../../../lib/closer-api';
+import { getLeads, createLead, updateLead, deleteLead, initiateCall, importLeads, getLeadCategories } from '../../../lib/closer-api';
 import { Conversation } from '@11labs/client';
 
 // ─── ConvAI Widget — Browser-based voice via ElevenLabs SDK ─────────────────
@@ -85,6 +85,7 @@ interface LeadFormData {
   notes: string;
   priority: number;
   status: LeadStatus;
+  category: string;
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -134,6 +135,7 @@ const EMPTY_FORM: LeadFormData = {
   notes: '',
   priority: 5,
   status: 'new',
+  category: '',
 };
 
 // ─── SVG Icons ───────────────────────────────────────────────────────────────
@@ -198,6 +200,16 @@ function IconPhone() {
   );
 }
 
+function IconUpload() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+  );
+}
+
 // ─── Utility ─────────────────────────────────────────────────────────────────
 
 function formatDate(d: string | null): string {
@@ -241,6 +253,8 @@ export default function LeadsPage() {
   const [statusFilter, setStatusFilter] = useState<LeadStatus | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortMode, setSortMode] = useState<SortMode>('newest');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [categories, setCategories] = useState<string[]>([]);
 
   // Form state
   const [showAddForm, setShowAddForm] = useState(false);
@@ -266,6 +280,16 @@ export default function LeadsPage() {
   // Browser voice call (ConvAI) state
   const [browserCallLead, setBrowserCallLead] = useState<Lead | null>(null);
 
+  // Import modal state
+  const [showImport, setShowImport] = useState(false);
+  const [importDragging, setImportDragging] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importPreview, setImportPreview] = useState<Record<string, string>[]>([]);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importSubmitting, setImportSubmitting] = useState(false);
+  const [importResult, setImportResult] = useState<{ imported: number; skipped: number; errors: string[] } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // ─── Data Fetching ──────────────────────────────────────────────────────
 
   const fetchLeads = useCallback(async () => {
@@ -282,9 +306,17 @@ export default function LeadsPage() {
     }
   }, []);
 
+  const fetchCategories = useCallback(async () => {
+    try {
+      const data = await getLeadCategories();
+      setCategories((data as any)?.categories ?? []);
+    } catch { /* categories are optional */ }
+  }, []);
+
   useEffect(() => {
     fetchLeads();
-  }, [fetchLeads]);
+    fetchCategories();
+  }, [fetchLeads, fetchCategories]);
 
   // ─── Filtering, Search, Sort ────────────────────────────────────────────
 
@@ -294,6 +326,11 @@ export default function LeadsPage() {
     // Status filter
     if (statusFilter !== 'all') {
       result = result.filter((l) => l.status === statusFilter);
+    }
+
+    // Category filter
+    if (categoryFilter !== 'all') {
+      result = result.filter((l) => (l as any).category === categoryFilter);
     }
 
     // Search filter (name, phone, email, company)
@@ -318,7 +355,7 @@ export default function LeadsPage() {
     });
 
     return result;
-  }, [leads, statusFilter, searchQuery, sortMode]);
+  }, [leads, statusFilter, categoryFilter, searchQuery, sortMode]);
 
   // ─── Create Lead ────────────────────────────────────────────────────────
 
@@ -342,10 +379,12 @@ export default function LeadsPage() {
         notes: formData.notes.trim(),
         priority: formData.priority,
         status: 'new',
+        category: formData.category.trim(),
       });
       setFormData({ ...EMPTY_FORM });
       setShowAddForm(false);
       await fetchLeads();
+      await fetchCategories();
     } catch (err: any) {
       setFormError(err?.message || 'Failed to create lead');
     } finally {
@@ -367,6 +406,7 @@ export default function LeadsPage() {
       notes: lead.notes || '',
       priority: lead.priority || 5,
       status: lead.status || 'new',
+      category: (lead as any).category || '',
     });
     setExpandedId(lead.id);
   };
@@ -387,9 +427,11 @@ export default function LeadsPage() {
         notes: editData.notes.trim(),
         priority: editData.priority,
         status: editData.status,
+        category: editData.category.trim(),
       });
       setEditingId(null);
       await fetchLeads();
+      await fetchCategories();
     } catch (err: any) {
       setFormError(err?.message || 'Failed to update lead');
     } finally {
@@ -437,6 +479,119 @@ export default function LeadsPage() {
     }
   };
 
+  // ─── Import Handlers ───────────────────────────────────────────────────
+
+  const parseCSV = (text: string): Record<string, string>[] => {
+    const lines = text.split(/\r?\n/).filter((l) => l.trim());
+    if (lines.length < 2) throw new Error('CSV must have a header row and at least one data row');
+    const headers = lines[0].split(',').map((h) => h.trim().replace(/^"|"$/g, '').toLowerCase().replace(/\s+/g, '_'));
+    return lines.slice(1).map((line) => {
+      const values: string[] = [];
+      let current = '';
+      let inQuotes = false;
+      for (const ch of line) {
+        if (ch === '"') { inQuotes = !inQuotes; }
+        else if (ch === ',' && !inQuotes) { values.push(current.trim()); current = ''; }
+        else { current += ch; }
+      }
+      values.push(current.trim());
+      const row: Record<string, string> = {};
+      headers.forEach((h, i) => { row[h] = values[i] || ''; });
+      return row;
+    });
+  };
+
+  const handleImportFile = async (file: File) => {
+    setImportFile(file);
+    setImportError(null);
+    setImportResult(null);
+    setImportPreview([]);
+
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    if (ext !== 'json' && ext !== 'csv') {
+      setImportError('Only .json and .csv files are supported');
+      setImportFile(null);
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setImportError('File too large (max 10MB)');
+      setImportFile(null);
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      let rows: Record<string, string>[];
+      if (ext === 'json') {
+        const parsed = JSON.parse(text);
+        rows = Array.isArray(parsed) ? parsed : parsed.leads || parsed.data || [parsed];
+      } else {
+        rows = parseCSV(text);
+      }
+      if (!rows.length) { setImportError('No leads found in file'); return; }
+      setImportPreview(rows);
+    } catch (err: any) {
+      setImportError(err?.message || 'Failed to parse file');
+      setImportFile(null);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setImportDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleImportFile(file);
+  };
+
+  const handleImportSubmit = async () => {
+    if (!importPreview.length) return;
+    setImportSubmitting(true);
+    setImportError(null);
+    try {
+      const leadsToImport = importPreview.map((row) => ({
+        first_name: row.first_name || row.firstname || row.name?.split(' ')[0] || '',
+        last_name: row.last_name || row.lastname || row.name?.split(' ').slice(1).join(' ') || '',
+        phone: row.phone || row.phone_number || row.tel || '',
+        email: row.email || row.email_address || '',
+        company: row.company || row.organization || row.business || '',
+        source: 'csv' as LeadSource,
+        notes: row.notes || row.description || '',
+        priority: parseInt(row.priority || '5', 10) || 5,
+        status: (row.status as LeadStatus) || 'new',
+      }));
+
+      const result = await importLeads({ leads: leadsToImport });
+      const imported = result?.created ?? result?.imported ?? leadsToImport.length;
+      const skipped = result?.skipped ?? 0;
+      const errorCount = typeof result?.errors === 'number' ? result.errors : (result?.errors?.length ?? 0);
+      const errorDetails = result?.details?.errors ?? (Array.isArray(result?.errors) ? result.errors : []);
+      setImportResult({ imported, skipped, errors: errorDetails.length ? errorDetails : (errorCount > 0 ? [{ reason: `${errorCount} leads failed` }] : []) });
+      await fetchLeads();
+    } catch (err: any) {
+      setImportError(err?.message || 'Import failed');
+    } finally {
+      setImportSubmitting(false);
+    }
+  };
+
+  const resetImport = () => {
+    setShowImport(false);
+    setImportFile(null);
+    setImportPreview([]);
+    setImportError(null);
+    setImportResult(null);
+    setImportDragging(false);
+  };
+
+  const openImport = () => {
+    setImportFile(null);
+    setImportPreview([]);
+    setImportError(null);
+    setImportResult(null);
+    setImportDragging(false);
+    setShowImport(true);
+  };
+
   // ─── Row Toggle ─────────────────────────────────────────────────────────
 
   const toggleExpand = (id: string) => {
@@ -479,30 +634,56 @@ export default function LeadsPage() {
             {filteredLeads.length}{leads.length !== filteredLeads.length ? ` / ${leads.length}` : ''} total
           </span>
         </div>
-        <button
-          data-tutorial="leads-add"
-          onClick={() => { setShowAddForm(!showAddForm); setFormData({ ...EMPTY_FORM }); setFormError(null); }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '8px 16px',
-            fontSize: 12,
-            fontWeight: 600,
-            color: '#fff',
-            backgroundColor: 'var(--ept-accent)',
-            border: 'none',
-            borderRadius: 10,
-            cursor: 'pointer',
-            letterSpacing: '0.03em',
-            transition: 'opacity 0.15s',
-          }}
-          onMouseOver={(e) => (e.currentTarget.style.opacity = '0.85')}
-          onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
-        >
-          {showAddForm ? <IconClose /> : <IconPlus />}
-          {showAddForm ? 'Cancel' : 'Add Lead'}
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            data-tutorial="leads-import"
+            onClick={openImport}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '8px 16px',
+              fontSize: 12,
+              fontWeight: 600,
+              color: 'var(--ept-text-secondary)',
+              backgroundColor: 'transparent',
+              border: '1px solid var(--ept-border)',
+              borderRadius: 10,
+              cursor: 'pointer',
+              letterSpacing: '0.03em',
+              transition: 'all 0.15s',
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--ept-accent)'; e.currentTarget.style.color = 'var(--ept-accent)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--ept-border)'; e.currentTarget.style.color = 'var(--ept-text-secondary)'; }}
+          >
+            <IconUpload />
+            Import
+          </button>
+          <button
+            data-tutorial="leads-add"
+            onClick={() => { setShowAddForm(!showAddForm); setFormData({ ...EMPTY_FORM }); setFormError(null); }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '8px 16px',
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#fff',
+              backgroundColor: 'var(--ept-accent)',
+              border: 'none',
+              borderRadius: 10,
+              cursor: 'pointer',
+              letterSpacing: '0.03em',
+              transition: 'opacity 0.15s',
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.opacity = '0.85')}
+            onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
+          >
+            {showAddForm ? <IconClose /> : <IconPlus />}
+            {showAddForm ? 'Cancel' : 'Add Lead'}
+          </button>
+        </div>
       </div>
 
       {/* ── Error Banner ──────────────────────────────────────────────────── */}
@@ -559,8 +740,8 @@ export default function LeadsPage() {
             <FormField label="Email" value={formData.email} onChange={(v) => setFormData({ ...formData, email: v })} placeholder="john@example.com" type="email" />
           </div>
 
-          {/* Row 3: Company + Source */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {/* Row 3: Company + Source + Category */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
             <FormField label="Company" value={formData.company} onChange={(v) => setFormData({ ...formData, company: v })} placeholder="Acme Corp" />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--ept-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Source</label>
@@ -584,6 +765,7 @@ export default function LeadsPage() {
                 ))}
               </select>
             </div>
+            <FormField label="Category" value={formData.category} onChange={(v) => setFormData({ ...formData, category: v })} placeholder="e.g. Enterprise, SMB, VIP" data-tutorial="leads-category" />
           </div>
 
           {/* Row 4: Priority */}
@@ -670,6 +852,221 @@ export default function LeadsPage() {
         </form>
       )}
 
+      {/* ── Import Modal ────────────────────────────────────────────────── */}
+      {showImport && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(4px)',
+          }}
+          onClick={(e) => { if (e.target === e.currentTarget) { setShowImport(false); resetImport(); } }}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: 600,
+              maxHeight: '85vh',
+              overflow: 'auto',
+              margin: 16,
+              padding: 24,
+              borderRadius: 16,
+              backgroundColor: 'var(--ept-card-bg)',
+              border: '1px solid var(--ept-card-border)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(20,184,166,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <IconUpload />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--ept-text)', margin: 0 }}>Import Leads</h3>
+                  <p style={{ fontSize: 11, color: 'var(--ept-text-muted)', margin: 0 }}>Upload a JSON or CSV file</p>
+                </div>
+              </div>
+              <button
+                onClick={() => { setShowImport(false); resetImport(); }}
+                style={{ background: 'none', border: 'none', color: 'var(--ept-text-muted)', cursor: 'pointer', padding: 4 }}
+              >
+                <IconClose />
+              </button>
+            </div>
+
+            {/* Result Banner */}
+            {importResult && (
+              <div
+                style={{
+                  padding: '12px 16px',
+                  marginBottom: 16,
+                  borderRadius: 10,
+                  fontSize: 13,
+                  backgroundColor: importResult.errors.length ? 'rgba(239,68,68,0.08)' : 'rgba(34,197,94,0.08)',
+                  border: `1px solid ${importResult.errors.length ? 'rgba(239,68,68,0.2)' : 'rgba(34,197,94,0.2)'}`,
+                  color: importResult.errors.length ? '#ef4444' : '#22c55e',
+                }}
+              >
+                <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                  {importResult.imported} imported, {importResult.skipped} skipped
+                </div>
+                {importResult.errors.length > 0 && (
+                  <ul style={{ margin: '4px 0 0 16px', padding: 0, fontSize: 12 }}>
+                    {importResult.errors.slice(0, 5).map((err, i) => <li key={i}>{err}</li>)}
+                    {importResult.errors.length > 5 && <li>...and {importResult.errors.length - 5} more</li>}
+                  </ul>
+                )}
+              </div>
+            )}
+
+            {/* Drop Zone */}
+            {!importPreview.length && !importResult && (
+              <div
+                onDragOver={(e) => { e.preventDefault(); setImportDragging(true); }}
+                onDragLeave={() => setImportDragging(false)}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  padding: 40,
+                  borderRadius: 12,
+                  border: `2px dashed ${importDragging ? 'var(--ept-accent)' : 'var(--ept-border)'}`,
+                  backgroundColor: importDragging ? 'rgba(20,184,166,0.06)' : 'transparent',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  transition: 'all 0.2s',
+                }}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json,.csv"
+                  style={{ display: 'none' }}
+                  onChange={(e) => { if (e.target.files?.[0]) handleImportFile(e.target.files[0]); }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: 'rgba(20,184,166,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ept-accent)" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--ept-text)', margin: 0 }}>
+                      {importDragging ? 'Drop file here' : 'Drag & drop your file here'}
+                    </p>
+                    <p style={{ fontSize: 12, color: 'var(--ept-text-muted)', margin: '4px 0 0' }}>
+                      or <span style={{ color: 'var(--ept-accent)', fontWeight: 600 }}>browse files</span> — JSON or CSV, max 10MB
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Error */}
+            {importError && (
+              <div style={{ padding: '10px 14px', marginTop: 12, fontSize: 12, color: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)', borderRadius: 8, border: '1px solid rgba(239,68,68,0.2)' }}>
+                {importError}
+              </div>
+            )}
+
+            {/* Preview Table */}
+            {importPreview.length > 0 && !importResult && (
+              <div style={{ marginTop: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ept-text)' }}>
+                    Preview — {importPreview.length} lead{importPreview.length !== 1 ? 's' : ''} found
+                  </span>
+                  <button
+                    onClick={resetImport}
+                    style={{ fontSize: 11, color: 'var(--ept-text-muted)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    Choose different file
+                  </button>
+                </div>
+                <div style={{ overflow: 'auto', maxHeight: 240, borderRadius: 8, border: '1px solid var(--ept-border)' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                    <thead>
+                      <tr style={{ backgroundColor: 'var(--ept-surface)' }}>
+                        {Object.keys(importPreview[0]).slice(0, 6).map((col) => (
+                          <th key={col} style={{ padding: '8px 10px', textAlign: 'left', fontWeight: 600, color: 'var(--ept-text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid var(--ept-border)' }}>
+                            {col}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {importPreview.slice(0, 8).map((row, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid var(--ept-border)' }}>
+                          {Object.keys(importPreview[0]).slice(0, 6).map((col) => (
+                            <td key={col} style={{ padding: '6px 10px', color: 'var(--ept-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140 }}>
+                              {row[col] || '—'}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {importPreview.length > 8 && (
+                  <p style={{ fontSize: 11, color: 'var(--ept-text-muted)', marginTop: 6, textAlign: 'center' }}>
+                    ...and {importPreview.length - 8} more rows
+                  </p>
+                )}
+                <p style={{ fontSize: 11, color: 'var(--ept-text-muted)', marginTop: 10, lineHeight: 1.5 }}>
+                  Columns auto-mapped: <strong>first_name</strong> (or firstname, name), <strong>last_name</strong> (or lastname, surname), <strong>phone</strong> (or phone_number, tel), <strong>email</strong> (or email_address), <strong>company</strong> (or organization, org)
+                </p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
+              <button
+                onClick={() => { setShowImport(false); resetImport(); }}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: 'var(--ept-text-muted)',
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--ept-border)',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                }}
+              >
+                {importResult ? 'Close' : 'Cancel'}
+              </button>
+              {importPreview.length > 0 && !importResult && (
+                <button
+                  onClick={handleImportSubmit}
+                  disabled={importSubmitting}
+                  style={{
+                    padding: '8px 20px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: '#fff',
+                    backgroundColor: 'var(--ept-accent)',
+                    border: 'none',
+                    borderRadius: 8,
+                    cursor: importSubmitting ? 'wait' : 'pointer',
+                    opacity: importSubmitting ? 0.6 : 1,
+                    transition: 'opacity 0.15s',
+                  }}
+                >
+                  {importSubmitting ? 'Importing...' : `Import ${importPreview.length} Lead${importPreview.length !== 1 ? 's' : ''}`}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Filter Bar ────────────────────────────────────────────────────── */}
       <div
         style={{
@@ -704,6 +1101,31 @@ export default function LeadsPage() {
         >
           {STATUS_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+
+        {/* Category Dropdown */}
+        <select
+          data-tutorial="leads-category-filter"
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          style={{
+            padding: '7px 10px',
+            fontSize: 12,
+            fontWeight: 500,
+            color: 'var(--ept-text)',
+            backgroundColor: 'var(--ept-surface)',
+            border: '1px solid var(--ept-border)',
+            borderRadius: 8,
+            outline: 'none',
+            cursor: 'pointer',
+            appearance: 'auto',
+            minWidth: 130,
+          }}
+        >
+          <option value="all">All Categories</option>
+          {categories.map((c) => (
+            <option key={c} value={c}>{c}</option>
           ))}
         </select>
 
@@ -852,14 +1274,14 @@ export default function LeadsPage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '2fr 1.3fr 1.8fr 1fr 0.8fr 1fr 0.8fr 0.6fr',
+              gridTemplateColumns: '1.8fr 1.2fr 1.6fr 0.9fr 0.8fr 0.8fr 0.8fr 0.7fr 0.5fr',
               gap: 0,
               padding: '10px 16px',
               borderBottom: '1px solid var(--ept-border)',
               backgroundColor: 'var(--ept-surface)',
             }}
           >
-            {['Name', 'Phone', 'Email', 'Status', 'Source', 'Priority', 'Last Contact', ''].map((h) => (
+            {['Name', 'Phone', 'Email', 'Status', 'Source', 'Category', 'Priority', 'Last Contact', ''].map((h) => (
               <span key={h} style={{ fontSize: 10, fontWeight: 600, color: 'var(--ept-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 {h}
               </span>
@@ -882,7 +1304,7 @@ export default function LeadsPage() {
                   onClick={() => toggleExpand(lead.id)}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '2fr 1.3fr 1.8fr 1fr 0.8fr 1fr 0.8fr 0.6fr',
+                    gridTemplateColumns: '1.8fr 1.2fr 1.6fr 0.9fr 0.8fr 0.8fr 0.8fr 0.7fr 0.5fr',
                     gap: 0,
                     padding: '12px 16px',
                     borderBottom: '1px solid var(--ept-border)',
@@ -941,6 +1363,18 @@ export default function LeadsPage() {
                   {/* Source */}
                   <span style={{ fontSize: 11, color: 'var(--ept-text-muted)', textTransform: 'capitalize' }}>
                     {lead.source || '--'}
+                  </span>
+
+                  {/* Category */}
+                  <span style={{
+                    fontSize: 10,
+                    fontWeight: 500,
+                    color: (lead as any).category ? 'var(--ept-accent)' : 'var(--ept-text-muted)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}>
+                    {(lead as any).category || '--'}
                   </span>
 
                   {/* Priority Bar */}
@@ -1055,7 +1489,7 @@ export default function LeadsPage() {
                           </div>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                             <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--ept-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Source</label>
                             <select
@@ -1078,6 +1512,7 @@ export default function LeadsPage() {
                               ))}
                             </select>
                           </div>
+                          <FormField label="Category" value={editData.category} onChange={(v) => setEditData({ ...editData, category: v })} placeholder="e.g. Enterprise, SMB, VIP" />
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                             <label style={{ fontSize: 10, fontWeight: 600, color: 'var(--ept-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                               Priority: {editData.priority}
@@ -1159,9 +1594,9 @@ export default function LeadsPage() {
                           <DetailField label="Email" value={lead.email || '--'} />
                           <DetailField label="Company" value={lead.company || '--'} />
                           <DetailField label="Source" value={lead.source || '--'} capitalize />
+                          <DetailField label="Category" value={(lead as any).category || '--'} />
                           <DetailField label="Priority" value={`${lead.priority || 5} / 10`} color={pColor} />
                           <DetailField label="Created" value={formatDate(lead.created_at)} />
-                          <DetailField label="Updated" value={formatDate(lead.updated_at)} />
                         </div>
 
                         {/* Notes */}

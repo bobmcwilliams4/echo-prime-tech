@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import ProductTutorialButton from '../../components/product-tutorial-button';
 
 /* ══════════════════════════════════════════════════════════════════════════════
    BREE AI OFFICE ASSISTANT — Interactive Service Page
@@ -19,21 +20,62 @@ import { useTheme } from '../../lib/theme-context';
 /* ─── ConvAI Voice Widget ─── */
 function BreeVoiceWidget({ active }: { active: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [widgetReady, setWidgetReady] = useState(false);
   useEffect(() => {
     if (!active || !containerRef.current) return;
-    if (!customElements.get('elevenlabs-convai')) {
-      const s = document.createElement('script');
-      s.src = 'https://elevenlabs.io/convai-widget/index.js';
-      s.async = true;
-      document.head.appendChild(s);
+    let cancelled = false;
+    const mount = () => {
+      if (cancelled || !containerRef.current) return;
+      const el = document.createElement('elevenlabs-convai');
+      el.setAttribute('agent-id', 'agent_7901khgqmsy8ey1rw38py5qxzxpa');
+      el.setAttribute('dynamic-variables', JSON.stringify({ user_name: 'visitor' }));
+      containerRef.current.replaceChildren(el);
+      setWidgetReady(true);
+    };
+    if (customElements.get('elevenlabs-convai')) {
+      mount();
+    } else {
+      const existing = document.querySelector('script[src*="elevenlabs.io/convai-widget"]');
+      if (!existing) {
+        const s = document.createElement('script');
+        s.src = 'https://elevenlabs.io/convai-widget/index.js';
+        s.async = true;
+        s.onload = () => {
+          const wait = setInterval(() => {
+            if (customElements.get('elevenlabs-convai') || cancelled) {
+              clearInterval(wait);
+              if (!cancelled) mount();
+            }
+          }, 100);
+          setTimeout(() => clearInterval(wait), 10000);
+        };
+        document.head.appendChild(s);
+      } else {
+        const wait = setInterval(() => {
+          if (customElements.get('elevenlabs-convai') || cancelled) {
+            clearInterval(wait);
+            if (!cancelled) mount();
+          }
+        }, 100);
+        setTimeout(() => clearInterval(wait), 10000);
+      }
     }
-    const el = document.createElement('elevenlabs-convai');
-    el.setAttribute('agent-id', 'agent_7901khgqmsy8ey1rw38py5qxzxpa');
-    el.setAttribute('dynamic-variables', JSON.stringify({ user_name: 'visitor' }));
-    containerRef.current.replaceChildren(el);
-    return () => { if (containerRef.current) containerRef.current.replaceChildren(); };
+    return () => { cancelled = true; setWidgetReady(false); if (containerRef.current) containerRef.current.replaceChildren(); };
   }, [active]);
-  return <div ref={containerRef} />;
+  return (
+    <>
+      <div data-tutorial="bree-hero" ref={containerRef} />
+      {active && !widgetReady && (
+        <div className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center animate-pulse"
+          style={{ backgroundColor: '#ec4899', boxShadow: '0 4px 20px rgba(236,72,153,0.5)' }}>
+          <svg className="w-6 h-6 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+        </div>
+      )}
+    </>
+  );
 }
 
 /* ─── Intersection Observer Hook ─── */
@@ -195,7 +237,7 @@ function ConversationSimulator() {
   return (
     <div className="rounded-2xl border overflow-hidden" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
       {/* Tab Bar */}
-      <div className="flex overflow-x-auto border-b" style={{ borderColor: 'var(--ept-border)' }}>
+      <div data-tutorial="bree-demo" className="flex overflow-x-auto border-b" style={{ borderColor: 'var(--ept-border)' }}>
         {Object.entries(DEMO_CONVERSATIONS).map(([key, val]) => (
           <button
             key={key}
@@ -217,7 +259,7 @@ function ConversationSimulator() {
       <div className="p-4 md:p-6 h-[420px] overflow-y-auto" style={{ backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.01)' }}>
         <div className="space-y-4">
           {convo.messages.slice(0, visibleMessages).map((msg, i) => (
-            <div key={`${activeTab}-${i}`} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-up`}>
+            <div data-tutorial="bree-roi" key={`${activeTab}-${i}`} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-up`}>
               <div className={`max-w-[85%] ${msg.role === 'user' ? 'order-1' : ''}`}>
                 {msg.role === 'bree' && (
                   <div className="flex items-center gap-2 mb-1">
@@ -998,7 +1040,7 @@ export default function BreeAssistantPage() {
                 </svg>
               </div>
               <div>
-                <h2 className="text-xl font-bold" style={{ color: '#ec4899' }}>Talk to Bree \u2014 Voice Demo</h2>
+                <h2 data-tutorial="bree-voice-widget" className="text-xl font-bold" style={{ color: '#ec4899' }}>Talk to Bree \u2014 Voice Demo</h2>
                 <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Have a real voice conversation with Bree. She sounds human.</p>
               </div>
             </div>
@@ -1023,7 +1065,7 @@ export default function BreeAssistantPage() {
                   <span className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: '#ec4899' }} />
                   <span className="text-sm font-bold" style={{ color: '#ec4899' }}>BREE VOICE ACTIVE</span>
                 </div>
-                <p className="text-sm mb-4" style={{ color: 'var(--ept-text-muted)' }}>Click the microphone bubble in the bottom-right corner to start talking.</p>
+                <p className="text-sm mb-4" style={{ color: 'var(--ept-text-muted)' }}>Look for the pink microphone bubble in the bottom-right corner. It may take a moment to load.</p>
                 <button
                   onClick={() => setVoiceActive(false)}
                   className="px-4 py-2 rounded-lg border text-sm transition-opacity hover:opacity-70"
@@ -1047,7 +1089,7 @@ export default function BreeAssistantPage() {
               Except Bree never takes vacation, never has a bad day, and learns from every interaction.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div data-tutorial="bree-capabilities" className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {CAPABILITIES.map((cap) => (
               <div
                 key={cap.title}
@@ -1299,7 +1341,7 @@ export default function BreeAssistantPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { title: 'AI Sales Agent (Closer)', desc: 'Add outbound calling to Bree\'s toolkit. She handles inbound \u2014 Closer handles outbound. Together, they\'re unstoppable.', href: '/closer', price: 'From $299/mo' },
-              { title: 'Intelligence Engines', desc: '2,632 AI engines with deep domain knowledge. Give Bree expert-level answers in tax, legal, medical, and 200+ more fields.', href: '/engines', price: 'From $199/mo' },
+              { title: 'Intelligence Engines', desc: '6,500+ AI engines with deep domain knowledge. Give Bree expert-level answers in tax, legal, medical, and 1,000+ more fields.', href: '/engines', price: 'From $199/mo' },
               { title: 'Data Pipelines', desc: 'Automatically import leads, customer data, and business intel into Bree\'s memory. She gets smarter every day.', href: '/pipelines', price: 'From $199/mo' },
             ].map((svc, i) => (
               <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
@@ -1318,6 +1360,7 @@ export default function BreeAssistantPage() {
           </p>
         </footer>
       </div>
+      <ProductTutorialButton tutorialId="bree-assistant" productName="Bree AI Assistant" />
     </div>
   );
 }
