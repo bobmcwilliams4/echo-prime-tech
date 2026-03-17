@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 // ═══════════════════════════════════════════════════════════════
 // SERVICE CATALOG — Mirrors ept-api SERVICES with ecommerce metadata
@@ -856,6 +857,18 @@ export default function EcommercePage() {
       </section>
 
       {/* Footer */}
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Commerce Intelligence Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['BUS', 'FIN']}
+          title="Ask the Commerce Intelligence Engine"
+          placeholder="Ask about ecommerce, payments, fulfillment..."
+          exampleQueries={['Best practices for subscription billing', 'How to reduce cart abandonment', 'Payment processor fee comparison']}
+        />
+      </section>
       <footer className="px-6 py-8 border-t text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>
           &copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved. |{' '}

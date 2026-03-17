@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useTheme } from '../../lib/theme-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 /* ── Scraper Categories ── */
 
@@ -280,6 +281,19 @@ export default function ScrapersPage() {
           </a>
         </div>
       </div>
+
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Scraping Intelligence Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['SE', 'DATA']}
+          title="Ask the Scraping Intelligence Engine"
+          placeholder="Ask about web scraping, data extraction..."
+          exampleQueries={['How to bypass Cloudflare protection ethically', 'Best headless browser for scraping', 'Handling dynamic JavaScript content']}
+        />
+      </section>
     </div>
   );
 }

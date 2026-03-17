@@ -8,6 +8,7 @@ import { useTheme } from '../../lib/theme-context';
 import { getServices, Service, createCheckout } from '../../lib/ept-api';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 const SERVICE_ID = 'multi-model-ai';
 
@@ -164,6 +165,18 @@ export default function OrchestrationPage() {
           <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>Get a unified API key and start routing queries to 30+ models in under 5 minutes.</p>
           <Link href={user ? '/services' : '/signup'} className="inline-block px-10 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
         </div>
+      </section>
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Systems Intelligence Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['SE', 'AI']}
+          title="Ask the Systems Intelligence Engine"
+          placeholder="Ask about orchestration, pipelines, automation..."
+          exampleQueries={['Event-driven vs scheduled orchestration', 'How to implement circuit breakers', 'Distributed task queue patterns']}
+        />
       </section>
 
       <footer className="border-t py-8 text-center" style={{ borderColor: 'var(--ept-border)' }}>

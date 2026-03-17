@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { QRCodeSVG } from 'qrcode.react'
 import { createPaymentLink } from '../../lib/paypal-api'
 import ProductTutorialButton from '../../components/product-tutorial-button'
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 /* ─── Payment Link Generator ─────────────────────────────────────────────── */
 
@@ -606,6 +607,18 @@ export default function PaymentsPage() {
       </section>
 
       {/* Footer */}
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Payments Intelligence Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['FIN', 'BUS']}
+          title="Ask the Payments Intelligence Engine"
+          placeholder="Ask about payment processing, compliance..."
+          exampleQueries={['PCI DSS compliance requirements', 'Stripe vs PayPal fee comparison', 'How to handle payment disputes']}
+        />
+      </section>
       <footer className="border-t px-6 py-12 text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p style={{ color: 'var(--ept-text-muted)' }}>
           © 2026 Echo Prime Technologies. All rights reserved.

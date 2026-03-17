@@ -8,6 +8,7 @@ import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { getServices, Service } from '../../lib/ept-api';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 export default function ServicesPage() {
   const router = useRouter();
@@ -114,6 +115,19 @@ export default function ServicesPage() {
           </p>
         </div>
       </div>
+
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Professional Services Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['BUS']}
+          title="Ask the Professional Services Engine"
+          placeholder="Ask about consulting, project management..."
+          exampleQueries={['How to scope a software consulting engagement', 'Best practices for SOW writing', 'Project estimation techniques']}
+        />
+      </section>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import {
   vaultCredentials,
   vaultCredential,
@@ -433,6 +434,19 @@ function Loader() {
   return (
     <div className="flex items-center justify-center py-16">
       <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: '#00ff88', borderTopColor: 'transparent' }} />
+
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Security Vault Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['CYBER', 'SE']}
+          title="Ask the Security Vault Engine"
+          placeholder="Ask about credential security, encryption..."
+          exampleQueries={['AES-256 vs ChaCha20 for credential storage', 'Best practices for API key rotation', 'How does Argon2id key derivation work?']}
+        />
+      </section>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import { getTokenomics, getRules, getLeaderboard, getBurnStats } from '../../lib/coin-rewards-api';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 type Tab = 'overview' | 'earn' | 'leaderboard' | 'burns' | 'staking';
 
@@ -371,6 +372,19 @@ export default function RewardsPage() {
           </div>
         </div>
       </div>
+
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Rewards Intelligence Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['BUS', 'FIN']}
+          title="Ask the Rewards Intelligence Engine"
+          placeholder="Ask about loyalty programs, rewards design..."
+          exampleQueries={['Best loyalty program structures', 'How to calculate reward point ROI', 'Gamification strategies for retention']}
+        />
+      </section>
     </div>
   );
 }

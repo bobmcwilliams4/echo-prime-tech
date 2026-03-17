@@ -9,6 +9,7 @@ import { getServices, Service, createCheckout } from '../../lib/ept-api';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import SubscriptionGate from '../../components/SubscriptionGate';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import {
   PipelineConfig,
   DataSourceType,
@@ -1073,6 +1074,18 @@ function PipelinesPageContent() {
           <PipelineBuilderApp />
         </section>
       )}
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Data Pipeline Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['SE', 'DATA']}
+          title="Ask the Data Pipeline Engine"
+          placeholder="Ask about ETL, data extraction, normalization..."
+          exampleQueries={['Best practices for web scraping at scale', 'How to handle rate limiting in data pipelines', 'Data normalization techniques']}
+        />
+      </section>
 
       <footer className="border-t py-8 text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>

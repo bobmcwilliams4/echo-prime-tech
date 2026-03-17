@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useTheme } from '../../lib/theme-context'
 import { useAuth } from '../../lib/auth-context'
 import ProductTutorialButton from '../../components/product-tutorial-button'
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 export default function XBotPage() {
   const { isDark } = useTheme()
@@ -346,6 +347,18 @@ export default function XBotPage() {
       </section>
 
       {/* Footer */}
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Social Media Intelligence Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['MKT', 'AI']}
+          title="Ask the Social Media Intelligence Engine"
+          placeholder="Ask about X/Twitter automation, engagement..."
+          exampleQueries={['X API v2 rate limits and best practices', 'How to grow engagement on X organically', 'Content scheduling strategies']}
+        />
+      </section>
       <footer className="border-t px-6 py-8 text-center" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
         <p>&copy; 2026 Echo Prime Technologies. All rights reserved.</p>
       </footer>

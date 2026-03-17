@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 // ════════════════════════════════════════════════════════════════
 // ECHO PRIME TECHNOLOGIES — Title Intelligence Product Page
@@ -611,6 +612,18 @@ export default function TitleIntelligencePage() {
         </section>
 
         {/* ─── Footer ─── */}
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Title Intelligence Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['OG', 'RE', 'LG']}
+          title="Ask the Title Intelligence Engine"
+          placeholder="Ask about mineral rights, chain of title, deeds..."
+          exampleQueries={['How to calculate net mineral acres', 'Texas intestate succession for mineral rights', 'What is a division order?']}
+        />
+      </section>
         <footer className="max-w-5xl mx-auto px-6 mt-20 pt-8 border-t text-center" style={{ borderColor: 'var(--ept-border)' }}>
           <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
             © {new Date().getFullYear()} Echo Prime Technologies. All rights reserved. Title Intelligence is for informational purposes and does not constitute a legal opinion.

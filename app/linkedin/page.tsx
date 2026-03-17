@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import ProductTutorialButton from '../../components/product-tutorial-button'
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 export default function LinkedInPage() {
   const { isDark } = useTheme()
@@ -316,6 +317,18 @@ export default function LinkedInPage() {
       </section>
 
       {/* Footer */}
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Marketing Intelligence Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['BUS', 'MKT']}
+          title="Ask the Marketing Intelligence Engine"
+          placeholder="Ask about LinkedIn strategy, B2B marketing..."
+          exampleQueries={['Optimal LinkedIn posting frequency for B2B', 'How to write engaging LinkedIn content', 'LinkedIn Sales Navigator best practices']}
+        />
+      </section>
       <footer className="border-t px-6 py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
         <p>&copy; 2026 Echo Prime Technologies. All rights reserved.</p>
       </footer>

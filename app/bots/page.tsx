@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useTheme } from '../../lib/theme-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 /* ── Bot Categories ── */
 
@@ -293,6 +294,19 @@ export default function BotsPage() {
           </a>
         </div>
       </div>
+
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Bot Intelligence Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['SE', 'AI']}
+          title="Ask the Bot Intelligence Engine"
+          placeholder="Ask about bot development, automation, APIs..."
+          exampleQueries={['Best practices for Discord bot rate limiting', 'How to handle webhook retries', 'OAuth2 bot token management']}
+        />
+      </section>
     </div>
   );
 }

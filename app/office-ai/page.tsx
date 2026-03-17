@@ -7,6 +7,7 @@ import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 /* ══════════════════════════════════════════════════════════════════════════════
    ECHO OFFICE AI — AI-Powered Office Management Platform
@@ -537,6 +538,18 @@ export default function OfficeAIPage() {
       </section>
 
       {/* ─── Footer ─── */}
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Business Operations Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['BUS', 'ACCT']}
+          title="Ask the Business Operations Engine"
+          placeholder="Ask about invoicing, payroll, scheduling..."
+          exampleQueries={['Best invoicing practices for service businesses', 'How to calculate overtime pay in Texas', 'Accounts receivable aging best practices']}
+        />
+      </section>
       <footer className="border-t py-12 px-6" style={{ borderColor: 'var(--ept-border)' }}>
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={400} height={260} className="w-[140px] h-auto opacity-80" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} />

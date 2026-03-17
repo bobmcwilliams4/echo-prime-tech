@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 /* ══════════════════════════════════════════════════════════════════════════════
    BREE AI OFFICE ASSISTANT — Interactive Service Page
@@ -1354,6 +1355,18 @@ export default function BreeAssistantPage() {
         </section>
 
         {/* ══════════════ FOOTER ══════════════ */}
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Business Intelligence Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['BUS', 'AI']}
+          title="Ask the Business Intelligence Engine"
+          placeholder="Ask about business operations, scheduling, HR..."
+          exampleQueries={['Best scheduling algorithms for service businesses', 'How to calculate employee utilization rate', 'Customer retention strategies for service companies']}
+        />
+      </section>
         <footer className="py-8 text-center border-t" style={{ borderColor: 'var(--ept-border)' }}>
           <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
             &copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved. | <Link href="/legal" className="underline">Terms</Link> | <Link href="/legal" className="underline">Privacy</Link>

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import {
   searchGenealogyRecords,
   searchDeedRecords,
@@ -677,6 +678,18 @@ export default function CountyRecordsPage() {
       </section>
 
       {/* Footer */}
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Legal & Real Estate Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['LG', 'RE']}
+          title="Ask the Legal & Real Estate Engine"
+          placeholder="Ask about property records, deeds, liens..."
+          exampleQueries={['What is a lis pendens and when is it filed?', 'How to search grantor-grantee index', 'Texas deed recording requirements']}
+        />
+      </section>
       <footer className="px-6 py-8 border-t text-center text-xs" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
         <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved.</p>
         <div className="flex justify-center gap-4 mt-2">

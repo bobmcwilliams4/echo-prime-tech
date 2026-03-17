@@ -5,6 +5,7 @@ import { useAuth } from '../../lib/auth-context'
 import Image from 'next/image'
 import Link from 'next/link'
 import ProductTutorialButton from '../../components/product-tutorial-button'
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 export default function RedditPage() {
   const { isDark } = useTheme()
@@ -307,6 +308,19 @@ export default function RedditPage() {
         </div>
       </section>
     <ProductTutorialButton tutorialId="reddit" productName="Reddit Intelligence" />
+
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Social Intelligence Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['MKT', 'AI']}
+          title="Ask the Social Intelligence Engine"
+          placeholder="Ask about Reddit marketing, sentiment analysis..."
+          exampleQueries={['Reddit API rate limits and best practices', 'How to analyze subreddit sentiment', 'Content marketing strategies for Reddit']}
+        />
+      </section>
     </div>
   )
 }

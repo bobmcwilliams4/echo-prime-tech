@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useTheme } from '../../lib/theme-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
 // ─── Constants ───
 const TTS_API = 'https://tts.echo-op.com';
@@ -2748,6 +2749,18 @@ export default function VoicePage() {
       </section>
 
       {/* ─── Footer ─── */}
+      {/* Intelligence Engine Integration */}
+      <section className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
+          Ask the Voice AI Engine
+        </h2>
+        <EngineQueryPanel
+          domains={['AI', 'SE']}
+          title="Ask the Voice AI Engine"
+          placeholder="Ask about TTS, STT, voice cloning..."
+          exampleQueries={['Comparison of TTS engines: ElevenLabs vs Azure vs Google', 'How to reduce TTS latency', 'Voice cloning ethical considerations']}
+        />
+      </section>
       <footer className="py-8 text-center border-t" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
           &copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved.
