@@ -195,7 +195,7 @@ export default function EnginesPage() {
 
   const handleCheckout = async (tier: string) => {
     // Route through proper checkout page with billing + invoice
-    window.location.href = `/checkout?service=sentinel-ai&tier=${tier.toLowerCase()}`;
+    window.location.href = `/checkout?service=engines&tier=${tier.toLowerCase()}`;
   };
 
   return (

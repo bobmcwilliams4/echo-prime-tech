@@ -139,9 +139,9 @@ export default function BotsPage() {
             We build autonomous bots for any platform. Social media, trading, arbitrage, customer service, monitoring — every bot powered by AI, deployed on Cloudflare Workers, running 24/7.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <a href="mailto:bob@echo-op.com?subject=Bot%20Build%20Request" className="px-8 py-3 rounded-xl font-semibold text-white transition-transform hover:scale-105" style={{ backgroundColor: 'var(--ept-accent)' }}>
-              Request a Bot Build
-            </a>
+            <Link href="/checkout?service=bots&tier=professional" className="px-8 py-3 rounded-xl font-semibold text-white transition-transform hover:scale-105" style={{ backgroundColor: 'var(--ept-accent)' }}>
+              Get Started
+            </Link>
             <Link href="/pricing" className="px-8 py-3 rounded-xl font-semibold border transition-transform hover:scale-105" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
               View Pricing
             </Link>
@@ -267,8 +267,8 @@ export default function BotsPage() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href={t.custom ? 'mailto:bob@echo-op.com?subject=Enterprise%20Bot%20Build' : 'mailto:bob@echo-op.com?subject=Bot%20Build%20Request%20-%20' + t.tier}
+                <Link
+                  href={t.custom ? 'mailto:bob@echo-op.com?subject=Enterprise%20Bot%20Build' : `/checkout?service=bots&tier=${t.tier.toLowerCase()}`}
                   className="block w-full text-center py-2.5 rounded-xl font-semibold transition-transform hover:scale-105"
                   style={{
                     backgroundColor: t.popular ? 'var(--ept-accent)' : 'transparent',
@@ -277,7 +277,7 @@ export default function BotsPage() {
                   }}
                 >
                   {t.custom ? 'Contact Us' : 'Get Started'}
-                </a>
+                </Link>
               </div>
             ))}
           </div>
@@ -289,9 +289,9 @@ export default function BotsPage() {
           <p className="text-sm mb-6 max-w-md mx-auto" style={{ color: 'var(--ept-text-muted)' }}>
             Tell us what you need — we&apos;ll design, build, and deploy your custom AI bot within days.
           </p>
-          <a href="mailto:bob@echo-op.com?subject=Custom%20Bot%20Request" className="inline-flex px-8 py-3 rounded-xl font-semibold text-white transition-transform hover:scale-105" style={{ backgroundColor: 'var(--ept-accent)' }}>
+          <Link href="/checkout?service=bots&tier=professional" className="inline-flex px-8 py-3 rounded-xl font-semibold text-white transition-transform hover:scale-105" style={{ backgroundColor: 'var(--ept-accent)' }}>
             Start Your Bot Project
-          </a>
+          </Link>
         </div>
       </div>
 

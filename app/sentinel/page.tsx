@@ -2145,11 +2145,11 @@ export default function SentinelPage() {
             Free tier: 50 queries/day &middot; Pro: unlimited queries, custom engines, voice &middot; Business: API access, team seats, SLA
           </p>
           <div className="flex justify-center gap-3">
-            <Link href="/pricing" className="px-5 py-2 rounded-lg text-xs font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
-              View Plans &amp; Pricing
+            <Link href="/checkout?service=sentinel&tier=pro" className="px-5 py-2 rounded-lg text-xs font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+              Upgrade to Pro
             </Link>
-            <Link href="/signup" className="px-5 py-2 rounded-lg text-xs font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
-              Create Free Account
+            <Link href="/pricing" className="px-5 py-2 rounded-lg text-xs font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+              View All Plans
             </Link>
           </div>
         </div>

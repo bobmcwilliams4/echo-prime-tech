@@ -515,7 +515,7 @@ export default function TitleIntelligencePage() {
                     ))}
                   </ul>
                   <Link
-                    href={tier.name === 'Enterprise' ? '/bree-assistant?context=title-intelligence-enterprise' : '/sentinel?preset=Landman+%2F+Title'}
+                    href={tier.name === 'Enterprise' ? 'mailto:bob@echo-op.com?subject=Title%20Intelligence%20Enterprise' : `/checkout?service=title-intelligence&tier=${tier.name.toLowerCase()}`}
                     className="w-full py-3 rounded-xl font-semibold text-center block text-sm"
                     style={{
                       backgroundColor: tier.accent ? 'var(--ept-accent)' : 'transparent',

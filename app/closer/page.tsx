@@ -165,11 +165,11 @@ function CloserLandingPage() {
             Sign In
           </Link>
           <Link
-            href="/signup"
+            href="/checkout?service=ai-closer&tier=professional"
             className="text-sm font-semibold px-5 py-2 rounded-lg"
             style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
           >
-            Get Started Free
+            Get Started
           </Link>
         </div>
       </nav>
@@ -545,19 +545,19 @@ function CloserLandingPage() {
                 Try Live Demo
               </button>
               <Link
-                href="/signup"
+                href="/checkout?service=ai-closer&tier=professional"
                 className="flex items-center gap-2 px-8 py-4 rounded-xl border font-semibold transition-all hover:opacity-80"
                 style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}
               >
-                Get Started Free
+                Buy Now
               </Link>
-              <a
-                href="mailto:bob@echo-op.com?subject=AI Sales Agent Inquiry"
+              <Link
+                href="/pricing"
                 className="flex items-center gap-2 px-8 py-4 rounded-xl border font-semibold transition-all hover:opacity-80"
                 style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}
               >
-                Contact Sales
-              </a>
+                View All Plans
+              </Link>
             </div>
           </div>
         </section>
