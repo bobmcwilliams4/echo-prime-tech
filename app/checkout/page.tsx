@@ -189,6 +189,37 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
     [selectedService?.id, initialTier]
   );
 
+  // Module breakdown for Office AI (combined platform)
+  const moduleBreakdown = useMemo(() => {
+    if (initialServiceId !== 'office-ai') return null;
+    const tierName = initialTier.toLowerCase();
+    const convoAI = {
+      label: 'Conversational AI',
+      modules: tierName === 'starter'
+        ? ['AI Phone Answering', 'Voicemail AI + Transcription', 'SMS & Text AI (100/mo)', 'Call Transcription & Notes']
+        : tierName === 'professional'
+          ? ['AI Phone Answering', 'AI Receptionist', 'Call Transcription & Notes', 'Outbound AI Calls', 'SMS & Text AI (unlimited)', 'Voicemail AI', 'Sentiment Analysis', 'Call Analytics & Scoring']
+          : ['All Conversational AI modules', 'Unlimited AI phone lines', 'Custom AI voice & persona'],
+    };
+    const officeMgmt = {
+      label: 'Office Management',
+      modules: tierName === 'starter'
+        ? ['Invoicing & Billing', 'Online Bookings', 'Customer Directory', 'Expense Tracking']
+        : tierName === 'professional'
+          ? ['Invoicing & Billing', 'Online Bookings', 'Customer Management', 'Route Optimization', 'Fleet Management', 'Expense Tracking', 'AI Chat Widget', 'Analytics Dashboard']
+          : ['All Office Management modules'],
+    };
+    const bizOps = {
+      label: 'Business Operations',
+      modules: tierName === 'starter'
+        ? []
+        : tierName === 'professional'
+          ? ['Inventory Management', 'AR/AP Management', 'Employee Management', 'Hours & Timesheets']
+          : ['All Business Operations modules', 'Payroll Processing', 'Reviews & Reputation'],
+    };
+    return [convoAI, officeMgmt, ...(bizOps.modules.length ? [bizOps] : [])];
+  }, [initialServiceId, initialTier]);
+
   // Calculate invoice — only recalculates when state (tax) changes, not on every keystroke
   const invoice = useMemo(() => {
     if (!selectedService || !selectedTier || selectedTier.price === null) return null;
@@ -355,6 +386,30 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
             </div>
 
             <BillingForm billing={billing} onChange={updateBilling} />
+
+            {/* Module Breakdown (Office AI only) */}
+            {moduleBreakdown && (
+              <div className="p-6 rounded-xl" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)' }}>
+                <h2 className="text-base font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Included Modules — {selectedTier?.tier} Plan</h2>
+                <div className="space-y-4">
+                  {moduleBreakdown.map((group, gi) => (
+                    <div key={gi}>
+                      <div className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--ept-accent)' }}>{group.label}</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                        {group.modules.map((mod, mi) => (
+                          <div key={mi} className="flex items-center gap-2 text-xs py-1" style={{ color: 'var(--ept-text-secondary)' }}>
+                            <svg className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--ept-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                            {mod}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* RIGHT: Invoice Preview (2 cols) */}

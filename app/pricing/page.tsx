@@ -111,15 +111,10 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Professional', price: 399, interval: 'mo', features: ['20+ pages', 'Custom design', 'CMS dashboard', 'Analytics', 'Priority support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited pages', 'E-commerce', 'API integration', 'SLA guarantee'], popular: false, custom: true },
   ] },
-  { id: 'business-manager', name: 'Business Manager', tagline: 'All-in-one autonomous business management — bookings, invoicing, payroll, inventory', pricing: [
-    { tier: 'Starter', price: 99, interval: 'mo', features: ['Dashboard + Analytics', 'Customers & Bookings', 'Basic Invoicing', 'Up to 3 users', 'Email support'], popular: false },
-    { tier: 'Professional', price: 249, interval: 'mo', features: ['Everything in Starter', 'Full Invoicing + AR/AP', 'Expense Tracking', 'Inventory Management', 'Employee + Hours + Payroll', 'Reviews Management', 'Up to 15 users', 'Priority support'], popular: true },
-    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Everything in Professional', 'Unlimited users', 'AI Receipt Scanning', 'Custom integrations', 'White-label option', 'Dedicated account manager', 'API access', '24/7 phone support'], popular: false, custom: true },
-  ] },
-  { id: 'office-ai', name: 'Echo Office AI', tagline: 'AI-powered office management — invoicing, bookings, customers & analytics', pricing: [
-    { tier: 'Starter', price: 79, interval: 'mo', features: ['1 business', '5 users', 'Invoicing & bookings', 'Customer directory', 'Expense tracking', 'Basic AI assistant'], popular: false },
-    { tier: 'Professional', price: 199, interval: 'mo', features: ['3 businesses', '25 users', 'Route optimization', 'Fleet management', 'Document generation', 'Analytics dashboard', 'Priority support'], popular: true },
-    { tier: 'Enterprise', price: 499, interval: 'mo', features: ['Unlimited businesses', 'Unlimited users', 'White-label branding', 'Custom domain', 'API access', 'Dedicated manager', 'SLA guarantee'], popular: false },
+  { id: 'office-ai', name: 'Echo Office AI', tagline: 'AI phone system + office management + business operations — 22 modules in one platform', pricing: [
+    { tier: 'Starter', price: 49, interval: 'mo', features: ['1 business, 5 users', 'AI Phone Answering', 'Voicemail AI + Transcription', 'SMS & Text AI (100/mo)', 'Invoicing & Billing', 'Online Bookings', 'Customer Directory', 'Expense Tracking'], popular: false },
+    { tier: 'Professional', price: 149, interval: 'mo', features: ['3 businesses, 25 users', 'Full Conversational AI (8 modules)', 'AI Receptionist + Outbound Calls', 'Sentiment Analysis + Call Scoring', 'Route & Fleet Management', 'Inventory + AR/AP', 'Employee Mgmt + Timesheets', 'Analytics Dashboard'], popular: true },
+    { tier: 'Enterprise', price: 399, interval: 'mo', features: ['Unlimited businesses & users', 'All 22 modules included', 'Unlimited AI phone lines', 'Custom AI voice & persona', 'Payroll + Reviews', 'White-label branding', 'Full API access', 'SLA guarantee + 24/7 support'], popular: false },
   ] },
   { id: 'pentesting', name: 'Pen Testing', tagline: 'Automated penetration testing and vulnerability assessment', pricing: [
     { tier: 'Starter', price: 999, interval: 'mo', features: ['Monthly scan', '1 domain', 'OWASP Top 10', 'PDF report'], popular: false },
