@@ -1,20 +1,34 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../../lib/theme-context';
+import { useAuth } from '../../../lib/auth-context';
+import { subscribe } from '../../../lib/ept-api';
 
 function SuccessContent() {
   const { isDark } = useTheme();
+  const { user } = useAuth();
   const params = useSearchParams();
-  const method = params.get('method') || 'stripe';
+  const method = params.get('method') || 'paypal';
+  const serviceId = params.get('service');
+  const tier = params.get('tier');
   const invoiceId = params.get('invoice_id');
   const orderId = params.get('order_id');
   const captureId = params.get('capture_id');
   const amount = params.get('amount');
   const status = params.get('status');
+
+  // Belt-and-suspenders: ensure subscription is activated even if checkout page call failed
+  const activated = useRef(false);
+  useEffect(() => {
+    if (!activated.current && user && serviceId) {
+      activated.current = true;
+      subscribe([serviceId]).catch(() => {});
+    }
+  }, [user, serviceId]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
@@ -34,10 +48,14 @@ function SuccessContent() {
         <p className="text-sm mb-2" style={{ color: 'var(--ept-text-secondary)' }}>
           {method === 'invoice'
             ? 'A detailed invoice has been sent to your email via PayPal. Payment is due within 30 days.'
-            : method === 'paypal'
-              ? 'Your PayPal payment has been processed. Your subscription is now active.'
-              : 'Your subscription is now active. You have full access to your selected services.'}
+            : 'Your PayPal payment has been processed. Your subscription is now active.'}
         </p>
+
+        {tier && (
+          <p className="text-xs font-semibold mb-4" style={{ color: 'var(--ept-accent)' }}>
+            {(serviceId || '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} — {tier.charAt(0).toUpperCase() + tier.slice(1)} Plan
+          </p>
+        )}
 
         {invoiceId && (
           <p className="text-xs font-mono mb-4" style={{ color: 'var(--ept-text-muted)' }}>

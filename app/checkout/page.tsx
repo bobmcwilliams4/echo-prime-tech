@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
-import { getServices, createCheckout, Service } from '../../lib/ept-api';
+import { getServices, subscribe, Service } from '../../lib/ept-api';
 import { createInvoice } from '../../lib/paypal-api';
 import PayPalCheckoutButtons from '../../components/PayPalCheckoutButtons';
 
@@ -136,7 +136,6 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
 
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  const [payMethod, setPayMethod] = useState<'stripe' | 'paypal'>('stripe');
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
   const [invoiceNumber] = useState(() => {
@@ -266,7 +265,8 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
   // B2B invoice flow (company name or tax ID present)
   const isB2BInvoice = !!(billing.companyName || billing.taxId);
 
-  const handleCheckout = async () => {
+  // B2B invoice flow (company name or tax ID → send PayPal invoice)
+  const handleInvoiceCheckout = async () => {
     const validationError = validateBilling();
     if (validationError) { setError(validationError); return; }
     if (!invoice || !selectedService || !selectedTier) return;
@@ -275,44 +275,41 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
     setProcessing(true);
 
     try {
-      if (payMethod === 'stripe') {
-        const { url } = await createCheckout(initialServiceId, selectedTier.tier.toLowerCase());
-        window.location.href = url;
-      } else if (payMethod === 'paypal' && isB2BInvoice) {
-        // B2B: Send PayPal invoice
-        const result = await createInvoice({
-          customer_email: billing.email,
-          customer_name: billing.companyName || billing.contactName,
-          items: [{
-            name: `${selectedService.name} — ${selectedTier.tier} Plan`,
-            quantity: 1,
-            unit_price: invoice.subtotal,
-            description: `${selectedTier.interval === 'month' ? 'Monthly' : 'Annual'} subscription. ${selectedTier.features?.join(', ') || ''}`,
-          },
-          ...(invoice.taxAmount > 0 ? [{
-            name: `Sales Tax (${invoice.taxRateDisplay} — ${invoice.stateName})`,
-            quantity: 1,
-            unit_price: invoice.taxAmount,
-            description: 'Applicable state sales tax',
-          }] : []),
-          ],
-          note: `Invoice for ${billing.companyName || billing.contactName}${billing.taxId ? ` | Tax ID: ${billing.taxId}` : ''}`,
-          auto_send: true,
-        });
-        if (result.success) {
-          router.push(`/checkout/success?method=invoice&invoice_id=${result.invoice_id}&amount=${invoice.total}`);
-        }
+      const result = await createInvoice({
+        customer_email: billing.email,
+        customer_name: billing.companyName || billing.contactName,
+        items: [{
+          name: `${selectedService.name} — ${selectedTier.tier} Plan`,
+          quantity: 1,
+          unit_price: invoice.subtotal,
+          description: `${selectedTier.interval === 'month' ? 'Monthly' : 'Annual'} subscription. ${selectedTier.features?.join(', ') || ''}`,
+        },
+        ...(invoice.taxAmount > 0 ? [{
+          name: `Sales Tax (${invoice.taxRateDisplay} — ${invoice.stateName})`,
+          quantity: 1,
+          unit_price: invoice.taxAmount,
+          description: 'Applicable state sales tax',
+        }] : []),
+        ],
+        note: `Invoice for ${billing.companyName || billing.contactName}${billing.taxId ? ` | Tax ID: ${billing.taxId}` : ''}`,
+        auto_send: true,
+      });
+      if (result.success) {
+        // Activate subscription in DB (invoice will be paid later, but grant access now for B2B)
+        try { await subscribe([initialServiceId]); } catch {}
+        router.push(`/checkout/success?method=invoice&service=${initialServiceId}&tier=${initialTier}&invoice_id=${result.invoice_id}&amount=${invoice.total}`);
       }
-      // B2C PayPal: handled by PayPalCheckoutButtons component below (not this handler)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Checkout failed. Please try again.');
+      setError(err instanceof Error ? err.message : 'Invoice creation failed. Please try again.');
     } finally {
       setProcessing(false);
     }
   };
 
-  const handlePayPalSuccess = (details: { order_id: string; capture_id?: string; payer?: string; status: string }) => {
-    router.push(`/checkout/success?method=paypal&order_id=${details.order_id}&capture_id=${details.capture_id || ''}&status=${details.status}`);
+  const handlePayPalSuccess = async (details: { order_id: string; capture_id?: string; payer?: string; status: string }) => {
+    // Activate subscription in DB after successful PayPal payment
+    try { await subscribe([initialServiceId]); } catch {}
+    router.push(`/checkout/success?method=paypal&service=${initialServiceId}&tier=${initialTier}&order_id=${details.order_id}&capture_id=${details.capture_id || ''}&status=${details.status}`);
   };
 
   const handlePayPalError = (errorMsg: string) => {
@@ -360,29 +357,14 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
         <div className="grid lg:grid-cols-5 gap-8">
           {/* LEFT: Billing Form (3 cols) */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Payment Method */}
+            {/* Payment Info */}
             <div className="p-6 rounded-xl" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-border)' }}>
-              <h2 className="text-base font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Payment Method</h2>
-              <div className="grid grid-cols-2 gap-3">
-                {(['stripe', 'paypal'] as const).map(method => (
-                  <button
-                    key={method}
-                    onClick={() => setPayMethod(method)}
-                    className="p-4 rounded-lg border-2 text-center transition-all"
-                    style={{
-                      borderColor: payMethod === method ? 'var(--ept-accent)' : 'var(--ept-border)',
-                      backgroundColor: payMethod === method ? (isDark ? '#0d737710' : '#0d737708') : 'transparent',
-                    }}
-                  >
-                    <div className="text-lg font-bold mb-1" style={{ color: payMethod === method ? 'var(--ept-accent)' : 'var(--ept-text)' }}>
-                      {method === 'stripe' ? 'Credit Card' : 'PayPal'}
-                    </div>
-                    <div className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
-                      {method === 'stripe' ? 'Visa, Mastercard, Amex' : 'PayPal or Invoice'}
-                    </div>
-                  </button>
-                ))}
-              </div>
+              <h2 className="text-base font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Payment</h2>
+              <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+                {isB2BInvoice
+                  ? 'A PayPal invoice will be sent to your email. Net-30 payment terms.'
+                  : 'Pay securely with PayPal, Venmo, credit/debit card, or Pay Later.'}
+              </p>
             </div>
 
             <BillingForm billing={billing} onChange={updateBilling} />
@@ -482,8 +464,8 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
                 </div>
               )}
 
-              {/* PayPal SDK Smart Buttons (B2C — no company/taxId) */}
-              {payMethod === 'paypal' && !isB2BInvoice && invoice ? (
+              {/* B2C: PayPal Smart Buttons | B2B: Send Invoice button */}
+              {!isB2BInvoice && invoice ? (
                 <div className="mt-6">
                   <PayPalCheckoutButtons
                     amount={invoice.total}
@@ -498,22 +480,17 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
                 </div>
               ) : (
                 <button
-                  onClick={handleCheckout}
+                  onClick={handleInvoiceCheckout}
                   disabled={processing || !invoice}
                   className="w-full mt-6 py-3 rounded-lg font-bold text-sm transition-all disabled:opacity-50"
                   style={{ backgroundColor: 'var(--ept-accent)', color: '#fff', cursor: processing ? 'wait' : 'pointer' }}
                 >
-                  {processing
-                    ? 'Processing...'
-                    : payMethod === 'stripe'
-                      ? `Pay $${invoice?.total.toLocaleString() || '0'} with Card`
-                      : `Send Invoice \u2014 $${invoice?.total.toLocaleString() || '0'}`
-                  }
+                  {processing ? 'Sending Invoice...' : `Send Invoice — $${invoice?.total.toLocaleString() || '0'}`}
                 </button>
               )}
 
               <p className="text-[10px] mt-3 text-center" style={{ color: 'var(--ept-text-muted)' }}>
-                {payMethod === 'stripe' ? 'Secure payment via Stripe. Your card details are never stored on our servers.' : isB2BInvoice ? 'A PayPal invoice will be sent to your email. Pay within 30 days.' : 'Secure payment via PayPal. Pay with your PayPal balance, Venmo, credit/debit card, or Pay Later.'}
+                {isB2BInvoice ? 'A PayPal invoice will be sent to your email. Pay within 30 days.' : 'Secure payment via PayPal. Pay with your PayPal balance, Venmo, credit/debit card, or Pay Later.'}
               </p>
 
               <div className="mt-4 pt-4 text-[10px] space-y-1" style={{ borderTop: '1px solid var(--ept-border)', color: 'var(--ept-text-muted)' }}>
