@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import { useAuth } from '../../lib/auth-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import { startAsyncInvestigation, getJobProgress, type AsyncJobProgress, type PipelineResult } from '../../lib/landman-api';
+import TitleChainReport from '../../components/TitleChainReport';
 
 // ════════════════════════════════════════════════════════════════
 // ECHO PRIME TECHNOLOGIES — Title Intelligence Product Page
@@ -190,6 +193,7 @@ function normalizeRecord(raw: DeedRecord): DisplayRecord {
 
 export default function TitleIntelligencePage() {
   const { isDark, toggle } = useTheme();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'features' | 'how' | 'pricing' | 'instruments'>('features');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<DisplayRecord[]>([]);
@@ -197,6 +201,67 @@ export default function TitleIntelligencePage() {
   const [searchError, setSearchError] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
+
+  // ── Title Investigation State ──
+  const [invCounty, setInvCounty] = useState('Reeves');
+  const [invSection, setInvSection] = useState('');
+  const [invBlock, setInvBlock] = useState('');
+  const [invAbstract, setInvAbstract] = useState('');
+  const [invParty, setInvParty] = useState('');
+  const [invProgress, setInvProgress] = useState<AsyncJobProgress | null>(null);
+  const [invResult, setInvResult] = useState<PipelineResult | null>(null);
+  const [invError, setInvError] = useState('');
+  const [invRunning, setInvRunning] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopPolling = useCallback(() => {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+  }, []);
+
+  useEffect(() => () => stopPolling(), [stopPolling]);
+
+  const runInvestigation = async () => {
+    if (!invCounty.trim()) { setInvError('County is required'); return; }
+    if (!user) { setInvError('Please sign in to run investigations'); return; }
+    setInvError('');
+    setInvResult(null);
+    setInvProgress(null);
+    setInvRunning(true);
+    try {
+      const { job_id } = await startAsyncInvestigation({
+        county: invCounty.trim(),
+        section: invSection.trim() || undefined,
+        block: invBlock.trim() || undefined,
+        abstract: invAbstract.trim() || undefined,
+        party: invParty.trim() || undefined,
+      });
+      // Poll for progress
+      pollRef.current = setInterval(async () => {
+        try {
+          const progress = await getJobProgress(job_id);
+          setInvProgress(progress);
+          if (progress.status === 'complete' && progress.result) {
+            stopPolling();
+            setInvResult(progress.result);
+            setInvRunning(false);
+          } else if (progress.status === 'failed') {
+            stopPolling();
+            setInvError(progress.error || 'Investigation failed');
+            setInvRunning(false);
+          } else if (progress.status === 'cancelled') {
+            stopPolling();
+            setInvError('Investigation was cancelled');
+            setInvRunning(false);
+          }
+        } catch {
+          // Polling error — keep trying
+        }
+      }, 3000);
+    } catch (err) {
+      setInvError(err instanceof Error ? err.message : 'Failed to start investigation');
+      setInvRunning(false);
+    }
+  };
 
   const runDemoSearch = async (override?: string) => {
     const q = override || searchQuery;
@@ -362,6 +427,130 @@ export default function TitleIntelligencePage() {
                   </button>
                 ))}
               </div>
+            )}
+          </div>
+        </section>
+
+        {/* ─── Full Title Investigation ─── */}
+        <section className="max-w-5xl mx-auto px-6 mb-16">
+          <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <div className="text-center mb-6">
+              <div className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-widest mb-3" style={{ backgroundColor: isDark ? '#14b8a615' : '#0d737715', color: 'var(--ept-accent)' }}>
+                AI-POWERED CHAIN OF TITLE
+              </div>
+              <h2 className="text-2xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Run a Full Title Investigation</h2>
+              <p className="text-sm mt-2" style={{ color: 'var(--ept-text-secondary)' }}>
+                Enter a county and tract description. Our pipeline searches courthouse records, builds the chain, detects gaps, and generates a professional report.
+              </p>
+            </div>
+
+            {invResult ? (
+              <TitleChainReport result={invResult} onClose={() => { setInvResult(null); setInvProgress(null); }} />
+            ) : (
+              <>
+                <div className="grid md:grid-cols-5 gap-3 max-w-3xl mx-auto mb-4">
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>County *</label>
+                    <input
+                      type="text" value={invCounty} onChange={e => setInvCounty(e.target.value)}
+                      placeholder="Reeves" className="w-full px-3 py-2.5 rounded-xl text-sm border"
+                      style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Section</label>
+                    <input
+                      type="text" value={invSection} onChange={e => setInvSection(e.target.value)}
+                      placeholder="270" className="w-full px-3 py-2.5 rounded-xl text-sm border"
+                      style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Block</label>
+                    <input
+                      type="text" value={invBlock} onChange={e => setInvBlock(e.target.value)}
+                      placeholder="13" className="w-full px-3 py-2.5 rounded-xl text-sm border"
+                      style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Abstract</label>
+                    <input
+                      type="text" value={invAbstract} onChange={e => setInvAbstract(e.target.value)}
+                      placeholder="A-270" className="w-full px-3 py-2.5 rounded-xl text-sm border"
+                      style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
+                    />
+                  </div>
+                </div>
+                <div className="max-w-3xl mx-auto mb-4">
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Party Name (optional — narrow search to a specific grantor/grantee)</label>
+                  <input
+                    type="text" value={invParty} onChange={e => setInvParty(e.target.value)}
+                    placeholder="Marathon Oil" className="w-full px-3 py-2.5 rounded-xl text-sm border"
+                    style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
+                  />
+                </div>
+
+                <div className="text-center">
+                  <button
+                    onClick={runInvestigation}
+                    disabled={invRunning || !invCounty.trim()}
+                    className="px-8 py-3 rounded-xl font-semibold text-white text-sm transition-all hover:scale-105 disabled:opacity-50"
+                    style={{ backgroundColor: 'var(--ept-accent)' }}
+                  >
+                    {invRunning ? 'Investigation Running...' : 'Start Investigation'}
+                  </button>
+                  {!user && (
+                    <p className="text-xs mt-2" style={{ color: 'var(--ept-text-muted)' }}>
+                      <Link href="/login" className="underline" style={{ color: 'var(--ept-accent)' }}>Sign in</Link> to run investigations
+                    </p>
+                  )}
+                </div>
+
+                {invError && (
+                  <div className="text-center text-sm py-3 mt-4 rounded-lg" style={{ backgroundColor: '#ef444415', color: '#ef4444' }}>{invError}</div>
+                )}
+
+                {invProgress && invRunning && (
+                  <div className="mt-6 max-w-2xl mx-auto">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold" style={{ color: 'var(--ept-text-secondary)' }}>
+                        {invProgress.current_step_label || invProgress.current_step || 'Starting...'}
+                      </span>
+                      <span className="text-xs font-mono" style={{ color: 'var(--ept-accent)' }}>
+                        {invProgress.progress_pct ?? 0}%
+                      </span>
+                    </div>
+                    <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${invProgress.progress_pct ?? 0}%`, backgroundColor: 'var(--ept-accent)' }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between mt-2 text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+                      <span>{invProgress.records_found ?? 0} records found</span>
+                      <span>{invProgress.gaps_found ?? 0} gaps detected</span>
+                      <span>{invProgress.elapsed_ms ? `${(invProgress.elapsed_ms / 1000).toFixed(1)}s` : '...'}</span>
+                    </div>
+                    {invProgress.steps && invProgress.steps.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {invProgress.steps.map((step, i) => (
+                          <span
+                            key={i}
+                            className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                            style={{
+                              backgroundColor: step.status === 'complete' ? (isDark ? '#14b8a620' : '#0d737720') : step.status === 'running' ? (isDark ? '#f59e0b20' : '#f59e0b15') : 'var(--ept-surface)',
+                              color: step.status === 'complete' ? 'var(--ept-accent)' : step.status === 'running' ? '#f59e0b' : 'var(--ept-text-muted)',
+                            }}
+                          >
+                            {step.status === 'complete' ? '\u2713' : step.status === 'running' ? '\u25CF' : '\u25CB'} {step.name || `Step ${i + 1}`}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </section>
@@ -605,8 +794,8 @@ export default function TitleIntelligencePage() {
             <Link href="/sentinel?preset=Landman+%2F+Title" className="px-8 py-4 rounded-xl font-semibold text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>
               Start Free Title Search
             </Link>
-            <Link href="/bree-assistant?context=title-intelligence-sales" className="px-8 py-4 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
-              Talk to Sales
+            <Link href="/checkout?service=title-intelligence&tier=professional" className="px-8 py-4 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+              Buy Professional Plan
             </Link>
           </div>
         </section>
