@@ -5,48 +5,58 @@ import { useEffect } from 'react';
 
 // Services that are LIVE — do NOT redirect
 const EXEMPT_PREFIXES = [
-  '/closer',             // AI Sales Agent
-  '/bots',               // Bot Factory
-  '/scrapers',           // Scraper & Harvester Factory
+  // ── Tier 1: Sellable NOW ──
+  '/closer',             // AI Sales Agent (real backend)
+  '/sentinel',           // Sentinel AI (2,660 engines)
+  '/tax-returns',        // AI Tax Returns (real backend)
+  '/voice',              // Voice Studio (3-tier TTS)
+  '/grading',            // AI Collectibles Grading (eBay API)
+  '/hephaestion-forge',  // Hephaestion Forge (code factory)
+  '/engines',            // Intelligence Engines (real runtime)
+  '/sdk',                // Echo SDK Gateway (real API)
+
+  // ── Tier 2: Finishing ──
+  '/title-intelligence', // Title Intelligence (landman pipeline)
+  '/payments',           // Payment Processing
+  '/county-records',     // County Records
+  '/echocad',            // EchoCAD (real backend)
+  '/daedalus-forge',     // Daedalus Forge (real backend)
   '/ecommerce',          // Ecommerce Store
-  '/business-manager',   // Business Manager
-  '/grading',            // AI Collectibles Grading
-  '/epocgs',             // AI Collectibles Grading (alt route)
-  '/office-ai',          // Auto Prime Office AI Assistant
-  '/immortality-vault',  // Immortality Vault
-  '/engines',            // Intelligence Engines
-  '/sentinel',           // Sentinel AI
-  '/tax-returns',        // AI Tax Returns
-  '/title-intelligence', // Title Intelligence
+  '/bree-assistant',     // Bree AI Assistant
+  '/office-ai',          // Office AI Assistant
   '/security',           // Cyber Defense
   '/pentesting',         // Penetration Testing
-  '/sdk',                // Echo SDK Gateway
+  '/immortality-vault',  // Immortality Vault
   '/knowledge',          // Knowledge Systems
-  '/pipelines',          // Data Pipelines
-  '/dark-web-intel',     // Dark Web Intelligence
-  '/crypto-trading',     // Crypto Trading
-  '/price-alerts',       // Price & Market Alerts
-  '/reddit',             // Reddit Monitor
-  '/voice',              // Voice Studio
-  '/echocad',            // EchoCAD
-  '/daedalus-forge',     // Daedalus Forge
-  '/hephaestion-forge',  // Hephaestion Forge
-  '/bree-assistant',     // Bree AI Assistant
+  '/vault',              // Digital Vault
+
+  // ── Tier 4: Easy wins (bot pages) ──
+  '/bots',               // Bot Factory
   '/x-bot',              // X/Twitter Bot
+  '/reddit',             // Reddit Monitor
   '/linkedin',           // LinkedIn Bot
-  '/payments',           // Payment Processing
   '/scanner',            // Security Scanner
   '/websites',           // Website Builder
-  '/orchestration',      // Orchestration
-  '/county-records',     // County Records
-  '/vault',              // Digital Vault
-  '/sandbox',            // AI Sandbox
+  '/price-alerts',       // Price & Market Alerts
+
+  // ── Infrastructure / User pages ──
   '/services',           // Professional Services
-  '/sec-intel',          // Security Intelligence
-  '/rewards',            // Rewards
   '/dashboard',          // User Dashboard
   '/settings',           // Settings
   '/forums',             // Forums
+  '/epocgs',             // AI Collectibles Grading (alt route)
+  '/business-manager',   // Business Manager
+
+  // ── BLOCKED (redirect to /coming-soon): ──
+  // '/dark-web-intel'   — no backend, liability risk
+  // '/surveillance'     — no backend, scary product name
+  // '/sec-intel'        — duplicate of /security, UI shell
+  // '/crypto-trading'   — no execution engine, regulatory risk
+  // '/scrapers'         — internal tool, looks shady
+  // '/pipelines'        — internal infra, not customer product
+  // '/orchestration'    — internal infra, 190 lines
+  // '/sandbox'          — CTF training, not a product
+  // '/rewards'          — no rewards system exists
 ];
 
 // Utility/non-service pages — do NOT redirect

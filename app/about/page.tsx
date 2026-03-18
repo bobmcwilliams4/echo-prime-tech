@@ -216,7 +216,7 @@ export default function AboutPage() {
               { name: 'Hephaestion Forge', desc: 'AI code factory — 13-stage build pipeline', href: '/hephaestion-forge' },
               { name: 'ShadowGlass', desc: 'Privacy browser with 120+ anti-detection measures', href: '/services' },
               { name: 'Custom Bots', desc: 'Discord, X, Telegram, LinkedIn — 14 AI personalities', href: '/bots' },
-              { name: 'Data Pipelines', desc: 'ETL, enrichment, real-time processing', href: '/pipelines' },
+              { name: 'Title Intelligence', desc: 'AI chain of title across 80+ Texas counties', href: '/title-intelligence' },
             ].map(product => (
               <Link key={product.name} href={product.href} className="p-5 rounded-xl border text-left flex items-center justify-between group card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
                 <div>

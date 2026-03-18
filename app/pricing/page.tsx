@@ -36,45 +36,10 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Professional', price: 1499, interval: 'mo', features: ['3 custom bots', 'Advanced AI + memory', 'Multi-platform', 'Trading strategies', 'Priority support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited bots', 'Custom trading algos', 'White-label', 'Dedicated engineer'], popular: false, custom: true },
   ] },
-  { id: 'scrapers', name: 'Data Scrapers', tagline: 'Industrial-scale web scraping & data harvesting', pricing: [
-    { tier: 'Starter', price: 449, interval: 'mo', features: ['1 scraper', 'Up to 10K records/mo', 'CSV/JSON export', 'Email delivery'], popular: false },
-    { tier: 'Professional', price: 1199, interval: 'mo', features: ['3 scrapers', '100K records/mo', 'API access', 'Anti-detection', 'Priority support'], popular: true },
-    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited scrapers', 'Custom pipelines', 'Dedicated infra', 'SLA guarantee'], popular: false, custom: true },
-  ] },
-  { id: 'pipelines', name: 'Data Pipelines', tagline: 'Automated ETL, transforms & delivery', pricing: [
-    { tier: 'Starter', price: 149, interval: 'mo', features: ['5 pipelines', '10K records/day', 'Email/webhook delivery', 'Scheduling'], popular: false },
-    { tier: 'Professional', price: 399, interval: 'mo', features: ['25 pipelines', '100K records/day', 'AI enrichment', 'Multi-destination', 'Priority support'], popular: true },
-    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited pipelines', 'Custom transforms', 'On-prem connectors', 'SLA guarantee'], popular: false, custom: true },
-  ] },
-  { id: 'dark-web-intel', name: 'Dark Web Intel', tagline: 'Deep & dark web monitoring and threat intelligence', pricing: [
-    { tier: 'Starter', price: 2499, interval: 'mo', features: ['5 brand monitors', 'Paste site scanning', 'Weekly threat digest', 'IOC extraction'], popular: false },
-    { tier: 'Professional', price: 4999, interval: 'mo', features: ['25 brand monitors', 'Breach intelligence', 'Crypto forensics', 'Real-time Telegram alerts', 'Priority support'], popular: true },
-    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited monitors', 'Custom .onion crawling', 'Dedicated threat analyst', 'SLA guarantee'], popular: false, custom: true },
-  ] },
-  { id: 'crypto-trading', name: 'Crypto Trading', tagline: 'Autonomous AI-powered cryptocurrency trading', pricing: [
-    { tier: 'Starter', price: 99, interval: 'mo', features: ['1 trading pair', 'Grid strategy', 'Basic analytics', 'Email alerts'], popular: false },
-    { tier: 'Professional', price: 299, interval: 'mo', features: ['5 trading pairs', 'Grid + Momentum', 'Advanced analytics', 'API access', 'Priority support'], popular: true },
-    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited pairs', 'Custom strategies', 'Multi-exchange', 'Dedicated quant support', 'White-label'], popular: false, custom: true },
-  ] },
   { id: 'price-alerts', name: 'Price Alerts', tagline: 'Real-time price monitoring across markets', pricing: [
     { tier: 'Free', price: 0, interval: 'mo', features: ['5 alerts', 'Email notifications', 'Crypto & stocks', 'Daily summary'], popular: false },
     { tier: 'Pro', price: 19, interval: 'mo', features: ['Unlimited alerts', 'SMS + Telegram + webhook', 'Commodities & forex', 'Priority delivery'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Custom integrations', 'API access', 'Bulk alert management', 'SLA guarantee'], popular: false, custom: true },
-  ] },
-  { id: 'sec-intel', name: 'SEC Intelligence', tagline: 'Real-time SEC EDGAR filing monitoring & analysis', pricing: [
-    { tier: 'Starter', price: 199, interval: 'mo', features: ['10 company monitors', '10-K/10-Q/8-K tracking', 'Email alerts', 'Filing summaries'], popular: false },
-    { tier: 'Professional', price: 499, interval: 'mo', features: ['50 company monitors', 'AI-powered analysis', 'Insider trading alerts', 'API access', 'Priority support'], popular: true },
-    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited monitors', 'Custom screening rules', 'Bulk data exports', 'SLA guarantee'], popular: false, custom: true },
-  ] },
-  { id: 'surveillance', name: 'Surveillance', tagline: 'Location intelligence and asset tracking platform', pricing: [
-    { tier: 'Starter', price: 499, interval: 'mo', features: ['10 assets tracked', 'Real-time location', 'Geofence alerts', 'History playback'], popular: false },
-    { tier: 'Professional', price: 999, interval: 'mo', features: ['50 assets tracked', 'Cell tower + WiFi', 'IP geolocation', 'API access', 'Priority support'], popular: true },
-    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited assets', 'Custom integrations', 'Fleet management', 'Dedicated support'], popular: false, custom: true },
-  ] },
-  { id: 'news', name: 'News Intelligence', tagline: 'Real-time news monitoring, sentiment analysis, and trend detection', pricing: [
-    { tier: 'Starter', price: 149, interval: 'mo', features: ['50 keywords', '10 source feeds', 'Email digests', 'Sentiment scoring'], popular: false },
-    { tier: 'Professional', price: 399, interval: 'mo', features: ['Unlimited keywords', '100+ sources', 'Real-time Telegram alerts', 'AI summaries', 'API access'], popular: true },
-    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Custom NLP models', 'Firehose API', 'White-label reports', 'SLA guarantee'], popular: false, custom: true },
   ] },
   { id: 'reddit', name: 'Reddit Intelligence', tagline: 'Subreddit monitoring, trend detection, and community analytics', pricing: [
     { tier: 'Starter', price: 99, interval: 'mo', features: ['10 subreddits', 'Keyword alerts', 'Daily digests', 'Sentiment tracking'], popular: false },
@@ -376,7 +341,7 @@ export default function PricingPage() {
               <tbody>
                 {[
                   { label: 'Starting Price', values: (svcs: Service[]) => svcs.map(s => { const p = s.pricing[0]?.price; return p === 0 ? 'Free' : p !== null ? `$${getDisplayPrice(p)}/mo` : 'Custom'; }) },
-                  { label: 'AI-Powered', values: (svcs: Service[]) => svcs.map(s => ['sentinel','engines','ai-closer','bots','dark-web-intel','crypto-trading','sec-intel','surveillance'].includes(s.id)) },
+                  { label: 'AI-Powered', values: (svcs: Service[]) => svcs.map(s => ['sentinel','engines','ai-closer','bots','title-intelligence','voice','grading','hephaestion-forge'].includes(s.id)) },
                   { label: 'REST API Access', values: (svcs: Service[]) => svcs.map(s => !['sentinel'].includes(s.id) || s.pricing.some(t => t.features.some(f => f.toLowerCase().includes('api')))) },
                   { label: 'Custom Integrations', values: (svcs: Service[]) => svcs.map(s => s.pricing.some(t => t.features.some(f => f.toLowerCase().includes('custom')))) },
                   { label: 'Analytics Dashboard', values: (svcs: Service[]) => svcs.map(s => s.pricing.some(t => t.features.some(f => f.toLowerCase().includes('analytics') || f.toLowerCase().includes('dashboard')))) },
