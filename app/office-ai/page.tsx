@@ -1189,6 +1189,45 @@ export default function OfficeAIPage() {
 
   const [voiceActive, setVoiceActive] = useState(false);
 
+  // Website Builder Form
+  const [webFormOpen, setWebFormOpen] = useState(false);
+  const [webForm, setWebForm] = useState({
+    businessName: '',
+    businessType: '',
+    email: '',
+    phone: '',
+    pages: ['Home', 'About', 'Services', 'Contact'] as string[],
+    features: [] as string[],
+    domain: '',
+    notes: '',
+  });
+  const [webFormSent, setWebFormSent] = useState(false);
+
+  const WEB_PAGE_OPTIONS = ['Home', 'About', 'Services', 'Contact', 'Pricing', 'Gallery', 'Blog', 'Testimonials', 'FAQ', 'Team', 'Careers', 'Portfolio'];
+  const WEB_FEATURE_OPTIONS = [
+    'AI Chat Widget', 'Online Booking', 'Payment Processing', 'Contact Form', 'Email Capture',
+    'SEO Optimization', 'Google Analytics', 'Social Media Links', 'Photo Gallery', 'Video Embed',
+    'Customer Reviews', 'Google Maps', 'Live Chat', 'Newsletter Signup', 'Dark/Light Theme',
+    'Mobile-First Design', 'Custom Domain', 'SSL Certificate',
+  ];
+
+  const toggleWebPage = (page: string) => {
+    setWebForm(f => ({ ...f, pages: f.pages.includes(page) ? f.pages.filter(p => p !== page) : [...f.pages, page] }));
+  };
+  const toggleWebFeature = (feat: string) => {
+    setWebForm(f => ({ ...f, features: f.features.includes(feat) ? f.features.filter(p => p !== feat) : [...f.features, feat] }));
+  };
+
+  const submitWebForm = () => {
+    if (!webForm.businessName || !webForm.email) return;
+    const subject = encodeURIComponent(`Website Build Request — ${webForm.businessName}`);
+    const body = encodeURIComponent(
+      `Business: ${webForm.businessName}\nType: ${webForm.businessType}\nEmail: ${webForm.email}\nPhone: ${webForm.phone}\nDomain: ${webForm.domain || 'Need one'}\n\nPages: ${webForm.pages.join(', ')}\n\nFeatures: ${webForm.features.join(', ')}\n\nNotes: ${webForm.notes}`
+    );
+    window.open(`mailto:bob@echo-op.com?subject=${subject}&body=${body}`, '_blank');
+    setWebFormSent(true);
+  };
+
   const accentHex = isDark ? '#14b8a6' : '#0d7377';
 
   const handleCheckout = (tier: PricingTier) => {
@@ -1578,6 +1617,120 @@ export default function OfficeAIPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* --- Website Builder Service --- */}
+      <section id="website-builder" className="py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Add-On Service</div>
+            <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight" style={{ color: 'var(--ept-text)' }}>
+              We&apos;ll Build Your <span className="gradient-text">Business Website</span>
+            </h2>
+            <p className="mt-5 text-lg max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
+              Every Office AI customer gets a professional website built by our team — with AI chat, online booking, and all your services integrated. Tell us what you need.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-10">
+            {[
+              { tier: 'Starter Site', price: '$499', desc: 'Up to 5 pages, mobile-responsive, contact form, SEO setup, and your Office AI chat widget embedded. Delivered in 3 days.', features: ['5 pages', 'Mobile-first', 'Contact form', 'SEO basics', 'AI Chat Widget'] },
+              { tier: 'Professional Site', price: '$999', desc: 'Up to 12 pages, booking integration, payment processing, gallery, reviews, analytics, and full Office AI integration. Delivered in 5 days.', features: ['12 pages', 'Online booking', 'Payments', 'Gallery + Reviews', 'Google Analytics', 'Full AI integration'] },
+              { tier: 'Custom Build', price: 'Custom', desc: 'Complex sites, e-commerce, portals, multi-location — whatever you need. White-label, API integrations, custom functionality.', features: ['Unlimited pages', 'E-commerce', 'Custom portal', 'API integrations', 'White-label', 'Dedicated support'] },
+            ].map((t, i) => (
+              <div key={i} className="p-6 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: i === 1 ? 'var(--ept-accent)' : 'var(--ept-card-border)', borderWidth: i === 1 ? 2 : 1 }}>
+                {i === 1 && <div className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--ept-accent)' }}>Most Popular</div>}
+                <h3 className="text-lg font-bold" style={{ color: 'var(--ept-text)' }}>{t.tier}</h3>
+                <div className="text-3xl font-extrabold gradient-text my-2">{t.price}</div>
+                <p className="text-sm mb-4" style={{ color: 'var(--ept-text-muted)' }}>{t.desc}</p>
+                <ul className="space-y-2 mb-6">
+                  {t.features.map(f => (
+                    <li key={f} className="flex items-center gap-2 text-sm" style={{ color: 'var(--ept-text-secondary)' }}>
+                      <svg className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'var(--ept-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <button onClick={() => setWebFormOpen(true)} className="w-full py-2.5 rounded-xl font-semibold text-sm" style={{ backgroundColor: i === 1 ? 'var(--ept-accent)' : 'transparent', color: i === 1 ? '#fff' : 'var(--ept-accent)', border: i === 1 ? 'none' : '1px solid var(--ept-accent)' }}>
+                  Request a Quote
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Request Form */}
+          {webFormOpen && !webFormSent && (
+            <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-accent)', borderWidth: 2 }}>
+              <h3 className="text-xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>Tell Us About Your Website</h3>
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Business Name *</label>
+                  <input type="text" value={webForm.businessName} onChange={e => setWebForm(f => ({ ...f, businessName: e.target.value }))} placeholder="My Business" className="w-full px-3 py-2.5 rounded-xl text-sm border" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }} />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Business Type</label>
+                  <input type="text" value={webForm.businessType} onChange={e => setWebForm(f => ({ ...f, businessType: e.target.value }))} placeholder="Cleaning, HVAC, Law Firm..." className="w-full px-3 py-2.5 rounded-xl text-sm border" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }} />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Email *</label>
+                  <input type="email" value={webForm.email} onChange={e => setWebForm(f => ({ ...f, email: e.target.value }))} placeholder="you@company.com" className="w-full px-3 py-2.5 rounded-xl text-sm border" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }} />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Phone</label>
+                  <input type="tel" value={webForm.phone} onChange={e => setWebForm(f => ({ ...f, phone: e.target.value }))} placeholder="(555) 123-4567" className="w-full px-3 py-2.5 rounded-xl text-sm border" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }} />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Domain (if you have one)</label>
+                  <input type="text" value={webForm.domain} onChange={e => setWebForm(f => ({ ...f, domain: e.target.value }))} placeholder="mybusiness.com or leave blank" className="w-full px-3 py-2.5 rounded-xl text-sm border" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }} />
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-xs font-medium mb-2" style={{ color: 'var(--ept-text-muted)' }}>Pages You Want</label>
+                <div className="flex flex-wrap gap-2">
+                  {WEB_PAGE_OPTIONS.map(p => (
+                    <button key={p} onClick={() => toggleWebPage(p)} className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-all" style={{ backgroundColor: webForm.pages.includes(p) ? (isDark ? '#14b8a620' : '#0d737715') : 'transparent', borderColor: webForm.pages.includes(p) ? 'var(--ept-accent)' : 'var(--ept-border)', color: webForm.pages.includes(p) ? 'var(--ept-accent)' : 'var(--ept-text-muted)' }}>
+                      {webForm.pages.includes(p) ? '\u2713 ' : ''}{p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-xs font-medium mb-2" style={{ color: 'var(--ept-text-muted)' }}>Features & Integrations</label>
+                <div className="flex flex-wrap gap-2">
+                  {WEB_FEATURE_OPTIONS.map(f => (
+                    <button key={f} onClick={() => toggleWebFeature(f)} className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-all" style={{ backgroundColor: webForm.features.includes(f) ? (isDark ? '#14b8a620' : '#0d737715') : 'transparent', borderColor: webForm.features.includes(f) ? 'var(--ept-accent)' : 'var(--ept-border)', color: webForm.features.includes(f) ? 'var(--ept-accent)' : 'var(--ept-text-muted)' }}>
+                      {webForm.features.includes(f) ? '\u2713 ' : ''}{f}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Anything Else?</label>
+                <textarea value={webForm.notes} onChange={e => setWebForm(f => ({ ...f, notes: e.target.value }))} rows={3} placeholder="Special requests, brand colors, example sites you like..." className="w-full px-3 py-2.5 rounded-xl text-sm border resize-none" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }} />
+              </div>
+
+              <div className="flex items-center gap-4">
+                <button onClick={submitWebForm} disabled={!webForm.businessName || !webForm.email} className="px-8 py-3 rounded-xl font-semibold text-white text-sm disabled:opacity-50" style={{ backgroundColor: 'var(--ept-accent)' }}>
+                  Submit Request
+                </button>
+                <button onClick={() => setWebFormOpen(false)} className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>Cancel</button>
+                <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{webForm.pages.length} pages selected &middot; {webForm.features.length} features</span>
+              </div>
+            </div>
+          )}
+
+          {webFormSent && (
+            <div className="p-8 rounded-2xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-accent)' }}>
+              <div className="text-4xl mb-4">&#x2705;</div>
+              <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Request Submitted!</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>We&apos;ll review your requirements and get back to you within 24 hours with a quote and timeline.</p>
+              <button onClick={() => { setWebFormSent(false); setWebFormOpen(false); }} className="mt-4 text-sm underline" style={{ color: 'var(--ept-accent)' }}>Submit Another Request</button>
+            </div>
+          )}
         </div>
       </section>
 
