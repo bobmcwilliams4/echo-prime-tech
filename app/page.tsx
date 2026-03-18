@@ -116,12 +116,12 @@ const CAPABILITIES = [
     link: '/closer',
   },
   {
-    title: 'Bree AI Office Assistant',
-    description: 'Custom-trained AI office assistant with emotional intelligence, KYC customer memory, smart scheduling, dark humor on command, and voice conversations. Handles phones, books appointments, manages customer relationships, and keeps your team laughing. Fine-tuned on YOUR business — not a generic chatbot.',
-    stat: '14',
-    statLabel: 'AI Personalities',
-    icon: '💖',
-    link: '/bree-assistant',
+    title: 'Echo Office AI',
+    description: 'AI-powered office platform with conversational phone system, smart scheduling, invoicing, fleet management, employee tracking, and 22+ business modules. AI answers calls, books appointments, handles complaints, sends texts, and runs your back office — 24/7. White-label ready.',
+    stat: '22+',
+    statLabel: 'Business Modules',
+    icon: '🏢',
+    link: '/office-ai',
   },
   {
     title: 'AI Collectibles Grading',

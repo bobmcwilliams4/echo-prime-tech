@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
@@ -9,10 +9,11 @@ import ReadAloudButton from '../../components/ReadAloudButton';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 
-/* ══════════════════════════════════════════════════════════════════════════════
+/* ==============================================================================
    ECHO OFFICE AI — AI-Powered Office Management Platform
-   Full product page: hero, metrics, features, how-it-works, pricing, CTA
-   ══════════════════════════════════════════════════════════════════════════════ */
+   Full product page: hero, metrics, features, live demo, tutorial, ROI,
+   comparison, how-it-works, industries, pricing, CTA
+   ============================================================================== */
 
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -27,7 +28,109 @@ function useInView(threshold = 0.15) {
   return { ref, visible };
 }
 
-/* ─── Inline SVG Icons ─── */
+/* --- Typewriter Effect --- */
+function Typewriter({ text, speed = 25, onComplete }: { text: string; speed?: number; onComplete?: () => void }) {
+  const [displayed, setDisplayed] = useState('');
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    setDisplayed('');
+    setDone(false);
+    let i = 0;
+    const timer = setInterval(() => {
+      i++;
+      setDisplayed(text.slice(0, i));
+      if (i >= text.length) {
+        clearInterval(timer);
+        setDone(true);
+        onComplete?.();
+      }
+    }, speed);
+    return () => clearInterval(timer);
+  }, [text, speed]);
+  return <>{displayed}{!done && <span className="animate-pulse">|</span>}</>;
+}
+
+/* --- Animated Counter --- */
+function AnimatedCounter({ target, suffix = '', duration = 2000 }: { target: number; suffix?: string; duration?: number }) {
+  const [count, setCount] = useState(0);
+  const { ref, visible } = useInView(0.3);
+  useEffect(() => {
+    if (!visible) return;
+    const steps = 60;
+    const increment = target / steps;
+    let current = 0;
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= target) { setCount(target); clearInterval(timer); }
+      else setCount(Math.floor(current));
+    }, duration / steps);
+    return () => clearInterval(timer);
+  }, [visible, target, duration]);
+  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
+}
+
+/* --- ConvAI Voice Widget --- */
+function AIVoiceWidget({ active }: { active: boolean }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [widgetReady, setWidgetReady] = useState(false);
+  useEffect(() => {
+    if (!active || !containerRef.current) return;
+    let cancelled = false;
+    const mount = () => {
+      if (cancelled || !containerRef.current) return;
+      const el = document.createElement('elevenlabs-convai');
+      el.setAttribute('agent-id', 'agent_7901khgqmsy8ey1rw38py5qxzxpa');
+      el.setAttribute('dynamic-variables', JSON.stringify({ user_name: 'visitor' }));
+      containerRef.current.replaceChildren(el);
+      setWidgetReady(true);
+    };
+    if (customElements.get('elevenlabs-convai')) {
+      mount();
+    } else {
+      const existing = document.querySelector('script[src*="elevenlabs.io/convai-widget"]');
+      if (!existing) {
+        const s = document.createElement('script');
+        s.src = 'https://elevenlabs.io/convai-widget/index.js';
+        s.async = true;
+        s.onload = () => {
+          const wait = setInterval(() => {
+            if (customElements.get('elevenlabs-convai') || cancelled) {
+              clearInterval(wait);
+              if (!cancelled) mount();
+            }
+          }, 100);
+          setTimeout(() => clearInterval(wait), 10000);
+        };
+        document.head.appendChild(s);
+      } else {
+        const wait = setInterval(() => {
+          if (customElements.get('elevenlabs-convai') || cancelled) {
+            clearInterval(wait);
+            if (!cancelled) mount();
+          }
+        }, 100);
+        setTimeout(() => clearInterval(wait), 10000);
+      }
+    }
+    return () => { cancelled = true; setWidgetReady(false); if (containerRef.current) containerRef.current.replaceChildren(); };
+  }, [active]);
+  return (
+    <>
+      <div ref={containerRef} />
+      {active && !widgetReady && (
+        <div className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center animate-pulse"
+          style={{ backgroundColor: 'var(--ept-accent)', boxShadow: '0 4px 20px rgba(20,184,166,0.5)' }}>
+          <svg className="w-6 h-6 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* --- Inline SVG Icons --- */
 function InvoiceIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-8 h-8">
@@ -93,7 +196,7 @@ function AnalyticsIcon() {
   );
 }
 
-/* ─── Conversational AI Icons ─── */
+/* --- Conversational AI Icons --- */
 function PhoneAIIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-8 h-8">
@@ -158,7 +261,7 @@ function CallScoringIcon() {
   );
 }
 
-/* ─── Business Operations Icons ─── */
+/* --- Business Operations Icons --- */
 function InventoryIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-8 h-8">
@@ -207,6 +310,10 @@ function ReviewsIcon() {
   );
 }
 
+/* ==============================================================================
+   FEATURE DATA
+   ============================================================================== */
+
 const BIZ_OPS_FEATURES = [
   {
     title: 'Inventory Management',
@@ -220,7 +327,7 @@ const BIZ_OPS_FEATURES = [
   },
   {
     title: 'Employee Management',
-    description: 'Employee directory, role assignments, certifications tracking, document storage, onboarding workflows, and performance reviews — all in one place.',
+    description: 'Employee directory, role assignments, certifications tracking, document storage, onboarding workflows, and performance reviews \u2014 all in one place.',
     Icon: EmployeeIcon,
   },
   {
@@ -243,12 +350,12 @@ const BIZ_OPS_FEATURES = [
 const CONVO_AI_FEATURES = [
   {
     title: 'AI Phone Answering',
-    description: 'Never miss a call. AI answers your business line 24/7, handles inquiries, takes messages, and routes urgent calls to the right person — in natural, human-like voice.',
+    description: 'Never miss a call. AI answers your business line 24/7, handles inquiries, takes messages, and routes urgent calls to the right person \u2014 in natural, human-like voice.',
     Icon: PhoneAIIcon,
   },
   {
     title: 'AI Receptionist',
-    description: 'A virtual front desk that greets callers by name, checks schedules, books appointments, answers FAQs, and transfers calls — all without a human operator.',
+    description: 'A virtual front desk that greets callers by name, checks schedules, books appointments, answers FAQs, and transfers calls \u2014 all without a human operator.',
     Icon: ReceptionistIcon,
   },
   {
@@ -316,7 +423,7 @@ const OFFICE_FEATURES = [
   },
   {
     title: 'AI Chat Assistant',
-    description: 'Embedded AI chat widget for your customers. Answers questions, books appointments, provides quotes, and escalates to a human when needed — 24/7.',
+    description: 'Embedded AI chat widget for your customers. Answers questions, books appointments, provides quotes, and escalates to a human when needed \u2014 24/7.',
     Icon: AIChatIcon,
   },
   {
@@ -330,12 +437,12 @@ const HOW_IT_WORKS = [
   {
     step: '01',
     title: 'Connect Your Business',
-    description: 'Sign up in under 2 minutes. Import your customer list, set your services and pricing, forward your business phone number to your AI line. Multi-tenant — run multiple businesses from one account.',
+    description: 'Sign up in under 2 minutes. Import your customer list, set your services and pricing, forward your business phone number to your AI line. Multi-tenant \u2014 run multiple businesses from one account.',
   },
   {
     step: '02',
     title: 'AI Handles Everything',
-    description: 'Phone calls answered, appointments booked, invoices sent, expenses categorized, routes optimized — all autonomously. The AI receptionist handles your calls while Office AI runs the backend.',
+    description: 'Phone calls answered, appointments booked, invoices sent, expenses categorized, routes optimized \u2014 all autonomously. The AI receptionist handles your calls while Office AI runs the backend.',
   },
   {
     step: '03',
@@ -343,6 +450,641 @@ const HOW_IT_WORKS = [
     description: 'Call scoring, sentiment analysis, revenue trends, and customer retention metrics. AI recommendations help you improve call quality, price smarter, and staff better.',
   },
 ];
+
+/* ==============================================================================
+   CONVERSATION SIMULATOR
+   ============================================================================== */
+
+interface ConvoMessage { role: 'user' | 'assistant'; text: string; }
+
+const DEMO_CONVERSATIONS: Record<string, { title: string; icon: string; color: string; messages: ConvoMessage[] }> = {
+  customer_service: {
+    title: 'Customer Service',
+    icon: '\uD83D\uDCAC',
+    color: '#14b8a6',
+    messages: [
+      { role: 'user', text: 'I CANNOT BELIEVE this happened. My order arrived damaged and 3 days late. This is UNACCEPTABLE.' },
+      { role: 'assistant', text: 'I completely understand how frustrating that must be, and I\'m genuinely sorry. A damaged order that\'s also late is a double hit \u2014 and your frustration is completely valid.\n\nLet me take ownership of this right now:\n1. I\'m filing a replacement/refund request immediately\n2. I\'m pulling the shipment tracking and incident details\n3. We\'ll cover expedited shipping on the replacement at no cost\n\nI know this disrupted your plans, and that\'s the part that matters most. What I CAN do is make sure the resolution is fast and painless.\n\nYour trust matters to us more than any single order. I want to earn it back.' },
+      { role: 'user', text: 'Well... that\'s actually a really good response. Thank you.' },
+      { role: 'assistant', text: 'Of course. And I mean every word. I\'ll have the replacement shipped within the hour and follow up with you by end of day tomorrow with a tracking number. You shouldn\'t have to chase us on this.\n\nIs there anything else I can help with?' },
+    ],
+  },
+  scheduling: {
+    title: 'Smart Scheduling',
+    icon: '\uD83D\uDCC5',
+    color: '#3b82f6',
+    messages: [
+      { role: 'user', text: 'I need to book a consultation for this Saturday. We have investors visiting Monday and need to prepare.' },
+      { role: 'assistant', text: 'Saturday \u2014 got it! Investor prep is serious business, and I\'m on it.\n\nI have morning slots (9-11 AM) and afternoon slots (1-3 PM) available. Which works better?\n\nSince you\'ve got investors on Monday, I\'d recommend the comprehensive approach:\n\u2022 Financial review & deck preparation\n\u2022 Talking points & objection handling\n\u2022 Facility walkthrough checklist\n\u2022 Materials & handout preparation\n\u2022 Mock Q&A session\n\nTrust me \u2014 investors notice preparation. They\'ll check the numbers first, then your confidence, then the details.' },
+      { role: 'user', text: 'Morning slot please! You really do know the drill.' },
+      { role: 'assistant', text: 'Booked! Saturday, 9 AM start. Estimated 2-3 hours for a thorough session.\n\nI\'ve added the investor-prep protocol notes to the agenda. We\'ll make sure everything is buttoned up.\n\nYou\'ll get a confirmation shortly and a reminder Friday evening. Good luck this weekend \u2014 you\'ve got this!' },
+    ],
+  },
+  jokes: {
+    title: 'Office Humor',
+    icon: '\uD83D\uDE02',
+    color: '#f59e0b',
+    messages: [
+      { role: 'user', text: 'I need a laugh. Got any jokes?' },
+      { role: 'assistant', text: 'I\'m reading a book on anti-gravity. It\'s impossible to put down.\n\nWhy don\'t eggs tell jokes? They\'d crack each other up.\n\nI told my computer I needed a break. Now it won\'t stop sending KitKat ads.\n\nWhy did the spreadsheet go to therapy? It had too many issues.\n\nI can do this all day. Try me.' },
+      { role: 'user', text: 'Give me an office work joke!' },
+      { role: 'assistant', text: 'Oh you want the OCCUPATIONAL hazard collection? Say less:\n\nI tried to organize a productivity meeting but nobody could find the time.\n\nWhat did the printer say to the employee? "You\'re really pushing my buttons."\n\nWhy did the calendar break up with the clock? Their days were numbered.\n\nMy boss told me to have a good day, so I went home.\n\nWhat do you call a meeting that could have been an email? Every meeting.\n\nI\'ve got hundreds more where that came from. This is what happens when you give an AI unlimited joke storage.' },
+    ],
+  },
+  business_ops: {
+    title: 'Business Intelligence',
+    icon: '\uD83D\uDCCA',
+    color: '#a855f7',
+    messages: [
+      { role: 'user', text: 'I think the new hire Jessica might be underperforming. Something seems off with her numbers.' },
+      { role: 'assistant', text: 'Your instinct is usually right. Let me pull the data.\n\nPerformance analysis for Jessica\'s recent activity:\n\u2022 She\'s been on the team for 3 weeks\n\u2022 Task completion rate: noticeably lower than team average\n\u2022 Specifically: project milestones (behind by 2.3x), response times (1.8x slower), client follow-ups (missing 8)\n\nPossible explanations:\n1. Underperformance \u2014 genuine skill gap\n2. Training gap \u2014 onboarding was too fast (common issue)\n3. Workload mismatch \u2014 her assignments may be above level\n\nMy recommendation: Before a difficult conversation, let\'s confirm. I can:\n\u2022 Run a detailed performance comparison over her next 3 work cycles\n\u2022 Cross-reference with the complexity of her assigned tasks\n\u2022 Check her onboarding completion status\n\nIf the numbers confirm underperformance after fair observation, we have documented evidence. If it\'s training, it\'s a fixable problem.\n\nLet the data speak. Give me 1 week and I\'ll have your answer.' },
+      { role: 'user', text: 'That\'s exactly what I needed. Do it.' },
+      { role: 'assistant', text: 'On it. I\'ve set up the tracking protocol:\n\n\u2714 Performance metrics flagged for comparison over next 3 cycles\n\u2714 Task difficulty ratings pulled for context\n\u2714 Onboarding checklist audit activated\n\nI\'ll have a full report with data, not assumptions. If action is needed, we\'ll have documentation that holds up.\n\nAnything else you need me watching?' },
+    ],
+  },
+  emotional_iq: {
+    title: 'Emotional Intelligence',
+    icon: '\u2764\uFE0F',
+    color: '#14b8a6',
+    messages: [
+      { role: 'user', text: 'Hi... I\'m going through a really tough time personally and I\'ve been falling behind on everything. I feel so overwhelmed and embarrassed to even ask for help.' },
+      { role: 'assistant', text: 'First \u2014 please don\'t feel embarrassed. Not even a little bit. Life hits hard sometimes, and staying on top of everything during a rough patch is about item number 847 on anyone\'s priority list. You\'re dealing with so much right now, and reaching out for help is actually a sign of strength.\n\nHere\'s what I\'d suggest:\n\nLet\'s start by getting the most urgent items handled first. Think of it as a reset \u2014 for your workload AND for your peace of mind.\n\nA few things to put your mind at ease:\n\u2022 I\'m here to help, not judge. Zero judgment.\n\u2022 We can tackle this together at whatever pace works for you\n\u2022 I\'ll prioritize everything so you see quick wins first \u2014 sometimes small progress does wonders for your headspace\n\nAfter we handle the immediate items, we can set up a manageable schedule so you never fall behind again. One less thing to worry about.\n\nYou\'re going to get through this. And things are going to look a lot better once we knock out a few of these together.' },
+    ],
+  },
+};
+
+function ConversationSimulator() {
+  const { isDark } = useTheme();
+  const [activeTab, setActiveTab] = useState('customer_service');
+  const [visibleMessages, setVisibleMessages] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const convo = DEMO_CONVERSATIONS[activeTab];
+
+  useEffect(() => {
+    setVisibleMessages(0);
+    setIsTyping(false);
+    let timeout: NodeJS.Timeout;
+    const showNext = (index: number) => {
+      if (index >= convo.messages.length) return;
+      const delay = index === 0 ? 500 : convo.messages[index].role === 'assistant' ? 1200 : 800;
+      timeout = setTimeout(() => {
+        if (convo.messages[index].role === 'assistant') {
+          setIsTyping(true);
+          timeout = setTimeout(() => {
+            setIsTyping(false);
+            setVisibleMessages(index + 1);
+            showNext(index + 1);
+          }, Math.min(convo.messages[index].text.length * 8, 2000));
+        } else {
+          setVisibleMessages(index + 1);
+          showNext(index + 1);
+        }
+      }, delay);
+    };
+    showNext(0);
+    return () => clearTimeout(timeout);
+  }, [activeTab]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [visibleMessages, isTyping]);
+
+  return (
+    <div className="rounded-2xl border overflow-hidden" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+      {/* Tab Bar */}
+      <div className="flex overflow-x-auto border-b" style={{ borderColor: 'var(--ept-border)' }}>
+        {Object.entries(DEMO_CONVERSATIONS).map(([key, val]) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key)}
+            className="flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-all border-b-2"
+            style={{
+              borderBottomColor: activeTab === key ? val.color : 'transparent',
+              color: activeTab === key ? val.color : 'var(--ept-text-muted)',
+              backgroundColor: activeTab === key ? (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)') : 'transparent',
+            }}
+          >
+            <span>{val.icon}</span>
+            <span className="hidden sm:inline">{val.title}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Chat Window */}
+      <div className="p-4 md:p-6 h-[420px] overflow-y-auto" style={{ backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.01)' }}>
+        <div className="space-y-4">
+          {convo.messages.slice(0, visibleMessages).map((msg, i) => (
+            <div key={`${activeTab}-${i}`} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-up`}>
+              <div className={`max-w-[85%] ${msg.role === 'user' ? 'order-1' : ''}`}>
+                {msg.role === 'assistant' && (
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs" style={{ backgroundColor: 'rgba(20,184,166,0.15)', color: 'var(--ept-accent)' }}>E</div>
+                    <span className="text-xs font-semibold" style={{ color: 'var(--ept-accent)' }}>Echo</span>
+                  </div>
+                )}
+                <div
+                  className="px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-line"
+                  style={{
+                    backgroundColor: msg.role === 'user'
+                      ? (isDark ? 'rgba(20,184,166,0.15)' : 'rgba(13,115,119,0.08)')
+                      : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'),
+                    color: 'var(--ept-text)',
+                    borderBottomRightRadius: msg.role === 'user' ? '4px' : undefined,
+                    borderBottomLeftRadius: msg.role === 'assistant' ? '4px' : undefined,
+                  }}
+                >
+                  {msg.text}
+                </div>
+              </div>
+            </div>
+          ))}
+          {isTyping && (
+            <div className="flex justify-start animate-fade-up">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs" style={{ backgroundColor: 'rgba(20,184,166,0.15)', color: 'var(--ept-accent)' }}>E</div>
+                  <span className="text-xs font-semibold" style={{ color: 'var(--ept-accent)' }}>Echo</span>
+                </div>
+                <div className="px-4 py-3 rounded-2xl" style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' }}>
+                  <div className="flex gap-1">
+                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--ept-text-muted)', animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--ept-text-muted)', animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--ept-text-muted)', animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={chatEndRef} />
+        </div>
+      </div>
+
+      {/* Replay Button */}
+      <div className="px-4 py-3 border-t flex items-center justify-between" style={{ borderColor: 'var(--ept-border)' }}>
+        <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+          Live demo \u2014 this is how your AI assistant actually responds
+        </span>
+        <button
+          onClick={() => { setVisibleMessages(0); setActiveTab(activeTab); }}
+          className="text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
+          style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-accent)' }}
+        >
+          Replay
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ==============================================================================
+   TRAINING TUTORIAL
+   ============================================================================== */
+
+const TUTORIAL_STEPS = [
+  {
+    step: 1,
+    title: 'Tell Echo About Your Business',
+    subtitle: 'Initial Setup \u2014 5 minutes',
+    description: 'Echo learns your company name, services, pricing, service area, team size, and brand voice. It adapts its personality to match your business culture.',
+    illustration: 'SETUP',
+    details: [
+      'Company name & branding',
+      'Services offered & pricing',
+      'Service area coverage',
+      'Team size & scheduling',
+      'Brand voice & tone preferences',
+    ],
+  },
+  {
+    step: 2,
+    title: 'Train It On Your Customers',
+    subtitle: 'Customer Intelligence \u2014 10 minutes',
+    description: 'Upload your FAQ, common complaints, and customer personas. Echo builds a knowledge base that grows smarter with every interaction.',
+    illustration: 'CUSTOMERS',
+    details: [
+      'Import existing FAQs',
+      'Define customer segments',
+      'Set up complaint handling flows',
+      'Configure VIP customer treatment',
+      'Enable emotional intelligence mode',
+    ],
+  },
+  {
+    step: 3,
+    title: 'Set Up Your Channels',
+    subtitle: 'Multi-Channel Deployment \u2014 5 minutes',
+    description: 'Connect Echo to your website chat, phone line, SMS, email, WhatsApp, Facebook Messenger, and more. One AI, every channel.',
+    illustration: 'CHANNELS',
+    details: [
+      'Website chat widget (1-line embed)',
+      'Phone system (Twilio / VoIP)',
+      'SMS & text messaging',
+      'Email auto-responder',
+      'Social media DMs',
+    ],
+  },
+  {
+    step: 4,
+    title: 'Customize the Personality',
+    subtitle: 'Voice & Personality \u2014 3 minutes',
+    description: 'Choose your AI\'s voice, humor level, formality, and response style. It can be warm and casual for a local business or polished and corporate for enterprise.',
+    illustration: 'PERSONALITY',
+    details: [
+      'Voice selection (6 voices available)',
+      'Humor level slider (Professional to Playful)',
+      'Formality dial (Casual to Corporate)',
+      'Emoji usage toggle',
+      'Custom catchphrases & sign-offs',
+    ],
+  },
+  {
+    step: 5,
+    title: 'Go Live & Watch It Work',
+    subtitle: 'Launch \u2014 Instant',
+    description: 'Echo starts handling customer inquiries, booking appointments, sending follow-ups, and managing your office \u2014 24/7, 365 days a year. You focus on your business.',
+    illustration: 'LIVE',
+    details: [
+      'Real-time conversation dashboard',
+      'Customer satisfaction scoring',
+      'Automatic escalation to humans',
+      'Daily performance reports',
+      'Continuous learning from feedback',
+    ],
+  },
+];
+
+function TutorialIllustration({ type, isDark }: { type: string; isDark: boolean }) {
+  const bg = isDark ? 'rgba(20,184,166,0.08)' : 'rgba(13,115,119,0.04)';
+  const accent = 'var(--ept-accent)';
+  const accentHex = isDark ? '#14b8a6' : '#0d7377';
+  const secondary = isDark ? '#64748b' : '#94a3b8';
+
+  const illustrations: Record<string, React.ReactNode> = {
+    SETUP: (
+      <div className="relative w-full h-48 rounded-xl overflow-hidden" style={{ backgroundColor: bg }}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="space-y-3 w-64">
+            {['Company Name', 'Services', 'Pricing'].map((label, i) => (
+              <div key={label} className="flex items-center gap-2 animate-fade-up" style={{ animationDelay: `${i * 200}ms` }}>
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: i < 2 ? '#22c55e' : accentHex }} />
+                <div className="flex-1 h-8 rounded-lg border px-3 flex items-center text-xs" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
+                  {label}
+                </div>
+                {i < 2 && <svg className="w-4 h-4" style={{ color: '#22c55e' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+              </div>
+            ))}
+            <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)' }}>
+              <div className="h-full rounded-full transition-all duration-1000" style={{ width: '66%', backgroundColor: accentHex }} />
+            </div>
+            <div className="text-[10px] text-center" style={{ color: secondary }}>Setup Progress: 66%</div>
+          </div>
+        </div>
+      </div>
+    ),
+    CUSTOMERS: (
+      <div className="relative w-full h-48 rounded-xl overflow-hidden" style={{ backgroundColor: bg }}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="grid grid-cols-3 gap-2 w-72">
+            {[
+              { emoji: '\uD83D\uDE0A', label: 'Happy', pct: '73%' },
+              { emoji: '\uD83D\uDE20', label: 'Frustrated', pct: '15%' },
+              { emoji: '\uD83E\uDD14', label: 'Curious', pct: '12%' },
+              { emoji: '\u2B50', label: 'VIP', pct: '8%' },
+              { emoji: '\uD83C\uDD95', label: 'New', pct: '42%' },
+              { emoji: '\uD83D\uDD01', label: 'Returning', pct: '58%' },
+            ].map((item, i) => (
+              <div key={item.label} className="p-2 rounded-lg border text-center animate-fade-up" style={{ borderColor: 'var(--ept-border)', animationDelay: `${i * 100}ms` }}>
+                <div className="text-lg">{item.emoji}</div>
+                <div className="text-[10px] font-semibold" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</div>
+                <div className="text-xs font-bold" style={{ color: accentHex }}>{item.pct}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+    CHANNELS: (
+      <div className="relative w-full h-48 rounded-xl overflow-hidden" style={{ backgroundColor: bg }}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl border-2" style={{ borderColor: accentHex, backgroundColor: isDark ? 'rgba(20,184,166,0.15)' : 'rgba(13,115,119,0.08)' }}>
+              E
+            </div>
+            {[
+              { icon: '\uD83D\uDCAC', angle: 0, label: 'Chat' },
+              { icon: '\uD83D\uDCDE', angle: 60, label: 'Phone' },
+              { icon: '\uD83D\uDCE7', angle: 120, label: 'Email' },
+              { icon: '\uD83D\uDCF1', angle: 180, label: 'SMS' },
+              { icon: '\uD83D\uDCAD', angle: 240, label: 'Social' },
+              { icon: '\uD83C\uDF10', angle: 300, label: 'Web' },
+            ].map((ch, i) => {
+              const r = 70;
+              const x = Math.cos((ch.angle * Math.PI) / 180) * r;
+              const y = Math.sin((ch.angle * Math.PI) / 180) * r;
+              return (
+                <div
+                  key={ch.label}
+                  className="absolute w-10 h-10 rounded-full flex items-center justify-center text-sm border animate-fade-up"
+                  style={{
+                    left: `calc(50% + ${x}px - 20px)`,
+                    top: `calc(50% + ${y}px - 20px)`,
+                    borderColor: 'var(--ept-border)',
+                    backgroundColor: 'var(--ept-card-bg)',
+                    animationDelay: `${i * 150}ms`,
+                  }}
+                  title={ch.label}
+                >
+                  {ch.icon}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    ),
+    PERSONALITY: (
+      <div className="relative w-full h-48 rounded-xl overflow-hidden" style={{ backgroundColor: bg }}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="space-y-3 w-56">
+            {[
+              { label: 'Warmth', value: 85 },
+              { label: 'Humor', value: 70 },
+              { label: 'Formality', value: 40 },
+              { label: 'Empathy', value: 95 },
+            ].map((slider, i) => (
+              <div key={slider.label} className="animate-fade-up" style={{ animationDelay: `${i * 150}ms` }}>
+                <div className="flex justify-between text-[10px] mb-1">
+                  <span style={{ color: 'var(--ept-text-muted)' }}>{slider.label}</span>
+                  <span style={{ color: accentHex }}>{slider.value}%</span>
+                </div>
+                <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)' }}>
+                  <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${slider.value}%`, backgroundColor: accentHex }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+    LIVE: (
+      <div className="relative w-full h-48 rounded-xl overflow-hidden" style={{ backgroundColor: bg }}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="space-y-2 w-64">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-xs font-bold" style={{ color: '#22c55e' }}>LIVE</span>
+              </div>
+              <span className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>Today</span>
+            </div>
+            {[
+              { metric: 'Conversations', value: '47', trend: '+12%' },
+              { metric: 'Appointments Booked', value: '8', trend: '+23%' },
+              { metric: 'Satisfaction Score', value: '4.9/5', trend: '+0.2' },
+              { metric: 'Avg Response Time', value: '1.2s', trend: '-0.3s' },
+            ].map((m, i) => (
+              <div key={m.metric} className="flex items-center justify-between p-2 rounded-lg border animate-fade-up" style={{ borderColor: 'var(--ept-border)', animationDelay: `${i * 100}ms` }}>
+                <span className="text-[11px]" style={{ color: 'var(--ept-text-secondary)' }}>{m.metric}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold" style={{ color: 'var(--ept-text)' }}>{m.value}</span>
+                  <span className="text-[10px] font-semibold" style={{ color: '#22c55e' }}>{m.trend}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+  };
+
+  return illustrations[type] || null;
+}
+
+function TrainingTutorial() {
+  const { isDark } = useTheme();
+  const [activeStep, setActiveStep] = useState(0);
+
+  const accentHex = isDark ? '#14b8a6' : '#0d7377';
+
+  return (
+    <div className="grid md:grid-cols-[280px_1fr] gap-6">
+      {/* Step Navigation */}
+      <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+        {TUTORIAL_STEPS.map((step, i) => (
+          <button
+            key={step.step}
+            onClick={() => setActiveStep(i)}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all whitespace-nowrap md:whitespace-normal min-w-[200px] md:min-w-0"
+            style={{
+              backgroundColor: activeStep === i
+                ? (isDark ? 'rgba(20,184,166,0.1)' : 'rgba(13,115,119,0.06)')
+                : 'transparent',
+              borderLeft: activeStep === i ? `3px solid ${accentHex}` : '3px solid transparent',
+            }}
+          >
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+              style={{
+                backgroundColor: activeStep === i ? accentHex : (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'),
+                color: activeStep === i ? '#fff' : 'var(--ept-text-muted)',
+              }}
+            >
+              {step.step}
+            </div>
+            <div>
+              <div className="text-sm font-semibold" style={{ color: activeStep === i ? accentHex : 'var(--ept-text-secondary)' }}>
+                {step.title}
+              </div>
+              <div className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>{step.subtitle}</div>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Step Content */}
+      <div className="p-6 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ backgroundColor: isDark ? 'rgba(20,184,166,0.12)' : 'rgba(13,115,119,0.08)', color: accentHex }}>
+              Step {TUTORIAL_STEPS[activeStep].step}
+            </span>
+            <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+              {TUTORIAL_STEPS[activeStep].subtitle}
+            </span>
+          </div>
+          <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>
+            {TUTORIAL_STEPS[activeStep].title}
+          </h3>
+          <p className="text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
+            {TUTORIAL_STEPS[activeStep].description}
+          </p>
+        </div>
+
+        {/* Illustration */}
+        <div className="mb-4">
+          <TutorialIllustration type={TUTORIAL_STEPS[activeStep].illustration} isDark={isDark} />
+        </div>
+
+        {/* Checklist */}
+        <div className="space-y-2">
+          {TUTORIAL_STEPS[activeStep].details.map((detail, i) => (
+            <div key={detail} className="flex items-center gap-2 animate-fade-up" style={{ animationDelay: `${i * 80}ms` }}>
+              <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#22c55e' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{detail}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Navigation */}
+        <div className="flex justify-between mt-6 pt-4 border-t" style={{ borderColor: 'var(--ept-border)' }}>
+          <button
+            onClick={() => setActiveStep(Math.max(0, activeStep - 1))}
+            disabled={activeStep === 0}
+            className="text-sm font-medium px-4 py-2 rounded-lg transition-opacity disabled:opacity-30"
+            style={{ color: 'var(--ept-text-secondary)' }}
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => setActiveStep(Math.min(TUTORIAL_STEPS.length - 1, activeStep + 1))}
+            disabled={activeStep === TUTORIAL_STEPS.length - 1}
+            className="text-sm font-semibold px-4 py-2 rounded-lg text-white transition-opacity disabled:opacity-30"
+            style={{ backgroundColor: accentHex }}
+          >
+            Next Step
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ==============================================================================
+   ROI CALCULATOR
+   ============================================================================== */
+
+function ROICalculator() {
+  const { isDark } = useTheme();
+  const [employees, setEmployees] = useState(2);
+  const [hourlyRate, setHourlyRate] = useState(18);
+  const [hoursPerWeek, setHoursPerWeek] = useState(15);
+  const [callsPerDay, setCallsPerDay] = useState(20);
+
+  const accentHex = isDark ? '#14b8a6' : '#0d7377';
+  const monthlyCost = employees * hourlyRate * hoursPerWeek * 4.33;
+  const echoCost = 149;
+  const savings = monthlyCost - echoCost;
+  const savingsPercent = monthlyCost > 0 ? Math.round((savings / monthlyCost) * 100) : 0;
+  const annualSavings = savings * 12;
+
+  return (
+    <div className="grid md:grid-cols-2 gap-6">
+      {/* Inputs */}
+      <div className="space-y-5">
+        <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Your Current Costs</h3>
+        {[
+          { label: 'Office staff handling calls/chat', value: employees, setter: setEmployees, min: 1, max: 20, unit: 'people' },
+          { label: 'Average hourly rate', value: hourlyRate, setter: setHourlyRate, min: 10, max: 50, unit: '$/hr' },
+          { label: 'Hours per week on admin/calls', value: hoursPerWeek, setter: setHoursPerWeek, min: 5, max: 40, unit: 'hrs/wk' },
+          { label: 'Customer inquiries per day', value: callsPerDay, setter: setCallsPerDay, min: 5, max: 100, unit: '/day' },
+        ].map((input) => (
+          <div key={input.label}>
+            <div className="flex justify-between mb-2">
+              <label className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{input.label}</label>
+              <span className="text-sm font-bold font-mono" style={{ color: accentHex }}>{input.value} {input.unit}</span>
+            </div>
+            <input
+              type="range"
+              min={input.min}
+              max={input.max}
+              value={input.value}
+              onChange={(e) => input.setter(Number(e.target.value))}
+              className="w-full h-2 rounded-full appearance-none cursor-pointer"
+              style={{
+                background: `linear-gradient(to right, ${accentHex} 0%, ${accentHex} ${((input.value - input.min) / (input.max - input.min)) * 100}%, ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'} ${((input.value - input.min) / (input.max - input.min)) * 100}%, ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'} 100%)`,
+              }}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Results */}
+      <div className="p-6 rounded-2xl border" style={{ backgroundColor: isDark ? 'rgba(20,184,166,0.05)' : 'rgba(13,115,119,0.03)', borderColor: isDark ? 'rgba(20,184,166,0.2)' : 'rgba(13,115,119,0.15)' }}>
+        <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--ept-text)' }}>With Echo Office AI</h3>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center pb-3 border-b" style={{ borderColor: 'var(--ept-border)' }}>
+            <span className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>Current monthly cost</span>
+            <span className="text-lg font-bold font-mono line-through" style={{ color: 'var(--ept-text-muted)' }}>${Math.round(monthlyCost).toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between items-center pb-3 border-b" style={{ borderColor: 'var(--ept-border)' }}>
+            <span className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>Echo Office AI monthly cost</span>
+            <span className="text-lg font-bold font-mono" style={{ color: '#22c55e' }}>${echoCost}/mo</span>
+          </div>
+          <div className="flex justify-between items-center pb-3 border-b" style={{ borderColor: 'var(--ept-border)' }}>
+            <span className="text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>Monthly savings</span>
+            <span className="text-2xl font-extrabold font-mono" style={{ color: '#22c55e' }}>${Math.round(savings).toLocaleString()}</span>
+          </div>
+          <div className="p-4 rounded-xl text-center" style={{ backgroundColor: isDark ? 'rgba(34,197,94,0.1)' : 'rgba(34,197,94,0.06)' }}>
+            <div className="text-3xl font-extrabold font-mono mb-1" style={{ color: '#22c55e' }}>
+              ${Math.round(annualSavings).toLocaleString()}
+            </div>
+            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#22c55e' }}>
+              Annual Savings ({savingsPercent}% reduction)
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="text-center p-3 rounded-lg" style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
+              <div className="text-lg font-bold" style={{ color: accentHex }}>24/7</div>
+              <div className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>Availability</div>
+            </div>
+            <div className="text-center p-3 rounded-lg" style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
+              <div className="text-lg font-bold" style={{ color: accentHex }}>{callsPerDay * 30}+</div>
+              <div className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>Inquiries/mo handled</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ==============================================================================
+   COMPARISON TABLE DATA
+   ============================================================================== */
+
+const COMPARE_DATA = [
+  { feature: 'Monthly Cost', echo: 'From $149', others: '$2,000-$4,000' },
+  { feature: 'Setup Time', echo: '< 1 hour', others: '2-4 weeks' },
+  { feature: 'Available Hours', echo: '24/7/365', others: 'Business hours' },
+  { feature: 'Emotional Intelligence', echo: '6-tier adaptive', others: 'Script-based' },
+  { feature: 'Customer Memory', echo: 'Infinite recall', others: 'Session-only' },
+  { feature: 'Humor & Personality', echo: '200K+ jokes, adaptive', others: 'None' },
+  { feature: 'Channels Supported', echo: '7+ simultaneous', others: '1-2 channels' },
+  { feature: 'Business Analytics', echo: 'Built-in real-time', others: 'Separate tool needed' },
+  { feature: 'Voice Conversations', echo: 'Natural AI voice', others: 'Text-only' },
+  { feature: 'Custom Training', echo: 'Your business, your data', others: 'Generic templates' },
+  { feature: 'Appointment Booking', echo: 'Intelligent scheduling', others: 'Basic calendar links' },
+  { feature: 'Escalation to Human', echo: 'Context-aware handoff', others: 'Cold transfer' },
+];
+
+/* ==============================================================================
+   INDUSTRIES
+   ============================================================================== */
+
+const INDUSTRIES = [
+  'Cleaning Services', 'Property Management', 'Real Estate', 'Legal Offices', 'Medical Practices',
+  'Dental Offices', 'Salons & Spas', 'HVAC Companies', 'Plumbing', 'Landscaping',
+  'Roofing', 'Insurance Agencies', 'Accounting Firms', 'Consulting', 'Fitness Studios',
+  'Auto Repair', 'Pet Services', 'Restaurants', 'Photography', 'Event Planning',
+];
+
+/* ==============================================================================
+   PRICING
+   ============================================================================== */
 
 interface PricingTier {
   name: string;
@@ -407,7 +1149,7 @@ const PRICING: PricingTier[] = [
     name: 'Enterprise',
     price: 399,
     interval: '/mo',
-    description: 'Unlimited everything — Conversational AI, business operations, white-label branding, and enterprise guarantees.',
+    description: 'Unlimited everything \u2014 Conversational AI, business operations, white-label branding, and enterprise guarantees.',
     features: [
       'Unlimited businesses',
       'Unlimited users',
@@ -429,6 +1171,10 @@ const PRICING: PricingTier[] = [
   },
 ];
 
+/* ==============================================================================
+   MAIN PAGE COMPONENT
+   ============================================================================== */
+
 export default function OfficeAIPage() {
   const { isDark } = useTheme();
   const { user } = useAuth();
@@ -436,6 +1182,14 @@ export default function OfficeAIPage() {
   const howSection = useInView();
   const priceSection = useInView();
   const ctaSection = useInView();
+  const demoSection = useInView(0.1);
+  const tutorialSection = useInView(0.1);
+  const roiSection = useInView(0.1);
+  const compareSection = useInView(0.1);
+
+  const [voiceActive, setVoiceActive] = useState(false);
+
+  const accentHex = isDark ? '#14b8a6' : '#0d7377';
 
   const handleCheckout = (tier: PricingTier) => {
     if (tier.price === 399) {
@@ -452,7 +1206,7 @@ export default function OfficeAIPage() {
 
   return (
     <div className="min-h-screen transition-colors duration-600" style={{ backgroundColor: 'var(--ept-bg)' }}>
-      {/* ─── Nav ─── */}
+      {/* --- Nav --- */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">
           <Image
@@ -475,7 +1229,7 @@ export default function OfficeAIPage() {
         </div>
       </nav>
 
-      {/* ─── Hero ─── */}
+      {/* --- Hero --- */}
       <section data-tutorial="office-hero" className="relative pt-24 pb-20 px-6 overflow-hidden">
         <div className="absolute inset-0" style={{ background: 'var(--ept-hero-gradient)' }} />
         <div className="absolute inset-0 dot-grid opacity-20" />
@@ -495,7 +1249,7 @@ export default function OfficeAIPage() {
             </h1>
 
             <p className="mt-6 text-lg md:text-xl leading-relaxed max-w-xl animate-fade-up animate-fade-up-delay-2" style={{ color: 'var(--ept-text-secondary)' }}>
-              AI phone answering, receptionist, call transcription, outbound calls, SMS — plus invoicing, bookings, fleet management, and analytics. One platform for every business you run.
+              AI phone answering, receptionist, call transcription, outbound calls, SMS &mdash; plus invoicing, bookings, fleet management, and analytics. One platform for every business you run.
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-4 items-start animate-fade-up animate-fade-up-delay-3">
@@ -513,7 +1267,7 @@ export default function OfficeAIPage() {
             </div>
           </div>
 
-          {/* ─── Key Metrics ─── */}
+          {/* --- Key Metrics --- */}
           <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-px rounded-2xl overflow-hidden animate-fade-up animate-fade-up-delay-4" style={{ backgroundColor: 'var(--ept-border)' }}>
             {[
               { value: '22+', label: 'Modules' },
@@ -530,7 +1284,7 @@ export default function OfficeAIPage() {
         </div>
       </section>
 
-      {/* ─── Conversational AI Features ─── */}
+      {/* --- Conversational AI Features --- */}
       <section data-tutorial="office-convo-ai" className="py-24 px-6" ref={featSection.ref} data-page-content>
         <div className="max-w-6xl mx-auto">
           <div className="max-w-2xl mb-14">
@@ -541,7 +1295,7 @@ export default function OfficeAIPage() {
               <span className="gradient-text">Always on. Always professional.</span>
             </h2>
             <p className="mt-5 text-lg leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
-              AI answers your calls, books appointments, sends texts, makes outbound calls, and scores every interaction — so you never miss a customer and never miss an insight.
+              AI answers your calls, books appointments, sends texts, makes outbound calls, and scores every interaction &mdash; so you never miss a customer and never miss an insight.
             </p>
           </div>
 
@@ -563,8 +1317,80 @@ export default function OfficeAIPage() {
         </div>
       </section>
 
-      {/* ─── Office Management Features ─── */}
-      <section data-tutorial="office-tools" className="py-24 px-6" style={{ backgroundColor: 'var(--ept-surface)' }}>
+      {/* --- Live AI Demo --- */}
+      <section id="demo" className="py-24 px-6" style={{ backgroundColor: 'var(--ept-surface)' }} ref={demoSection.ref}>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10">
+            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Live Demo</div>
+            <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4" style={{ color: 'var(--ept-text)' }}>
+              See Your AI In <span className="gradient-text">Action</span>
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
+              These are real conversations your AI assistant handles every day. Click each tab to see how it adapts its personality, tone, and expertise to every situation.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-[1fr_380px] gap-8">
+            {/* Conversation Simulator */}
+            <ConversationSimulator />
+
+            {/* Voice Widget Panel */}
+            <div
+              className="p-6 rounded-2xl border flex flex-col"
+              style={{
+                backgroundColor: 'var(--ept-card-bg)',
+                borderColor: isDark ? 'rgba(20,184,166,0.3)' : 'rgba(13,115,119,0.15)',
+              }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: isDark ? 'rgba(20,184,166,0.12)' : 'rgba(13,115,119,0.08)' }}>
+                  <svg className="w-5 h-5" style={{ color: 'var(--ept-accent)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold" style={{ color: 'var(--ept-accent)' }}>Try Live AI Voice</h3>
+                  <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Have a real voice conversation</p>
+                </div>
+              </div>
+
+              {!voiceActive ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
+                  <p className="mb-6 text-sm" style={{ color: 'var(--ept-text-secondary)' }}>
+                    Click below to activate voice mode. A microphone bubble will appear in the bottom-right corner. Have a real conversation &mdash; ask about your business needs, request a joke, or test the emotional intelligence.
+                  </p>
+                  <button
+                    onClick={() => setVoiceActive(true)}
+                    className="px-6 py-3 rounded-xl font-bold text-white transition-all hover:opacity-90"
+                    style={{ backgroundColor: 'var(--ept-accent)', boxShadow: `0 8px 24px ${isDark ? 'rgba(20,184,166,0.3)' : 'rgba(13,115,119,0.2)'}` }}
+                  >
+                    Activate Voice Demo
+                  </button>
+                </div>
+              ) : (
+                <div className="flex-1 flex flex-col items-center justify-center text-center py-4">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <span className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: 'var(--ept-accent)' }} />
+                    <span className="text-sm font-bold" style={{ color: 'var(--ept-accent)' }}>VOICE ACTIVE</span>
+                  </div>
+                  <p className="text-sm mb-4" style={{ color: 'var(--ept-text-muted)' }}>Look for the microphone bubble in the bottom-right corner. It may take a moment to load.</p>
+                  <button
+                    onClick={() => setVoiceActive(false)}
+                    className="px-4 py-2 rounded-lg border text-sm transition-opacity hover:opacity-70"
+                    style={{ borderColor: 'rgba(239,68,68,0.4)', color: '#ef4444' }}
+                  >
+                    End Voice Demo
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+          {voiceActive && <AIVoiceWidget active={voiceActive} />}
+        </div>
+      </section>
+
+      {/* --- Office Management Features --- */}
+      <section data-tutorial="office-tools" className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="max-w-2xl mb-14">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Office Management</div>
@@ -596,8 +1422,8 @@ export default function OfficeAIPage() {
         </div>
       </section>
 
-      {/* ─── Business Operations Features ─── */}
-      <section className="py-24 px-6">
+      {/* --- Business Operations Features --- */}
+      <section className="py-24 px-6" style={{ backgroundColor: 'var(--ept-surface)' }}>
         <div className="max-w-6xl mx-auto">
           <div className="max-w-2xl mb-14">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Business Operations</div>
@@ -607,7 +1433,7 @@ export default function OfficeAIPage() {
               <span className="gradient-text">Not just the office.</span>
             </h2>
             <p className="mt-5 text-lg leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
-              Inventory, payroll, timesheets, AR/AP, employee management, and reputation monitoring — everything a service business needs to operate, all in one platform.
+              Inventory, payroll, timesheets, AR/AP, employee management, and reputation monitoring &mdash; everything a service business needs to operate, all in one platform.
             </p>
           </div>
 
@@ -629,7 +1455,75 @@ export default function OfficeAIPage() {
         </div>
       </section>
 
-      {/* ─── How It Works ─── */}
+      {/* --- Setup Tutorial --- */}
+      <section className="py-24 px-6" ref={tutorialSection.ref}>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10">
+            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Getting Started</div>
+            <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4" style={{ color: 'var(--ept-text)' }}>
+              Set Up in <span className="gradient-text">Under 30 Minutes</span>
+            </h2>
+            <p className="text-lg" style={{ color: 'var(--ept-text-secondary)' }}>
+              Interactive walkthrough &mdash; click each step to see exactly what happens.
+            </p>
+          </div>
+          <TrainingTutorial />
+        </div>
+      </section>
+
+      {/* --- ROI Calculator --- */}
+      <section className="py-24 px-6" style={{ backgroundColor: 'var(--ept-surface)' }} ref={roiSection.ref}>
+        <div className="max-w-6xl mx-auto">
+          <div className="p-8 md:p-12 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <div className="text-center mb-8">
+              <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>ROI Calculator</div>
+              <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4" style={{ color: 'var(--ept-text)' }}>
+                Calculate Your <span className="gradient-text">Savings</span>
+              </h2>
+              <p style={{ color: 'var(--ept-text-secondary)' }}>
+                Drag the sliders to see how much Echo Office AI saves your business.
+              </p>
+            </div>
+            <ROICalculator />
+          </div>
+        </div>
+      </section>
+
+      {/* --- Comparison Table --- */}
+      <section className="py-24 px-6" ref={compareSection.ref}>
+        <div className="max-w-6xl mx-auto">
+          <div className="p-6 md:p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <div className="text-center mb-8">
+              <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Comparison</div>
+              <h2 className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--ept-text)' }}>
+                Echo Office AI vs. Traditional Staff & Chatbots
+              </h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--ept-border)' }}>
+                    <th className="text-left py-3 font-medium" style={{ color: 'var(--ept-text-muted)' }}>Feature</th>
+                    <th className="text-center py-3 font-bold text-xs uppercase tracking-wider" style={{ color: 'var(--ept-accent)' }}>Echo Office AI</th>
+                    <th className="text-center py-3 font-medium text-xs uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Others</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPARE_DATA.map((row) => (
+                    <tr key={row.feature} style={{ borderBottom: `1px solid ${isDark ? 'rgba(30,41,59,0.5)' : 'rgba(226,232,240,0.5)'}` }}>
+                      <td className="py-3" style={{ color: 'var(--ept-text-secondary)' }}>{row.feature}</td>
+                      <td className="py-3 text-center font-bold" style={{ color: '#22c55e' }}>{row.echo}</td>
+                      <td className="py-3 text-center" style={{ color: 'var(--ept-text-muted)' }}>{row.others}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- How It Works --- */}
       <section data-tutorial="office-demo" className="py-24 px-6" style={{ backgroundColor: 'var(--ept-surface)' }} ref={howSection.ref}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
@@ -663,8 +1557,32 @@ export default function OfficeAIPage() {
         </div>
       </section>
 
-      {/* ─── Pricing ─── */}
-      <section data-tutorial="office-pricing" id="pricing" className="py-24 px-6" ref={priceSection.ref}>
+      {/* --- Industries We Serve --- */}
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Industries</div>
+            <h2 className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Built For Every Service Business</h2>
+            <p className="text-sm mt-2" style={{ color: 'var(--ept-text-muted)' }}>Echo adapts to your industry, your terminology, and your customers.</p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-3">
+            {INDUSTRIES.map((industry) => (
+              <div
+                key={industry}
+                className="card-hover px-5 py-3 rounded-xl border text-sm font-medium cursor-default transition-all"
+                style={{ borderColor: 'var(--ept-card-border)', backgroundColor: 'var(--ept-card-bg)', color: 'var(--ept-text-secondary)' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--ept-accent)'; e.currentTarget.style.color = 'var(--ept-text)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--ept-card-border)'; e.currentTarget.style.color = 'var(--ept-text-secondary)'; }}
+              >
+                {industry}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- Pricing --- */}
+      <section data-tutorial="office-pricing" id="pricing" className="py-24 px-6" style={{ backgroundColor: 'var(--ept-surface)' }} ref={priceSection.ref}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Pricing</div>
@@ -744,34 +1662,7 @@ export default function OfficeAIPage() {
         </div>
       </section>
 
-      {/* ─── Who It's For ─── */}
-      <section className="py-20 px-6" style={{ backgroundColor: 'var(--ept-surface)' }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-accent)' }}>Built For</div>
-            <h2 className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Service businesses that move fast.</h2>
-          </div>
-          <div className="flex flex-wrap justify-center gap-4">
-            {[
-              'Cleaning Companies', 'HVAC & Plumbing', 'Landscaping', 'Construction',
-              'Auto Detailing', 'Property Management', 'Home Services', 'Pest Control',
-              'Electrical Contractors', 'Consulting Firms', 'Oilfield Services', 'Delivery & Logistics',
-            ].map((industry, i) => (
-              <div
-                key={i}
-                className="card-hover px-5 py-3 rounded-xl border text-sm font-medium cursor-default transition-all"
-                style={{ borderColor: 'var(--ept-card-border)', backgroundColor: 'var(--ept-card-bg)', color: 'var(--ept-text-secondary)' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--ept-accent)'; e.currentTarget.style.color = 'var(--ept-text)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--ept-card-border)'; e.currentTarget.style.color = 'var(--ept-text-secondary)'; }}
-              >
-                {industry}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── CTA ─── */}
+      {/* --- CTA --- */}
       <section className="py-28 px-6 relative" ref={ctaSection.ref}>
         <div className="absolute inset-0 dot-grid opacity-20" />
         <div className={`max-w-3xl mx-auto text-center relative transition-all duration-700 ${ctaSection.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
@@ -807,8 +1698,7 @@ export default function OfficeAIPage() {
         </div>
       </section>
 
-      {/* ─── Footer ─── */}
-      {/* Intelligence Engine Integration */}
+      {/* --- Engine Query Panel --- */}
       <section className="max-w-4xl mx-auto px-6 py-12">
         <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>
           Ask the Business Operations Engine
@@ -820,6 +1710,8 @@ export default function OfficeAIPage() {
           exampleQueries={['Best invoicing practices for service businesses', 'How to calculate overtime pay in Texas', 'Accounts receivable aging best practices']}
         />
       </section>
+
+      {/* --- Footer --- */}
       <footer className="border-t py-12 px-6" style={{ borderColor: 'var(--ept-border)' }}>
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={400} height={260} className="w-[140px] h-auto opacity-80" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} />
