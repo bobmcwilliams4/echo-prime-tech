@@ -1,15 +1,24 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useTheme } from '../../lib/theme-context'
 import { useAuth } from '../../lib/auth-context'
 import Image from 'next/image'
 import Link from 'next/link'
 import ProductTutorialButton from '../../components/product-tutorial-button'
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import { getBotHealth, getRedditStats, type BotHealth, type RedditStats } from '../../lib/bot-status-api'
 
 export default function RedditPage() {
   const { isDark } = useTheme()
   const { user } = useAuth()
+  const [health, setHealth] = useState<BotHealth | null>(null)
+  const [stats, setStats] = useState<RedditStats | null>(null)
+
+  useEffect(() => {
+    getBotHealth('reddit').then(setHealth).catch(() => {})
+    getRedditStats().then(setStats).catch(() => {})
+  }, [])
 
   const features = [
     {
@@ -190,6 +199,57 @@ export default function RedditPage() {
           </Link>
         </div>
       </section>
+
+      {/* Live Bot Status */}
+      {(health || stats) && (
+        <section className="max-w-7xl mx-auto px-6 py-12">
+          <h2 className="text-2xl font-bold mb-6 text-center">Live Bot Status</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs mb-1 font-medium" style={{ color: 'var(--ept-text-muted)' }}>Status</div>
+              <div className="flex items-center justify-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: health?.status === 'ok' ? '#22c55e' : '#ef4444' }} />
+                <span className="text-sm font-semibold" style={{ color: health?.status === 'ok' ? '#22c55e' : '#ef4444' }}>
+                  {health?.status === 'ok' ? 'Online' : 'Offline'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs mb-1 font-medium" style={{ color: 'var(--ept-text-muted)' }}>Total Posts</div>
+              <div className="text-2xl font-bold">{stats?.posts?.total ?? '—'}</div>
+            </div>
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs mb-1 font-medium" style={{ color: 'var(--ept-text-muted)' }}>Replies</div>
+              <div className="text-2xl font-bold" style={{ color: 'var(--ept-accent)' }}>{stats?.replies?.total ?? '—'}</div>
+            </div>
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs mb-1 font-medium" style={{ color: 'var(--ept-text-muted)' }}>Leads Detected</div>
+              <div className="text-2xl font-bold">{stats?.leads?.total ?? '—'}</div>
+              {stats?.leads && (stats.leads.hot > 0 || stats.leads.warm > 0) && (
+                <div className="text-xs mt-1" style={{ color: 'var(--ept-text-muted)' }}>
+                  {stats.leads.hot} hot · {stats.leads.warm} warm
+                </div>
+              )}
+            </div>
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs mb-1 font-medium" style={{ color: 'var(--ept-text-muted)' }}>Avg Score</div>
+              <div className="text-2xl font-bold">{stats?.posts?.avg_score?.toFixed(1) ?? '—'}</div>
+            </div>
+          </div>
+          {stats?.by_subreddit && stats.by_subreddit.length > 0 && (
+            <div className="p-4 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs font-medium mb-3" style={{ color: 'var(--ept-text-muted)' }}>Monitored Subreddits</div>
+              <div className="flex flex-wrap gap-2">
+                {stats.by_subreddit.slice(0, 12).map((sub, i) => (
+                  <span key={i} className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-secondary)' }}>
+                    r/{sub.subreddit} ({sub.cnt})
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Features */}
       <section id="features" className="px-6 py-16 max-w-7xl mx-auto">

@@ -1,14 +1,18 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Sentinel AI — Multi-Domain Intelligence | Echo Prime Technologies',
-  description: 'Engine-backed AI intelligence across 1,000+ domains. Tax, legal, cybersecurity, oilfield, finance, engineering, and more. Doctrine-grounded answers with authority citations.',
-  keywords: ['AI intelligence', 'multi-domain AI', 'tax AI', 'legal AI', 'Sentinel AI', 'doctrine engine', 'knowledge AI'],
+  title: 'Sentinel AI — Professional Intelligence Interface | Echo Prime Technologies',
+  description: 'Engine-backed AI intelligence for tax, legal, cybersecurity, oilfield, and 200+ domains. Doctrine-hardened responses with authority citations. Not a chatbot.',
+  keywords: ['AI intelligence', 'doctrine AI', 'tax AI advisor', 'legal AI', 'cybersecurity AI', 'oilfield AI', 'sentinel AI'],
   openGraph: {
-    title: 'Sentinel AI — Multi-Domain Intelligence',
-    description: 'Engine-backed AI across 1,000+ domains with authority citations. Tax, legal, cyber, oilfield, finance.',
+    title: 'Sentinel AI — Engine-Backed Intelligence',
+    description: 'Doctrine-hardened AI for tax, legal, cyber, oilfield, and 200+ domains. Authority citations on every response.',
     url: 'https://echo-ept.com/sentinel',
-    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sentinel AI — Engine-Backed Intelligence',
+    description: 'AI intelligence backed by 6,500+ engines. Tax, legal, cyber, oilfield. Not a chatbot.',
   },
   alternates: { canonical: '/sentinel' },
 };

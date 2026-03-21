@@ -1,0 +1,350 @@
+'use client';
+
+import Link from 'next/link';
+import Image from 'next/image';
+import { useTheme } from '../../lib/theme-context';
+
+interface ChangelogEntry {
+  date: string;
+  version?: string;
+  title: string;
+  type: 'feature' | 'improvement' | 'fix' | 'launch';
+  description: string;
+  highlights?: string[];
+  link?: string;
+}
+
+const CHANGELOG: ChangelogEntry[] = [
+  {
+    date: '2026-03-20',
+    title: 'SDK Gateway v3.0 & Engine Marketplace',
+    type: 'launch',
+    description: 'Public developer SDK with TypeScript package, CLI tool, 17 API endpoints, and engine marketplace. Free tier includes 100 queries/day across all 6,500+ engines.',
+    highlights: [
+      'TypeScript SDK (@echo-prime/sdk) on GitHub',
+      'CLI tool with 45+ commands',
+      'Engine Marketplace at /engines/marketplace',
+      'Interactive API docs at /sdk/docs',
+      'Developer portal at /sdk with quickstart guides',
+    ],
+    link: '/sdk',
+  },
+  {
+    date: '2026-03-18',
+    title: 'Echo Speak Cloud v2.0 — ConvoAI-Level Voice',
+    type: 'feature',
+    description: 'Major voice system upgrade with bidirectional WebSocket conversations, 4-layer emotion engine, cloud-native STT, and quota-aware multi-provider TTS orchestration.',
+    highlights: [
+      'Real-time voice conversations via WebSocket',
+      '4-layer emotion intelligence (lexicon → trajectory → selection → placement)',
+      'Cloud STT via Workers AI Whisper',
+      'Multi-provider TTS blending (ElevenLabs + Edge)',
+      'Durable Object session persistence',
+    ],
+    link: '/voice',
+  },
+  {
+    date: '2026-03-16',
+    title: '11 Autonomous Infrastructure Workers',
+    type: 'feature',
+    description: 'Deployed complete autonomous operations layer: service registry, alert routing, log aggregation, rate limiting, usage tracking, cron orchestration, API gateway, notification hub, secrets rotation, distributed tracing, and more.',
+    highlights: [
+      'Service Registry with auto-discovery (19 services)',
+      'Alert Router with 4 rules and 2 channels',
+      'API Gateway with key management and rate limiting',
+      'Distributed Tracing with W3C Trace Context',
+      'Secrets Rotator with HIBP breach checking',
+    ],
+  },
+  {
+    date: '2026-03-15',
+    title: 'Sovereign Pricing Audit — 27 Price Adjustments',
+    type: 'improvement',
+    description: 'Complete pricing overhaul across all 16 services using 13 Laws of Sovereign Pricing framework. Optimized for market positioning, perceived value, and revenue maximization.',
+    highlights: [
+      'Annual billing toggle with 20% discount',
+      'SDK Gateway tiers: Free / Pro $49 / Enterprise $299',
+      'Closer AI tiers: $299 / $499 / $999',
+      'Projected $847K-1.42M annual revenue at scale',
+    ],
+    link: '/pricing',
+  },
+  {
+    date: '2026-03-13',
+    title: 'Bot Fleet Capability Parity',
+    type: 'feature',
+    description: 'All 8 social media bot Workers now have all 10 mandatory capabilities: A/B testing, lead detection, content dedup, Secret Sauce Firewall, Grok AI images, abuse detection, Workers AI fallback, conversation history, subscriber management, and engagement analytics.',
+    highlights: [
+      'X Bot: 134+ tweets, post caps, Jaccard dedup',
+      'LinkedIn Bot: 86 posts, DM auto-reply pipeline',
+      'Telegram Bot: 32 personalities, Grok images',
+      'Reddit, Slack, WhatsApp, Messenger, Instagram bots deployed',
+    ],
+  },
+  {
+    date: '2026-03-12',
+    title: 'SDK Dashboard & 4 New Bot Workers',
+    type: 'launch',
+    description: 'Launched SDK self-service dashboard with API key management. Deployed Slack, Reddit, WhatsApp, and Messenger bot Workers. Knowledge Forge expanded to 1,562 docs across 218 categories.',
+    highlights: [
+      'SDK Dashboard: API key creation, usage tracking, quotas',
+      'Slack Bot v1.1.0 with 5 slash commands',
+      'Reddit Bot monitoring 11 subreddits',
+      'Knowledge Forge: 1,562 docs, 7,139 chunks',
+    ],
+  },
+  {
+    date: '2026-03-09',
+    title: 'BRAVO Inference Server v2.0 — Zero Cloud Cost',
+    type: 'feature',
+    description: 'Moved all AI inference from RunPod ($290/mo) to on-premise BRAVO node with RTX 3070. 10 LoRA adapters serving through permanent Cloudflare Tunnel.',
+    highlights: [
+      'Qwen2.5-7B base with 10 domain adapters',
+      'TitleHound, Doctrine Generator, Landman, TaxLaw, Legal, Real Estate, Cyber, Engineering, Medical, Software',
+      'Permanent tunnel: inference.echo-op.com',
+      'Savings: $290/month → $0/month',
+    ],
+  },
+  {
+    date: '2026-03-07',
+    title: 'Hephaestion Forge — 6,546 Engines Built',
+    type: 'feature',
+    description: 'Autonomous engine construction reached 6,546 engines across 1,091 batches in 20 sessions. Every domain of human knowledge getting its own intelligence engine.',
+    highlights: [
+      '6,546 named engines across 1,000+ domains',
+      '13-stage build pipeline per engine',
+      '100% success rate through pipeline',
+      'Average ~1,500 lines per engine',
+    ],
+    link: '/engines',
+  },
+  {
+    date: '2026-03-05',
+    title: 'Revenue Optimization Sprint',
+    type: 'improvement',
+    description: 'Sentinel AI bug fixes, bot factory page, scraper factory page, annual billing, lead capture widget, and full site audit.',
+    highlights: [
+      'Bot Factory: 29 templates, $499-$1,499 pricing',
+      'Scraper Factory: 23 templates, $399-$1,299 pricing',
+      'Lead capture chat widget for anonymous visitors',
+      'Sentinel AI: 5 critical bugs fixed',
+    ],
+    link: '/pricing',
+  },
+  {
+    date: '2026-03-04',
+    title: 'Full Checkout Pipeline',
+    type: 'launch',
+    description: 'End-to-end checkout flow: pricing → auth → Stripe checkout → success. 17 services with full pricing tiers operational.',
+    highlights: [
+      'Stripe checkout integration (test mode)',
+      'Auth redirect flow preserves checkout intent',
+      'Case-insensitive tier matching fixed',
+    ],
+    link: '/pricing',
+  },
+  {
+    date: '2026-02-26',
+    title: '4-Node Compute Cluster',
+    type: 'feature',
+    description: 'ALPHA, BRAVO, CHARLIE, and DELTA nodes networked. 24GB VRAM, 12+ cores, 64GB RAM, 5Gbps fiber. Cloud-first priority chain established.',
+    highlights: [
+      'ALPHA: i7-6700K, RTX 4060 + GTX 1080',
+      'BRAVO: i7-11700F, RTX 3070 (inference)',
+      'CHARLIE: Kali (security/OSINT)',
+      'Cloudflare Workers → BRAVO → ALPHA priority',
+    ],
+  },
+  {
+    date: '2026-02-12',
+    title: 'Engine Runtime — 2,660 Engines Live',
+    type: 'feature',
+    description: 'Intelligence engine fleet reached 2,660 engines with 472,998 doctrines across 210 domains. TIE Gold Standard: 20 mandatory components per engine.',
+  },
+  {
+    date: '2025-12-01',
+    title: 'Echo Prime Technologies Founded',
+    type: 'launch',
+    description: 'Bobby Don McWilliams II begins building the most advanced autonomous AI platform ever constructed by an independent founder. Zero VC funding. Built from scratch on edge infrastructure in Midland, Texas.',
+  },
+];
+
+const TYPE_COLORS: Record<string, string> = {
+  feature: '#3b82f6',
+  improvement: '#22c55e',
+  fix: '#f59e0b',
+  launch: '#a855f7',
+};
+
+const TYPE_LABELS: Record<string, string> = {
+  feature: 'New Feature',
+  improvement: 'Improvement',
+  fix: 'Bug Fix',
+  launch: 'Launch',
+};
+
+export default function ChangelogPage() {
+  const { isDark } = useTheme();
+
+  return (
+    <div style={{ color: 'var(--ept-text)' }}>
+      {/* Nav */}
+      <nav
+        className="border-b px-6 py-4 flex items-center justify-between"
+        style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}
+      >
+        <Link href="/" className="flex items-center gap-3">
+          <Image
+            src={isDark ? '/logo-night.png' : '/logo-day.png'}
+            alt="Echo Prime Technologies"
+            width={140}
+            height={32}
+            style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }}
+          />
+        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/pricing" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>
+            Pricing
+          </Link>
+          <Link href="/sdk" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>
+            SDK
+          </Link>
+          <Link href="/engines" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>
+            Engines
+          </Link>
+        </div>
+      </nav>
+
+      {/* Header */}
+      <section style={{ maxWidth: 720, margin: '0 auto', padding: '64px 24px 32px', textAlign: 'center' }}>
+        <h1 className="text-3xl md:text-5xl font-extrabold" style={{ color: 'var(--ept-text)', marginBottom: 12 }}>
+          Changelog
+        </h1>
+        <p style={{ fontSize: 18, color: 'var(--ept-text-secondary)', marginBottom: 8 }}>
+          What we shipped. No fluff, no buzzwords — just real engineering updates.
+        </p>
+        <p style={{ fontSize: 14, color: 'var(--ept-text-muted)' }}>
+          Building since December 2025. 14+ months. Zero VC funding.
+        </p>
+      </section>
+
+      {/* Timeline */}
+      <section style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px 80px' }}>
+        {CHANGELOG.map((entry, i) => (
+          <div
+            key={i}
+            style={{
+              display: 'flex',
+              gap: 24,
+              marginBottom: 32,
+              paddingBottom: 32,
+              borderBottom: i < CHANGELOG.length - 1 ? '1px solid var(--ept-card-border)' : 'none',
+            }}
+          >
+            {/* Date column */}
+            <div style={{ minWidth: 100, flexShrink: 0, paddingTop: 4 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ept-text-muted)' }}>
+                {new Date(entry.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--ept-text-muted)', opacity: 0.6 }}>
+                {entry.date.split('-')[0]}
+              </div>
+            </div>
+
+            {/* Content */}
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    padding: '2px 10px',
+                    borderRadius: 20,
+                    background: TYPE_COLORS[entry.type] + '22',
+                    color: TYPE_COLORS[entry.type],
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {TYPE_LABELS[entry.type]}
+                </span>
+                {entry.version && (
+                  <span style={{ fontSize: 12, color: 'var(--ept-text-muted)', fontFamily: 'var(--font-mono, monospace)' }}>
+                    {entry.version}
+                  </span>
+                )}
+              </div>
+
+              <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6, color: 'var(--ept-text)' }}>
+                {entry.link ? (
+                  <Link href={entry.link} style={{ color: 'inherit', textDecoration: 'none' }}>
+                    {entry.title}
+                  </Link>
+                ) : (
+                  entry.title
+                )}
+              </h3>
+
+              <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--ept-text-secondary)', marginBottom: entry.highlights ? 12 : 0 }}>
+                {entry.description}
+              </p>
+
+              {entry.highlights && (
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {entry.highlights.map((h, j) => (
+                    <li
+                      key={j}
+                      style={{
+                        fontSize: 13,
+                        padding: '3px 0',
+                        color: 'var(--ept-text-secondary)',
+                        display: 'flex',
+                        alignItems: 'baseline',
+                        gap: 8,
+                      }}
+                    >
+                      <span style={{ color: 'var(--ept-accent)', fontSize: 10, flexShrink: 0 }}>&#9679;</span>
+                      {h}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* CTA */}
+      <section
+        style={{
+          maxWidth: 720,
+          margin: '0 auto',
+          padding: '48px 24px 80px',
+          textAlign: 'center',
+          borderTop: '1px solid var(--ept-card-border)',
+        }}
+      >
+        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>Want to build with us?</h2>
+        <p style={{ fontSize: 15, color: 'var(--ept-text-secondary)', marginBottom: 24 }}>
+          Start free with 100 queries/day across 6,500+ intelligence engines.
+        </p>
+        <Link href="/sdk/signup">
+          <button
+            style={{
+              padding: '12px 32px',
+              borderRadius: 8,
+              border: 'none',
+              background: 'var(--ept-accent)',
+              color: '#fff',
+              fontSize: 15,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            Get Your API Key
+          </button>
+        </Link>
+      </section>
+    </div>
+  );
+}

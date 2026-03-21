@@ -1,17 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTheme } from '../../lib/theme-context'
 import { useAuth } from '../../lib/auth-context'
 import ProductTutorialButton from '../../components/product-tutorial-button'
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import { getBotHealth, getXBotStats, type BotHealth, type XBotStats } from '../../lib/bot-status-api'
 
 export default function XBotPage() {
   const { isDark } = useTheme()
   const { user } = useAuth()
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly')
+  const [health, setHealth] = useState<BotHealth | null>(null)
+  const [stats, setStats] = useState<XBotStats | null>(null)
+
+  useEffect(() => {
+    getBotHealth('x-bot').then(setHealth).catch(() => {})
+    getXBotStats().then(setStats).catch(() => {})
+  }, [])
 
   const features = [
     {
@@ -201,6 +209,55 @@ export default function XBotPage() {
           Start Free Trial
         </Link>
       </section>
+
+      {/* Live Bot Status */}
+      {(health || stats) && (
+        <section className="px-6 py-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: health?.status === 'healthy' ? '#22c55e' : '#ef4444' }} />
+                <span className="text-xs font-semibold" style={{ color: health?.status === 'healthy' ? '#22c55e' : '#ef4444' }}>
+                  {health?.status === 'healthy' ? 'LIVE' : 'OFFLINE'}
+                </span>
+              </div>
+              <div className="text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>v{health?.version || '—'}</div>
+            </div>
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-2xl font-bold" style={{ color: 'var(--ept-accent)' }}>{stats?.total_posts ?? '—'}</div>
+              <div className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Total Posts</div>
+            </div>
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-2xl font-bold" style={{ color: 'var(--ept-accent)' }}>{stats?.posts_today ?? '—'}</div>
+              <div className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Posts Today</div>
+            </div>
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-2xl font-bold" style={{ color: 'var(--ept-accent)' }}>{stats?.mentions_replied ?? '—'}</div>
+              <div className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Mentions Replied</div>
+            </div>
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-2xl font-bold" style={{ color: 'var(--ept-accent)' }}>{stats?.threads_posted ?? '—'}</div>
+              <div className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Threads</div>
+            </div>
+          </div>
+          {stats?.recent && stats.recent.length > 0 && (
+            <div className="mt-6 p-4 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs font-semibold mb-3" style={{ color: 'var(--ept-text-secondary)' }}>Latest Posts</div>
+              <div className="space-y-2">
+                {stats.recent.slice(0, 3).map((post, i) => (
+                  <a key={i} href={post.url} target="_blank" rel="noopener noreferrer" className="block p-3 rounded-lg border hover:opacity-80 transition-opacity" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-surface)' }}>
+                    <div className="text-sm line-clamp-2" style={{ color: 'var(--ept-text)' }}>{post.text}</div>
+                    <div className="flex items-center gap-3 mt-1.5 text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>
+                      <span>{post.category}</span>
+                      <span>{new Date(post.posted_at).toLocaleDateString()}</span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Features Grid */}
       <section data-tutorial="xbot-feed" className="px-6 py-16 max-w-7xl mx-auto">

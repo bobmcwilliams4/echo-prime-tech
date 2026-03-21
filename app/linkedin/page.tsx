@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useTheme } from '../../lib/theme-context'
 import { useAuth } from '../../lib/auth-context'
 import Image from 'next/image'
@@ -7,11 +8,19 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import ProductTutorialButton from '../../components/product-tutorial-button'
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import { getBotHealth, getLinkedInStats, type BotHealth, type LinkedInStats } from '../../lib/bot-status-api'
 
 export default function LinkedInPage() {
   const { isDark } = useTheme()
   const { user } = useAuth()
   const router = useRouter()
+  const [health, setHealth] = useState<BotHealth | null>(null)
+  const [stats, setStats] = useState<LinkedInStats | null>(null)
+
+  useEffect(() => {
+    getBotHealth('linkedin').then(setHealth).catch(() => {})
+    getLinkedInStats().then(setStats).catch(() => {})
+  }, [])
 
   const features = [
     {
@@ -218,6 +227,72 @@ export default function LinkedInPage() {
           </button>
         </div>
       </section>
+
+      {/* Live Bot Status */}
+      {(health || stats) && (
+        <section className="max-w-7xl mx-auto px-6 py-12">
+          <h2 className="text-2xl font-bold mb-6 text-center">Live Bot Status</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs mb-1 font-medium" style={{ color: 'var(--ept-text-muted)' }}>Status</div>
+              <div className="flex items-center justify-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: health?.status === 'ok' ? '#22c55e' : '#ef4444' }} />
+                <span className="text-sm font-semibold" style={{ color: health?.status === 'ok' ? '#22c55e' : '#ef4444' }}>
+                  {health?.status === 'ok' ? 'Online' : 'Offline'}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs mb-1 font-medium" style={{ color: 'var(--ept-text-muted)' }}>Total Posts</div>
+              <div className="text-2xl font-bold">{stats?.total ?? '—'}</div>
+            </div>
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs mb-1 font-medium" style={{ color: 'var(--ept-text-muted)' }}>Published</div>
+              <div className="text-2xl font-bold" style={{ color: 'var(--ept-accent)' }}>{stats?.posted ?? '—'}</div>
+            </div>
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs mb-1 font-medium" style={{ color: 'var(--ept-text-muted)' }}>Impressions</div>
+              <div className="text-2xl font-bold">{stats?.engagement?.total_impressions?.toLocaleString() ?? '—'}</div>
+            </div>
+            <div className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs mb-1 font-medium" style={{ color: 'var(--ept-text-muted)' }}>Engagement</div>
+              <div className="text-2xl font-bold">{stats?.engagement ? (stats.engagement.total_likes + stats.engagement.total_comments + stats.engagement.total_shares).toLocaleString() : '—'}</div>
+            </div>
+          </div>
+          {stats?.top_categories && stats.top_categories.length > 0 && (
+            <div className="p-4 rounded-xl border mb-4" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-xs font-medium mb-3" style={{ color: 'var(--ept-text-muted)' }}>Top Categories</div>
+              <div className="flex flex-wrap gap-2">
+                {stats.top_categories.slice(0, 6).map((cat, i) => (
+                  <span key={i} className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-secondary)' }}>
+                    {cat.category} ({cat.count})
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {stats?.recent_posts && stats.recent_posts.length > 0 && (
+            <div className="space-y-3">
+              <div className="text-xs font-medium" style={{ color: 'var(--ept-text-muted)' }}>Recent Posts</div>
+              {stats.recent_posts.slice(0, 3).map((post, i) => (
+                <div key={i} className="p-4 rounded-xl border flex items-start justify-between gap-4" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm line-clamp-2" style={{ color: 'var(--ept-text-secondary)' }}>{post.content?.slice(0, 140)}{(post.content?.length ?? 0) > 140 ? '...' : ''}</p>
+                    <div className="flex gap-4 mt-2 text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+                      <span>{post.impressions?.toLocaleString() ?? 0} impressions</span>
+                      <span>{post.likes ?? 0} likes</span>
+                      <span>{post.comments ?? 0} comments</span>
+                    </div>
+                  </div>
+                  {post.linkedin_url && (
+                    <a href={post.linkedin_url} target="_blank" rel="noopener noreferrer" className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>View</a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Features Grid */}
       <section data-tutorial="linkedin-content" className="max-w-7xl mx-auto px-6 py-16">

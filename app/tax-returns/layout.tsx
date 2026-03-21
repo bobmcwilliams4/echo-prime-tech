@@ -1,14 +1,18 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'AI Tax Return Preparation | Echo Prime Technologies',
-  description: 'Professional tax preparation powered by 14 Tax Intelligence Engines. 1040 calculation, MACRS depreciation, QBI deduction, oil & gas IDC, partnership K-1 analysis. $150-$750.',
-  keywords: ['AI tax preparation', 'tax return AI', 'MACRS depreciation', 'oil and gas taxes', 'QBI deduction', 'K-1 analysis', 'tax AI'],
+  title: 'AI Tax Return Preparation — 14 Tax Engines | Echo Prime Technologies',
+  description: 'AI-powered tax preparation with 14 specialized tax engines. 1040 calculation, MACRS depreciation, deduction optimization, IRC compliance. Catches deductions human CPAs miss.',
+  keywords: ['AI tax preparation', 'tax return AI', 'MACRS depreciation', '1040 AI', 'tax optimization AI', 'deduction finder'],
   openGraph: {
-    title: 'AI Tax Return Preparation',
-    description: 'Professional tax prep with 14 Tax Intelligence Engines. 1040, MACRS, QBI, oil & gas IDC. $150-$750.',
+    title: 'AI Tax Preparation — 14 Specialized Tax Engines',
+    description: 'AI tax preparation that catches deductions CPAs miss. 14 specialized engines. IRC-compliant.',
     url: 'https://echo-ept.com/tax-returns',
-    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Tax Preparation — 14 Specialized Tax Engines',
+    description: 'AI tax preparation that catches deductions CPAs miss. IRC-compliant. MACRS depreciation.',
   },
   alternates: { canonical: '/tax-returns' },
 };

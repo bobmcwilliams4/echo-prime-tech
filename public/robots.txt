@@ -41,5 +41,17 @@ Allow: /
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /vault
+Disallow: /closer/calls
+Disallow: /closer/leads
+Disallow: /closer/analytics
+Disallow: /closer/settings
+Disallow: /checkout
+Disallow: /login
+Disallow: /signup
+Disallow: /sandbox
+Disallow: /coming-soon
+Disallow: /settings
+Disallow: /command-center
+Disallow: /commander
 
 Sitemap: https://echo-ept.com/sitemap.xml

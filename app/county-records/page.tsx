@@ -79,6 +79,12 @@ interface HealthStatus {
   loading: boolean;
 }
 
+const LANDMAN_API = 'https://echo-landman-pipeline.bmcii1976.workers.dev';
+const LANDMAN_KEY = 'echo-omega-prime-forge-x-2026';
+const PAGE_SIZE = 25;
+
+type SortOption = 'relevance' | 'date-desc' | 'date-asc' | 'county-az';
+
 export default function CountyRecordsPage() {
   const { isDark, toggle } = useTheme();
   const { user } = useAuth();
@@ -92,6 +98,10 @@ export default function CountyRecordsPage() {
   const [deedCounties, setDeedCounties] = useState<string[]>([]);
   const [deedTypes, setDeedTypes] = useState<string[]>([]);
   const [deedStats, setDeedStats] = useState<{ total_records: number; counties: number; instrument_types: number } | null>(null);
+  const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState<SortOption>('relevance');
+  const [titleChainLoading, setTitleChainLoading] = useState<number | null>(null);
+  const [titleChainResult, setTitleChainResult] = useState<{ county: string; grantor: string; grantee: string; chain: any } | null>(null);
   const [search, setSearch] = useState<SearchState>({
     query: '', surname: '', givenName: '', county: '', state: 'TX',
     recordType: '', instrumentType: '', grantor: '', grantee: '',
@@ -120,11 +130,12 @@ export default function CountyRecordsPage() {
     load();
   }, []);
 
-  const handleUnifiedSearch = useCallback(async () => {
+  const handleUnifiedSearch = useCallback(async (pg = 1) => {
     if (!search.query.trim()) return;
     setLoading(true);
     setError('');
     setHasSearched(true);
+    setPage(pg);
     try {
       const data = await unifiedSearch(search.query, search.county || undefined);
       setResults(data);
@@ -136,11 +147,12 @@ export default function CountyRecordsPage() {
     setLoading(false);
   }, [search.query, search.county]);
 
-  const handleGenealogySearch = useCallback(async () => {
+  const handleGenealogySearch = useCallback(async (pg = 1) => {
     if (!search.surname.trim() && !search.givenName.trim()) return;
     setLoading(true);
     setError('');
     setHasSearched(true);
+    setPage(pg);
     try {
       const data = await searchGenealogyRecords({
         surname: search.surname || undefined,
@@ -148,7 +160,8 @@ export default function CountyRecordsPage() {
         county: search.county || undefined,
         state: search.state || undefined,
         record_type: search.recordType || undefined,
-        limit: 50,
+        limit: PAGE_SIZE,
+        offset: (pg - 1) * PAGE_SIZE,
       });
       setResults((data.records || []).map(r => ({ type: 'genealogy' as const, data: r })));
       setTotalResults(data.total || 0);
@@ -159,11 +172,12 @@ export default function CountyRecordsPage() {
     setLoading(false);
   }, [search]);
 
-  const handleDeedSearch = useCallback(async () => {
+  const handleDeedSearch = useCallback(async (pg = 1) => {
     if (!search.county && !search.grantor && !search.grantee) return;
     setLoading(true);
     setError('');
     setHasSearched(true);
+    setPage(pg);
     try {
       const data = await searchDeedRecords({
         county: search.county || undefined,
@@ -172,7 +186,8 @@ export default function CountyRecordsPage() {
         grantee: search.grantee || undefined,
         date_from: search.dateFrom || undefined,
         date_to: search.dateTo || undefined,
-        limit: 50,
+        limit: PAGE_SIZE,
+        offset: (pg - 1) * PAGE_SIZE,
       });
       setResults((data.records || []).map(r => ({ type: 'deed' as const, data: r })));
       setTotalResults(data.total || 0);
@@ -183,10 +198,58 @@ export default function CountyRecordsPage() {
     setLoading(false);
   }, [search]);
 
-  const handleSearch = () => {
-    if (activeTab === 'unified') handleUnifiedSearch();
-    else if (activeTab === 'genealogy') handleGenealogySearch();
-    else if (activeTab === 'deeds') handleDeedSearch();
+  const handleSearch = (pg = 1) => {
+    if (activeTab === 'unified') handleUnifiedSearch(pg);
+    else if (activeTab === 'genealogy') handleGenealogySearch(pg);
+    else if (activeTab === 'deeds') handleDeedSearch(pg);
+  };
+
+  const goToPage = (pg: number) => {
+    handleSearch(pg);
+    window.scrollTo({ top: 300, behavior: 'smooth' });
+  };
+
+  const totalPages = Math.ceil(totalResults / PAGE_SIZE);
+
+  const sortedResults = [...results].sort((a, b) => {
+    if (sortBy === 'date-desc' || sortBy === 'date-asc') {
+      const getDate = (r: UnifiedRecord) => {
+        if (r.type === 'deed') return (r.data as DeedRecord).filing_date || (r.data as DeedRecord).recording_date || '';
+        return (r.data as GenealogyRecord).birth_date || (r.data as GenealogyRecord).death_date || '';
+      };
+      const da = getDate(a), db = getDate(b);
+      return sortBy === 'date-desc' ? db.localeCompare(da) : da.localeCompare(db);
+    }
+    if (sortBy === 'county-az') {
+      const ca = a.type === 'deed' ? (a.data as DeedRecord).county : (a.data as GenealogyRecord).county || '';
+      const cb = b.type === 'deed' ? (b.data as DeedRecord).county : (b.data as GenealogyRecord).county || '';
+      return (ca || '').localeCompare(cb || '');
+    }
+    return 0;
+  });
+
+  const runTitleChain = async (record: DeedRecord, idx: number) => {
+    if (!record.county || (!record.grantor && !record.grantee)) return;
+    setTitleChainLoading(idx);
+    try {
+      const res = await fetch(`${LANDMAN_API}/chain-of-title`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': LANDMAN_KEY },
+        body: JSON.stringify({
+          county: record.county,
+          state: 'TX',
+          grantor: record.grantor || undefined,
+          grantee: record.grantee || undefined,
+          legal_description: record.legal_description || undefined,
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setTitleChainResult({ county: record.county, grantor: record.grantor || '', grantee: record.grantee || '', chain: data });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Title chain request failed');
+    }
+    setTitleChainLoading(null);
   };
 
   const updateSearch = (field: keyof SearchState, value: string) => {
@@ -301,7 +364,7 @@ export default function CountyRecordsPage() {
                   style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
                 />
                 <button
-                  onClick={handleSearch}
+                  onClick={() => handleSearch()}
                   disabled={loading || !search.query.trim()}
                   className="px-8 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-40"
                   style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
@@ -327,22 +390,32 @@ export default function CountyRecordsPage() {
 
             {results.length > 0 && (
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-2">
                   <span className="text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>
                     {totalResults} record{totalResults !== 1 ? 's' : ''} found
+                    {totalPages > 1 && <span style={{ color: 'var(--ept-text-muted)' }}> — page {page} of {totalPages}</span>}
                   </span>
-                  <div className="flex gap-2 text-xs">
-                    <span className="px-2 py-1 rounded-full" style={{ backgroundColor: isDark ? '#14b8a620' : '#0d737720', color: 'var(--ept-accent)' }}>
-                      {results.filter(r => r.type === 'genealogy').length} genealogy
-                    </span>
-                    <span className="px-2 py-1 rounded-full" style={{ backgroundColor: isDark ? '#f59e0b20' : '#f59e0b20', color: '#f59e0b' }}>
-                      {results.filter(r => r.type === 'deed').length} deeds
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <select value={sortBy} onChange={e => setSortBy(e.target.value as SortOption)} className="px-3 py-1.5 rounded-lg text-xs border outline-none" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}>
+                      <option value="relevance">Sort: Relevance</option>
+                      <option value="date-desc">Sort: Newest</option>
+                      <option value="date-asc">Sort: Oldest</option>
+                      <option value="county-az">Sort: County A-Z</option>
+                    </select>
+                    <div className="flex gap-2 text-xs">
+                      <span className="px-2 py-1 rounded-full" style={{ backgroundColor: isDark ? '#14b8a620' : '#0d737720', color: 'var(--ept-accent)' }}>
+                        {results.filter(r => r.type === 'genealogy').length} genealogy
+                      </span>
+                      <span className="px-2 py-1 rounded-full" style={{ backgroundColor: isDark ? '#f59e0b20' : '#f59e0b20', color: '#f59e0b' }}>
+                        {results.filter(r => r.type === 'deed').length} deeds
+                      </span>
+                    </div>
                   </div>
                 </div>
-                {results.map((record, i) => (
-                  <RecordCard key={`${record.type}-${i}`} record={record} isDark={isDark} />
+                {sortedResults.map((record, i) => (
+                  <RecordCard key={`${record.type}-${i}`} record={record} isDark={isDark} onTitleChain={record.type === 'deed' ? () => runTitleChain(record.data as DeedRecord, i) : undefined} titleChainLoading={titleChainLoading === i} />
                 ))}
+                <PaginationControls page={page} totalPages={totalPages} onPageChange={goToPage} />
               </div>
             )}
           </div>
@@ -418,7 +491,7 @@ export default function CountyRecordsPage() {
                 </div>
                 <div className="flex items-end">
                   <button
-                    onClick={handleSearch}
+                    onClick={() => handleSearch()}
                     disabled={loading || (!search.surname.trim() && !search.givenName.trim())}
                     className="w-full px-6 py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-40"
                     style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
@@ -444,12 +517,22 @@ export default function CountyRecordsPage() {
 
             {results.length > 0 && (
               <div className="space-y-3">
-                <div className="text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>
-                  {totalResults} record{totalResults !== 1 ? 's' : ''} found
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>
+                    {totalResults} record{totalResults !== 1 ? 's' : ''} found
+                    {totalPages > 1 && <span style={{ color: 'var(--ept-text-muted)' }}> — page {page} of {totalPages}</span>}
+                  </span>
+                  <select value={sortBy} onChange={e => setSortBy(e.target.value as SortOption)} className="px-3 py-1.5 rounded-lg text-xs border outline-none" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}>
+                    <option value="relevance">Sort: Relevance</option>
+                    <option value="date-desc">Sort: Newest</option>
+                    <option value="date-asc">Sort: Oldest</option>
+                    <option value="county-az">Sort: County A-Z</option>
+                  </select>
                 </div>
-                {results.map((record, i) => (
+                {sortedResults.map((record, i) => (
                   <RecordCard key={`gen-${i}`} record={record} isDark={isDark} />
                 ))}
+                <PaginationControls page={page} totalPages={totalPages} onPageChange={goToPage} />
               </div>
             )}
           </div>
@@ -540,7 +623,7 @@ export default function CountyRecordsPage() {
               </div>
               <div className="mt-4">
                 <button
-                  onClick={handleSearch}
+                  onClick={() => handleSearch()}
                   disabled={loading || (!search.county && !search.grantor && !search.grantee)}
                   className="px-8 py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-40"
                   style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
@@ -565,12 +648,22 @@ export default function CountyRecordsPage() {
 
             {results.length > 0 && (
               <div className="space-y-3">
-                <div className="text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>
-                  {totalResults} record{totalResults !== 1 ? 's' : ''} found
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>
+                    {totalResults} record{totalResults !== 1 ? 's' : ''} found
+                    {totalPages > 1 && <span style={{ color: 'var(--ept-text-muted)' }}> — page {page} of {totalPages}</span>}
+                  </span>
+                  <select value={sortBy} onChange={e => setSortBy(e.target.value as SortOption)} className="px-3 py-1.5 rounded-lg text-xs border outline-none" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}>
+                    <option value="relevance">Sort: Relevance</option>
+                    <option value="date-desc">Sort: Newest</option>
+                    <option value="date-asc">Sort: Oldest</option>
+                    <option value="county-az">Sort: County A-Z</option>
+                  </select>
                 </div>
-                {results.map((record, i) => (
-                  <RecordCard key={`deed-${i}`} record={record} isDark={isDark} />
+                {sortedResults.map((record, i) => (
+                  <RecordCard key={`deed-${i}`} record={record} isDark={isDark} onTitleChain={record.type === 'deed' ? () => runTitleChain(record.data as DeedRecord, i) : undefined} titleChainLoading={titleChainLoading === i} />
                 ))}
+                <PaginationControls page={page} totalPages={totalPages} onPageChange={goToPage} />
               </div>
             )}
           </div>
@@ -690,6 +783,51 @@ export default function CountyRecordsPage() {
           exampleQueries={['What is a lis pendens and when is it filed?', 'How to search grantor-grantee index', 'Texas deed recording requirements']}
         />
       </section>
+      {/* Title Chain Result Modal */}
+      {titleChainResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }} onClick={() => setTitleChainResult(null)}>
+          <div className="w-full max-w-3xl max-h-[80vh] overflow-y-auto rounded-2xl border p-6" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }} onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold" style={{ color: 'var(--ept-text)' }}>
+                Chain of Title — {titleChainResult.county} County
+              </h3>
+              <button onClick={() => setTitleChainResult(null)} className="w-8 h-8 rounded-lg flex items-center justify-center border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
+                x
+              </button>
+            </div>
+            {titleChainResult.grantor && <p className="text-xs mb-1" style={{ color: 'var(--ept-text-secondary)' }}>Grantor: {titleChainResult.grantor}</p>}
+            {titleChainResult.grantee && <p className="text-xs mb-3" style={{ color: 'var(--ept-text-secondary)' }}>Grantee: {titleChainResult.grantee}</p>}
+            {titleChainResult.chain?.report ? (
+              <div className="prose prose-sm max-w-none text-sm leading-relaxed whitespace-pre-wrap font-mono" style={{ color: 'var(--ept-text)' }}>
+                {typeof titleChainResult.chain.report === 'string' ? titleChainResult.chain.report : JSON.stringify(titleChainResult.chain, null, 2)}
+              </div>
+            ) : titleChainResult.chain?.chain ? (
+              <div className="space-y-2">
+                {(titleChainResult.chain.chain as any[]).map((link: any, i: number) => (
+                  <div key={i} className="p-3 rounded-lg border text-xs" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)' }}>
+                    <span className="font-semibold" style={{ color: 'var(--ept-accent)' }}>{link.instrument_type || 'Deed'}</span>
+                    {' — '}{link.grantor} → {link.grantee}
+                    {link.filing_date && <span style={{ color: 'var(--ept-text-muted)' }}> ({link.filing_date})</span>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <pre className="text-xs overflow-x-auto p-4 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text)' }}>
+                {JSON.stringify(titleChainResult.chain, null, 2)}
+              </pre>
+            )}
+            <div className="mt-4 flex gap-3">
+              <Link href="/title-intelligence" className="px-4 py-2 rounded-lg text-xs font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+                Full Title Intelligence
+              </Link>
+              <button onClick={() => setTitleChainResult(null)} className="px-4 py-2 rounded-lg text-xs font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <footer className="px-6 py-8 border-t text-center text-xs" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
         <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved.</p>
         <div className="flex justify-center gap-4 mt-2">
@@ -703,8 +841,59 @@ export default function CountyRecordsPage() {
   );
 }
 
+// ── Pagination Controls ──────────────────────────────────────
+function PaginationControls({ page, totalPages, onPageChange }: { page: number; totalPages: number; onPageChange: (pg: number) => void }) {
+  if (totalPages <= 1) return null;
+  const range: (number | '...')[] = [];
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= page - 1 && i <= page + 1)) {
+      range.push(i);
+    } else if (range[range.length - 1] !== '...') {
+      range.push('...');
+    }
+  }
+  return (
+    <div className="flex items-center justify-center gap-1.5 mt-4">
+      <button
+        onClick={() => onPageChange(page - 1)}
+        disabled={page <= 1}
+        className="px-3 py-1.5 rounded-lg text-xs font-semibold border disabled:opacity-30 transition-colors"
+        style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}
+      >
+        Prev
+      </button>
+      {range.map((item, i) =>
+        item === '...' ? (
+          <span key={`dot-${i}`} className="px-2 text-xs" style={{ color: 'var(--ept-text-muted)' }}>...</span>
+        ) : (
+          <button
+            key={item}
+            onClick={() => onPageChange(item as number)}
+            className="w-8 h-8 rounded-lg text-xs font-semibold transition-colors"
+            style={{
+              backgroundColor: page === item ? 'var(--ept-accent)' : 'transparent',
+              color: page === item ? '#fff' : 'var(--ept-text-secondary)',
+              border: page === item ? 'none' : '1px solid var(--ept-border)',
+            }}
+          >
+            {item}
+          </button>
+        )
+      )}
+      <button
+        onClick={() => onPageChange(page + 1)}
+        disabled={page >= totalPages}
+        className="px-3 py-1.5 rounded-lg text-xs font-semibold border disabled:opacity-30 transition-colors"
+        style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}
+      >
+        Next
+      </button>
+    </div>
+  );
+}
+
 // ── Record Card Component ─────────────────────────────────────
-function RecordCard({ record, isDark }: { record: UnifiedRecord; isDark: boolean }) {
+function RecordCard({ record, isDark, onTitleChain, titleChainLoading }: { record: UnifiedRecord; isDark: boolean; onTitleChain?: () => void; titleChainLoading?: boolean }) {
   if (record.type === 'genealogy') {
     const r = record.data as GenealogyRecord;
     return (
@@ -785,11 +974,23 @@ function RecordCard({ record, isDark }: { record: UnifiedRecord; isDark: boolean
             </div>
           )}
         </div>
-        {r.source_url && (
-          <a href={r.source_url} target="_blank" rel="noopener noreferrer" className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold border hover:opacity-80" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
-            Source
-          </a>
-        )}
+        <div className="shrink-0 flex flex-col gap-2">
+          {onTitleChain && (
+            <button
+              onClick={onTitleChain}
+              disabled={titleChainLoading}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50"
+              style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
+            >
+              {titleChainLoading ? 'Running...' : 'Run Title Chain'}
+            </button>
+          )}
+          {r.source_url && (
+            <a href={r.source_url} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg text-xs font-semibold border hover:opacity-80 text-center" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+              Source
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );

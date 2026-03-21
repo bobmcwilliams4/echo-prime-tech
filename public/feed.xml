@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Echo Prime Technologies — Changelog</title>
+    <link>https://echo-ept.com/changelog</link>
+    <description>Weekly releases, new engine deployments, platform upgrades, and feature launches from Echo Prime Technologies.</description>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 20 Mar 2026 00:00:00 GMT</lastBuildDate>
+    <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>v2026.12 — Signal Amplification: Bot Fleet Quality + SEO</title>
+      <link>https://echo-ept.com/changelog</link>
+      <pubDate>Thu, 20 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/changelog#2026-03-20</guid>
+      <description>LinkedIn bot v2.5.0 with content quality overhaul (temperature tuning, stats cleanup, plain-text formatting). Reddit bot v1.8.0 with organic content fixes. Slack bot truncation fixes. Enterprise CTA on homepage. SEO metadata on 4 product pages. Full bot fleet health verification.</description>
+    </item>
+    <item>
+      <title>v2026.11 — Autonomous Infrastructure Fleet</title>
+      <link>https://echo-ept.com/changelog</link>
+      <pubDate>Wed, 19 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/changelog#2026-03-19</guid>
+      <description>11 new infrastructure Workers deployed: config-manager, alert-router, log-aggregator, rate-limiter, usage-tracker, cron-orchestrator, api-gateway, notification-hub, secrets-rotator, distributed-tracing, service-registry. 7,833 lines, 356KB, 11 D1 databases, 31 crons.</description>
+    </item>
+    <item>
+      <title>v2026.10 — Echo Speak Cloud v2.0 + ConvoAI Voice System</title>
+      <link>https://echo-ept.com/changelog</link>
+      <pubDate>Tue, 18 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/changelog#2026-03-18</guid>
+      <description>Echo Speak Cloud upgraded to v2.0 with bidirectional voice: STT (Whisper), emotion engine (12 lexicons, personality modifiers), ElevenLabs WebSocket streaming TTS, voice orchestrator with quota-aware blending, VoiceConversation Durable Object.</description>
+    </item>
+    <item>
+      <title>v2026.9 — Landman Pipeline v3.1 + County DB Cascade</title>
+      <link>https://echo-ept.com/changelog</link>
+      <pubDate>Sun, 16 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/changelog#2026-03-16</guid>
+      <description>COUNTY_DB cascade architecture: search local D1 first, supplement from ShadowGlass, then trigger live scrape. ACRIS-inspired schema with content-hash dedup. 2,695+ records migrated across 5 counties. 4 new HTTP endpoints for county data.</description>
+    </item>
+    <item>
+      <title>v2026.8 — Sovereign Pricing Audit + Bot Parity</title>
+      <link>https://echo-ept.com/changelog</link>
+      <pubDate>Sat, 15 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/changelog#2026-03-15</guid>
+      <description>27 price changes across 13 services using 13 Laws framework. All 8 bot Workers now have 10 mandatory capabilities: A/B testing, lead detection, content dedup, Secret Sauce Firewall, Grok AI images, abuse detection, Workers AI fallback, conversation history, subscribers, analytics.</description>
+    </item>
+    <item>
+      <title>v2026.7 — SDK v3.0 + Engine Marketplace + Developer Portal</title>
+      <link>https://echo-ept.com/changelog</link>
+      <pubDate>Wed, 12 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/changelog#2026-03-12</guid>
+      <description>Echo SDK v3.0 with 4 new Workers (tool-discovery, scraper-orchestrator, bot-factory, sdk-dashboard). Developer portal at /sdk with quickstart, docs, playground, and pricing. 4 new bot Workers deployed (Slack, Reddit, WhatsApp, Messenger).</description>
+    </item>
+    <item>
+      <title>v2026.6 — BRAVO Inference Server + 10 LoRA Adapters</title>
+      <link>https://echo-ept.com/changelog</link>
+      <pubDate>Mon, 09 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/changelog#2026-03-09</guid>
+      <description>BRAVO inference server v2.0 with Qwen2.5-7B 4-bit base and 10 LoRA adapters (titlehound, doctrine-gen, landman, taxlaw, legal, realestate, cyber, engineering, medical, software). Zero cloud cost. Permanent tunnel at inference.echo-op.com.</description>
+    </item>
+    <item>
+      <title>v2026.5 — Hephaestion Forge Mass Engine Build</title>
+      <link>https://echo-ept.com/changelog</link>
+      <pubDate>Fri, 07 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/changelog#2026-03-07</guid>
+      <description>5,400+ engines across 450+ domains built via Hephaestion Forge. 13-stage pipeline, 6 engines per batch in parallel. Covering every domain of human knowledge from tax law to veterinary science.</description>
+    </item>
+    <item>
+      <title>v2026.4 — Revenue Optimization + Checkout Pipeline</title>
+      <link>https://echo-ept.com/changelog</link>
+      <pubDate>Tue, 04 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/changelog#2026-03-04</guid>
+      <description>Full checkout pipeline: Pricing to signup to Stripe checkout. Sentinel AI fixed (5 bugs). Bot Factory and Scraper Factory pages. Annual billing with 20% discount. Lead capture chat widget. Enterprise bundle CTA.</description>
+    </item>
+  </channel>
+</rss>

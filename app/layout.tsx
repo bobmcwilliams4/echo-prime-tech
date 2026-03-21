@@ -183,6 +183,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <link rel="alternate" type="application/rss+xml" title="Echo Prime Technologies Changelog" href="/feed.xml" />
       </head>
       <body className="antialiased">
         <AuthProvider>

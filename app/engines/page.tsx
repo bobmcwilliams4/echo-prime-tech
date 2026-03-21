@@ -218,6 +218,14 @@ export default function EnginesPage() {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-6" style={{ backgroundColor: '#6366f120', color: '#818cf8', border: '1px solid #6366f140' }}>
             Engine Intelligence Catalog
           </div>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <Link href="/engines/marketplace" className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors" style={{ backgroundColor: '#6366f120', color: '#818cf8', border: '1px solid #6366f140' }}>
+              Browse Marketplace →
+            </Link>
+            <Link href="/sdk/docs" className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-secondary)', border: '1px solid var(--ept-border)' }}>
+              API Docs
+            </Link>
+          </div>
           <h1 className="text-4xl md:text-6xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>
             <span style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               {totalEngines.toLocaleString()}

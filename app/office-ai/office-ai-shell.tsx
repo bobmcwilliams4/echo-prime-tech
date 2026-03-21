@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
+import { getSettings } from '../../lib/business-api';
 
 /* ── Service Health Monitor ── */
 
@@ -145,6 +146,7 @@ const NAV_SECTIONS: NavSection[] = [
       { href: '/office-ai/sales-calls', icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z', label: 'Sales Calls' },
       { href: '/office-ai/phone-support', icon: 'M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414', label: 'Phone Support' },
       { href: '/office-ai/taxes', icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z', label: 'Taxes' },
+      { href: '/office-ai/commissions', icon: 'M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0120.25 6v12A2.25 2.25 0 0118 20.25H6A2.25 2.25 0 013.75 18V6A2.25 2.25 0 016 3.75h1.5m9 0h-9', label: 'Commissions' },
     ],
   },
   {
@@ -165,6 +167,7 @@ const SETTINGS_ITEM = {
 /* ── Main Shell ── */
 
 const PUBLIC_PATHS = ['/office-ai'];
+const ALWAYS_ON_MODULES = new Set(['dashboard', 'modules']);
 
 export default function OfficeAIShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -173,9 +176,22 @@ export default function OfficeAIShell({ children }: { children: React.ReactNode 
   const { isDark, toggle: toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [enabledModules, setEnabledModules] = useState<Set<string> | null>(null);
   const services = useServiceStatus(60000);
 
   const isPublicPath = PUBLIC_PATHS.includes(pathname);
+
+  // Load enabled modules from settings
+  useEffect(() => {
+    if (!user) return;
+    getSettings().then((data: any) => {
+      const mods = data?.enabled_modules;
+      if (mods && Array.isArray(mods) && mods.length > 0) {
+        setEnabledModules(new Set(mods));
+      }
+      // null = show all (no config saved yet)
+    }).catch(() => {});
+  }, [user]);
 
   useEffect(() => {
     if (!loading && !user && !isPublicPath) router.push('/login');
@@ -204,8 +220,20 @@ export default function OfficeAIShell({ children }: { children: React.ReactNode 
     );
   }
 
+  // Filter nav sections based on enabled modules
+  const filteredSections = useMemo(() => {
+    if (!enabledModules) return NAV_SECTIONS; // no config yet = show all
+    return NAV_SECTIONS.map(section => ({
+      ...section,
+      items: section.items.filter(item => {
+        const moduleId = item.href.replace('/office-ai/', '');
+        return ALWAYS_ON_MODULES.has(moduleId) || enabledModules.has(moduleId);
+      }),
+    })).filter(section => section.items.length > 0);
+  }, [enabledModules]);
+
   // Find current page label
-  const allItems = NAV_SECTIONS.flatMap(s => s.items);
+  const allItems = filteredSections.flatMap(s => s.items);
   const currentPage = allItems.find(n => pathname.startsWith(n.href)) || allItems[0];
 
   function isActive(href: string): boolean {
@@ -237,7 +265,7 @@ export default function OfficeAIShell({ children }: { children: React.ReactNode 
 
       {/* Nav sections */}
       <nav className="flex-1 py-1 overflow-y-auto overflow-x-hidden">
-        {NAV_SECTIONS.map((section) => (
+        {filteredSections.map((section) => (
           <div key={section.title} style={{ marginBottom: 6 }}>
             {sidebarOpen && (
               <p className="px-3 pt-3 pb-1 text-[9px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--ept-text-muted)' }}>
@@ -319,7 +347,7 @@ export default function OfficeAIShell({ children }: { children: React.ReactNode 
         <div className="mx-3 my-1" style={{ height: 1, backgroundColor: 'var(--ept-border)' }} />
 
         <nav className="flex-1 py-1 overflow-y-auto px-1">
-          {NAV_SECTIONS.map((section) => (
+          {filteredSections.map((section) => (
             <div key={section.title} style={{ marginBottom: 6 }}>
               <p className="px-3 pt-3 pb-1 text-[9px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--ept-text-muted)' }}>
                 {section.title}

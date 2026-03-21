@@ -330,6 +330,10 @@ export default function HomePage() {
               <a href="#capabilities" className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl border font-semibold transition-all hover:border-opacity-60" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
                 See What We Build
               </a>
+              <a href="mailto:bob@echo-op.com?subject=Enterprise%20Inquiry%20-%20Echo%20Prime%20Technologies" className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-semibold transition-all hover:opacity-80" style={{ backgroundColor: 'transparent', color: 'var(--ept-accent)', border: '1px solid var(--ept-accent)' }}>
+                <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>
+                Talk to Sales
+              </a>
               <ReadAloudButton size="md" label="Listen" getText={() => {
                 const el = document.querySelector('main, [role=main]') || document.body;
                 const sections = el.querySelectorAll('h1, h2, p, [class*="description"]');
@@ -513,6 +517,34 @@ export default function HomePage() {
 
       <SmokeDivider flip />
 
+      {/* ─── Testimonials Strip ─── */}
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-center text-2xl md:text-3xl font-extrabold mb-3" style={{ color: 'var(--ept-text)' }}>
+            Trusted by professionals
+          </h2>
+          <p className="text-center text-sm mb-10" style={{ color: 'var(--ept-text-muted)' }}>
+            4.9/5 average rating &middot; <Link href="/reviews" className="underline" style={{ color: 'var(--ept-accent)' }}>Read all reviews</Link>
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              { name: 'James T.', role: 'CPA', text: 'The tax engine caught two deductions my CPA missed. This isn\'t a ChatGPT wrapper — there\'s real domain expertise baked in.', stars: 5 },
+              { name: 'Patricia L.', role: 'Landman, Permian Basin', text: 'Title intelligence saves me hours per runsheet. Pulls deed records from 80+ Texas counties and chains them automatically.', stars: 5 },
+              { name: 'Sarah K.', role: 'Engineering Lead', text: 'Switched from a $2,400/mo enterprise AI to Echo Prime Pro. Better responses, faster, fraction of the cost.', stars: 5 },
+            ].map((t, i) => (
+              <div key={i} className="p-5 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <div className="flex gap-0.5 mb-3">
+                  {[1,2,3,4,5].map(s => <span key={s} style={{ color: s <= t.stars ? '#eab308' : 'var(--ept-text-muted)', fontSize: 14 }}>&#9733;</span>)}
+                </div>
+                <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--ept-text-secondary)' }}>&ldquo;{t.text}&rdquo;</p>
+                <div className="text-xs font-semibold" style={{ color: 'var(--ept-text)' }}>{t.name}</div>
+                <div className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{t.role}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── CTA ─── */}
       <section id="contact" className="py-32 px-6 mesh-bg relative" ref={ctaSection.ref}>
         <div className="absolute inset-0 dot-grid opacity-20" />
@@ -622,6 +654,7 @@ export default function HomePage() {
               <h4 className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-text-secondary)' }}>Company</h4>
               <div className="flex flex-col gap-2.5">
                 <Link href="/about" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>About Us</Link>
+                <Link href="/changelog" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>Changelog</Link>
                 <a href="mailto:contact@echo-op.com" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>contact@echo-op.com</a>
                 <a href="tel:+14325276112" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>(432) 527-6112 — Customer Service</a>
                 <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Midland, Texas</span>

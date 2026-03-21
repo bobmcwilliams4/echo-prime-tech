@@ -139,7 +139,7 @@ export const DATA_SOURCE_TYPES: DataSourceType[] = [
       { key: 'keywords', label: 'Keywords', placeholder: 'Additional search terms' },
       { key: 'severity', label: 'Min Severity', placeholder: 'low, medium, high, critical' },
     ],
-    workerUrl: 'https://echo-darkweb-scraper.bmcii1976.workers.dev',
+    workerUrl: 'https://echo-darkweb-intelligence.bmcii1976.workers.dev',
   },
   {
     id: 'web_scraper',

@@ -77,8 +77,6 @@
   <url><loc>https://echo-ept.com/immortality-vault/app</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://echo-ept.com/grading</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://echo-ept.com/rewards</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://echo-ept.com/sandbox</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>
-
   <!-- SDK Developer Portal -->
   <url><loc>https://echo-ept.com/sdk</loc><lastmod>2026-03-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://echo-ept.com/sdk/signup</loc><lastmod>2026-03-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
@@ -87,12 +85,24 @@
   <url><loc>https://echo-ept.com/sdk/playground</loc><lastmod>2026-03-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/sdk/pricing</loc><lastmod>2026-03-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
+  <!-- Engine Marketplace -->
+  <url><loc>https://echo-ept.com/engines/marketplace</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+
   <!-- Reviews -->
   <url><loc>https://echo-ept.com/reviews</loc><lastmod>2026-03-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+
+  <!-- Products — Vault -->
+  <url><loc>https://echo-ept.com/vault</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+
+  <!-- Products — Websites Tutorial -->
+  <url><loc>https://echo-ept.com/websites/builder/tutorial</loc><lastmod>2026-03-07</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
 
   <!-- Auth -->
   <url><loc>https://echo-ept.com/login</loc><lastmod>2026-03-07</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://echo-ept.com/signup</loc><lastmod>2026-03-07</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+
+  <!-- Changelog -->
+  <url><loc>https://echo-ept.com/changelog</loc><lastmod>2026-03-20</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
 
   <!-- Legal -->
   <url><loc>https://echo-ept.com/legal</loc><lastmod>2026-03-07</lastmod><changefreq>monthly</changefreq><priority>0.4</priority></url>

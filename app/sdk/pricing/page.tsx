@@ -198,27 +198,61 @@ export default function SDKPricingPage() {
                   ))}
                 </ul>
 
-                <Link href={tier.key === 'free' ? '/sdk/signup' : tier.key === 'enterprise' ? '/support' : '/sdk/signup'}>
-                  <button
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      borderRadius: 8,
-                      border: tier.popular ? 'none' : '1px solid var(--ept-card-border)',
-                      background: tier.popular ? 'var(--ept-accent)' : 'transparent',
-                      color: tier.popular ? '#fff' : 'var(--ept-text)',
-                      fontSize: 15,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {tier.key === 'free'
-                      ? 'Get Started Free'
-                      : tier.key === 'enterprise'
-                        ? 'Contact Sales'
-                        : 'Upgrade to Pro'}
-                  </button>
-                </Link>
+                {tier.key === 'free' ? (
+                  <Link href="/sdk/signup">
+                    <button
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        borderRadius: 8,
+                        border: '1px solid var(--ept-card-border)',
+                        background: 'transparent',
+                        color: 'var(--ept-text)',
+                        fontSize: 15,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Get Started Free
+                    </button>
+                  </Link>
+                ) : tier.key === 'enterprise' ? (
+                  <Link href="/support">
+                    <button
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        borderRadius: 8,
+                        border: '1px solid var(--ept-card-border)',
+                        background: 'transparent',
+                        color: 'var(--ept-text)',
+                        fontSize: 15,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Contact Sales
+                    </button>
+                  </Link>
+                ) : (
+                  <Link href={user ? `/checkout?service=sdk-gateway&tier=${tier.key}` : `/signup?redirect=${encodeURIComponent(`/checkout?service=sdk-gateway&tier=${tier.key}`)}`}>
+                    <button
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        borderRadius: 8,
+                        border: 'none',
+                        background: 'var(--ept-accent)',
+                        color: '#fff',
+                        fontSize: 15,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Upgrade to Pro
+                    </button>
+                  </Link>
+                )}
               </div>
             );
           })}

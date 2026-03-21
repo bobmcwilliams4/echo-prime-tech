@@ -52,8 +52,11 @@ export interface ServiceItem {
   description: string;
   base_price: number;
   category: string;
+  pricing_type: string;
   duration_minutes: number;
+  billing_cycle: 'monthly' | 'annually' | 'one-time' | 'per-project' | 'per-unit';
   active: boolean;
+  sort_order: number;
 }
 
 export interface Booking {
@@ -371,9 +374,11 @@ export const approveReview = (id: string) =>
 export const deleteReview = (id: string) =>
   apiFetch<{ success: boolean }>(`/reviews/${id}?tenant=public`, { method: 'DELETE' });
 
-/* ─── Reviews (public — no auth) ─── */
+/* ─── Reviews (public — no auth, via ept-api for seed data + submissions) ─── */
+const EPT_API_URL = 'https://ept-api.bmcii1976.workers.dev';
+
 export const getPublicReviews = async (): Promise<{ reviews: Review[] }> => {
-  const res = await fetch(`${API_URL}/public/reviews`);
+  const res = await fetch(`${EPT_API_URL}/public/reviews`);
   if (!res.ok) throw new Error(`API ${res.status}`);
   return res.json();
 };
@@ -383,7 +388,7 @@ export const submitPublicReview = async (data: {
   text: string;
   service_type?: string;
 }): Promise<{ success: boolean; message: string }> => {
-  const res = await fetch(`${API_URL}/public/reviews`, {
+  const res = await fetch(`${EPT_API_URL}/public/reviews`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -457,6 +462,62 @@ export const getSettings = () =>
   apiFetch<BusinessSettings>('/settings');
 export const updateSetting = (key: string, value: unknown) =>
   apiFetch<{ success: boolean }>('/settings', { method: 'PUT', body: JSON.stringify({ key, value }) });
+
+/* ─── Sales Reps ─── */
+export interface SalesRep {
+  id: number;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  commission_rate: number;
+  status: 'active' | 'inactive';
+  total_earned: number;
+  total_paid: number;
+  notes: string | null;
+  created_at: string;
+}
+
+export const getSalesReps = (status?: string) =>
+  apiFetch<{ sales_reps: SalesRep[]; count: number }>(`/sales-reps${status ? `?status=${status}` : ''}`);
+export const createSalesRep = (data: { name: string; email?: string; phone?: string; commission_rate?: number; notes?: string }) =>
+  apiFetch<{ success: boolean; id: number }>('/sales-reps', { method: 'POST', body: JSON.stringify(data) });
+export const updateSalesRep = (id: number, data: Partial<SalesRep>) =>
+  apiFetch<{ success: boolean }>(`/sales-reps/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+export const deleteSalesRep = (id: number) =>
+  apiFetch<{ success: boolean }>(`/sales-reps/${id}`, { method: 'DELETE' });
+
+/* ─── Commissions ─── */
+export interface Commission {
+  id: number;
+  rep_id: number;
+  rep_name: string;
+  rep_email: string | null;
+  customer_id: number | null;
+  customer_name: string | null;
+  company_name: string | null;
+  invoice_id: number | null;
+  invoice_total: number;
+  commission_rate: number;
+  commission_amount: number;
+  status: 'pending' | 'approved' | 'paid';
+  paid_date: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export const getCommissions = (filters?: { rep_id?: number; status?: string }) => {
+  const params = new URLSearchParams();
+  if (filters?.rep_id) params.set('rep_id', String(filters.rep_id));
+  if (filters?.status) params.set('status', filters.status);
+  const qs = params.toString();
+  return apiFetch<{ commissions: Commission[]; count: number; totals: { pending: number; approved: number; paid: number } }>(`/commissions${qs ? `?${qs}` : ''}`);
+};
+export const createCommission = (data: { rep_id: number; customer_id?: number; invoice_id?: number; invoice_total: number; commission_rate?: number; notes?: string }) =>
+  apiFetch<{ success: boolean; id: number; commission_amount: number }>('/commissions', { method: 'POST', body: JSON.stringify(data) });
+export const approveCommission = (id: number) =>
+  apiFetch<{ success: boolean }>(`/commissions/${id}/approve`, { method: 'PUT' });
+export const payCommission = (id: number) =>
+  apiFetch<{ success: boolean }>(`/commissions/${id}/pay`, { method: 'PUT' });
 
 /* ─── Analytics ─── */
 export const getSummary = () =>
