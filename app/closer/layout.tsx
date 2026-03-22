@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import CloserShell from './closer-shell';
 
 export const metadata: Metadata = {
   title: 'AI Closer — Autonomous Sales Agent | Echo Prime Technologies',
@@ -19,5 +20,5 @@ export const metadata: Metadata = {
 };
 
 export default function CloserLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <CloserShell>{children}</CloserShell>;
 }
