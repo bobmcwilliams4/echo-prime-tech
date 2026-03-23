@@ -401,7 +401,7 @@ export default function SecIntelPage() {
           {[
             { title: 'Price Alerts', desc: 'Real-time market monitoring across 10,000+ assets. AI trend scoring, custom thresholds, and multi-channel delivery.', href: '/price-alerts', price: 'Free tier available' },
             { title: 'Crypto Trading', desc: 'Automated trading strategies on BTC, ETH, and altcoins. Grid, momentum, and custom strategies with risk management.', href: '/crypto-trading', price: 'From $99/mo' },
-            { title: 'Intelligence Engines', desc: '6,500+ domain-specific AI engines with embedded expertise across 1,000+ verticals including finance and accounting.', href: '/engines', price: 'From $199/mo' },
+            { title: 'Intelligence Engines', desc: '5,400+ domain-specific AI engines with embedded expertise across 940+ verticals including finance and accounting.', href: '/engines', price: 'From $199/mo' },
           ].map((svc, i) => (
             <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
               <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{svc.title}</h3>

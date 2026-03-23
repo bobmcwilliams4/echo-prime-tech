@@ -217,7 +217,7 @@ export default function EngineMarketplacePage() {
             Engine <span className="gradient-text">Marketplace</span>
           </h1>
           <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
-            Browse 2,600+ doctrine-hardened intelligence engines across 210+ domains. Zero hallucination. Court-defensible reasoning.
+            Browse 5,400+ doctrine-hardened intelligence engines across 450+ domains. Zero hallucination. Court-defensible reasoning.
           </p>
           <div className="max-w-xl mx-auto relative">
             <svg className="absolute left-4 top-1/2 -translate-y-1/2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--ept-text-muted)' }}>
@@ -238,9 +238,9 @@ export default function EngineMarketplacePage() {
       <section className="border-y px-6 py-5" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-surface)' }}>
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           {[
-            { value: '2,632', label: 'Engines' },
-            { value: '449K+', label: 'Doctrines' },
-            { value: '210+', label: 'Domains' },
+            { value: '5,400+', label: 'Engines' },
+            { value: '697K+', label: 'Doctrines' },
+            { value: '450+', label: 'Domains' },
             { value: '<50ms', label: 'Avg Response' },
           ].map(s => (
             <div key={s.label}>
@@ -282,7 +282,7 @@ export default function EngineMarketplacePage() {
       <section className="px-6 py-14" style={{ backgroundColor: 'var(--ept-surface)' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Browse by Domain</h2>
-          <p className="text-sm mb-8" style={{ color: 'var(--ept-text-muted)' }}>210+ domains of specialized intelligence</p>
+          <p className="text-sm mb-8" style={{ color: 'var(--ept-text-muted)' }}>450+ domains of specialized intelligence</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {DOMAINS.map(d => (
               <button
@@ -453,7 +453,7 @@ const result = await response.json();
       {/* ── Footer ── */}
       <footer className="border-t px-6 py-8 text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
-          &copy; {new Date().getFullYear()} Echo Prime Technologies. 2,632 engines. 449K+ doctrines. 210+ domains.
+          &copy; {new Date().getFullYear()} Echo Prime Technologies. 5,400+ engines. 697K+ doctrines. 450+ domains.
         </p>
       </footer>
 

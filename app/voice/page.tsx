@@ -2736,7 +2736,7 @@ export default function VoicePage() {
         <div className="grid md:grid-cols-3 gap-6">
           {[
             { title: 'AI Sales Agent', desc: 'Autonomous voice closer with real-time STT, LLM reasoning, and natural TTS. Full CRM and lead pipeline.', href: '/closer', price: 'From $299/mo' },
-            { title: 'Sentinel AI', desc: 'Multi-domain intelligence assistant with voice output. Ask anything across 1,000+ domains, hear the answer.', href: '/sentinel', price: 'Free tier available' },
+            { title: 'Sentinel AI', desc: 'Multi-domain intelligence assistant with voice output. Ask anything across 940+ domains, hear the answer.', href: '/sentinel', price: 'Free tier available' },
             { title: 'Immortality Vault', desc: 'Preserve your voice for generations. Voice cloning + guided life story interviews + AI conversational recall.', href: '/immortality-vault', price: 'Coming soon' },
           ].map((svc, i) => (
             <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>

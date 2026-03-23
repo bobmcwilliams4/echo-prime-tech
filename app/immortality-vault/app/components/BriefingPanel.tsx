@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ACCENT, GOLD, BG_CARD, BORDER, BG_DARK } from '../lib/constants';
-import { getUser, getFamilyMembers, getMemories, synthesizeSpeech, type VaultUser, type FamilyMember, type Memory } from '../lib/vault-api';
+import { getUser, getFamilyMembers, getMemories, synthesizeSpeech, getGamificationStats, getPersonalityProfile, type VaultUser, type FamilyMember, type Memory, type GamificationStats, type PersonalityProfileResponse } from '../lib/vault-api';
 import { playAudioBlob } from '../lib/media';
 
 interface Props {
@@ -48,6 +48,8 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
       let name = 'Friend';
       let familyCount = 0;
       let memoryOfDay: Memory | null = null;
+      let gamification: GamificationStats | null = null;
+      let personality: PersonalityProfileResponse | null = null;
 
       try {
         const user = await getUser(userId);
@@ -67,6 +69,9 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
         }
       } catch { /* empty */ }
 
+      try { gamification = await getGamificationStats(userId); } catch { /* empty */ }
+      try { personality = await getPersonalityProfile(userId); } catch { /* empty */ }
+
       const built: BriefingSection[] = [
         {
           id: 'greeting',
@@ -74,6 +79,48 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
           title: `${getGreeting()}, ${name}`,
           content: `Welcome to your Immortality Vault. Today is ${getDateStr()}. Let's make it count.`,
         },
+      ];
+
+      // Vault Progress section (from gamification)
+      if (gamification) {
+        const score = gamification.consciousness_score ?? 0;
+        const unlocked = gamification.achievements?.length ?? 0;
+        const total = gamification.available_achievements?.length ?? 0;
+        const level = gamification.level ?? 'Newcomer';
+        built.push({
+          id: 'progress',
+          icon: '\u{1F4CA}',
+          title: `Vault Progress \u2014 ${level}`,
+          content: `Consciousness: ${score}% complete. ${gamification.total_memories ?? 0} memories preserved, ${gamification.total_interviews ?? 0} interviews recorded. ${unlocked}/${total} achievements unlocked, ${gamification.total_points ?? 0} XP earned. ${score < 50 ? 'Keep going \u2014 every story brings you closer to digital immortality!' : score < 80 ? 'Great progress! Your digital self is taking shape.' : 'Impressive! Your consciousness is richly preserved.'}`,
+        });
+      }
+
+      // Personality Snapshot (from personality profile)
+      if (personality && personality.confidence_score > 0) {
+        const topTraits: string[] = [];
+        for (const [category, traits] of Object.entries(personality.traits || {})) {
+          for (const t of traits) {
+            if (t.confidence >= 0.5 && t.value >= 0.6) {
+              topTraits.push(t.trait_name);
+            }
+          }
+        }
+        const traitStr = topTraits.length > 0
+          ? `Your top traits: ${topTraits.slice(0, 5).join(', ')}. `
+          : '';
+        const mood = personality.emotional_profile?.baseline_mood;
+        const moodStr = mood ? `Baseline mood: ${mood}. ` : '';
+        const pace = personality.voice_pattern?.speech_pace;
+        const paceStr = pace ? `Speech style: ${pace} pace${personality.voice_pattern?.uses_contractions ? ', casual' : ', formal'}. ` : '';
+        built.push({
+          id: 'personality',
+          icon: '\u{1F9EC}',
+          title: 'Personality Snapshot',
+          content: `${traitStr}${moodStr}${paceStr}Based on ${personality.sample_count} analyzed samples with ${Math.round(personality.confidence_score * 100)}% confidence.`,
+        });
+      }
+
+      built.push(
         {
           id: 'family',
           icon: '\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}',
@@ -96,7 +143,7 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
           title: 'Daily Inspiration',
           content: INSPIRING[Math.floor(Math.random() * INSPIRING.length)],
         },
-      ];
+      );
 
       setSections(built);
       setLoading(false);

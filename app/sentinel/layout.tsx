@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Sentinel AI — Engine-Backed Intelligence',
-    description: 'AI intelligence backed by 6,500+ engines. Tax, legal, cyber, oilfield. Not a chatbot.',
+    description: 'AI intelligence backed by 5,400+ engines. Tax, legal, cyber, oilfield. Not a chatbot.',
   },
   alternates: { canonical: '/sentinel' },
 };

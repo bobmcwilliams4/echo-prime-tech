@@ -63,7 +63,7 @@ const SERVICES: EcomService[] = [
   },
   {
     id: 'intelligence-engines', name: 'Intelligence Engines', tagline: 'AI that thinks like a senior analyst',
-    description: '5,400+ purpose-built AI reasoning systems across 210+ domains. Deep embedded expertise — not a wrapper. Tax, legal, oilfield, medical, finance, cybersecurity, and more.',
+    description: '5,400+ purpose-built AI reasoning systems across 450+ domains. Deep embedded expertise — not a wrapper. Tax, legal, oilfield, medical, finance, cybersecurity, and more.',
     icon: '\u2B21', category: 'ai', badge: 'Flagship',
     pricing: [
       { tier: 'API Access', price: 199, interval: 'month', features: ['10K queries/mo', 'Standard engines', 'REST API'] },
@@ -140,7 +140,7 @@ const SERVICES: EcomService[] = [
   },
   {
     id: 'knowledge-systems', name: 'Knowledge Systems', tagline: "Your organization's second brain",
-    description: '75,000+ knowledge chunks, 218 categories, semantic vector search, auto-categorization. Hybrid retrieval combining precision and understanding.',
+    description: '170,000+ knowledge chunks, 575 categories, semantic vector search, auto-categorization. Hybrid retrieval combining precision and understanding.',
     icon: '\u25B3', category: 'data',
     pricing: [
       { tier: 'Team', price: 149, interval: 'month', features: ['5K documents', 'Semantic search', 'Auto-categorization'] },

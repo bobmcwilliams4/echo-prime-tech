@@ -20,6 +20,7 @@ import BriefingPanel from './components/BriefingPanel';
 import FamilyPanel from './components/FamilyPanel';
 import FaceTimePanel from './components/FaceTimePanel';
 import SettingsPanel from './components/SettingsPanel';
+import PersonalityPanel from './components/PersonalityPanel';
 
 /* ─── Onboarding Modal ───────────────────────────────────────────────── */
 
@@ -122,6 +123,7 @@ export default function VaultAppPage() {
       case 'voice': return <VoicePanel userId={vaultUserId} />;
       case 'memories': return <MemoriesPanel userId={vaultUserId} />;
       case 'progress': return <ProgressPanel userId={vaultUserId} onNavigate={handleNavigate} />;
+      case 'personality': return <PersonalityPanel userId={vaultUserId} />;
       case 'briefing': return <BriefingPanel userId={vaultUserId} onNavigate={handleNavigate} />;
       case 'family': return <FamilyPanel userId={vaultUserId} />;
       case 'facetime': return <FaceTimePanel userId={vaultUserId} onNavigate={handleNavigate} />;

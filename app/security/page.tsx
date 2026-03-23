@@ -477,7 +477,7 @@ function SecurityPageContent() {
         <div className="grid md:grid-cols-3 gap-6">
           {[
             { title: 'Penetration Testing', desc: 'Offensive security engagements. Our red team has never failed to breach a target. Find vulnerabilities before attackers do.', href: '/pentesting', price: 'From $2,500' },
-            { title: 'Intelligence Engines', desc: 'AI-powered threat intelligence across 1,000+ domains. Correlate indicators of compromise with deep contextual analysis.', href: '/engines', price: 'From $199/mo' },
+            { title: 'Intelligence Engines', desc: 'AI-powered threat intelligence across 940+ domains. Correlate indicators of compromise with deep contextual analysis.', href: '/engines', price: 'From $199/mo' },
             { title: 'Sentinel AI', desc: 'Real-time security monitoring with natural language queries. Ask your data questions in plain English.', href: '/sentinel', price: 'Free tier available' },
           ].map((svc, i) => (
             <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>

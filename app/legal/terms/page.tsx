@@ -3,71 +3,95 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../../lib/theme-context';
-import ReadAloudButton from '../../../components/ReadAloudButton';
 
-export default function TermsPage() {
+const LAST_UPDATED = 'March 21, 2026';
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-10">
+      <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--ept-text)' }}>{title}</h2>
+      <div className="space-y-3" style={{ color: 'var(--ept-text-secondary)', lineHeight: 1.7 }}>{children}</div>
+    </div>
+  );
+}
+
+export default function TermsOfServicePage() {
   const { isDark } = useTheme();
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
-      <nav className="border-b px-6 py-4" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
-        <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority /></Link>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--ept-bg)' }}>
+      <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
+        <Link href="/" className="flex items-center gap-3">
+          <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={140} height={32} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} />
+        </Link>
+        <Link href="/legal" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Back to Legal</Link>
       </nav>
+
       <div className="max-w-3xl mx-auto px-6 py-16">
-        <h1 className="text-3xl font-extrabold mb-2" style={{ color: 'var(--ept-text)' }}>Terms of Service</h1>
-        <p className="text-sm mb-4" style={{ color: 'var(--ept-text-muted)' }}>Last updated: February 19, 2026</p>
-        <div className="mb-8"><ReadAloudButton label="Read Terms Aloud" getText={() => document.getElementById('terms-content')?.textContent?.trim() || ''} /></div>
-        <div id="terms-content" className="space-y-6 text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
-          <section>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>1. Acceptance of Terms</h2>
-            <p>By accessing or using Echo Prime Technologies (&quot;EPT&quot;) services, you agree to be bound by these Terms of Service. If you do not agree, do not use our services.</p>
-          </section>
-          <section>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>2. Description of Services</h2>
-            <p>EPT provides AI-powered intelligence engines, data pipelines, website creation tools, voice AI, security monitoring, and related technology services. Services are provided on a subscription basis as described on our pricing page.</p>
-          </section>
-          <section>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>3. Account Registration</h2>
-            <p>You must provide accurate information when creating an account. You are responsible for maintaining the confidentiality of your credentials and for all activities under your account. You must notify us immediately of any unauthorized access.</p>
-          </section>
-          <section>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>4. Subscriptions & Payment</h2>
-            <p>Subscriptions are billed monthly or annually as selected. All fees are non-refundable except as required by law. We may change pricing with 30 days&apos; written notice. Failure to pay may result in service suspension.</p>
-          </section>
-          <section>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>5. Acceptable Use</h2>
-            <p>You agree not to: use our services for illegal purposes; attempt to gain unauthorized access to our systems; reverse engineer our technology; resell access without authorization; transmit malware or harmful code; harass or impersonate others; or violate third-party intellectual property rights.</p>
-          </section>
-          <section>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>6. Intellectual Property</h2>
-            <p>All EPT technology, including intelligence engines, algorithms, and interfaces, is our proprietary property. Your subscription grants you a limited, non-exclusive, non-transferable license to use our services. Content you create using our tools belongs to you.</p>
-          </section>
-          <section>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>7. Data Ownership</h2>
-            <p>You retain ownership of all data you upload or create using our services. We may use anonymized, aggregated data to improve our services. We will not access your data except as necessary to provide services or as required by law.</p>
-          </section>
-          <section>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>8. Service Availability</h2>
-            <p>We target 99.9% uptime for our services. We may perform scheduled maintenance with reasonable notice. We are not liable for downtime caused by factors beyond our control.</p>
-          </section>
-          <section>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>9. Limitation of Liability</h2>
-            <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, EPT SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES. OUR TOTAL LIABILITY SHALL NOT EXCEED THE AMOUNT YOU PAID US IN THE 12 MONTHS PRECEDING THE CLAIM.</p>
-          </section>
-          <section>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>10. Termination</h2>
-            <p>Either party may terminate at any time. Upon termination, your access to services will cease. We will retain your data for 30 days to allow export, after which it may be deleted.</p>
-          </section>
-          <section>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>11. Governing Law</h2>
-            <p>These terms are governed by the laws of the State of Texas. Any disputes shall be resolved in the courts of Midland County, Texas.</p>
-          </section>
-          <section>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>12. Contact</h2>
-            <p>Questions about these terms: <a href="mailto:bob@echo-op.com" className="underline" style={{ color: 'var(--ept-accent)' }}>bob@echo-op.com</a> or <a href="mailto:customerservice@echo-op.com" className="underline" style={{ color: 'var(--ept-accent)' }}>customerservice@echo-op.com</a></p>
-            <p className="mt-2">Echo Prime Technologies, Midland, Texas</p>
-          </section>
-        </div>
+        <h1 className="text-3xl md:text-5xl font-extrabold mb-2" style={{ color: 'var(--ept-text)' }}>Terms of Service</h1>
+        <p className="text-sm mb-12" style={{ color: 'var(--ept-text-muted)' }}>Last updated: {LAST_UPDATED}</p>
+
+        <Section title="1. Acceptance of Terms">
+          <p>By accessing or using Echo Prime Technologies services, including echo-ept.com, our APIs, intelligence engines, and related products (collectively, the &quot;Services&quot;), you agree to be bound by these Terms of Service. If you do not agree, do not use the Services.</p>
+        </Section>
+
+        <Section title="2. Description of Services">
+          <p>Echo Prime Technologies provides AI-powered intelligence engines, knowledge systems, voice synthesis, data pipelines, security tools, and related technology services. Our platform includes over 5,400 specialized AI reasoning systems across 450+ domains.</p>
+        </Section>
+
+        <Section title="3. Account Registration">
+          <p>To access certain features, you must create an account. You agree to: provide accurate and complete information; maintain the security of your credentials; accept responsibility for all activity under your account; and notify us immediately of any unauthorized access.</p>
+        </Section>
+
+        <Section title="4. Subscriptions and Payments">
+          <p>Paid services are billed on a monthly or annual basis as selected at checkout. Payments are processed through Stripe. You may cancel at any time; cancellation takes effect at the end of the current billing period. Refunds are handled on a case-by-case basis within 30 days of purchase.</p>
+          <p>Prices are subject to change with 30 days notice. Annual subscriptions lock in the rate for the subscription term.</p>
+        </Section>
+
+        <Section title="5. Acceptable Use">
+          <p>You agree not to: use the Services for unlawful purposes; attempt to reverse-engineer, decompile, or extract source code; interfere with service operation or security; exceed rate limits or abuse API access; resell access without authorization; use automated systems to scrape content; or transmit malware or harmful code.</p>
+        </Section>
+
+        <Section title="6. API and SDK Usage">
+          <p>API and SDK access is subject to rate limits and usage quotas defined by your subscription tier. You must include proper attribution when required and comply with our API documentation. API keys are confidential and must not be shared publicly.</p>
+        </Section>
+
+        <Section title="7. Intellectual Property">
+          <p>Echo Prime Technologies retains all rights to its platform, intelligence engines, models, documentation, and proprietary technology. You retain ownership of your data and content submitted through the Services. We are granted a limited license to process your data solely to provide the Services.</p>
+        </Section>
+
+        <Section title="8. AI-Generated Output">
+          <p>Output generated by our intelligence engines and AI systems is provided for informational purposes. While we strive for accuracy through doctrine-backed reasoning and authority citations, AI output should not be relied upon as professional legal, financial, medical, or engineering advice without independent verification.</p>
+        </Section>
+
+        <Section title="9. Disclaimers">
+          <p>THE SERVICES ARE PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. WE DO NOT WARRANT THAT THE SERVICES WILL BE UNINTERRUPTED, ERROR-FREE, OR COMPLETELY SECURE.</p>
+        </Section>
+
+        <Section title="10. Limitation of Liability">
+          <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, ECHO PRIME TECHNOLOGIES SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES. OUR TOTAL LIABILITY SHALL NOT EXCEED THE GREATER OF 00 OR THE AMOUNT PAID BY YOU IN THE 12 MONTHS PRECEDING THE CLAIM.</p>
+        </Section>
+
+        <Section title="11. Indemnification">
+          <p>You agree to indemnify and hold harmless Echo Prime Technologies, its officers, directors, and employees from any claims, damages, or expenses arising from your use of the Services or violation of these Terms.</p>
+        </Section>
+
+        <Section title="12. Termination">
+          <p>We may suspend or terminate your access for violation of these Terms, non-payment, or at our discretion with reasonable notice. Upon termination, your right to use the Services ceases immediately. You may export your data within 30 days of termination.</p>
+        </Section>
+
+        <Section title="13. Governing Law">
+          <p>These Terms are governed by the laws of the State of Texas. Any disputes shall be resolved in the courts of Midland County, Texas. You consent to the exclusive jurisdiction of these courts.</p>
+        </Section>
+
+        <Section title="14. General Provisions">
+          <p>These Terms constitute the entire agreement between you and Echo Prime Technologies regarding the Services. If any provision is found unenforceable, the remaining provisions remain in effect. Our failure to enforce any right does not constitute a waiver. We may assign these Terms; you may not without our consent.</p>
+        </Section>
+
+        <Section title="15. Contact Us">
+          <p>For questions about these Terms, contact us at <a href="mailto:legal@echo-op.com" style={{ color: 'var(--ept-accent)' }}>legal@echo-op.com</a>.</p>
+          <p>Echo Prime Technologies<br />Midland, Texas</p>
+        </Section>
       </div>
     </div>
   );

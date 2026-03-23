@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ACCENT, GOLD, BG_CARD, BORDER, LEVEL_THRESHOLDS } from '../lib/constants';
-import { getGamificationStats, checkAchievements, getConsciousnessState, type GamificationStats, type ConsciousnessStateResponse } from '../lib/vault-api';
+import { getGamificationStats, checkAchievements, getConsciousnessState, setConsciousnessState, type GamificationStats, type ConsciousnessStateResponse, type ConsciousnessStateType } from '../lib/vault-api';
 
 interface Props {
   userId: string;
@@ -13,12 +13,24 @@ interface Props {
 export default function DashboardPanel({ userId, stats, onNavigate }: Props) {
   const [gamification, setGamification] = useState<GamificationStats | null>(null);
   const [consciousness, setConsciousness] = useState<ConsciousnessStateResponse | null>(null);
+  const [stateChanging, setStateChanging] = useState(false);
 
   useEffect(() => {
     getGamificationStats(userId).then(setGamification).catch(() => {});
     checkAchievements(userId).catch(() => {});
     getConsciousnessState(userId).then(setConsciousness).catch(() => {});
   }, [userId]);
+
+  const handleStateChange = async (newState: ConsciousnessStateType) => {
+    if (stateChanging || consciousness?.state === newState) return;
+    setStateChanging(true);
+    try {
+      await setConsciousnessState(userId, newState);
+      const updated = await getConsciousnessState(userId);
+      setConsciousness(updated);
+    } catch { /* empty */ }
+    setStateChanging(false);
+  };
 
   const score = consciousness?.score?.overall ?? gamification?.consciousness_score ?? Math.min(100, Math.round(((stats?.memories || 0) + (stats?.interviews || 0) * 3) / 2));
   const level = gamification?.level ?? LEVEL_THRESHOLDS.filter(l => score >= l.min).pop()?.label ?? 'Newcomer';
@@ -122,6 +134,38 @@ export default function DashboardPanel({ userId, stats, onNavigate }: Props) {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Consciousness State Controls */}
+        <div className="mt-5 pt-4" style={{ borderTop: `1px solid ${BORDER}` }}>
+          <div className="text-xs text-gray-500 mb-3">Consciousness State</div>
+          <div className="flex flex-wrap gap-2">
+            {([
+              { state: 'DORMANT' as const, icon: '\u{1F4A4}', label: 'Dormant', desc: 'Paused — not learning' },
+              { state: 'LEARNING' as const, icon: '\u{1F4D6}', label: 'Learning', desc: 'Absorbing new memories' },
+              { state: 'ACTIVE' as const, icon: '\u{26A1}', label: 'Active', desc: 'Full consciousness' },
+              { state: 'INTERVIEWING' as const, icon: '\u{1F399}\u{FE0F}', label: 'Interviewing', desc: 'Deep biography mode' },
+              { state: 'CONVERSING' as const, icon: '\u{1F4AC}', label: 'Conversing', desc: 'Live conversation' },
+            ]).map(s => {
+              const active = consciousness?.state === s.state;
+              return (
+                <button
+                  key={s.state}
+                  onClick={() => handleStateChange(s.state)}
+                  disabled={stateChanging}
+                  className="px-3 py-1.5 rounded-lg text-xs transition hover:opacity-80 disabled:opacity-40"
+                  style={{
+                    background: active ? `${ACCENT}25` : '#0a0a0f',
+                    border: `1px solid ${active ? ACCENT : BORDER}`,
+                    color: active ? ACCENT : '#94a3b8',
+                  }}
+                  title={s.desc}
+                >
+                  {s.icon} {s.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

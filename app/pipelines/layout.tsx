@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/pipelines',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Data Pipelines — Autonomous ETL & Real-Time Processing',
+    description: 'Autonomous data extraction from 50+ source types. Real-time processing and structured output. $199-$499/mo.',
+  },
   alternates: { canonical: '/pipelines' },
 };
 

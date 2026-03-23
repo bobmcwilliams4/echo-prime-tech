@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ACCENT, BG_CARD, BORDER } from '../lib/constants';
-import { getFamilyMembers, addFamilyMember, deleteFamilyMember, type FamilyMember } from '../lib/vault-api';
+import { getFamilyMembers, addFamilyMember, updateFamilyMember, deleteFamilyMember, type FamilyMember } from '../lib/vault-api';
 
 interface Props {
   userId: string;
@@ -20,6 +20,13 @@ export default function FamilyPanel({ userId }: Props) {
   const [newBio, setNewBio] = useState('');
   const [newBirthDate, setNewBirthDate] = useState('');
   const [newDeathDate, setNewDeathDate] = useState('');
+  const [editing, setEditing] = useState<FamilyMember | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editRelation, setEditRelation] = useState('');
+  const [editBio, setEditBio] = useState('');
+  const [editBirthDate, setEditBirthDate] = useState('');
+  const [editDeathDate, setEditDeathDate] = useState('');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     getFamilyMembers(userId)
@@ -66,8 +73,82 @@ export default function FamilyPanel({ userId }: Props) {
     }
   };
 
+  const startEdit = (m: FamilyMember) => {
+    setEditing(m);
+    setEditName(m.name);
+    setEditRelation(m.relationship);
+    setEditBio(m.bio || '');
+    setEditBirthDate(m.birth_date || '');
+    setEditDeathDate(m.death_date || '');
+    setError(null);
+  };
+
+  const saveEdit = async () => {
+    if (!editing || !editName.trim() || !editRelation.trim()) return;
+    setSaving(true);
+    setError(null);
+    try {
+      const updated = await updateFamilyMember(editing.id, {
+        name: editName.trim(),
+        relationship: editRelation.trim(),
+        bio: editBio.trim() || undefined,
+        birth_date: editBirthDate || undefined,
+        death_date: editDeathDate || undefined,
+      });
+      setMembers(prev => prev.map(m => m.id === editing.id ? { ...m, ...updated } : m));
+      setEditing(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update member');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Edit Modal */}
+      {editing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
+          <div className="w-full max-w-md p-6 rounded-2xl space-y-3" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+            <h3 className="text-lg font-bold text-white mb-1">Edit Family Member</h3>
+            <input value={editName} onChange={e => setEditName(e.target.value)} placeholder="Full name *"
+              className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none"
+              style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }} disabled={saving} />
+            <input value={editRelation} onChange={e => setEditRelation(e.target.value)} placeholder="Relationship *"
+              className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none"
+              style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }} disabled={saving} />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Birth Date</label>
+                <input type="date" value={editBirthDate} onChange={e => setEditBirthDate(e.target.value)}
+                  className="w-full p-3 rounded-lg text-sm text-white outline-none"
+                  style={{ background: '#0a0a0f', border: `1px solid ${BORDER}`, colorScheme: 'dark' }} disabled={saving} />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Death Date</label>
+                <input type="date" value={editDeathDate} onChange={e => setEditDeathDate(e.target.value)}
+                  className="w-full p-3 rounded-lg text-sm text-white outline-none"
+                  style={{ background: '#0a0a0f', border: `1px solid ${BORDER}`, colorScheme: 'dark' }} disabled={saving} />
+              </div>
+            </div>
+            <textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder="Short biography"
+              className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none resize-none"
+              style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }} rows={3} disabled={saving} />
+            <div className="flex items-center gap-3 pt-1">
+              <button onClick={saveEdit} disabled={saving || !editName.trim() || !editRelation.trim()}
+                className="px-5 py-2 rounded-full text-sm font-bold text-white transition disabled:opacity-40"
+                style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}>
+                {saving ? 'Saving...' : 'Save Changes'}
+              </button>
+              <button onClick={() => setEditing(null)} disabled={saving}
+                className="px-4 py-2 rounded-full text-sm text-gray-400 hover:text-white transition">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-white">Family Vault</h2>
         <button
@@ -169,26 +250,42 @@ export default function FamilyPanel({ userId }: Props) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {members.map(m => (
-            <div key={m.id} className="p-5 rounded-xl group relative" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-              <button
-                onClick={() => removeMember(m.id)}
-                disabled={deletingId === m.id}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs text-gray-600 hover:text-red-400 hover:bg-red-400/10 opacity-0 group-hover:opacity-100 transition disabled:opacity-50"
-              >
-                {deletingId === m.id ? (
-                  <span className="w-3 h-3 rounded-full border border-gray-500 border-t-transparent animate-spin inline-block" />
-                ) : (
-                  <span>&times;</span>
-                )}
-              </button>
+            <div key={m.id} className="p-5 rounded-xl group relative cursor-pointer transition hover:border-purple-500/40" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
+              onClick={() => startEdit(m)}>
+              <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                <button
+                  onClick={e => { e.stopPropagation(); startEdit(m); }}
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-gray-500 hover:text-purple-400 hover:bg-purple-400/10"
+                  title="Edit"
+                >
+                  {'\u{270F}\u{FE0F}'}
+                </button>
+                <button
+                  onClick={e => { e.stopPropagation(); removeMember(m.id); }}
+                  disabled={deletingId === m.id}
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-xs text-gray-600 hover:text-red-400 hover:bg-red-400/10 disabled:opacity-50"
+                  title="Remove"
+                >
+                  {deletingId === m.id ? (
+                    <span className="w-3 h-3 rounded-full border border-gray-500 border-t-transparent animate-spin inline-block" />
+                  ) : (
+                    <span>&times;</span>
+                  )}
+                </button>
+              </div>
               <div className="w-12 h-12 rounded-full mb-3 flex items-center justify-center text-xl" style={{ background: '#1e1e2e', border: `2px solid ${BORDER}` }}>
                 {'\u{1F464}'}
               </div>
               <div className="text-base font-bold text-white">{m.name}</div>
               <div className="text-xs mb-2" style={{ color: ACCENT }}>{m.relationship}</div>
-              {m.bio && <div className="text-xs text-gray-400">{m.bio}</div>}
-              {m.birth_date && <div className="text-[10px] text-gray-600 mt-1">Born: {m.birth_date}</div>}
-              {m.death_date && <div className="text-[10px] text-gray-600">Passed: {m.death_date}</div>}
+              {m.bio && <div className="text-xs text-gray-400 line-clamp-2">{m.bio}</div>}
+              {(m.birth_date || m.death_date) && (
+                <div className="mt-2 pt-2 text-[10px] text-gray-600" style={{ borderTop: `1px solid ${BORDER}` }}>
+                  {m.birth_date && <span>Born: {m.birth_date}</span>}
+                  {m.birth_date && m.death_date && <span className="mx-1">&middot;</span>}
+                  {m.death_date && <span>Passed: {m.death_date}</span>}
+                </div>
+              )}
             </div>
           ))}
         </div>

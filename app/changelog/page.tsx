@@ -16,12 +16,41 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-03-21',
+    version: 'v2026.13',
+    title: 'Technical Blog + Newsletter + Lead Capture',
+    type: 'launch',
+    description: 'Launched the Echo Prime blog with 6 SEO-optimized technical articles spanning AI engineering, oilfield tech, tax intelligence, cybersecurity, and cloud architecture. Newsletter signup wired to live lead capture. RSS feed expanded with blog entries.',
+    highlights: [
+      '6 technical articles with full-length content (~1,200+ words each)',
+      'Newsletter signup → /api/leads endpoint with D1 UPSERT',
+      'Blog JSON-LD structured data (BlogPosting schema for all articles)',
+      'RSS feed expanded with blog articles + Atom namespace',
+      'Category filtering (AI & Engineering, Oilfield, Tax, Security, Product)',
+      'Chat widget lead capture silently failing — now fixed',
+    ],
+    link: '/blog',
+  },
+  {
+    date: '2026-03-21',
+    title: 'Permian Basin AI & Legal Compliance',
+    type: 'launch',
+    description: 'Launched dedicated Permian Basin oilfield AI landing page with 9 specialized modules and full legal compliance suite — Privacy Policy, Terms of Service, and Cookie Policy.',
+    highlights: [
+      'Permian Basin AI: 9 specialized oilfield modules (Well Eval, Lease Analysis, Decline Curve, AFE Review, more)',
+      'Privacy Policy: 13 sections covering CCPA, international transfers, data rights',
+      'Terms of Service: 15 sections with Texas jurisdiction, AI output disclaimers',
+      'Cookie Policy: 8 sections with third-party cookie disclosure table',
+    ],
+    link: '/permian',
+  },
+  {
     date: '2026-03-20',
     title: 'SDK Gateway v3.0 & Engine Marketplace',
     type: 'launch',
-    description: 'Public developer SDK with TypeScript package, CLI tool, 17 API endpoints, and engine marketplace. Free tier includes 100 queries/day across all 6,500+ engines.',
+    description: 'Public developer SDK with TypeScript package, CLI tool, 17 API endpoints, and engine marketplace. Free tier includes 100 queries/day across all 5,400+ engines.',
     highlights: [
-      'TypeScript SDK (@echo-prime/sdk) on GitHub',
+      'TypeScript SDK (@echo-omega-prime/sdk) on GitHub',
       'CLI tool with 45+ commands',
       'Engine Marketplace at /engines/marketplace',
       'Interactive API docs at /sdk/docs',
@@ -326,7 +355,7 @@ export default function ChangelogPage() {
       >
         <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>Want to build with us?</h2>
         <p style={{ fontSize: 15, color: 'var(--ept-text-secondary)', marginBottom: 24 }}>
-          Start free with 100 queries/day across 6,500+ intelligence engines.
+          Start free with 100 queries/day across 5,400+ intelligence engines.
         </p>
         <Link href="/sdk/signup">
           <button

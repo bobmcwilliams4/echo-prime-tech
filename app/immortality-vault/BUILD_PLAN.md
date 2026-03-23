@@ -170,7 +170,7 @@ User (echo-ept.com/immortality-vault)
 |------------|-------|---------------|
 | StoryWorth | $99/yr (book only) | We do voice cloning, AI chat, video, real-time conversation |
 | HereAfter AI | $50/yr | We have 14 AI personalities, emotional TTS, consciousness evolution |
-| Eternos | $200/yr | We have deeper trait extraction, 2,600+ knowledge engines backing answers |
+| Eternos | $200/yr | We have deeper trait extraction, 5,400+ knowledge engines backing answers |
 | MyHeritage Deep Nostalgia | Free/limited | We build a full consciousness, not just animate photos |
 
 ## PRICING (echo-ept.com/pricing)

@@ -1,18 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Echo Prime Technologies — Changelog</title>
-    <link>https://echo-ept.com/changelog</link>
-    <description>Weekly releases, new engine deployments, platform upgrades, and feature launches from Echo Prime Technologies.</description>
+    <title>Echo Prime Technologies</title>
+    <link>https://echo-ept.com</link>
+    <description>Technical blog and changelog from Echo Prime Technologies — AI engineering, intelligence engines, oilfield tech, tax intelligence, and autonomous systems.</description>
     <language>en-us</language>
-    <lastBuildDate>Thu, 20 Mar 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 21 Mar 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
+
+    <!-- Blog Articles -->
+    <item>
+      <title>Why Intelligence Engines Beat Chatbot Wrappers for Enterprise AI</title>
+      <link>https://echo-ept.com/blog/why-intelligence-engines-beat-chatbot-wrappers</link>
+      <pubDate>Fri, 21 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/why-intelligence-engines-beat-chatbot-wrappers</guid>
+      <category>AI &amp; Engineering</category>
+      <description>Most AI platforms are thin wrappers around ChatGPT. Intelligence engines embed real domain expertise — doctrine-backed reasoning with 697K+ blocks across 5,400+ engines. Here's why the difference matters for enterprise decisions.</description>
+    </item>
+    <item>
+      <title>How AI is Transforming Title Examination in the Permian Basin</title>
+      <link>https://echo-ept.com/blog/ai-powered-title-examination-permian-basin</link>
+      <pubDate>Wed, 19 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/ai-powered-title-examination-permian-basin</guid>
+      <category>Oilfield Tech</category>
+      <description>Traditional title examination in the Permian Basin takes 40-80 hours per section. AI-powered chain-of-title analysis with 259K+ deed records and automated gap detection cuts that to hours, not weeks.</description>
+    </item>
+    <item>
+      <title>Building Autonomous AI Agents That Actually Work in Production</title>
+      <link>https://echo-ept.com/blog/building-autonomous-ai-agents-2026</link>
+      <pubDate>Mon, 17 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/building-autonomous-ai-agents-2026</guid>
+      <category>AI &amp; Engineering</category>
+      <description>The gap between demo AI agents and production AI agents is enormous. Here's how we run 100+ autonomous Workers on Cloudflare with self-healing, circuit breakers, and zero downtime.</description>
+    </item>
+    <item>
+      <title>MACRS Depreciation Optimization with AI Tax Engines</title>
+      <link>https://echo-ept.com/blog/ai-tax-preparation-macrs-depreciation</link>
+      <pubDate>Fri, 14 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/ai-tax-preparation-macrs-depreciation</guid>
+      <category>Tax Intelligence</category>
+      <description>MACRS depreciation is one of the most powerful tax optimization tools available. Our AI tax engines analyze asset classifications, bonus depreciation eligibility, and cost segregation opportunities with IRC-backed reasoning.</description>
+    </item>
+    <item>
+      <title>Zero-Trust Security Architecture for AI-First Companies</title>
+      <link>https://echo-ept.com/blog/zero-trust-ai-security-monitoring</link>
+      <pubDate>Tue, 11 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/zero-trust-ai-security-monitoring</guid>
+      <category>Security</category>
+      <description>When your AI processes sensitive business data across 100+ microservices, traditional perimeter security fails. Here's how we implement zero-trust with HMAC verification, rate limiting, and defense-in-depth.</description>
+    </item>
+    <item>
+      <title>Running 100+ Microservices on Cloudflare Workers: Architecture Lessons</title>
+      <link>https://echo-ept.com/blog/edge-computing-cloudflare-workers-ai</link>
+      <pubDate>Sun, 08 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/edge-computing-cloudflare-workers-ai</guid>
+      <category>Product Updates</category>
+      <description>We run 100+ Cloudflare Workers in production — service bindings, D1 databases, KV caches, R2 storage, Durable Objects. Here are the architectural patterns and hard-won lessons from building at scale on the edge.</description>
+    </item>
+
+    <!-- Changelog -->
+    <item>
+      <title>v2026.13 — Technical Blog + Newsletter + Lead Capture</title>
+      <link>https://echo-ept.com/changelog</link>
+      <pubDate>Fri, 21 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/changelog#2026-03-21b</guid>
+      <description>Launched technical blog with 6 SEO-optimized articles. Newsletter signup wired to ept-api lead capture. /api/leads endpoint added (also fixes silent chat widget failure). Blog JSON-LD schema. RSS feed expanded with blog articles.</description>
+    </item>
+    <item>
+      <title>v2026.12.1 — Permian Basin AI + Legal Compliance</title>
+      <link>https://echo-ept.com/changelog</link>
+      <pubDate>Fri, 21 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/changelog#2026-03-21</guid>
+      <description>Dedicated Permian Basin oilfield AI page with 9 specialized modules. Full legal compliance: Privacy Policy (13 sections, CCPA), Terms of Service (15 sections, Texas jurisdiction), Cookie Policy (8 sections).</description>
+    </item>
     <item>
       <title>v2026.12 — Signal Amplification: Bot Fleet Quality + SEO</title>
       <link>https://echo-ept.com/changelog</link>
       <pubDate>Thu, 20 Mar 2026 00:00:00 GMT</pubDate>
       <guid>https://echo-ept.com/changelog#2026-03-20</guid>
-      <description>LinkedIn bot v2.5.0 with content quality overhaul (temperature tuning, stats cleanup, plain-text formatting). Reddit bot v1.8.0 with organic content fixes. Slack bot truncation fixes. Enterprise CTA on homepage. SEO metadata on 4 product pages. Full bot fleet health verification.</description>
+      <description>LinkedIn bot v2.5.0 with content quality overhaul. Reddit bot v1.8.0 with organic content fixes. Slack bot truncation fixes. Enterprise CTA on homepage. SEO metadata on 4 product pages.</description>
     </item>
     <item>
       <title>v2026.11 — Autonomous Infrastructure Fleet</title>
@@ -26,49 +92,28 @@
       <link>https://echo-ept.com/changelog</link>
       <pubDate>Tue, 18 Mar 2026 00:00:00 GMT</pubDate>
       <guid>https://echo-ept.com/changelog#2026-03-18</guid>
-      <description>Echo Speak Cloud upgraded to v2.0 with bidirectional voice: STT (Whisper), emotion engine (12 lexicons, personality modifiers), ElevenLabs WebSocket streaming TTS, voice orchestrator with quota-aware blending, VoiceConversation Durable Object.</description>
+      <description>Echo Speak Cloud upgraded to v2.0 with bidirectional voice: STT (Whisper), emotion engine (12 lexicons, personality modifiers), ElevenLabs WebSocket streaming TTS, voice orchestrator with quota-aware blending.</description>
     </item>
     <item>
       <title>v2026.9 — Landman Pipeline v3.1 + County DB Cascade</title>
       <link>https://echo-ept.com/changelog</link>
       <pubDate>Sun, 16 Mar 2026 00:00:00 GMT</pubDate>
       <guid>https://echo-ept.com/changelog#2026-03-16</guid>
-      <description>COUNTY_DB cascade architecture: search local D1 first, supplement from ShadowGlass, then trigger live scrape. ACRIS-inspired schema with content-hash dedup. 2,695+ records migrated across 5 counties. 4 new HTTP endpoints for county data.</description>
+      <description>COUNTY_DB cascade architecture: search local D1 first, supplement from ShadowGlass, then trigger live scrape. ACRIS-inspired schema with content-hash dedup. 2,695+ records migrated across 5 counties.</description>
     </item>
     <item>
       <title>v2026.8 — Sovereign Pricing Audit + Bot Parity</title>
       <link>https://echo-ept.com/changelog</link>
       <pubDate>Sat, 15 Mar 2026 00:00:00 GMT</pubDate>
       <guid>https://echo-ept.com/changelog#2026-03-15</guid>
-      <description>27 price changes across 13 services using 13 Laws framework. All 8 bot Workers now have 10 mandatory capabilities: A/B testing, lead detection, content dedup, Secret Sauce Firewall, Grok AI images, abuse detection, Workers AI fallback, conversation history, subscribers, analytics.</description>
+      <description>27 price changes across 13 services using 13 Laws framework. All 8 bot Workers now have 10 mandatory capabilities.</description>
     </item>
     <item>
       <title>v2026.7 — SDK v3.0 + Engine Marketplace + Developer Portal</title>
       <link>https://echo-ept.com/changelog</link>
       <pubDate>Wed, 12 Mar 2026 00:00:00 GMT</pubDate>
       <guid>https://echo-ept.com/changelog#2026-03-12</guid>
-      <description>Echo SDK v3.0 with 4 new Workers (tool-discovery, scraper-orchestrator, bot-factory, sdk-dashboard). Developer portal at /sdk with quickstart, docs, playground, and pricing. 4 new bot Workers deployed (Slack, Reddit, WhatsApp, Messenger).</description>
-    </item>
-    <item>
-      <title>v2026.6 — BRAVO Inference Server + 10 LoRA Adapters</title>
-      <link>https://echo-ept.com/changelog</link>
-      <pubDate>Mon, 09 Mar 2026 00:00:00 GMT</pubDate>
-      <guid>https://echo-ept.com/changelog#2026-03-09</guid>
-      <description>BRAVO inference server v2.0 with Qwen2.5-7B 4-bit base and 10 LoRA adapters (titlehound, doctrine-gen, landman, taxlaw, legal, realestate, cyber, engineering, medical, software). Zero cloud cost. Permanent tunnel at inference.echo-op.com.</description>
-    </item>
-    <item>
-      <title>v2026.5 — Hephaestion Forge Mass Engine Build</title>
-      <link>https://echo-ept.com/changelog</link>
-      <pubDate>Fri, 07 Mar 2026 00:00:00 GMT</pubDate>
-      <guid>https://echo-ept.com/changelog#2026-03-07</guid>
-      <description>5,400+ engines across 450+ domains built via Hephaestion Forge. 13-stage pipeline, 6 engines per batch in parallel. Covering every domain of human knowledge from tax law to veterinary science.</description>
-    </item>
-    <item>
-      <title>v2026.4 — Revenue Optimization + Checkout Pipeline</title>
-      <link>https://echo-ept.com/changelog</link>
-      <pubDate>Tue, 04 Mar 2026 00:00:00 GMT</pubDate>
-      <guid>https://echo-ept.com/changelog#2026-03-04</guid>
-      <description>Full checkout pipeline: Pricing to signup to Stripe checkout. Sentinel AI fixed (5 bugs). Bot Factory and Scraper Factory pages. Annual billing with 20% discount. Lead capture chat widget. Enterprise bundle CTA.</description>
+      <description>Echo SDK v3.0 with 4 new Workers. Developer portal at /sdk with quickstart, docs, playground, and pricing. 4 new bot Workers deployed (Slack, Reddit, WhatsApp, Messenger).</description>
     </item>
   </channel>
 </rss>

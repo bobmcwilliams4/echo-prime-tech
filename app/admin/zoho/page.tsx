@@ -136,7 +136,7 @@ export default function ZohoIntegrationPage() {
           <div>
             <h1 className="text-3xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Zoho CRM Integration</h1>
             <p className="mt-1" style={{ color: 'var(--ept-text-secondary)' }}>
-              Connect Zoho CRM to sync leads with Closer AI and access 6,500+ intelligence engines.
+              Connect Zoho CRM to sync leads with Closer AI and access 5,400+ intelligence engines.
             </p>
           </div>
           <button onClick={loadAll} className="text-sm px-4 py-2 rounded-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
@@ -216,7 +216,7 @@ export default function ZohoIntegrationPage() {
                 { label: 'Zoho Leads', value: (stats as Record<string, unknown>)?.total_leads || '0' },
                 { label: 'Synced Leads', value: (stats as Record<string, unknown>)?.total_syncs || '0' },
                 { label: 'Total Syncs', value: (stats as Record<string, unknown>)?.sync_count || '0' },
-                { label: 'Engines Available', value: '6,500+' },
+                { label: 'Engines Available', value: '5,400+' },
               ].map((s) => (
                 <div key={s.label} className="p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
                   <div className="text-xs uppercase font-semibold mb-1" style={{ color: 'var(--ept-text-muted)' }}>{s.label}</div>

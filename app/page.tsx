@@ -16,7 +16,7 @@ interface LiveStats {
 }
 
 function useLiveStats(): LiveStats {
-  const [stats, setStats] = useState<LiveStats>({ engines: '5,400+', categories: '210+', doctrines: '619K+', industries: [] });
+  const [stats, setStats] = useState<LiveStats>({ engines: '5,400+', categories: '940+', doctrines: '697K+', industries: [] });
   useEffect(() => {
     fetch('https://echo-engine-runtime.bmcii1976.workers.dev/stats')
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
@@ -205,7 +205,7 @@ const CAPABILITIES = [
   },
   {
     title: 'SDK & Developer Portal',
-    description: 'Access every Echo Prime capability through a unified REST API. OpenAPI spec, interactive playground, code samples in 6 languages, webhook support, and usage analytics. Build on top of 6,500+ engines and 700K+ knowledge blocks.',
+    description: 'Access every Echo Prime capability through a unified REST API. OpenAPI spec, interactive playground, code samples in 6 languages, webhook support, and usage analytics. Build on top of 5,400+ engines and 700K+ knowledge blocks.',
     stat: '17+',
     statLabel: 'API Endpoints',
     icon: '🔗',
@@ -268,10 +268,12 @@ export default function HomePage() {
           <div className="hidden md:flex items-center gap-6">
             {[
               { label: 'Engines', href: '/engines' },
+              { label: 'Permian', href: '/permian' },
               { label: 'Store', href: '/ecommerce' },
               { label: 'Services', href: '/services' },
               { label: 'Security', href: '/security' },
               { label: 'Pricing', href: '/pricing' },
+              { label: 'Blog', href: '/blog' },
             ].map(item => (
               <Link key={item.href} href={item.href} className="text-sm font-medium transition-colors hover:opacity-100" style={{ color: 'var(--ept-text-secondary)' }}>{item.label}</Link>
             ))}
@@ -370,7 +372,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { title: 'AI Sales Agent', desc: 'Autonomous voice closer — STT, LLM reasoning, natural TTS. CRM with full lead pipeline. White-label SaaS.', price: '$299', interval: '/mo', href: '/closer', badge: 'Best Seller' },
-              { title: 'Intelligence Engines', desc: '6,500+ domain-specific AI engines with embedded expertise. Tax, legal, oilfield, cyber — 1,000+ verticals.', price: '$199', interval: '/mo', href: '/engines', badge: null },
+              { title: 'Intelligence Engines', desc: '5,400+ domain-specific AI engines with embedded expertise. Tax, legal, oilfield, cyber — 940+ verticals.', price: '$199', interval: '/mo', href: '/engines', badge: null },
               { title: 'Title Intelligence', desc: 'AI chain of title across 80+ Texas counties. 259K+ deed records, mineral rights tracing, gap detection.', price: '$200', interval: '/mo', href: '/title-intelligence', badge: 'Oil & Gas' },
               { title: 'Sentinel AI', desc: 'Multi-domain AI assistant with web search, knowledge retrieval, and real-time analysis. 14 personalities.', price: 'Free', interval: ' tier', href: '/sentinel', badge: 'Try Free' },
             ].map((p, i) => (
@@ -603,6 +605,7 @@ export default function HomePage() {
                   { label: 'Business Manager', href: '/business-manager' },
                   { label: 'Data Pipelines', href: '/pipelines' },
                   { label: 'Title Intelligence', href: '/title-intelligence' },
+                  { label: 'Permian Basin AI', href: '/permian' },
                   { label: 'Tax Preparation', href: '/tax-returns' },
                   { label: 'Sentinel AI', href: '/sentinel' },
                   { label: 'Voice Studio', href: '/voice' },
@@ -645,6 +648,7 @@ export default function HomePage() {
                   { label: 'Pen Testing', href: '/pentesting' },
                   { label: 'Website Builder', href: '/websites' },
                   { label: 'AI Orchestration', href: '/orchestration' },
+                  { label: 'Permian Basin AI', href: '/permian' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}
@@ -654,6 +658,7 @@ export default function HomePage() {
               <h4 className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--ept-text-secondary)' }}>Company</h4>
               <div className="flex flex-col gap-2.5">
                 <Link href="/about" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>About Us</Link>
+                <Link href="/blog" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>Blog</Link>
                 <Link href="/changelog" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>Changelog</Link>
                 <a href="mailto:contact@echo-op.com" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>contact@echo-op.com</a>
                 <a href="tel:+14325276112" className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>(432) 527-6112 — Customer Service</a>

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ACCENT, GOLD, BG_CARD, BORDER, BG_DARK } from '../lib/constants';
-import { uploadVideo, getVideoList, type VideoMeta } from '../lib/vault-api';
+import { uploadVideo, getVideoList, submitBiometric, type VideoMeta } from '../lib/vault-api';
 import { startCamera, stopCamera, createMediaRecorder, createAnalyser, getAudioLevel, formatDuration, formatBytes, type RecorderHandle } from '../lib/media';
 
 interface Props {
@@ -100,6 +100,10 @@ export default function RecordPanel({ userId }: Props) {
     try {
       const meta = await uploadVideo(userId, recordedBlob);
       setVideos(prev => [meta, ...prev]);
+      // Fire-and-forget: trigger biometric analysis on the uploaded video
+      submitBiometric(meta.id, [
+        { capture_type: 'facial_video', data_json: JSON.stringify({ duration: meta.duration_seconds, source: 'selfie_camera' }), confidence: 0.8 },
+      ]).catch(() => {});
       setRecordedBlob(null);
       setState('idle');
     } catch {

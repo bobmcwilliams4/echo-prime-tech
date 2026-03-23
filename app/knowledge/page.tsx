@@ -538,8 +538,8 @@ function KnowledgePageContent() {
           <section data-tutorial="knowledge-stats" className="max-w-5xl mx-auto px-6 pb-16">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { value: '75K+', label: 'Knowledge Chunks', sub: 'Indexed & searchable' },
-                { value: '140+', label: 'Categories', sub: 'Auto-classified' },
+                { value: '170K+', label: 'Knowledge Chunks', sub: 'Indexed & searchable' },
+                { value: '575', label: 'Categories', sub: 'Auto-classified' },
                 { value: '312K', label: 'Graph Nodes', sub: 'Entity relationships' },
                 { value: '<50ms', label: 'Search Latency', sub: 'Vectorize + D1' },
               ].map((s, i) => (
@@ -628,10 +628,10 @@ function KnowledgePageContent() {
           <section className="max-w-4xl mx-auto px-6 pb-16">
             <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
               <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Intelligence Engine Query</h2>
-              <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>Search across all 1,000+ knowledge domains, 6,500+ engines, and 521K+ pre-compiled doctrines. Select a domain or search globally.</p>
+              <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>Search across all 940+ knowledge domains, 5,400+ engines, and 697K+ pre-compiled doctrines. Select a domain or search globally.</p>
               <EngineQueryPanel
                 title="Cross-Domain Intelligence Search"
-                placeholder="Search all 1,000+ domains — tax, legal, cyber, engineering, medical, finance, AI/ML..."
+                placeholder="Search all 940+ domains — tax, legal, cyber, engineering, medical, finance, AI/ML..."
                 exampleQueries={[
                   'Section 1031 like-kind exchange requirements',
                   'NIST cybersecurity framework core functions',

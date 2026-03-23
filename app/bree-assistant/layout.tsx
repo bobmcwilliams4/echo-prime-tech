@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Bree AI Assistant | Echo Prime Technologies',
-  description: 'Warm, empathetic AI assistant with voice conversations, 14 personality modes, and deep knowledge across 1,000+ domains. Your personal AI companion.',
+  description: 'Warm, empathetic AI assistant with voice conversations, 14 personality modes, and deep knowledge across 940+ domains. Your personal AI companion.',
   keywords: ['AI assistant', 'Bree AI', 'voice AI', 'personal AI', 'AI companion', 'conversational AI'],
   openGraph: {
     title: 'Bree AI Assistant',

@@ -40,7 +40,7 @@ const CATEGORIES = ['All', 'Business', 'Creative', 'Commerce', 'Local', 'Content
 /* ─── Stats ──────────────────────────────────────────────────── */
 const STATS = [
   { value: '20+', label: 'Starter Templates' },
-  { value: '2,600+', label: 'AI Engines' },
+  { value: '5,400+', label: 'AI Engines' },
   { value: '<50ms', label: 'Global Load Time' },
   { value: '99.9%', label: 'Uptime SLA' },
 ];
@@ -69,7 +69,7 @@ const PROCESS_STEPS = [
 const COMPARISON_FEATURES = [
   { feature: 'AI Content Generation', echo: true, wix: true, squarespace: true, webflow: false },
   { feature: 'AI Full-Page Generation', echo: true, wix: true, squarespace: false, webflow: false },
-  { feature: '6,500+ Domain Intelligence Engines', echo: true, wix: false, squarespace: false, webflow: false },
+  { feature: '5,400+ Domain Intelligence Engines', echo: true, wix: false, squarespace: false, webflow: false },
   { feature: 'Edge Deployment (<50ms)', echo: true, wix: false, squarespace: false, webflow: false },
   { feature: 'No Vendor Lock-In (HTML Export)', echo: true, wix: false, squarespace: false, webflow: true },
   { feature: 'E-Commerce Built In', echo: true, wix: true, squarespace: true, webflow: true },
@@ -166,7 +166,7 @@ function WebsitesPageContent() {
       <section className="py-24 md:py-32 px-6 text-center relative overflow-hidden">
         <div className="max-w-4xl mx-auto animate-fade-up relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium mb-6 border" style={{ backgroundColor: 'var(--ept-accent-glow)', borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)' }}>
-            <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: 'var(--ept-accent)' }} /> Backed by 6,500+ AI Intelligence Engines
+            <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: 'var(--ept-accent)' }} /> Backed by 5,400+ AI Intelligence Engines
           </div>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight" style={{ color: 'var(--ept-text)' }}>
             Describe your business.<br />
@@ -215,7 +215,7 @@ function WebsitesPageContent() {
                 Tell AI what you need.<br />Get a complete website.
               </h2>
               <p className="mt-4 text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
-                Our AI doesn&apos;t just swap placeholder text on a template. It draws from 6,500+ specialized intelligence engines to generate industry-specific copy, SEO-optimized structure, and conversion-focused layouts tailored to your exact business.
+                Our AI doesn&apos;t just swap placeholder text on a template. It draws from 5,400+ specialized intelligence engines to generate industry-specific copy, SEO-optimized structure, and conversion-focused layouts tailored to your exact business.
               </p>
               <ul className="mt-6 space-y-3">
                 {[
@@ -448,7 +448,7 @@ function WebsitesPageContent() {
           </div>
           <div className="text-center mt-6">
             <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
-              Only Echo Prime combines 6,500+ AI intelligence engines with a visual builder and edge deployment.
+              Only Echo Prime combines 5,400+ AI intelligence engines with a visual builder and edge deployment.
             </p>
           </div>
         </div>

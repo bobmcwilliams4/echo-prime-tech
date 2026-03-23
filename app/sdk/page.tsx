@@ -1,240 +1,308 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useRef, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
+import { useAuth } from '../../lib/auth-context';
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Echo Prime SDK Developer Portal
-   ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════════
+   Echo Prime SDK — Developer Sales + Signup Page
+   Gateway: https://echo-sdk-gateway.bmcii1976.workers.dev
+   ═══════════════════════════════════════════════════════════════════════════════ */
 
-const CODE_EXAMPLES: Record<string, string> = {
-  typescript: `import EchoPrime from "@echo-omega-prime/sdk";
+const GATEWAY = 'https://echo-sdk-gateway.bmcii1976.workers.dev';
 
-const echo = new EchoPrime({ apiKey: process.env.ECHO_API_KEY });
+/* ─── Code examples ─── */
+const CODE_EXAMPLES: Record<string, { label: string; code: string }> = {
+  typescript: {
+    label: 'TypeScript',
+    code: `import { EchoPrimeSDK } from '@echo-omega-prime/sdk';
+
+const echo = new EchoPrimeSDK({ apiKey: 'your-key' });
 
 // Query an intelligence engine
-const result = await echo.engine.query({
-  query: "What is MACRS depreciation for 5-year property?",
-  domain: "tax",
-  mode: "FAST",
-});
+const result = await echo.engines.query('LG01', 'contract liability');
 
 console.log(result.analysis);
-// => "MACRS (Modified Accelerated Cost Recovery System) for 5-year
-//     property uses the 200% declining balance method switching to
-//     straight-line. Recovery periods: 20%, 32%, 19.2%, 11.52%..."`,
+// => "Under UCC 2-314, implied warranty of merchantability..."
+console.log(result.confidence);   // 0.94
+console.log(result.authorities);  // ["UCC 2-314", "Henningsen v. Bloomfield"]`,
+  },
+  python: {
+    label: 'Python',
+    code: `from echo_prime_sdk import EchoPrimeSDK
 
-  python: `import echo_prime
-
-client = echo_prime.Client(api_key="YOUR_API_KEY")
+echo = EchoPrimeSDK(api_key="your-key")
 
 # Query an intelligence engine
-result = client.engine.query(
-    query="Analyze drilling mud weight for 12,000ft well",
-    domain="drilling",
-    mode="DEFENSE",
-)
+result = echo.engines.query("LG01", "contract liability")
 
 print(result.analysis)
 print(f"Confidence: {result.confidence}")
-print(f"Citations: {result.authorities}")`,
+print(f"Authorities: {result.authorities}")
 
-  curl: `# Query an intelligence engine
-curl -X POST https://echo-sdk-gateway.bmcii1976.workers.dev/engine/query \\
+# Search the knowledge base
+docs = echo.knowledge.search("IRC Section 1031 like-kind exchange", limit=5)
+for doc in docs:
+    print(f"{doc.title} — {doc.score}")`,
+  },
+  curl: {
+    label: 'cURL',
+    code: `# Query an intelligence engine
+curl -X POST ${GATEWAY}/engine/query \\
   -H "Content-Type: application/json" \\
-  -H "X-Echo-API-Key: YOUR_API_KEY" \\
+  -H "X-Echo-API-Key: your-key" \\
   -d '{
-    "query": "What are the tax implications of a 1031 exchange?",
-    "domain": "tax",
-    "mode": "FAST"
+    "engine_id": "LG01",
+    "query": "contract liability",
+    "mode": "DEFENSE"
   }'
 
 # Search the knowledge base
-curl -X POST https://echo-sdk-gateway.bmcii1976.workers.dev/knowledge/search \\
+curl -X POST ${GATEWAY}/knowledge/search \\
   -H "Content-Type: application/json" \\
-  -H "X-Echo-API-Key: YOUR_API_KEY" \\
-  -d '{"query": "IRC Section 1031 like-kind exchange", "limit": 5}'`,
+  -H "X-Echo-API-Key: your-key" \\
+  -d '{"query": "IRC Section 1031", "limit": 5}'`,
+  },
 };
 
-const SDK_PRODUCTS = [
-  {
-    title: 'CLI Tool',
-    description: '20 commands, 45+ subcommands. Engine queries, knowledge search, brain memory, doctrine generation. Install globally and query from any terminal.',
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" />
-      </svg>
-    ),
-    stats: '20 commands',
-  },
-  {
-    title: 'Engine SDK',
-    description: 'TypeScript SDK for engine queries, batch operations, metadata lookup, and domain routing. Full type safety with generics and Zod validation.',
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-      </svg>
-    ),
-    stats: '5,400+ engines',
-  },
-  {
-    title: 'Doctrine SDK',
-    description: 'Generate domain expertise blocks with 24 FREE LLM providers. Compile reasoning frameworks, key factors, and authority citations into reusable doctrine caches.',
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
-      </svg>
-    ),
-    stats: '24 LLM providers',
-  },
-  {
-    title: 'Tool Discovery',
-    description: '927+ indexed tools across 20 categories, 8 tool chains, and intelligent recommendations. Search, discover, and compose tools into automated workflows.',
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
-    ),
-    stats: '927+ tools',
-  },
-  {
-    title: 'Bot Factory',
-    description: '29 bot templates across 8 platforms. Deploy Discord, X, Telegram, LinkedIn, Slack, Reddit, WhatsApp, and Messenger bots with 14 AI personalities.',
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="11" width="18" height="10" rx="2" /><circle cx="12" cy="5" r="2" /><path d="M12 7v4" /><line x1="8" y1="16" x2="8" y2="16" /><line x1="16" y1="16" x2="16" y2="16" />
-      </svg>
-    ),
-    stats: '29 templates',
-  },
-  {
-    title: 'Scraper Orchestrator',
-    description: '23 scraper templates with job scheduling, result storage, and R2 integration. Web, government, social media, and dark web data extraction at scale.',
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4.03-3-9s1.34-9 3-9" />
-      </svg>
-    ),
-    stats: '23 scrapers',
-  },
-];
-
-const API_ENDPOINTS = [
-  { method: 'POST', path: '/engine/query', description: 'Query intelligence engines with domain routing' },
-  { method: 'POST', path: '/knowledge/search', description: 'Semantic search across 12,000+ knowledge documents' },
-  { method: 'POST', path: '/brain/ingest', description: 'Store memories with importance scoring' },
-  { method: 'POST', path: '/brain/search', description: 'Semantic recall across infinite memory' },
-  { method: 'GET', path: '/engine/list', description: 'List all engines with metadata and domains' },
-  { method: 'POST', path: '/doctrine/generate', description: 'Generate doctrine blocks via 24 LLM providers' },
-  { method: 'POST', path: '/chat', description: 'Chat with 14 AI personalities and engine context' },
-  { method: 'POST', path: '/search/unified', description: 'Unified search across engines, knowledge, and brain' },
-  { method: 'GET', path: '/health', description: 'System health with dependency status' },
-  { method: 'POST', path: '/worker/call', description: 'Proxy requests to any Echo Worker service' },
-];
-
+/* ─── Pricing tiers ─── */
 const PRICING_TIERS = [
   {
     name: 'Free',
     price: '$0',
     period: '',
-    queries: '1,000 queries/month',
+    requests: '500 req/day',
     features: [
+      '500 requests per day',
       '10 engine domains',
       'Knowledge search',
-      'Brain storage (100 memories)',
       'Community support',
-      'Rate limited: 10 req/min',
+      'Rate limited: 5 req/min',
     ],
-    cta: 'Get Started',
-    ctaLink: '/sdk/signup',
+    cta: 'Get Started Free',
     highlighted: false,
+    tier: 'free',
+  },
+  {
+    name: 'Starter',
+    price: '$49',
+    period: '/mo',
+    requests: '2,000 req/day',
+    features: [
+      '2,000 requests per day',
+      'All engine domains',
+      'Knowledge search + Brain storage',
+      'Doctrine generation',
+      'Email support',
+      'Rate: 30 req/min',
+    ],
+    cta: 'Subscribe',
+    highlighted: false,
+    tier: 'starter',
   },
   {
     name: 'Pro',
-    price: '$99',
+    price: '$199',
     period: '/mo',
-    queries: '50,000 queries/month',
+    requests: '10,000 req/day',
     features: [
-      'All engine domains',
-      'Doctrine generation',
-      'Brain storage (unlimited)',
+      '10,000 requests per day',
+      'All engine domains + priority routing',
+      'Unlimited brain storage',
       'Bot Factory access',
       'Scraper Orchestrator',
-      'Priority support',
       'Webhook callbacks',
-      'Rate: 100 req/min',
+      'Priority support',
+      'Rate: 120 req/min',
     ],
-    cta: 'Upgrade to Pro',
-    ctaLink: '/sdk/pricing',
+    cta: 'Subscribe',
     highlighted: true,
+    tier: 'pro',
   },
   {
     name: 'Enterprise',
-    price: 'Custom',
-    period: '',
-    queries: 'Unlimited',
+    price: '$999',
+    period: '/mo',
+    requests: '100,000 req/day',
     features: [
+      '100,000 requests per day',
       'Dedicated infrastructure',
       'Custom engine training',
-      'Private deployment',
       'SLA guarantee (99.9%)',
       'Dedicated support engineer',
       'Audit logs & compliance',
       'Custom rate limits',
       'On-premises option',
     ],
-    cta: 'Contact Sales',
-    ctaLink: '/support',
+    cta: 'Subscribe',
     highlighted: false,
+    tier: 'enterprise',
   },
 ];
 
-export default function SDKDeveloperPortal() {
+/* ─── Features grid ─── */
+const FEATURES = [
+  {
+    title: '5,400+ Intelligence Engines',
+    description: 'Purpose-built AI reasoning across 940+ domains. Tax, legal, engineering, oil & gas, cybersecurity, finance, and more.',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+      </svg>
+    ),
+    stat: '940+ domains',
+  },
+  {
+    title: '29 LLM Models',
+    description: 'Route queries to the optimal model. Claude, GPT-4, Gemini, Mistral, Llama, Qwen, and 23 more — all through one API.',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
+      </svg>
+    ),
+    stat: '29 models',
+  },
+  {
+    title: 'Knowledge Forge',
+    description: '24,000+ indexed documents. IRC sections, case law, NIST frameworks, API specs, engineering standards, and domain expertise.',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
+      </svg>
+    ),
+    stat: '24K+ docs',
+  },
+  {
+    title: 'Graph RAG',
+    description: '312,000 connected knowledge nodes. Traverse relationships, discover hidden connections, and reason across linked concepts.',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="6" cy="6" r="3" /><circle cx="18" cy="18" r="3" /><circle cx="18" cy="6" r="3" /><circle cx="6" cy="18" r="3" /><line x1="8.5" y1="7.5" x2="15.5" y2="16.5" /><line x1="15.5" y1="7.5" x2="8.5" y2="16.5" />
+      </svg>
+    ),
+    stat: '312K nodes',
+  },
+  {
+    title: 'Bot Factory',
+    description: 'Deploy AI bots across 8 platforms: Discord, X, Telegram, LinkedIn, Slack, Reddit, WhatsApp, Messenger. 14 built-in personalities.',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="11" width="18" height="10" rx="2" /><circle cx="12" cy="5" r="2" /><path d="M12 7v4" /><circle cx="8" cy="16" r="1" /><circle cx="16" cy="16" r="1" />
+      </svg>
+    ),
+    stat: '8 platforms',
+  },
+  {
+    title: 'Forge Marketplace',
+    description: 'Browse, purchase, and deploy pre-built intelligence engines from the marketplace. Monetize your own engines and doctrine blocks.',
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 01-8 0" />
+      </svg>
+    ),
+    stat: 'Buy & sell',
+  },
+];
+
+/* ═══════════════════════════════════════════════════════════════════════════════ */
+
+export default function SDKPage() {
   const { isDark, toggle } = useTheme();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('typescript');
-  const [engineCount, setEngineCount] = useState('5,400+');
-  const [doctrineCount, setDoctrineCount] = useState('697K+');
+  const [showSignup, setShowSignup] = useState(false);
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupName, setSignupName] = useState('');
+  const [signupLoading, setSignupLoading] = useState(false);
+  const [signupError, setSignupError] = useState('');
+  const [apiKey, setApiKey] = useState('');
+  const [copied, setCopied] = useState(false);
+  const signupRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    fetch('https://echo-engine-runtime.bmcii1976.workers.dev/stats')
-      .then(r => { if (!r.ok) throw new Error('fail'); return r.json(); })
-      .then(d => {
-        if (d.total_engines) {
-          setEngineCount(`${(d.total_engines / 1000).toFixed(1).replace(/\.0$/, '')}K+`);
-        }
-        if (d.total_doctrines) {
-          setDoctrineCount(`${(d.total_doctrines / 1000).toFixed(0)}K+`);
-        }
-      })
-      .catch(() => {});
-  }, []);
+  const RED = '#dc2626';
+  const RED_GLOW = 'rgba(220, 38, 38, 0.15)';
+  const RED_LIGHT = 'rgba(220, 38, 38, 0.08)';
 
-  const cardStyle: React.CSSProperties = {
-    background: 'var(--ept-card-bg)',
-    border: '1px solid var(--ept-card-border)',
-    borderRadius: 12,
-    padding: 24,
+  const scrollToSignup = () => {
+    setShowSignup(true);
+    setTimeout(() => signupRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
   };
 
+  const handleSignup = async (e: FormEvent) => {
+    e.preventDefault();
+    setSignupLoading(true);
+    setSignupError('');
+    setApiKey('');
+    try {
+      const res = await fetch(`${GATEWAY}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: signupEmail, name: signupName }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      setApiKey(data.api_key || data.apiKey || data.key || '');
+    } catch (err: unknown) {
+      setSignupError(err instanceof Error ? err.message : 'Signup failed. Please try again.');
+    } finally {
+      setSignupLoading(false);
+    }
+  };
+
+  const handlePricingCTA = async (tier: typeof PRICING_TIERS[0]) => {
+    if (tier.tier === 'free') {
+      scrollToSignup();
+      return;
+    }
+    // Paid tiers — POST to checkout endpoint
+    try {
+      const res = await fetch(`${GATEWAY}/auth/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: tier.tier, email: signupEmail || undefined }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        // Fallback — open signup first
+        scrollToSignup();
+      }
+    } catch {
+      scrollToSignup();
+    }
+  };
+
+  const copyKey = () => {
+    navigator.clipboard.writeText(apiKey);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const cardBg = 'var(--ept-card-bg)';
+  const cardBorder = 'var(--ept-card-border)';
+  const textPrimary = 'var(--ept-text)';
+  const textSecondary = 'var(--ept-text-secondary)';
+  const textMuted = 'var(--ept-text-muted)';
+  const surface = 'var(--ept-surface)';
+
   return (
-    <div style={{ color: 'var(--ept-text)' }}>
-      {/* ─── Navigation ─── */}
+    <div style={{ color: textPrimary, minHeight: '100vh' }}>
+      {/* ═══════════════ NAVIGATION ═══════════════ */}
       <nav
         className="fixed top-0 w-full z-50 backdrop-blur-2xl border-b transition-colors duration-500"
         style={{ backgroundColor: 'var(--ept-nav-bg)', borderColor: 'var(--ept-border)' }}
       >
-        <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/">
             <Image
               src={isDark ? '/logo-night.png' : '/logo-day.png'}
               alt="Echo Prime Technologies"
               width={600}
               height={400}
-              className="w-[240px] md:w-[340px] h-auto transition-opacity duration-500"
+              className="w-[200px] md:w-[280px] h-auto transition-opacity duration-500"
               style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }}
               priority
             />
@@ -243,7 +311,6 @@ export default function SDKDeveloperPortal() {
             {[
               { label: 'Engines', href: '/engines' },
               { label: 'Closer AI', href: '/closer' },
-              { label: 'Bree AI', href: '/bree-assistant' },
               { label: 'Security', href: '/security' },
               { label: 'SDK', href: '/sdk' },
               { label: 'Pricing', href: '/pricing' },
@@ -252,564 +319,603 @@ export default function SDKDeveloperPortal() {
                 key={item.href}
                 href={item.href}
                 className="text-sm font-medium transition-colors hover:opacity-100"
-                style={{ color: item.href === '/sdk' ? 'var(--ept-accent)' : 'var(--ept-text-secondary)' }}
+                style={{ color: item.href === '/sdk' ? RED : textSecondary }}
               >
                 {item.label}
               </Link>
             ))}
-            <Link href="/sentinel" className="text-sm font-semibold transition-colors" style={{ color: 'var(--ept-accent)' }}>
-              Sentinel AI
-            </Link>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={toggle}
               className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors text-sm"
-              style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-secondary)' }}
+              style={{ backgroundColor: surface, color: textSecondary }}
+              aria-label="Toggle theme"
             >
               {isDark ? '\u2600\uFE0F' : '\uD83C\uDF19'}
             </button>
             {user ? (
               <Link
                 href="/dashboard"
-                className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:opacity-90"
-                style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
+                className="hidden md:inline-flex px-5 py-2 rounded-lg text-sm font-semibold transition-all hover:opacity-90"
+                style={{ backgroundColor: RED, color: '#fff' }}
               >
                 Dashboard
               </Link>
             ) : (
-              <Link
-                href="/login"
-                className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:opacity-90"
-                style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
+              <button
+                onClick={scrollToSignup}
+                className="hidden md:inline-flex px-5 py-2 rounded-lg text-sm font-semibold transition-all hover:opacity-90"
+                style={{ backgroundColor: RED, color: '#fff', border: 'none', cursor: 'pointer' }}
               >
-                Get Started
-              </Link>
+                Get API Key
+              </button>
             )}
           </div>
         </div>
       </nav>
 
       {/* ═══════════════ HERO ═══════════════ */}
-      <section style={{ maxWidth: 1000, margin: '0 auto', padding: '140px 24px 48px', textAlign: 'center' }}>
+      <section className="relative overflow-hidden" style={{ paddingTop: 120 }}>
+        {/* Background glow */}
         <div
+          className="absolute inset-0 pointer-events-none"
           style={{
-            display: 'inline-block',
-            background: 'var(--ept-accent)',
-            color: '#fff',
-            fontSize: 12,
-            fontWeight: 700,
-            padding: '4px 14px',
-            borderRadius: 20,
-            marginBottom: 20,
-            letterSpacing: '0.5px',
+            background: `radial-gradient(ellipse 70% 50% at 50% 0%, ${RED_GLOW} 0%, transparent 70%)`,
           }}
-        >
-          DEVELOPER PORTAL
-        </div>
-        <h1 className="text-4xl md:text-6xl font-extrabold" style={{ lineHeight: 1.08, marginBottom: 20 }}>
-          Echo Prime SDK
-        </h1>
-        <p className="text-lg md:text-xl" style={{ opacity: 0.65, maxWidth: 660, margin: '0 auto 12px', lineHeight: 1.6 }}>
-          Intelligence at your fingertips.{' '}
-          <span style={{ color: 'var(--ept-accent)', fontWeight: 700 }}>{engineCount}</span> engines.{' '}
-          One API key.
-        </p>
-        <p className="text-base" style={{ opacity: 0.5, maxWidth: 600, margin: '0 auto 36px', lineHeight: 1.5 }}>
-          Query domain-specific AI reasoning, search infinite memory, generate doctrine blocks,
-          and deploy bots — all through a single authenticated gateway.
-        </p>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/sdk/signup">
-            <button
-              className="font-semibold transition-all hover:opacity-90"
-              style={{
-                background: 'var(--ept-accent)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 10,
-                padding: '14px 32px',
-                fontSize: 16,
-                cursor: 'pointer',
-              }}
-            >
-              Get API Key
-            </button>
-          </Link>
-          <a href="#docs">
-            <button
-              className="font-medium transition-all hover:opacity-80"
-              style={{
-                background: 'transparent',
-                color: 'var(--ept-text)',
-                border: '1px solid var(--ept-card-border)',
-                borderRadius: 10,
-                padding: '14px 32px',
-                fontSize: 16,
-                cursor: 'pointer',
-              }}
-            >
-              View Docs
-            </button>
-          </a>
-        </div>
-      </section>
-
-      {/* ═══════════════ LIVE STATS BAR ═══════════════ */}
-      <section style={{ maxWidth: 900, margin: '0 auto', padding: '0 24px 56px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 14 }}>
-          {[
-            { label: 'Engines', value: engineCount },
-            { label: 'Doctrines', value: doctrineCount },
-            { label: 'Domains', value: '1,000+' },
-            { label: 'Endpoints', value: '17' },
-            { label: 'Latency', value: '<50ms' },
-            { label: 'Uptime', value: '99.9%' },
-          ].map(s => (
-            <div key={s.label} style={{ ...cardStyle, textAlign: 'center', padding: 18 }}>
-              <div style={{ fontSize: 26, fontWeight: 800, color: 'var(--ept-accent)' }}>{s.value}</div>
-              <div style={{ fontSize: 12, opacity: 0.55, marginTop: 4 }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══════════════ QUICK START ═══════════════ */}
-      <section style={{ maxWidth: 800, margin: '0 auto', padding: '0 24px 72px' }}>
-        <h2 className="text-2xl md:text-3xl font-bold" style={{ textAlign: 'center', marginBottom: 36 }}>
-          Up and running in 60 seconds
-        </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {[
-            {
-              step: '1',
-              title: 'Install',
-              code: 'npm install @echo-omega-prime/sdk',
-              description: 'Install the SDK package globally or in your project.',
-            },
-            {
-              step: '2',
-              title: 'Initialize',
-              code: 'echo init <your-api-key>',
-              description: 'Authenticate with your API key. Keys are free at /sdk/signup.',
-            },
-            {
-              step: '3',
-              title: 'Query',
-              code: 'echo engine query "What is MACRS depreciation?" --domain tax',
-              description: 'Query any of 5,400+ engines from the command line or SDK.',
-            },
-          ].map(s => (
-            <div key={s.step} style={{ ...cardStyle, display: 'flex', gap: 20, alignItems: 'flex-start' }}>
-              <div
-                style={{
-                  minWidth: 40,
-                  height: 40,
-                  borderRadius: 10,
-                  background: 'var(--ept-accent)',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  fontSize: 18,
-                  flexShrink: 0,
-                }}
-              >
-                {s.step}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>{s.title}</div>
-                <pre
-                  style={{
-                    fontFamily: 'var(--font-mono, monospace)',
-                    fontSize: 14,
-                    padding: '10px 14px',
-                    borderRadius: 8,
-                    background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.04)',
-                    margin: '6px 0 6px',
-                    overflowX: 'auto',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-all',
-                  }}
-                >
-                  <code style={{ color: 'var(--ept-accent)' }}>{s.code}</code>
-                </pre>
-                <p style={{ fontSize: 13, opacity: 0.55, margin: 0 }}>{s.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══════════════ SDK PRODUCTS GRID ═══════════════ */}
-      <section style={{ maxWidth: 1000, margin: '0 auto', padding: '0 24px 72px' }}>
-        <h2 className="text-2xl md:text-3xl font-bold" style={{ textAlign: 'center', marginBottom: 12 }}>
-          SDK Products
-        </h2>
-        <p style={{ textAlign: 'center', opacity: 0.55, fontSize: 15, maxWidth: 550, margin: '0 auto 36px' }}>
-          Everything you need to build intelligent applications.
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: 20 }}>
-          {SDK_PRODUCTS.map(p => (
-            <div
-              key={p.title}
-              className="card-hover"
-              style={{
-                ...cardStyle,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 12,
-                transition: 'border-color 0.2s',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ color: 'var(--ept-accent)' }}>{p.icon}</div>
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    padding: '3px 10px',
-                    borderRadius: 20,
-                    background: isDark ? 'rgba(20,184,166,0.12)' : 'rgba(13,115,119,0.08)',
-                    color: 'var(--ept-accent)',
-                    letterSpacing: '0.3px',
-                  }}
-                >
-                  {p.stats}
-                </span>
-              </div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{p.title}</h3>
-              <p style={{ fontSize: 14, opacity: 0.65, lineHeight: 1.55, margin: 0, flex: 1 }}>{p.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══════════════ API ENDPOINTS ═══════════════ */}
-      <section id="docs" style={{ maxWidth: 900, margin: '0 auto', padding: '0 24px 72px' }}>
-        <h2 className="text-2xl md:text-3xl font-bold" style={{ textAlign: 'center', marginBottom: 12 }}>
-          API Reference
-        </h2>
-        <p style={{ textAlign: 'center', opacity: 0.55, fontSize: 15, maxWidth: 500, margin: '0 auto 32px' }}>
-          All endpoints are authenticated with a single API key header.
-        </p>
-        <div style={{ ...cardStyle, padding: 0, overflow: 'hidden' }}>
+        />
+        <div className="relative max-w-4xl mx-auto px-6 pt-16 pb-12 text-center">
           <div
+            className="inline-block text-xs font-bold tracking-widest uppercase mb-6 animate-fade-up"
             style={{
-              display: 'grid',
-              gridTemplateColumns: '90px 1fr',
-              fontSize: 13,
-              fontFamily: 'var(--font-mono, monospace)',
+              background: RED_LIGHT,
+              color: RED,
+              padding: '6px 16px',
+              borderRadius: 20,
+              border: `1px solid ${RED}33`,
             }}
           >
-            {/* Header */}
-            <div
+            ECHO PRIME SDK
+          </div>
+
+          <h1
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold animate-fade-up animate-fade-up-delay-1"
+            style={{ lineHeight: 1.05, marginBottom: 24 }}
+          >
+            Build with{' '}
+            <span style={{ color: RED }}>5,400+</span>
+            <br />
+            Intelligence Engines
+          </h1>
+
+          <p
+            className="text-lg md:text-xl animate-fade-up animate-fade-up-delay-2"
+            style={{ color: textSecondary, maxWidth: 640, margin: '0 auto 40px', lineHeight: 1.6 }}
+          >
+            One API key. 940+ domains. Query domain-specific AI reasoning, search infinite memory,
+            generate doctrine blocks, and deploy bots — all through a single gateway.
+          </p>
+
+          <div className="flex flex-wrap gap-4 justify-center animate-fade-up animate-fade-up-delay-3">
+            <button
+              onClick={scrollToSignup}
+              className="font-bold text-base transition-all hover:scale-105"
               style={{
-                gridColumn: '1 / -1',
-                display: 'grid',
-                gridTemplateColumns: '90px 1fr',
-                padding: '12px 20px',
-                background: 'var(--ept-surface)',
-                borderBottom: '1px solid var(--ept-card-border)',
-                fontWeight: 700,
-                fontSize: 11,
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                fontFamily: 'inherit',
-                opacity: 0.6,
+                background: RED,
+                color: '#fff',
+                border: 'none',
+                borderRadius: 12,
+                padding: '16px 36px',
+                cursor: 'pointer',
+                boxShadow: `0 0 30px ${RED_GLOW}`,
               }}
             >
-              <span>Method</span>
-              <span>Endpoint</span>
-            </div>
-            {API_ENDPOINTS.map((ep, i) => (
-              <div
-                key={ep.path}
+              Get Free API Key
+            </button>
+            <a href="#docs">
+              <button
+                className="font-semibold text-base transition-all hover:opacity-80"
                 style={{
-                  gridColumn: '1 / -1',
-                  display: 'grid',
-                  gridTemplateColumns: '90px 1fr',
-                  padding: '14px 20px',
-                  borderBottom: i < API_ENDPOINTS.length - 1 ? '1px solid var(--ept-card-border)' : 'none',
-                  alignItems: 'start',
-                  gap: 0,
+                  background: 'transparent',
+                  color: textPrimary,
+                  border: `1px solid ${cardBorder}`,
+                  borderRadius: 12,
+                  padding: '16px 36px',
+                  cursor: 'pointer',
                 }}
               >
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    padding: '2px 8px',
-                    borderRadius: 4,
-                    background: ep.method === 'GET'
-                      ? (isDark ? 'rgba(34,197,94,0.15)' : 'rgba(34,197,94,0.1)')
-                      : (isDark ? 'rgba(59,130,246,0.15)' : 'rgba(59,130,246,0.1)'),
-                    color: ep.method === 'GET' ? '#22c55e' : '#3b82f6',
-                    display: 'inline-block',
-                    width: 'fit-content',
-                  }}
-                >
-                  {ep.method}
-                </span>
-                <div>
-                  <div style={{ fontWeight: 600, color: 'var(--ept-text)' }}>{ep.path}</div>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      opacity: 0.55,
-                      marginTop: 2,
-                      fontFamily: 'inherit',
-                    }}
-                  >
-                    {ep.description}
-                  </div>
-                </div>
+                View Docs
+              </button>
+            </a>
+          </div>
+
+          {/* Live stats */}
+          <div
+            className="grid grid-cols-3 md:grid-cols-6 gap-3 mt-16 animate-fade-up animate-fade-up-delay-4"
+            style={{ maxWidth: 800, margin: '64px auto 0' }}
+          >
+            {[
+              { v: '5,400+', l: 'Engines' },
+              { v: '940+', l: 'Domains' },
+              { v: '29', l: 'LLM Models' },
+              { v: '24K+', l: 'Knowledge Docs' },
+              { v: '<50ms', l: 'Latency' },
+              { v: '99.9%', l: 'Uptime' },
+            ].map(s => (
+              <div
+                key={s.l}
+                className="rounded-xl text-center py-4 px-2"
+                style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
+              >
+                <div className="text-xl md:text-2xl font-extrabold" style={{ color: RED }}>{s.v}</div>
+                <div className="text-xs mt-1" style={{ color: textMuted }}>{s.l}</div>
               </div>
             ))}
           </div>
         </div>
-        <div style={{ textAlign: 'center', marginTop: 20 }}>
-          <Link
-            href="/sdk/docs"
-            style={{ color: 'var(--ept-accent)', fontSize: 14, fontWeight: 600 }}
+      </section>
+
+      {/* ═══════════════ TERMINAL INSTALL ═══════════════ */}
+      <section className="max-w-3xl mx-auto px-6 py-20">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">
+          Up and running in 60 seconds
+        </h2>
+        <p className="text-center mb-10" style={{ color: textSecondary, fontSize: 15 }}>
+          Install the CLI, sign up, and start querying — all from your terminal.
+        </p>
+
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{ background: isDark ? '#0c0c14' : '#1a1a2e', border: `1px solid ${isDark ? '#1e293b' : '#2d2d44'}` }}
+        >
+          {/* Terminal header */}
+          <div
+            className="flex items-center gap-2 px-4 py-3"
+            style={{ background: isDark ? '#08080f' : '#12121f', borderBottom: `1px solid ${isDark ? '#1e293b' : '#2d2d44'}` }}
           >
-            Full API documentation {'->'}
-          </Link>
+            <div className="w-3 h-3 rounded-full" style={{ background: '#ff5f57' }} />
+            <div className="w-3 h-3 rounded-full" style={{ background: '#febc2e' }} />
+            <div className="w-3 h-3 rounded-full" style={{ background: '#28c840' }} />
+            <span className="ml-3 text-xs font-mono" style={{ color: '#64748b' }}>terminal</span>
+          </div>
+
+          {/* Terminal body */}
+          <div className="p-6 font-mono text-sm leading-relaxed" style={{ color: '#e2e8f0' }}>
+            <div style={{ color: '#64748b', marginBottom: 12 }}># Install the CLI (Node.js)</div>
+            <div>
+              <span style={{ color: '#22c55e' }}>$</span>{' '}
+              <span style={{ color: '#f1f5f9' }}>npm install -g @echo-omega-prime/cli</span>
+            </div>
+            <div className="mt-6" style={{ color: '#64748b' }}># Sign up for a free API key</div>
+            <div>
+              <span style={{ color: '#22c55e' }}>$</span>{' '}
+              <span style={{ color: '#f1f5f9' }}>echo signup you@email.com</span>
+            </div>
+            <div className="mt-1" style={{ color: '#94a3b8' }}>
+              {'  '}API Key: <span style={{ color: RED }}>echo_sk_1a2b3c4d5e6f...</span>
+            </div>
+            <div className="mt-6" style={{ color: '#64748b' }}># Query an intelligence engine</div>
+            <div>
+              <span style={{ color: '#22c55e' }}>$</span>{' '}
+              <span style={{ color: '#f1f5f9' }}>echo engine query &quot;contract liability&quot;</span>
+            </div>
+            <div className="mt-1" style={{ color: '#94a3b8' }}>
+              {'  '}Engine LG01 | Confidence: 0.94 | 3 authorities cited
+            </div>
+
+            <div
+              className="mt-8 pt-6"
+              style={{ borderTop: `1px solid ${isDark ? '#1e293b' : '#2d2d44'}` }}
+            >
+              <div style={{ color: '#64748b', marginBottom: 8 }}># Or install with Python</div>
+              <div>
+                <span style={{ color: '#22c55e' }}>$</span>{' '}
+                <span style={{ color: '#f1f5f9' }}>pip install echo-prime-sdk</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ═══════════════ CODE EXAMPLES ═══════════════ */}
-      <section style={{ maxWidth: 800, margin: '0 auto', padding: '0 24px 72px' }}>
-        <h2 className="text-2xl md:text-3xl font-bold" style={{ textAlign: 'center', marginBottom: 12 }}>
+      <section id="docs" className="max-w-3xl mx-auto px-6 pb-20">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">
           Code Examples
         </h2>
-        <p style={{ textAlign: 'center', opacity: 0.55, fontSize: 15, maxWidth: 500, margin: '0 auto 32px' }}>
+        <p className="text-center mb-10" style={{ color: textSecondary, fontSize: 15 }}>
           First-class support for TypeScript, Python, and cURL.
         </p>
-        <div style={{ ...cardStyle, padding: 0, overflow: 'hidden' }}>
-          {/* Language tabs */}
-          <div
-            style={{
-              display: 'flex',
-              borderBottom: '1px solid var(--ept-card-border)',
-              background: 'var(--ept-surface)',
-            }}
-          >
-            {Object.keys(CODE_EXAMPLES).map(lang => (
+
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
+        >
+          {/* Tabs */}
+          <div className="flex" style={{ borderBottom: `1px solid ${cardBorder}`, background: surface }}>
+            {Object.entries(CODE_EXAMPLES).map(([key, val]) => (
               <button
-                key={lang}
-                onClick={() => setActiveTab(lang)}
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className="font-medium text-sm transition-colors"
                 style={{
-                  padding: '12px 22px',
-                  fontSize: 13,
-                  fontWeight: activeTab === lang ? 700 : 400,
-                  color: activeTab === lang ? 'var(--ept-accent)' : 'var(--ept-text-secondary)',
+                  padding: '14px 24px',
+                  color: activeTab === key ? RED : textSecondary,
                   background: 'transparent',
                   border: 'none',
-                  borderBottom: activeTab === lang ? '2px solid var(--ept-accent)' : '2px solid transparent',
+                  borderBottom: activeTab === key ? `2px solid ${RED}` : '2px solid transparent',
                   cursor: 'pointer',
-                  textTransform: 'capitalize',
-                  transition: 'color 0.15s',
                 }}
               >
-                {lang}
+                {val.label}
               </button>
             ))}
           </div>
           {/* Code block */}
           <pre
+            className="font-mono text-sm"
             style={{
               padding: 24,
               margin: 0,
-              fontSize: 13,
-              lineHeight: 1.65,
-              fontFamily: 'var(--font-mono, monospace)',
+              lineHeight: 1.7,
               overflowX: 'auto',
               color: isDark ? '#e2e8f0' : '#1e293b',
               background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.02)',
             }}
           >
-            <code>{CODE_EXAMPLES[activeTab]}</code>
+            <code>{CODE_EXAMPLES[activeTab].code}</code>
           </pre>
         </div>
       </section>
 
-      {/* ═══════════════ PRICING ═══════════════ */}
-      <section style={{ maxWidth: 1000, margin: '0 auto', padding: '0 24px 72px', textAlign: 'center' }}>
-        <h2 className="text-2xl md:text-3xl font-bold" style={{ marginBottom: 12 }}>
-          Simple, transparent pricing
+      {/* ═══════════════ FEATURES GRID ═══════════════ */}
+      <section className="max-w-5xl mx-auto px-6 pb-24">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">
+          Everything You Need
         </h2>
-        <p style={{ opacity: 0.55, marginBottom: 40, fontSize: 15 }}>
-          Start free. Scale when you need to. No surprises.
+        <p className="text-center mb-12" style={{ color: textSecondary, fontSize: 15, maxWidth: 500, margin: '0 auto 48px' }}>
+          One API. Full stack intelligence infrastructure.
         </p>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: 20,
-            maxWidth: 900,
-            margin: '0 auto',
-          }}
-        >
-          {PRICING_TIERS.map(tier => (
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {FEATURES.map(f => (
             <div
-              key={tier.name}
-              style={{
-                ...cardStyle,
-                textAlign: 'left',
-                position: 'relative',
-                borderColor: tier.highlighted ? 'var(--ept-accent)' : 'var(--ept-card-border)',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
+              key={f.title}
+              className="card-hover rounded-2xl p-6 flex flex-col gap-4 transition-all"
+              style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
             >
-              {tier.highlighted && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: -12,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: 'var(--ept-accent)',
-                    color: '#fff',
-                    fontSize: 11,
-                    fontWeight: 700,
-                    padding: '3px 14px',
-                    borderRadius: 20,
-                    letterSpacing: '0.5px',
-                  }}
+              <div className="flex items-center justify-between">
+                <div style={{ color: RED }}>{f.icon}</div>
+                <span
+                  className="text-xs font-bold px-3 py-1 rounded-full"
+                  style={{ background: RED_LIGHT, color: RED, border: `1px solid ${RED}22` }}
                 >
-                  MOST POPULAR
-                </div>
-              )}
-              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{tier.name}</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
-                <span style={{ fontSize: 36, fontWeight: 800, color: 'var(--ept-accent)' }}>
-                  {tier.price}
+                  {f.stat}
                 </span>
-                {tier.period && (
-                  <span style={{ fontSize: 14, opacity: 0.5 }}>{tier.period}</span>
-                )}
               </div>
-              <div style={{ fontSize: 13, opacity: 0.55, marginBottom: 20 }}>{tier.queries}</div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', flex: 1 }}>
-                {tier.features.map(f => (
-                  <li
-                    key={f}
-                    style={{
-                      fontSize: 14,
-                      padding: '6px 0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 10,
-                      opacity: 0.75,
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M3 8.5L6.5 12L13 4" stroke="var(--ept-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link href={tier.ctaLink}>
-                <button
-                  className="font-semibold transition-all hover:opacity-90"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: 10,
-                    border: tier.highlighted ? 'none' : '1px solid var(--ept-card-border)',
-                    background: tier.highlighted ? 'var(--ept-accent)' : 'transparent',
-                    color: tier.highlighted ? '#fff' : 'var(--ept-text)',
-                    fontSize: 14,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {tier.cta}
-                </button>
-              </Link>
+              <h3 className="text-lg font-bold">{f.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: textSecondary, margin: 0 }}>
+                {f.description}
+              </p>
             </div>
           ))}
         </div>
       </section>
 
+      {/* ═══════════════ PRICING ═══════════════ */}
+      <section className="max-w-6xl mx-auto px-6 pb-24">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">
+          Simple, Transparent Pricing
+        </h2>
+        <p className="text-center mb-12" style={{ color: textSecondary, fontSize: 15 }}>
+          Start free. Scale as you grow. No surprises.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" style={{ maxWidth: 1100, margin: '0 auto' }}>
+          {PRICING_TIERS.map(tier => (
+            <div
+              key={tier.name}
+              className="card-hover rounded-2xl p-6 flex flex-col relative transition-all"
+              style={{
+                background: cardBg,
+                border: tier.highlighted ? `2px solid ${RED}` : `1px solid ${cardBorder}`,
+                boxShadow: tier.highlighted ? `0 0 40px ${RED_GLOW}` : 'none',
+              }}
+            >
+              {tier.highlighted && (
+                <div
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-4 py-1 rounded-full"
+                  style={{ background: RED, color: '#fff', letterSpacing: '0.5px' }}
+                >
+                  MOST POPULAR
+                </div>
+              )}
+
+              <div className="text-base font-bold mb-2">{tier.name}</div>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-4xl font-extrabold" style={{ color: RED }}>{tier.price}</span>
+                {tier.period && <span className="text-sm" style={{ color: textMuted }}>{tier.period}</span>}
+              </div>
+              <div className="text-sm mb-5" style={{ color: textMuted }}>{tier.requests}</div>
+
+              <ul className="flex-1 mb-6" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {tier.features.map(f => (
+                  <li key={f} className="flex items-start gap-2 py-1.5 text-sm" style={{ color: textSecondary }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="mt-0.5 flex-shrink-0">
+                      <path d="M3 8.5L6.5 12L13 4" stroke={RED} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => handlePricingCTA(tier)}
+                className="w-full py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90"
+                style={{
+                  background: tier.highlighted ? RED : 'transparent',
+                  color: tier.highlighted ? '#fff' : textPrimary,
+                  border: tier.highlighted ? 'none' : `1px solid ${cardBorder}`,
+                  cursor: 'pointer',
+                }}
+              >
+                {tier.cta}
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════ SIGNUP FORM ═══════════════ */}
+      <section ref={signupRef} className="max-w-xl mx-auto px-6 pb-24" id="signup">
+        <div
+          className="rounded-2xl p-8 md:p-10"
+          style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
+        >
+          {apiKey ? (
+            /* ─── Success state ─── */
+            <div className="text-center">
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+                style={{ background: 'rgba(34, 197, 94, 0.12)' }}
+              >
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold mb-2">You&apos;re in!</h3>
+              <p className="text-sm mb-6" style={{ color: textSecondary }}>
+                Your API key is ready. Keep it safe — you won&apos;t see it again.
+              </p>
+
+              <div
+                className="flex items-center gap-2 rounded-xl p-4 mb-6 font-mono text-sm"
+                style={{
+                  background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.04)',
+                  border: `1px solid ${cardBorder}`,
+                  wordBreak: 'break-all',
+                }}
+              >
+                <code className="flex-1" style={{ color: RED }}>{apiKey}</code>
+                <button
+                  onClick={copyKey}
+                  className="flex-shrink-0 p-2 rounded-lg transition-all hover:opacity-80"
+                  style={{
+                    background: copied ? 'rgba(34,197,94,0.12)' : RED_LIGHT,
+                    color: copied ? '#22c55e' : RED,
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                  title="Copy to clipboard"
+                >
+                  {copied ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+
+              <div
+                className="rounded-xl p-4 text-left font-mono text-xs leading-relaxed"
+                style={{
+                  background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.04)',
+                  color: isDark ? '#94a3b8' : '#64748b',
+                }}
+              >
+                <div style={{ color: '#64748b' }}># Start using your key:</div>
+                <div className="mt-1">
+                  <span style={{ color: '#22c55e' }}>$</span>{' '}
+                  npm install -g @echo-omega-prime/cli
+                </div>
+                <div>
+                  <span style={{ color: '#22c55e' }}>$</span>{' '}
+                  echo init {apiKey.slice(0, 12)}...
+                </div>
+                <div>
+                  <span style={{ color: '#22c55e' }}>$</span>{' '}
+                  echo engine query &quot;your first query&quot;
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* ─── Signup form ─── */
+            <>
+              <h3 className="text-2xl font-bold mb-2 text-center">Get Your Free API Key</h3>
+              <p className="text-sm text-center mb-8" style={{ color: textSecondary }}>
+                No credit card required. 500 requests per day. Start building immediately.
+              </p>
+
+              <form onSubmit={handleSignup} className="flex flex-col gap-4">
+                <div>
+                  <label className="block text-sm font-semibold mb-2" htmlFor="signup-name">
+                    Full Name
+                  </label>
+                  <input
+                    id="signup-name"
+                    type="text"
+                    required
+                    value={signupName}
+                    onChange={e => setSignupName(e.target.value)}
+                    placeholder="Jane Developer"
+                    className="w-full rounded-xl px-4 py-3 text-sm font-medium outline-none transition-all focus:ring-2"
+                    style={{
+                      background: surface,
+                      border: `1px solid ${cardBorder}`,
+                      color: textPrimary,
+                      // @ts-expect-error CSS custom property
+                      '--tw-ring-color': RED,
+                    }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2" htmlFor="signup-email">
+                    Email Address
+                  </label>
+                  <input
+                    id="signup-email"
+                    type="email"
+                    required
+                    value={signupEmail}
+                    onChange={e => setSignupEmail(e.target.value)}
+                    placeholder="you@company.com"
+                    className="w-full rounded-xl px-4 py-3 text-sm font-medium outline-none transition-all focus:ring-2"
+                    style={{
+                      background: surface,
+                      border: `1px solid ${cardBorder}`,
+                      color: textPrimary,
+                      // @ts-expect-error CSS custom property
+                      '--tw-ring-color': RED,
+                    }}
+                  />
+                </div>
+
+                {signupError && (
+                  <div className="text-sm font-medium rounded-xl px-4 py-3" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
+                    {signupError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={signupLoading}
+                  className="w-full py-3.5 rounded-xl font-bold text-base transition-all hover:opacity-90 disabled:opacity-50"
+                  style={{
+                    background: RED,
+                    color: '#fff',
+                    border: 'none',
+                    cursor: signupLoading ? 'not-allowed' : 'pointer',
+                    boxShadow: `0 0 20px ${RED_GLOW}`,
+                  }}
+                >
+                  {signupLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Creating your key...
+                    </span>
+                  ) : (
+                    'Get Free API Key'
+                  )}
+                </button>
+              </form>
+
+              <p className="text-xs text-center mt-6" style={{ color: textMuted }}>
+                By signing up you agree to our{' '}
+                <Link href="/legal/terms" className="underline" style={{ color: textSecondary }}>Terms of Service</Link>
+                {' '}and{' '}
+                <Link href="/legal/privacy" className="underline" style={{ color: textSecondary }}>Privacy Policy</Link>.
+              </p>
+            </>
+          )}
+        </div>
+      </section>
+
       {/* ═══════════════ AUTH HEADER INFO ═══════════════ */}
-      <section style={{ maxWidth: 800, margin: '0 auto', padding: '0 24px 72px' }}>
-        <div style={{ ...cardStyle, textAlign: 'center' }}>
-          <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12 }}>Single authentication header</h3>
-          <p style={{ fontSize: 14, opacity: 0.55, maxWidth: 500, margin: '0 auto 20px', lineHeight: 1.55 }}>
-            Every request uses the same API key. No OAuth flows, no token rotation, no session management.
-            One header. Every endpoint.
+      <section className="max-w-3xl mx-auto px-6 pb-20">
+        <div
+          className="rounded-2xl p-8 text-center"
+          style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
+        >
+          <h3 className="text-xl font-bold mb-3">Single Authentication Header</h3>
+          <p className="text-sm mb-6" style={{ color: textSecondary, maxWidth: 460, margin: '0 auto 24px', lineHeight: 1.6 }}>
+            No OAuth flows, no token rotation, no session management. One header. Every endpoint.
           </p>
           <pre
-            style={{
-              display: 'inline-block',
-              fontFamily: 'var(--font-mono, monospace)',
-              fontSize: 14,
-              padding: '14px 28px',
-              borderRadius: 8,
-              background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.04)',
-              textAlign: 'left',
-            }}
+            className="inline-block font-mono text-sm rounded-xl px-6 py-4"
+            style={{ background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.04)' }}
           >
             <code>
-              <span style={{ opacity: 0.5 }}>X-Echo-API-Key:</span>{' '}
-              <span style={{ color: 'var(--ept-accent)' }}>your-api-key-here</span>
+              <span style={{ color: textMuted }}>X-Echo-API-Key:</span>{' '}
+              <span style={{ color: RED }}>your-api-key-here</span>
             </code>
           </pre>
         </div>
       </section>
 
-      {/* ═══════════════ CTA FOOTER ═══════════════ */}
-      <section
-        style={{
-          maxWidth: 800,
-          margin: '0 auto',
-          padding: '48px 24px 100px',
-          textAlign: 'center',
-        }}
-      >
-        <h2 className="text-2xl md:text-3xl font-bold" style={{ marginBottom: 12 }}>
-          Start building today
-        </h2>
-        <p style={{ opacity: 0.55, fontSize: 15, maxWidth: 480, margin: '0 auto 28px', lineHeight: 1.55 }}>
-          Get a free API key in seconds. No credit card required. 1,000 queries per month on us.
-        </p>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/sdk/signup">
-            <button
-              className="font-semibold transition-all hover:opacity-90"
-              style={{
-                background: 'var(--ept-accent)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 10,
-                padding: '14px 36px',
-                fontSize: 16,
-                cursor: 'pointer',
-              }}
-            >
-              Get Free API Key
-            </button>
-          </Link>
-          <Link href="/sdk/docs">
-            <button
-              className="font-medium transition-all hover:opacity-80"
-              style={{
-                background: 'transparent',
-                color: 'var(--ept-text)',
-                border: '1px solid var(--ept-card-border)',
-                borderRadius: 10,
-                padding: '14px 36px',
-                fontSize: 16,
-                cursor: 'pointer',
-              }}
-            >
-              Read the Docs
-            </button>
-          </Link>
+      {/* ═══════════════ FOOTER CTA ═══════════════ */}
+      <section className="max-w-3xl mx-auto px-6 pb-32 text-center">
+        <div className="relative">
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `radial-gradient(ellipse 80% 60% at 50% 50%, ${RED_GLOW} 0%, transparent 70%)`,
+            }}
+          />
+          <div className="relative">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
+              Start building for free
+            </h2>
+            <p className="text-base mb-10" style={{ color: textSecondary, maxWidth: 480, margin: '0 auto 40px', lineHeight: 1.6 }}>
+              Get a free API key in seconds. 500 requests per day. No credit card required.
+              Join developers building the next generation of intelligent applications.
+            </p>
+
+            <div className="flex flex-wrap gap-4 justify-center">
+              <button
+                onClick={scrollToSignup}
+                className="font-bold text-base transition-all hover:scale-105"
+                style={{
+                  background: RED,
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 12,
+                  padding: '16px 40px',
+                  cursor: 'pointer',
+                  boxShadow: `0 0 30px ${RED_GLOW}`,
+                }}
+              >
+                Get Free API Key
+              </button>
+              <Link href="/engines">
+                <button
+                  className="font-semibold text-base transition-all hover:opacity-80"
+                  style={{
+                    background: 'transparent',
+                    color: textPrimary,
+                    border: `1px solid ${cardBorder}`,
+                    borderRadius: 12,
+                    padding: '16px 40px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Browse Engines
+                </button>
+              </Link>
+            </div>
+
+            <div className="mt-12 flex flex-wrap gap-8 justify-center text-sm" style={{ color: textMuted }}>
+              <span>5,400+ engines</span>
+              <span>|</span>
+              <span>29 LLM models</span>
+              <span>|</span>
+              <span>99.9% uptime</span>
+              <span>|</span>
+              <span>{'<'}50ms latency</span>
+            </div>
+          </div>
         </div>
       </section>
     </div>

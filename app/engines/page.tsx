@@ -408,7 +408,7 @@ export default function EnginesPage() {
               </span>
             </div>
             <p className="text-xs mt-2 ml-6" style={{ color: 'var(--ept-text-muted)' }}>
-              Actively building toward 10,000+ engines across 1,000+ domains. New engines deploy daily via automated build pipeline.
+              Actively building toward 10,000+ engines across 940+ domains. New engines deploy daily via automated build pipeline.
             </p>
           </div>
           <div data-tutorial="engines-search" className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 p-6">

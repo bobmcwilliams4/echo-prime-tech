@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ACCENT, BG_CARD, BORDER, CATEGORIES } from '../lib/constants';
-import { selectQuestion, answerQuestion, type InterviewQuestion } from '../lib/vault-api';
+import { selectQuestion, answerQuestion, extractTraits, type InterviewQuestion } from '../lib/vault-api';
 
 interface Props {
   userId: string;
@@ -32,6 +32,8 @@ export default function InterviewPanel({ userId }: Props) {
     setLoading(true);
     try {
       await answerQuestion(userId, question.question_id, answer.trim(), selectedCategory);
+      // Fire-and-forget: extract personality traits from the answer via AI
+      extractTraits(userId, answer.trim(), 'interview').catch(() => {});
       setSubmitted(true);
       setAnswer('');
       setTimeout(() => {

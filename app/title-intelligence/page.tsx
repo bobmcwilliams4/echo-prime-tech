@@ -52,8 +52,8 @@ const FEATURES = [
   },
   {
     icon: '🧠',
-    title: '6,500+ Domain Engines',
-    description: 'Multi-domain intelligence across 1,000+ categories with 521K+ doctrine blocks. From oil & gas lease interpretation to environmental compliance — every edge case has a doctrine.',
+    title: '5,400+ Domain Engines',
+    description: 'Multi-domain intelligence across 940+ categories with 697K+ doctrine blocks. From oil & gas lease interpretation to environmental compliance — every edge case has a doctrine.',
   },
 ];
 
@@ -562,7 +562,7 @@ export default function TitleIntelligencePage() {
               { value: '16M+', label: 'Records Indexed' },
               { value: '98', label: 'TX Counties' },
               { value: '59', label: 'Instrument Types' },
-              { value: '6,500+', label: 'AI Engines' },
+              { value: '5,400+', label: 'AI Engines' },
             ].map(stat => (
               <div key={stat.label} className="text-center p-5 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
                 <div className="text-2xl md:text-3xl font-extrabold gradient-text">{stat.value}</div>
@@ -770,7 +770,7 @@ export default function TitleIntelligencePage() {
           <div data-tutorial="title-county" className="grid md:grid-cols-3 gap-6">
             {[
               { title: 'Data Pipelines', desc: 'Automated extraction from county clerk websites, RRC filings, and tax assessor records. Feed fresh data directly into title analysis.', href: '/pipelines', price: 'From $199/mo' },
-              { title: 'Intelligence Engines', desc: '6,500+ domain-specific AI engines including 22 landman engines for lease analysis, easements, water rights, and ROW acquisition.', href: '/engines', price: 'From $199/mo' },
+              { title: 'Intelligence Engines', desc: '5,400+ domain-specific AI engines including 22 landman engines for lease analysis, easements, water rights, and ROW acquisition.', href: '/engines', price: 'From $199/mo' },
               { title: 'AI Sales Agent', desc: 'Automate mineral rights outreach to surface owners and lessors. AI handles cold calls, scheduling, and lead qualification 24/7.', href: '/closer', price: 'From $299/mo' },
             ].map((svc, i) => (
               <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>

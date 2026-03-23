@@ -16,7 +16,7 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Growth', price: 599, interval: 'mo', features: ['3 AI closer agents', '2,000 calls/mo', 'Custom scripts', 'Analytics dashboard', 'Priority support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited agents', 'Unlimited calls', 'White-label', 'Dedicated account manager', 'Custom integrations'], popular: false, custom: true },
   ] },
-  { id: 'engines', name: 'Intelligence Engines', tagline: '6,500+ domain-specific AI engines', pricing: [
+  { id: 'engines', name: 'Intelligence Engines', tagline: '5,400+ domain-specific AI engines', pricing: [
     { tier: 'API Access', price: 199, interval: 'mo', features: ['100 queries/day', 'All engine categories', 'REST API', 'JSON responses'], popular: false },
     { tier: 'Professional', price: 499, interval: 'mo', features: ['1,000 queries/day', 'Priority routing', 'Webhook callbacks', 'Custom doctrines', 'Dedicated support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited queries', 'Private deployment', 'Custom engines', 'SLA guarantee', 'On-premises option'], popular: false, custom: true },
@@ -308,7 +308,7 @@ export default function PricingPage() {
         <div className="mt-20 mb-12">
           <div className="grid md:grid-cols-4 gap-6 text-center">
             {[
-              { value: '6,500+', label: 'AI Engines', sub: 'Domain-specific intelligence' },
+              { value: '5,400+', label: 'AI Engines', sub: 'Domain-specific intelligence' },
               { value: '259K+', label: 'Records Indexed', sub: '80+ Texas counties' },
               { value: '99.9%', label: 'Uptime SLA', sub: 'Enterprise reliability' },
               { value: '<200ms', label: 'Avg Response', sub: 'Doctrine cache layer' },

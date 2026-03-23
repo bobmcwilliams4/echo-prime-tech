@@ -12,9 +12,9 @@ const NAV_ITEMS = [
 ];
 
 const STATS = [
-  { value: '6,500+', label: 'AI Engines' },
-  { value: '1,000+', label: 'Domains' },
-  { value: '521K+', label: 'Doctrine Blocks' },
+  { value: '5,400+', label: 'AI Engines' },
+  { value: '940+', label: 'Domains' },
+  { value: '697K+', label: 'Doctrine Blocks' },
   { value: '99.9%', label: 'Uptime' },
 ];
 
@@ -55,7 +55,7 @@ const TIMELINE = [
   { year: '2024', event: 'Founded by Bobby Don McWilliams II after 30 years in the oilfield industry' },
   { year: '2025', event: 'First intelligence engines deployed — Tax, Legal, and Landman domains' },
   { year: '2025', event: 'ShadowGlass privacy browser launched with 120+ anti-detection measures' },
-  { year: '2026', event: 'Scaled to 6,500+ engines across 1,000+ domains with 521K+ doctrine blocks' },
+  { year: '2026', event: 'Scaled to 5,400+ engines across 940+ domains with 697K+ doctrine blocks' },
   { year: '2026', event: 'AI Closer, Hephaestion Forge, and Daedalus Forge enter production' },
   { year: '2026', event: 'Full autonomous operations — bots, scrapers, monitoring across all platforms' },
 ];
@@ -122,7 +122,7 @@ export default function AboutPage() {
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10" style={{ color: 'var(--ept-text-secondary)' }}>
             We build autonomous AI systems that embed real domain expertise — not API wrappers, not prompt templates.
-            6,500+ specialized engines across 1,000+ domains, running on global edge infrastructure with zero cold starts.
+            5,400+ specialized engines across 940+ domains, running on global edge infrastructure with zero cold starts.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {STATS.map(stat => (
@@ -211,7 +211,7 @@ export default function AboutPage() {
           </p>
           <div className="grid md:grid-cols-2 gap-4">
             {[
-              { name: 'Intelligence Engines', desc: '6,500+ domain-specific reasoning systems', href: '/engines' },
+              { name: 'Intelligence Engines', desc: '5,400+ domain-specific reasoning systems', href: '/engines' },
               { name: 'AI Closer', desc: 'Autonomous sales agent with <2s voice response', href: '/closer' },
               { name: 'Hephaestion Forge', desc: 'AI code factory — 13-stage build pipeline', href: '/hephaestion-forge' },
               { name: 'ShadowGlass', desc: 'Privacy browser with 120+ anti-detection measures', href: '/services' },
