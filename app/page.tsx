@@ -271,8 +271,8 @@ export default function HomePage() {
               { label: 'Permian', href: '/permian' },
               { label: 'Store', href: '/ecommerce' },
               { label: 'Services', href: '/services' },
-              { label: 'Security', href: '/security' },
               { label: 'Pricing', href: '/pricing' },
+              { label: 'Case Studies', href: '/case-studies' },
               { label: 'Blog', href: '/blog' },
             ].map(item => (
               <Link key={item.href} href={item.href} className="text-sm font-medium transition-colors hover:opacity-100" style={{ color: 'var(--ept-text-secondary)' }}>{item.label}</Link>
@@ -325,7 +325,7 @@ export default function HomePage() {
             </p>
 
             <div className="mt-12 flex flex-col sm:flex-row gap-4 items-start animate-fade-up animate-fade-up-delay-3">
-              <Link href="/pricing" className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-semibold transition-all hover:opacity-90 hover:gap-3" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+              <Link href="/free" className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-semibold transition-all hover:opacity-90 hover:gap-3" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
                 Start Building Free
                 <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 transition-transform group-hover:translate-x-0.5"><path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" /></svg>
               </Link>
