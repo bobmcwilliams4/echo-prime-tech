@@ -2077,6 +2077,78 @@ const GUIDED_STEPS: Record<string, GuidedStep[]> = {
       tooltipPosition: 'top',
     },
   ]),
+
+  /* ═══════════════════════════════════════════════════════
+     DASHBOARD (/dashboard)
+     ═══════════════════════════════════════════════════════ */
+  'dashboard': makeSteps('dashboard', [
+    {
+      id: 'dashboard-welcome',
+      route: '/dashboard',
+      selector: '[data-tutorial="dashboard-welcome"]',
+      action: 'observe',
+      title: 'Welcome to Your Dashboard',
+      callout: 'This is your Echo Prime control center. From here you can access all your services, monitor usage, and manage your account.',
+      autoAdvance: true,
+      autoAdvanceDelay: 4000,
+      tooltipPosition: 'bottom',
+    },
+    {
+      id: 'dashboard-sidebar',
+      route: '/dashboard',
+      selector: '[data-tutorial="dashboard-sidebar"]',
+      action: 'observe',
+      title: 'Navigation Sidebar',
+      callout: 'Use the sidebar to quickly navigate between Sentinel AI, Engines, Business Manager, and all other services. On mobile, this appears as a bottom tab bar.',
+      autoAdvance: true,
+      autoAdvanceDelay: 5000,
+      tooltipPosition: 'right',
+    },
+    {
+      id: 'dashboard-sentinel',
+      route: '/dashboard',
+      selector: '[data-tutorial="dashboard-sentinel"]',
+      action: 'observe',
+      title: 'Sentinel AI',
+      callout: 'Your primary intelligence interface. 932+ engines across 65 domains with three query modes: Standard, Swarm, and Echo Prime personality mode.',
+      autoAdvance: true,
+      autoAdvanceDelay: 5000,
+      tooltipPosition: 'bottom',
+    },
+    {
+      id: 'dashboard-usage',
+      route: '/dashboard',
+      selector: '[data-tutorial="dashboard-usage"]',
+      action: 'observe',
+      title: 'Usage Stats',
+      callout: 'Track your plan, queries used, remaining balance, and available modes at a glance. Upgrade anytime from the Pricing page.',
+      autoAdvance: true,
+      autoAdvanceDelay: 4000,
+      tooltipPosition: 'top',
+    },
+    {
+      id: 'dashboard-services',
+      route: '/dashboard',
+      selector: '[data-tutorial="dashboard-services"]',
+      action: 'observe',
+      title: 'Your Services',
+      callout: 'Active services appear here as quick-access cards. Click any card to open that service directly.',
+      autoAdvance: true,
+      autoAdvanceDelay: 4000,
+      tooltipPosition: 'top',
+    },
+    {
+      id: 'dashboard-available',
+      route: '/dashboard',
+      selector: '[data-tutorial="dashboard-available"]',
+      action: 'observe',
+      title: 'Available Services',
+      callout: 'Browse and activate additional services. Each one integrates seamlessly with your dashboard and Sentinel AI.',
+      autoAdvance: true,
+      autoAdvanceDelay: 4000,
+      tooltipPosition: 'top',
+    },
+  ]),
 };
 
 export function getGuidedSteps(tutorialId: string): GuidedStep[] {
