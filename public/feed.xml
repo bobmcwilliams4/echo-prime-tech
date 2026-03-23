@@ -5,7 +5,7 @@
     <link>https://echo-ept.com</link>
     <description>Technical blog and changelog from Echo Prime Technologies — AI engineering, intelligence engines, oilfield tech, tax intelligence, and autonomous systems.</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 21 Mar 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 23 Mar 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
 
     <!-- Blog Articles -->
@@ -58,7 +58,104 @@
       <description>We run 100+ Cloudflare Workers in production — service bindings, D1 databases, KV caches, R2 storage, Durable Objects. Here are the architectural patterns and hard-won lessons from building at scale on the edge.</description>
     </item>
 
+    <item>
+      <title>How Autonomous AI Bots Generate Leads While You Sleep</title>
+      <link>https://echo-ept.com/blog/autonomous-ai-bots-for-business</link>
+      <pubDate>Mon, 23 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/autonomous-ai-bots-for-business</guid>
+      <category>AI &amp; Engineering</category>
+      <description>Social media bots that post, engage, and capture leads 24/7 across 6 platforms. How we built a fleet of autonomous agents with 14 AI personalities, A/B testing, and lead detection — all running on Cloudflare Workers for under $0.05/month.</description>
+    </item>
+    <item>
+      <title>Building with the Echo SDK: A Developer's Guide to AI-First Applications</title>
+      <link>https://echo-ept.com/blog/building-ai-sdk-developers-guide</link>
+      <pubDate>Mon, 23 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/building-ai-sdk-developers-guide</guid>
+      <category>Product Updates</category>
+      <description>One import, zero config. The Echo SDK gives you 5,400+ intelligence engines, knowledge search across 170,000 chunks, voice synthesis, and autonomous agents — all from a single TypeScript package with 31 modules.</description>
+    </item>
+    <item>
+      <title>Searching County Records with AI: How Landmen Save 80% of Research Time</title>
+      <link>https://echo-ept.com/blog/county-records-search-ai-landman</link>
+      <pubDate>Sun, 22 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/county-records-search-ai-landman</guid>
+      <category>Oilfield Tech</category>
+      <description>Traditional county records research means days at the courthouse. Our AI searches 259,000+ deed records across 80 Texas counties in seconds, building chain-of-title graphs automatically with TitleHound AI.</description>
+    </item>
+    <item>
+      <title>How We Built a 170,000-Chunk Knowledge Base That Powers Every AI Decision</title>
+      <link>https://echo-ept.com/blog/knowledge-forge-technical-documentation-ai</link>
+      <pubDate>Sun, 22 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/knowledge-forge-technical-documentation-ai</guid>
+      <category>AI &amp; Engineering</category>
+      <description>Behind every intelligent response is a knowledge base. Ours contains 24,800+ documents, 170,000+ indexed chunks, and 575 categories with domain-aware chunking, purpose-built for enterprise AI decisions.</description>
+    </item>
+
+    <item>
+      <title>How AI Compliance Engines Reduce Audit Risk by 72%</title>
+      <link>https://echo-ept.com/blog/ai-compliance-automation-enterprise</link>
+      <pubDate>Sun, 23 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/ai-compliance-automation-enterprise</guid>
+      <category>Security</category>
+      <description>Manual compliance checks consume 200+ analyst hours per month and still miss gaps. AI compliance engines provide continuous monitoring across NIST, SOC 2, HIPAA, and PCI-DSS — catching issues before auditors do.</description>
+    </item>
+    <item>
+      <title>How to Evaluate AI APIs: The Developer's Decision Framework</title>
+      <link>https://echo-ept.com/blog/evaluating-ai-apis-developer-guide</link>
+      <pubDate>Sun, 23 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/evaluating-ai-apis-developer-guide</guid>
+      <category>AI &amp; Engineering</category>
+      <description>Choosing between AI APIs isn't just about which model is smartest. Latency, pricing, domain coverage, rate limits, and developer experience determine whether your production app succeeds or burns money.</description>
+    </item>
+    <item>
+      <title>AI in Drilling Operations: From Well Planning to Real-Time Decision Support</title>
+      <link>https://echo-ept.com/blog/ai-drilling-operations-optimization</link>
+      <pubDate>Sun, 22 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/ai-drilling-operations-optimization</guid>
+      <category>Oilfield Tech</category>
+      <description>Drilling a horizontal well in the Permian Basin costs $6-12M. AI-driven well planning, mud weight optimization, and real-time torque/drag analysis can reduce NPT by 22% and save $150K per well.</description>
+    </item>
+    <item>
+      <title>7 Ways AI Automation Generates Revenue While You Sleep</title>
+      <link>https://echo-ept.com/blog/revenue-automation-ai-small-business</link>
+      <pubDate>Sun, 22 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/revenue-automation-ai-small-business</guid>
+      <category>Product Updates</category>
+      <description>From AI sales agents that close deals at 2 AM to automated social media that builds pipeline 24/7, here are 7 proven revenue automation strategies powered by AI that small businesses can deploy today.</description>
+    </item>
+    <item>
+      <title>AI Sales Agents vs. Human SDRs: Why Voice AI Is Replacing Cold Calling Teams</title>
+      <link>https://echo-ept.com/blog/ai-sales-agent-cold-calling-automation</link>
+      <pubDate>Fri, 20 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/ai-sales-agent-cold-calling-automation</guid>
+      <category>Product Updates</category>
+      <description>A single AI sales agent handles 200+ calls per day with sub-2-second response times, perfect memory of every conversation, and zero sick days. Here's how autonomous voice AI is reshaping B2B sales — and what it means for your revenue pipeline.</description>
+    </item>
+    <item>
+      <title>Autonomous Web Scraping at Scale: How AI Turns Raw Data Into Business Intelligence</title>
+      <link>https://echo-ept.com/blog/autonomous-web-scraping-business-intelligence</link>
+      <pubDate>Mon, 17 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/autonomous-web-scraping-business-intelligence</guid>
+      <category>AI &amp; Engineering</category>
+      <description>Scraping a few pages is easy. Scraping thousands of sources continuously, handling anti-bot measures, and transforming raw HTML into structured intelligence is hard. Here's how we built a scraper fleet that monitors 56 sources across 18 categories — autonomously.</description>
+    </item>
+    <item>
+      <title>AI Document Processing for Oil &amp; Gas: From Scanned Deeds to Structured Data in Seconds</title>
+      <link>https://echo-ept.com/blog/ai-document-processing-oil-gas-land-records</link>
+      <pubDate>Fri, 14 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/ai-document-processing-oil-gas-land-records</guid>
+      <category>Oilfield Tech</category>
+      <description>Oil and gas land departments process thousands of handwritten deeds, mineral leases, and title opinions every year. Most are scanned PDFs with no searchable text. Here's how AI OCR and intelligent extraction turn these documents into structured, queryable data.</description>
+    </item>
+
     <!-- Changelog -->
+    <item>
+      <title>v2026.14 — Conversion Funnel + 4 New Blog Articles + RSS Complete</title>
+      <link>https://echo-ept.com/changelog</link>
+      <pubDate>Sun, 23 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/changelog#2026-03-23</guid>
+      <description>/free landing page with feature matrix and email capture. /case-studies with 6 industry deep-dives. 4 new blog articles (compliance, API eval, drilling AI, revenue automation). RSS feed expanded to all 17 articles. Related articles on every blog post. Total: 66+ pages.</description>
+    </item>
     <item>
       <title>v2026.13 — Technical Blog + Newsletter + Lead Capture</title>
       <link>https://echo-ept.com/changelog</link>

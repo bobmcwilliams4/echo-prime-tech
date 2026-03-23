@@ -16,6 +16,22 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-03-23',
+    version: 'v2026.14',
+    title: 'Conversion Funnel + 4 New Blog Articles + RSS Complete',
+    type: 'launch',
+    description: 'Full conversion funnel with /free landing page (feature comparison matrix, email capture, 6 free products) and /case-studies (6 industry deep-dives). 4 new blog articles targeting compliance, API evaluation, drilling AI, and revenue automation. RSS feed expanded to all 17 articles. Related articles on every blog post. Internal cross-linking across engines, blog, and conversion pages.',
+    highlights: [
+      '/free: Feature matrix comparing Free/Starter/Pro/Enterprise tiers',
+      '/case-studies: Oil & Gas, Tax, Legal, Cybersecurity, Drilling, Sales',
+      '4 new blog articles (17 total): compliance, API eval, drilling ops, revenue automation',
+      'Auto-computed Related Articles on every blog post (tag + category scoring)',
+      'RSS feed now includes all 17 blog articles + 9 changelog entries',
+      'Cross-links between blog, engines, free tier, and case studies',
+    ],
+    link: '/free',
+  },
+  {
     date: '2026-03-21',
     version: 'v2026.13',
     title: 'Technical Blog + Newsletter + Lead Capture',
