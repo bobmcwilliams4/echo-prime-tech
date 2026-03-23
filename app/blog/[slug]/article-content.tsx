@@ -220,7 +220,7 @@ export default function ArticleContent({ post }: { post: BlogPost }) {
         {/* CTA */}
         <div className="mt-12 p-8 rounded-2xl text-center" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
           <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Ready to see it in action?</h3>
-          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-secondary)' }}>Start free with 5,400+ AI engines, 24,800+ knowledge docs, and a full developer SDK.</p>
+          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-secondary)' }}>Start free with 5,486+ AI engines, 24,800+ knowledge docs, and a full developer SDK.</p>
           <div className="flex justify-center gap-4 flex-wrap">
             <Link href="/free" className="px-6 py-3 rounded-xl font-semibold text-sm text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>
               Start Free

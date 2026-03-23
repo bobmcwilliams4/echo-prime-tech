@@ -8,6 +8,11 @@ export const metadata: Metadata = {
     description: 'Get help with Echo Prime Technologies products and services. FAQ, documentation, and contact support.',
     url: 'https://echo-ept.com/support',
   },
+  twitter: {
+    card: 'summary',
+    title: 'Support — Echo Prime Technologies',
+    description: 'Get help with Echo Prime Technologies products and services. FAQ, documentation, and contact support.',
+  },
   alternates: { canonical: '/support' },
 };
 

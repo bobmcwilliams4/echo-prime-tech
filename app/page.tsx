@@ -16,7 +16,7 @@ interface LiveStats {
 }
 
 function useLiveStats(): LiveStats {
-  const [stats, setStats] = useState<LiveStats>({ engines: '5,400+', categories: '940+', doctrines: '697K+', industries: [] });
+  const [stats, setStats] = useState<LiveStats>({ engines: '5,486+', categories: '940+', doctrines: '529K+', industries: [] });
   useEffect(() => {
     fetch('https://echo-engine-runtime.bmcii1976.workers.dev/stats')
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
@@ -205,7 +205,7 @@ const CAPABILITIES = [
   },
   {
     title: 'SDK & Developer Portal',
-    description: 'Access every Echo Prime capability through a unified REST API. OpenAPI spec, interactive playground, code samples in 6 languages, webhook support, and usage analytics. Build on top of 5,400+ engines and 700K+ knowledge blocks.',
+    description: 'Access every Echo Prime capability through a unified REST API. OpenAPI spec, interactive playground, code samples in 6 languages, webhook support, and usage analytics. Build on top of 5,486+ engines and 529K+ doctrine blocks.',
     stat: '17+',
     statLabel: 'API Endpoints',
     icon: '🔗',
@@ -372,7 +372,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { title: 'AI Sales Agent', desc: 'Autonomous voice closer — STT, LLM reasoning, natural TTS. CRM with full lead pipeline. White-label SaaS.', price: '$299', interval: '/mo', href: '/closer', badge: 'Best Seller' },
-              { title: 'Intelligence Engines', desc: '5,400+ domain-specific AI engines with embedded expertise. Tax, legal, oilfield, cyber — 940+ verticals.', price: '$199', interval: '/mo', href: '/engines', badge: null },
+              { title: 'Intelligence Engines', desc: '5,486+ domain-specific AI engines with embedded expertise. Tax, legal, oilfield, cyber — 940+ verticals.', price: '$199', interval: '/mo', href: '/engines', badge: null },
               { title: 'Title Intelligence', desc: 'AI chain of title across 80+ Texas counties. 259K+ deed records, mineral rights tracing, gap detection.', price: '$200', interval: '/mo', href: '/title-intelligence', badge: 'Oil & Gas' },
               { title: 'Sentinel AI', desc: 'Multi-domain AI assistant with web search, knowledge retrieval, and real-time analysis. 14 personalities.', price: 'Free', interval: ' tier', href: '/sentinel', badge: 'Try Free' },
             ].map((p, i) => (

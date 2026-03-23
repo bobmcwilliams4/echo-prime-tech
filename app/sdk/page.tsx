@@ -145,7 +145,7 @@ const PRICING_TIERS = [
 /* ─── Features grid ─── */
 const FEATURES = [
   {
-    title: '5,400+ Intelligence Engines',
+    title: '5,486+ Intelligence Engines',
     description: 'Purpose-built AI reasoning across 940+ domains. Tax, legal, engineering, oil & gas, cybersecurity, finance, and more.',
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -383,7 +383,7 @@ export default function SDKPage() {
             style={{ lineHeight: 1.05, marginBottom: 24 }}
           >
             Build with{' '}
-            <span style={{ color: RED }}>5,400+</span>
+            <span style={{ color: RED }}>5,486+</span>
             <br />
             Intelligence Engines
           </h1>
@@ -435,7 +435,7 @@ export default function SDKPage() {
             style={{ maxWidth: 800, margin: '64px auto 0' }}
           >
             {[
-              { v: '5,400+', l: 'Engines' },
+              { v: '5,486+', l: 'Engines' },
               { v: '940+', l: 'Domains' },
               { v: '29', l: 'LLM Models' },
               { v: '24K+', l: 'Knowledge Docs' },
@@ -907,7 +907,7 @@ export default function SDKPage() {
             </div>
 
             <div className="mt-12 flex flex-wrap gap-8 justify-center text-sm" style={{ color: textMuted }}>
-              <span>5,400+ engines</span>
+              <span>5,486+ engines</span>
               <span>|</span>
               <span>29 LLM models</span>
               <span>|</span>

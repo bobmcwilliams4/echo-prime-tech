@@ -64,7 +64,7 @@ const CHANGELOG: ChangelogEntry[] = [
     date: '2026-03-20',
     title: 'SDK Gateway v3.0 & Engine Marketplace',
     type: 'launch',
-    description: 'Public developer SDK with TypeScript package, CLI tool, 17 API endpoints, and engine marketplace. Free tier includes 100 queries/day across all 5,400+ engines.',
+    description: 'Public developer SDK with TypeScript package, CLI tool, 17 API endpoints, and engine marketplace. Free tier includes 100 queries/day across all 5,486+ engines.',
     highlights: [
       'TypeScript SDK (@echo-omega-prime/sdk) on GitHub',
       'CLI tool with 45+ commands',
@@ -371,7 +371,7 @@ export default function ChangelogPage() {
       >
         <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>Want to build with us?</h2>
         <p style={{ fontSize: 15, color: 'var(--ept-text-secondary)', marginBottom: 24 }}>
-          Start free with 100 queries/day across 5,400+ intelligence engines.
+          Start free with 100 queries/day across 5,486+ intelligence engines.
         </p>
         <Link href="/sdk/signup">
           <button

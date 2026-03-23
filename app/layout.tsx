@@ -12,7 +12,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   title: 'Echo Prime Technologies | AI Intelligence Engines, Sales Agents & Enterprise AI',
-  description: '5,400+ AI engines across 940+ domains. AI sales agents, title intelligence, data pipelines, tax preparation, cybersecurity, and autonomous systems. Production-grade AI for industries that demand precision.',
+  description: '5,486+ AI engines across 940+ domains. AI sales agents, title intelligence, data pipelines, tax preparation, cybersecurity, and autonomous systems. Production-grade AI for industries that demand precision.',
   keywords: ['AI engines', 'AI sales agent', 'title intelligence', 'data pipelines', 'enterprise AI', 'autonomous systems', 'tax AI', 'cybersecurity AI', 'Echo Prime Technologies', 'oil and gas AI'],
   metadataBase: new URL('https://echo-ept.com'),
   alternates: { canonical: '/' },
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Echo Prime Technologies — AI Engines, Sales Agents & Enterprise Intelligence',
-    description: '5,400+ AI engines, autonomous sales agents, title intelligence, data pipelines, tax prep, and cybersecurity. Production-grade AI.',
+    description: '5,486+ AI engines, autonomous sales agents, title intelligence, data pipelines, tax prep, and cybersecurity. Production-grade AI.',
     type: 'website',
     url: 'https://echo-ept.com',
     siteName: 'Echo Prime Technologies',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Echo Prime Technologies — AI Engines & Enterprise Intelligence',
-    description: '5,400+ AI engines across 940+ domains. Sales agents, title intelligence, data pipelines, tax prep, and cybersecurity.',
+    description: '5,486+ AI engines across 940+ domains. Sales agents, title intelligence, data pipelines, tax prep, and cybersecurity.',
     images: ['/logo-day.png'],
   },
   robots: { index: true, follow: true },
@@ -83,7 +83,7 @@ const jsonLd = {
       name: 'Sentinel AI',
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web',
-      description: 'Multi-domain AI intelligence system with 5,400+ engines, web search, knowledge retrieval, and real-time analysis across 940+ domains.',
+      description: 'Multi-domain AI intelligence system with 5,486+ engines, web search, knowledge retrieval, and real-time analysis across 940+ domains.',
       url: 'https://echo-ept.com/sentinel',
       provider: { '@id': 'https://echo-ept.com/#organization' },
     },
@@ -112,7 +112,7 @@ const jsonLd = {
       name: 'Intelligence Engines',
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web',
-      description: 'Purpose-built AI reasoning systems with deep domain expertise across 940+ verticals. 5,400+ engines with embedded knowledge blocks.',
+      description: 'Purpose-built AI reasoning systems with deep domain expertise across 940+ verticals. 5,486+ engines with embedded knowledge blocks.',
       url: 'https://echo-ept.com/engines',
       offers: { '@type': 'AggregateOffer', lowPrice: '199', highPrice: '499', priceCurrency: 'USD', offerCount: 3 },
       provider: { '@id': 'https://echo-ept.com/#organization' },
@@ -146,7 +146,7 @@ const jsonLd = {
       name: 'Echo SDK Gateway',
       applicationCategory: 'DeveloperApplication',
       operatingSystem: 'Web',
-      description: 'One API, 5,400+ intelligence engines. Query domain-specific AI reasoning, search infinite memory, and access 12,000+ knowledge documents through a single authenticated endpoint.',
+      description: 'One API, 5,486+ intelligence engines. Query domain-specific AI reasoning, search infinite memory, and access 12,000+ knowledge documents through a single authenticated endpoint.',
       url: 'https://echo-ept.com/sdk',
       offers: {
         '@type': 'AggregateOffer',

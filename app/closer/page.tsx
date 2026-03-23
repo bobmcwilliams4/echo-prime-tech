@@ -569,7 +569,7 @@ function CloserLandingPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { title: 'Data Pipelines', desc: 'Feed fresh leads directly into Closer. Autonomous extraction from 50+ data sources, running 24/7.', href: '/pipelines', price: 'From $199/mo' },
-              { title: 'Intelligence Engines', desc: '5,400+ AI engines with deep domain knowledge. Arm your AI closer with industry-specific expertise.', href: '/engines', price: 'From $199/mo' },
+              { title: 'Intelligence Engines', desc: '5,486+ AI engines with deep domain knowledge. Arm your AI closer with industry-specific expertise.', href: '/engines', price: 'From $199/mo' },
               { title: 'Sentinel AI', desc: 'Monitor call quality, track lead conversion, and get real-time alerts on sales performance.', href: '/sentinel', price: 'Free tier available' },
             ].map((svc, i) => (
               <a key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>

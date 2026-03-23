@@ -1746,7 +1746,7 @@ export default function SentinelPage() {
               </h2>
               <p className="text-lg mb-10" style={{ color: '#94a3b8' }}>
                 {chatMode === 'engine'
-                  ? 'Pure doctrine search — 5,400+ engines, 697K+ doctrines, zero hallucination'
+                  ? 'Pure doctrine search — 5,486+ engines, 529K+ doctrines, zero hallucination'
                   : 'Expert analysis across 1,000+ knowledge domains'}
               </p>
               <div className="flex flex-wrap justify-center gap-2 max-w-xl mx-auto">
@@ -2070,7 +2070,7 @@ export default function SentinelPage() {
                 e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px';
               }}
               onKeyDown={handleKeyDown}
-              placeholder={sending ? 'Analyzing...' : chatMode === 'engine' ? 'Search 5,400+ engines across 940+ domains...' : 'Ask anything across 940+ domains...'}
+              placeholder={sending ? 'Analyzing...' : chatMode === 'engine' ? 'Search 5,486+ engines across 940+ domains...' : 'Ask anything across 940+ domains...'}
               disabled={sending}
               rows={1}
               className="flex-1 resize-none bg-transparent outline-none text-sm py-1.5"

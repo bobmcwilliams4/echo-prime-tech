@@ -481,7 +481,7 @@ export default function CryptoTradingPage() {
           {[
             { title: 'Bot Factory', desc: 'Custom AI bots for Telegram, Discord, and social platforms. Automated alerts, congress-watching, arbitrage signals, and market monitoring bots.', href: '/bots', price: 'From $499' },
             { title: 'Data Pipelines', desc: 'Autonomous data extraction, transformation, and delivery. Real-time market feeds, on-chain analytics, and custom data aggregation.', href: '/pipelines', price: 'From $199/mo' },
-            { title: 'Intelligence Engines', desc: '5,400+ domain-specific AI engines including crypto, DeFi, finance, and trading verticals with embedded expert reasoning.', href: '/engines', price: 'From $199/mo' },
+            { title: 'Intelligence Engines', desc: '5,486+ domain-specific AI engines including crypto, DeFi, finance, and trading verticals with embedded expert reasoning.', href: '/engines', price: 'From $199/mo' },
           ].map((svc, i) => (
             <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
               <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{svc.title}</h3>

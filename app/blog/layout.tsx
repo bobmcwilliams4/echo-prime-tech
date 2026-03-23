@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Blog — Echo Prime Technologies',
-  description: 'Technical deep-dives on AI engineering, oilfield technology, tax intelligence, cybersecurity, and building autonomous systems at scale. Written by the team that builds 5,400+ intelligence engines.',
+  description: 'Technical deep-dives on AI engineering, oilfield technology, tax intelligence, cybersecurity, and building autonomous systems at scale. Written by the team that builds 5,486+ intelligence engines.',
   openGraph: {
     title: 'Echo Prime Blog — AI Engineering & Autonomous Systems',
     description: 'Technical deep-dives on intelligence engines, oilfield AI, tax technology, and building production autonomous systems.',

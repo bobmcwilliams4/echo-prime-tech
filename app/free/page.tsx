@@ -25,7 +25,7 @@ const FREE_PRODUCTS: FreeTier[] = [
   {
     id: 'sentinel',
     name: 'Sentinel AI',
-    tagline: 'Multi-domain AI assistant with 5,400+ engines',
+    tagline: 'Multi-domain AI assistant with 5,486+ engines',
     icon: '\u{1F9E0}',
     freeFeatures: ['10 queries per day', 'Web search', 'General knowledge base', 'Text responses', '940+ domains'],
     limit: '10 queries/day',
@@ -65,7 +65,7 @@ const FREE_PRODUCTS: FreeTier[] = [
   {
     id: 'engines',
     name: 'Engine Explorer',
-    tagline: 'Browse 5,400+ AI intelligence engines',
+    tagline: 'Browse 5,486+ AI intelligence engines',
     icon: '\u{2699}\u{FE0F}',
     freeFeatures: ['Browse all categories', 'View engine specs', 'Sample queries', 'Domain directory'],
     limit: 'Browse only',
@@ -144,7 +144,7 @@ export default function FreePage() {
           for Free
         </h1>
         <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8" style={{ color: 'var(--ept-text-secondary)' }}>
-          Access 5,400+ AI intelligence engines, search 24,800+ knowledge documents,
+          Access 5,486+ AI intelligence engines, search 24,800+ knowledge documents,
           and query 940+ domains &mdash; all at zero cost. Upgrade when you&rsquo;re ready.
         </p>
 

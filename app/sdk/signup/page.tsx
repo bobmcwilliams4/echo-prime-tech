@@ -135,7 +135,7 @@ export default function SDKSignupPage() {
         <div style={cardStyle}>
           <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 12 }}>Get Your API Key</h1>
           <p style={{ opacity: 0.7, marginBottom: 24, lineHeight: 1.6 }}>
-            Sign in to generate a free API key. You&apos;ll get 100 queries/day across all 17 endpoints and 5,400+ intelligence engines.
+            Sign in to generate a free API key. You&apos;ll get 100 queries/day across all 17 endpoints and 5,486+ intelligence engines.
           </p>
           <Link href="/login?redirect=/sdk/signup">
             <button style={btnPrimary}>Sign In to Continue</button>

@@ -36,7 +36,7 @@ export default function TermsOfServicePage() {
         </Section>
 
         <Section title="2. Description of Services">
-          <p>Echo Prime Technologies provides AI-powered intelligence engines, knowledge systems, voice synthesis, data pipelines, security tools, and related technology services. Our platform includes over 5,400 specialized AI reasoning systems across 450+ domains.</p>
+          <p>Echo Prime Technologies provides AI-powered intelligence engines, knowledge systems, voice synthesis, data pipelines, security tools, and related technology services. Our platform includes over 5,486 specialized AI reasoning systems across 940+ domains.</p>
         </Section>
 
         <Section title="3. Account Registration">

@@ -159,7 +159,7 @@ export default function CaseStudiesPage() {
         </h1>
         <p className="text-lg md:text-xl max-w-3xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
           See how companies across oil &amp; gas, legal, tax, cybersecurity, and sales
-          use Echo Prime&rsquo;s 5,400+ AI engines to automate expert-level analysis.
+          use Echo Prime&rsquo;s 5,486+ AI engines to automate expert-level analysis.
         </p>
       </section>
 
@@ -259,7 +259,7 @@ export default function CaseStudiesPage() {
           Ready to See Results Like These?
         </h2>
         <p className="text-sm mb-8 max-w-xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
-          Start with the free tier &mdash; no credit card required. Access 5,400+ engines,
+          Start with the free tier &mdash; no credit card required. Access 5,486+ engines,
           24,800+ knowledge documents, and 940+ domains today.
         </p>
         <div className="flex flex-wrap justify-center gap-4">

@@ -121,7 +121,7 @@ const TIERS = [
 ];
 
 const STATS = [
-  { value: '5,400+', label: 'AI Engines' },
+  { value: '5,486+', label: 'AI Engines' },
   { value: '259K+', label: 'Deed Records' },
   { value: '98', label: 'TX Counties' },
   { value: '<50ms', label: 'Response Time' },
@@ -182,7 +182,7 @@ export default function PermianBasinPage() {
             <span style={{ color: 'var(--ept-text)' }}>That Speaks Your Language</span>
           </h1>
           <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 leading-relaxed animate-fade-up-delay-1" style={{ color: 'var(--ept-text-secondary)' }}>
-            5,400+ intelligence engines purpose-built for oil &amp; gas. Title chains in hours, not weeks.
+            5,486+ intelligence engines purpose-built for oil &amp; gas. Title chains in hours, not weeks.
             Production analytics powered by real doctrine. Built by a 30-year Permian Basin veteran
             who knows the difference between a pooling clause and a Pugh clause.
           </p>
@@ -391,7 +391,7 @@ export default function PermianBasinPage() {
                   { label: 'Instrument Types Classified', value: '59' },
                   { label: 'Oilfield AI Engines', value: '140+' },
                   { label: 'Domain Categories', value: '940+' },
-                  { label: 'Doctrine Blocks', value: '697,000+' },
+                  { label: 'Doctrine Blocks', value: '529,000+' },
                 ].map(row => (
                   <div key={row.label} className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)' }}>
                     <span className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{row.label}</span>
@@ -434,7 +434,7 @@ export default function PermianBasinPage() {
               Ready to Modernize Your Oilfield Operations?
             </h2>
             <p className="text-sm mb-8 max-w-xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
-              Start with a free title search or explore our 5,400+ intelligence engines.
+              Start with a free title search or explore our 5,486+ intelligence engines.
               No sales calls. No 6-month implementations. Just results.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

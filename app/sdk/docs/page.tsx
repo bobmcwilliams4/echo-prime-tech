@@ -52,7 +52,7 @@ const SECTIONS: Section[] = [
     { id:'ec', method:'GET', path:'/engine/status', section:'engines',
       description:'Get real-time engine runtime status including total engines, domains, and system health.',
       curl:`curl -s "${BASE}/engine/status" \\\n  -H "X-Echo-API-Key: YOUR_KEY"`,
-      response:`{\n  "success": true,\n  "data": {\n    "total_engines": 5477,\n    "total_doctrines": 697497,\n    "domains": 450,\n    "status": "operational",\n    "avg_latency_ms": 35\n  }\n}` },
+      response:`{\n  "success": true,\n  "data": {\n    "total_engines": 5486,\n    "total_doctrines": 529977,\n    "domains": 940,\n    "status": "operational",\n    "avg_latency_ms": 35\n  }\n}` },
   ]},
   { id: 'knowledge', label: 'Knowledge', endpoints: [
     { id:'ks', method:'POST', path:'/knowledge/search', section:'knowledge',
@@ -269,7 +269,7 @@ export default function SDKDocsPage() {
           {/* Hero */}
           <div className="mb-12">
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3">API Reference</h1>
-            <p className="text-zinc-400 text-base mb-4 max-w-2xl">Complete reference for the Echo Prime SDK Gateway. Access 5,400+ intelligence engines, 170K+ knowledge chunks, semantic memory, doctrine generation, and multi-personality AI chat through a single unified API.</p>
+            <p className="text-zinc-400 text-base mb-4 max-w-2xl">Complete reference for the Echo Prime SDK Gateway. Access 5,486+ intelligence engines, 170K+ knowledge chunks, semantic memory, doctrine generation, and multi-personality AI chat through a single unified API.</p>
             <div className="flex flex-wrap gap-2 items-center">
               <code className="text-[13px] px-3 py-1.5 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-300 font-mono">{BASE}</code>
               <span className="text-[12px] text-zinc-600">|</span>

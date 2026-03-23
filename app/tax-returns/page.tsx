@@ -1958,7 +1958,7 @@ function TaxReturnPageContent() {
         <p className="text-center text-sm mb-10" style={{ color: 'var(--ept-text-muted)' }}>Pair AI tax preparation with these services for full-spectrum financial intelligence</p>
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { title: 'Intelligence Engines', desc: '5,400+ domain-specific AI engines including 14 tax law, MACRS depreciation, QBI, and oil & gas IDC engines.', href: '/engines', price: 'From $199/mo' },
+            { title: 'Intelligence Engines', desc: '5,486+ domain-specific AI engines including 14 tax law, MACRS depreciation, QBI, and oil & gas IDC engines.', href: '/engines', price: 'From $199/mo' },
             { title: 'Title Intelligence', desc: 'AI chain of title for oil & gas mineral rights. Perfect for clients with royalty income and depletion deductions.', href: '/title-intelligence', price: 'From $200/mo' },
             { title: 'Data Pipelines', desc: 'Automated extraction of W-2s, 1099s, K-1s, and financial documents. Feeds directly into tax preparation workflow.', href: '/pipelines', price: 'From $199/mo' },
           ].map((svc, i) => (

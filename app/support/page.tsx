@@ -15,7 +15,7 @@ const SUPPORT_CHANNELS = [
 const FAQ = [
   { q: 'How do I get started?', a: 'Sign up at echo-ept.com/signup and explore the dashboard. Most services include a free tier to get started.' },
   { q: 'What payment methods do you accept?', a: 'We accept all major credit cards via Stripe. Enterprise customers can request invoicing.' },
-  { q: 'How do Intelligence Engines work?', a: 'Our 5,400+ engines embed real domain expertise — tax law, oilfield operations, cybersecurity, and 940+ more domains. They produce doctrine-backed responses with authority citations, not generic AI output.' },
+  { q: 'How do Intelligence Engines work?', a: 'Our 5,486+ engines embed real domain expertise — tax law, oilfield operations, cybersecurity, and 940+ more domains. They produce doctrine-backed responses with authority citations, not generic AI output.' },
   { q: 'Can I integrate your services into my own application?', a: 'Yes. All services are available via REST API with Bearer token authentication. See the API documentation in your dashboard after signing up.' },
   { q: 'What is your uptime guarantee?', a: 'We run on Cloudflare\'s global edge network with zero cold starts. Our infrastructure delivers 99.9%+ uptime across all services.' },
   { q: 'How do I cancel my subscription?', a: 'You can cancel anytime from your dashboard under Settings. No contracts, no cancellation fees.' },

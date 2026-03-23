@@ -63,11 +63,11 @@ const SERVICES: EcomService[] = [
   },
   {
     id: 'intelligence-engines', name: 'Intelligence Engines', tagline: 'AI that thinks like a senior analyst',
-    description: '5,400+ purpose-built AI reasoning systems across 450+ domains. Deep embedded expertise — not a wrapper. Tax, legal, oilfield, medical, finance, cybersecurity, and more.',
+    description: '5,486+ purpose-built AI reasoning systems across 940+ domains. Deep embedded expertise — not a wrapper. Tax, legal, oilfield, medical, finance, cybersecurity, and more.',
     icon: '\u2B21', category: 'ai', badge: 'Flagship',
     pricing: [
       { tier: 'API Access', price: 199, interval: 'month', features: ['10K queries/mo', 'Standard engines', 'REST API'] },
-      { tier: 'Professional', price: 499, interval: 'month', features: ['100K queries/mo', 'All 5,400+ engines', 'Priority queue', 'Batch processing'], popular: true },
+      { tier: 'Professional', price: 499, interval: 'month', features: ['100K queries/mo', 'All 5,486+ engines', 'Priority queue', 'Batch processing'], popular: true },
       { tier: 'Enterprise', price: null, interval: 'month', features: ['Unlimited queries', 'Custom engines', 'Dedicated infra'], custom: true },
     ],
     learnMore: '/engines', workerHealthy: true,
@@ -753,7 +753,7 @@ export default function EcommercePage() {
         {/* Stats bar */}
         <div className="flex items-center justify-center gap-8 mt-6 text-sm" style={{ color: 'var(--ept-text-muted)' }}>
           <span><strong style={{ color: 'var(--ept-text)' }}>{SERVICES.length}</strong> Products</span>
-          <span><strong style={{ color: 'var(--ept-text)' }}>5,400+</strong> AI Engines</span>
+          <span><strong style={{ color: 'var(--ept-text)' }}>5,486+</strong> AI Engines</span>
           <span><strong style={{ color: 'var(--ept-text)' }}>99.9%</strong> Uptime</span>
           <span><strong style={{ color: 'var(--ept-text)' }}>0</strong> Cold Starts</span>
         </div>

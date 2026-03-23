@@ -230,7 +230,7 @@ console.log(data.analysis);`}
           <div>
             <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Explore domains</h2>
             <p style={{ opacity: 0.7, fontSize: 15 }}>
-              Discover 940+ domain categories across 5,400+ engines.
+              Discover 940+ domain categories across 5,486+ engines.
             </p>
           </div>
         </div>

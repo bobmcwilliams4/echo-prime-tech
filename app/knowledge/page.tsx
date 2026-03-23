@@ -628,7 +628,7 @@ function KnowledgePageContent() {
           <section className="max-w-4xl mx-auto px-6 pb-16">
             <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
               <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Intelligence Engine Query</h2>
-              <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>Search across all 940+ knowledge domains, 5,400+ engines, and 697K+ pre-compiled doctrines. Select a domain or search globally.</p>
+              <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>Search across all 940+ knowledge domains, 5,486+ engines, and 529K+ pre-compiled doctrines. Select a domain or search globally.</p>
               <EngineQueryPanel
                 title="Cross-Domain Intelligence Search"
                 placeholder="Search all 940+ domains — tax, legal, cyber, engineering, medical, finance, AI/ML..."

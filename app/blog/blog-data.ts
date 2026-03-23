@@ -37,7 +37,7 @@ This matters because enterprise decisions — tax positions, drilling parameters
 
 ## What Makes an Intelligence Engine Different
 
-An intelligence engine is built from the ground up around a specific domain. At Echo Prime Technologies, each of our 5,400+ engines contains:
+An intelligence engine is built from the ground up around a specific domain. At Echo Prime Technologies, each of our 5,486+ engines contains:
 
 - **Doctrine Blocks**: Pre-compiled expert reasoning covering 50+ scenarios per engine. Each block includes primary authority citations, counter-arguments, confidence stratification, and adversary positions.
 - **Three-Layer Response Architecture**: Layer 1 hits cached doctrine (sub-200ms). Layer 2 performs semantic retrieval. Layer 3 runs deep analysis with multi-source synthesis.
@@ -881,7 +881,7 @@ Starting at $499/month for a managed bot, or build custom through our SDK.
   {
     slug: 'building-ai-sdk-developers-guide',
     title: 'Building with the Echo SDK: A Developer\'s Guide to AI-First Applications',
-    excerpt: 'One import, zero config. The Echo SDK gives you 5,400+ intelligence engines, knowledge search across 170,000 chunks, voice synthesis, and autonomous agents — all from a single TypeScript package.',
+    excerpt: 'One import, zero config. The Echo SDK gives you 5,486+ intelligence engines, knowledge search across 170,000 chunks, voice synthesis, and autonomous agents — all from a single TypeScript package.',
     category: 'Product Updates',
     date: '2026-03-23',
     readTime: '7 min',
@@ -899,7 +899,7 @@ import { EchoSDK } from '@echo-omega-prime/sdk';
 
 const echo = new EchoSDK({ apiKey: 'your-key' });
 
-// Query 5,400+ intelligence engines
+// Query 5,486+ intelligence engines
 const analysis = await echo.engines.query({
   q: 'What are the MACRS depreciation rules for oil and gas equipment?',
   domain: 'tax',
@@ -924,7 +924,7 @@ The SDK ships as a tree-shakeable TypeScript package with 31 independently impor
 
 | Module | What It Does |
 |--------|-------------|
-| \`engines\` | Query 5,400+ intelligence engines across 940 domains |
+| \`engines\` | Query 5,486+ intelligence engines across 940 domains |
 | \`knowledge\` | Search 24,800+ documents and 170,000+ indexed chunks |
 | \`brain\` | Shared memory — store and retrieve cross-session context |
 | \`doctrine\` | Access 529,000+ pre-compiled doctrine blocks |
@@ -976,7 +976,7 @@ import { EchoSDK } from '@echo-omega-prime/sdk';
 
 const echo = new EchoSDK({ apiKey: process.env.ECHO_API_KEY });
 
-// That's it. You now have access to 5,400+ engines,
+// That's it. You now have access to 5,486+ engines,
 // 170,000+ knowledge chunks, voice synthesis,
 // autonomous agents, and more.
 \`\`\`
@@ -1282,7 +1282,7 @@ The real question isn't "which model is smartest" — it's "which API will make 
 
 General-purpose APIs (OpenAI, Anthropic, Google) excel at broad tasks but lack depth in specific domains. Ask GPT-4 about IRC §1031 like-kind exchanges or API RP 53 BOP testing requirements, and you'll get a plausible-sounding answer that a domain expert would immediately flag as incomplete or wrong.
 
-Domain-specific APIs (like Echo Prime's engine platform) trade breadth for depth. Our 5,400+ engines contain doctrine blocks — pre-compiled expert reasoning with citations, counter-arguments, and confidence stratification. The answer isn't generated from training data; it's reasoned through documented frameworks.
+Domain-specific APIs (like Echo Prime's engine platform) trade breadth for depth. Our 5,486+ engines contain doctrine blocks — pre-compiled expert reasoning with citations, counter-arguments, and confidence stratification. The answer isn't generated from training data; it's reasoned through documented frameworks.
 
 **Evaluation test**: Ask your target domain's hardest question. If the API can't cite its sources or quantify its confidence, it's not ready for production in that domain.
 

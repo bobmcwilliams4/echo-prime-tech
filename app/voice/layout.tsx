@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/voice',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Voice Studio — AI Text-to-Speech & Cloning',
+    description: 'Professional AI voice synthesis with 40+ endpoints. TTS, cloning, STT, emotion tags, and real-time streaming.',
+  },
   alternates: { canonical: '/voice' },
 };
 
