@@ -11,8 +11,8 @@ const ANNUAL_DISCOUNT = 0.20;
 const COMPARISON_FEATURES = [
   { feature: 'Daily query limit', free: '100', pro: '10,000', enterprise: 'Unlimited' },
   { feature: 'All 17 endpoints', free: true, pro: true, enterprise: true },
-  { feature: '6,500+ engines', free: true, pro: true, enterprise: true },
-  { feature: '1,000+ domains', free: true, pro: true, enterprise: true },
+  { feature: '5,400+ engines', free: true, pro: true, enterprise: true },
+  { feature: '940+ domains', free: true, pro: true, enterprise: true },
   { feature: 'Brain memory', free: true, pro: true, enterprise: true },
   { feature: 'Knowledge search', free: true, pro: true, enterprise: true },
   { feature: 'Priority routing', free: false, pro: true, enterprise: true },
@@ -45,7 +45,7 @@ const FAQ = [
   },
   {
     q: 'Is there a free trial of Pro?',
-    a: 'The free tier is your trial. It gives full access to all 17 endpoints and 6,500+ engines — just with a lower daily limit. Upgrade anytime.',
+    a: 'The free tier is your trial. It gives full access to all 17 endpoints and 5,400+ engines — just with a lower daily limit. Upgrade anytime.',
   },
   {
     q: 'Can I downgrade?',
