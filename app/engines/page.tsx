@@ -633,9 +633,12 @@ export default function EnginesPage() {
           <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
             Echo Prime Technologies — {totalEngines.toLocaleString()} engines. {totalDoctrines.toLocaleString()} doctrines. AES-256-GCM encrypted. Deterministic audit trails. Court-defensible AI.
           </p>
-          <div className="flex justify-center gap-4 mt-3">
+          <div className="flex justify-center gap-4 mt-3 flex-wrap">
+            <Link href="/free" className="text-xs underline" style={{ color: 'var(--ept-accent)' }}>Start Free</Link>
+            <Link href="/case-studies" className="text-xs underline" style={{ color: '#818cf8' }}>Case Studies</Link>
             <Link href="/sentinel" className="text-xs underline" style={{ color: '#818cf8' }}>Sentinel</Link>
             <Link href="/pricing" className="text-xs underline" style={{ color: '#818cf8' }}>Pricing</Link>
+            <Link href="/sdk" className="text-xs underline" style={{ color: '#818cf8' }}>SDK</Link>
             <a href="mailto:bob@echo-op.com" className="text-xs underline" style={{ color: '#818cf8' }}>Contact</a>
           </div>
         </div>

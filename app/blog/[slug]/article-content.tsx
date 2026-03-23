@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../../lib/theme-context';
-import { type BlogPost, formatDate } from '../blog-data';
+import { type BlogPost, formatDate, BLOG_POSTS } from '../blog-data';
 
 function renderMarkdown(md: string) {
   const lines = md.split('\n');
@@ -134,8 +134,22 @@ function renderMarkdown(md: string) {
   return elements;
 }
 
+function getRelatedPosts(post: BlogPost, limit = 3): BlogPost[] {
+  const others = BLOG_POSTS.filter(p => p.slug !== post.slug);
+  const scored = others.map(p => {
+    let score = 0;
+    if (p.category === post.category) score += 3;
+    const sharedTags = p.tags.filter(t => post.tags.includes(t)).length;
+    score += sharedTags * 2;
+    return { post: p, score };
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, limit).map(s => s.post);
+}
+
 export default function ArticleContent({ post }: { post: BlogPost }) {
   const { isDark } = useTheme();
+  const related = getRelatedPosts(post);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
@@ -146,7 +160,7 @@ export default function ArticleContent({ post }: { post: BlogPost }) {
         <div className="flex items-center gap-6">
           <Link href="/blog" className="text-sm font-medium" style={{ color: 'var(--ept-accent)' }}>&larr; Back to Blog</Link>
           <Link href="/engines" className="text-sm font-medium hidden md:block" style={{ color: 'var(--ept-text-secondary)' }}>Engines</Link>
-          <Link href="/pricing" className="text-sm font-medium hidden md:block" style={{ color: 'var(--ept-text-secondary)' }}>Pricing</Link>
+          <Link href="/free" className="text-sm font-medium hidden md:block" style={{ color: 'var(--ept-accent)' }}>Start Free</Link>
         </div>
       </nav>
 
@@ -177,15 +191,42 @@ export default function ArticleContent({ post }: { post: BlogPost }) {
           ))}
         </div>
 
+        {/* Related Articles */}
+        {related.length > 0 && (
+          <div className="mt-12 pt-8 border-t" style={{ borderColor: 'var(--ept-border)' }}>
+            <h3 className="text-xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>Related Articles</h3>
+            <div className="grid gap-4">
+              {related.map(r => (
+                <Link
+                  key={r.slug}
+                  href={`/blog/${r.slug}`}
+                  className="p-5 rounded-xl border transition-all hover:scale-[1.01] block"
+                  style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-border)' }}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded" style={{ backgroundColor: isDark ? '#14b8a620' : '#0d737720', color: 'var(--ept-accent)' }}>
+                      {r.category}
+                    </span>
+                    <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{r.readTime}</span>
+                  </div>
+                  <h4 className="font-semibold text-sm mb-1" style={{ color: 'var(--ept-text)' }}>{r.title}</h4>
+                  <p className="text-xs line-clamp-2" style={{ color: 'var(--ept-text-muted)' }}>{r.excerpt}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* CTA */}
         <div className="mt-12 p-8 rounded-2xl text-center" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
           <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Ready to see it in action?</h3>
-          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-secondary)' }}>Explore our intelligence engines, try our SDK, or talk to our AI.</p>
+          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-secondary)' }}>Start free with 5,400+ AI engines, 24,800+ knowledge docs, and a full developer SDK.</p>
           <div className="flex justify-center gap-4 flex-wrap">
-            <Link href="/engines" className="px-6 py-3 rounded-xl font-semibold text-sm text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>
-              Explore Engines
+            <Link href="/free" className="px-6 py-3 rounded-xl font-semibold text-sm text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>
+              Start Free
             </Link>
-            <Link href="/sdk" className="px-6 py-3 rounded-xl font-semibold text-sm border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
-              View SDK
+            <Link href="/case-studies" className="px-6 py-3 rounded-xl font-semibold text-sm border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+              View Case Studies
             </Link>
           </div>
         </div>
