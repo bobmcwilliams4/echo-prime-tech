@@ -1570,6 +1570,353 @@ These 7 automations can run simultaneously for under $500/month:
 
 *Start free at [echo-ept.com/free](/free). Explore all products at [echo-ept.com/services](/services). See [case studies](/case-studies).*`,
   },
+  {
+    slug: 'ai-voice-synthesis-business-communications',
+    title: 'AI Voice Synthesis for Business: Beyond Text-to-Speech',
+    excerpt: 'Modern AI voice goes far beyond robotic text-to-speech. Custom voice clones, emotion-aware delivery, real-time streaming, and multi-language support are transforming how businesses communicate — from sales calls to customer support.',
+    category: 'Product Updates',
+    date: '2026-03-22',
+    readTime: '8 min',
+    author: 'Echo Prime',
+    tags: ['voice-ai', 'tts', 'elevenlabs', 'customer-experience', 'automation', 'speech-synthesis'],
+    featured: false,
+    content: `The gap between robotic TTS and natural AI voice has collapsed. In 2026, AI voices carry emotion, adapt tone mid-sentence, and sound indistinguishable from human speakers. For businesses, this changes everything — from how you handle phone calls to how you create content.
+
+## Why Voice AI Matters Now
+
+Three breakthroughs converged in 2025-2026:
+
+- **Neural voice cloning** — Clone any voice from 30 seconds of audio
+- **Emotion-aware synthesis** — AI detects context and adjusts tone, pace, and emphasis
+- **Real-time streaming** — Sub-200ms latency makes live conversations possible
+
+The result: AI can now handle voice interactions that previously required human operators.
+
+## The 4-Layer Emotion Engine
+
+Basic TTS reads words. Intelligent voice synthesis understands intent. Our [Echo Speak Cloud](/voice) system uses a 4-layer emotion intelligence pipeline:
+
+### Layer 1: Lexicon Analysis
+Every incoming message is scored against 12 emotion lexicons — joy, sadness, anger, surprise, trust, fear, anticipation, disgust, and four composite emotions. This produces a raw emotion vector.
+
+### Layer 2: Trajectory Tracking
+Single-message emotion is noisy. Layer 2 tracks emotion trajectory across the conversation, smoothing spikes and detecting genuine emotional shifts vs. noise.
+
+### Layer 3: Voice Selection
+Based on the emotion profile, the system selects the optimal voice parameters:
+
+| Emotion | Speaking Rate | Pitch | Stability | Style |
+|---------|-------------|-------|-----------|-------|
+| Excited | +15% | +2 semitones | Lower | Enthusiastic |
+| Concerned | -10% | -1 semitone | Higher | Empathetic |
+| Professional | Neutral | Neutral | High | Authoritative |
+| Casual | +5% | Neutral | Medium | Conversational |
+
+### Layer 4: Delivery Optimization
+Fine-grained control over pauses, emphasis placement, and breathing patterns. The system inserts natural pauses before important points and adjusts pacing based on content complexity.
+
+## Multi-Provider Architecture
+
+Relying on a single TTS provider is a single point of failure. Our architecture uses quota-aware provider blending:
+
+- **ElevenLabs** — Highest quality, custom voice clones, multilingual. Used for premium interactions.
+- **Edge TTS** — Microsoft's neural voices. Zero cost, solid quality. Used for high-volume, lower-priority content.
+- **Fallback routing** — If the primary provider hits rate limits or goes down, requests automatically route to the next best option.
+
+The quota tracker monitors character usage across providers in real-time, automatically shifting load when approaching limits.
+
+## Custom Voice Cloning for Business
+
+Voice cloning isn't just for content creators. Business applications include:
+
+- **Brand consistency** — Every AI interaction uses your company's voice
+- **Multilingual support** — Clone one voice, synthesize in 29 languages
+- **Executive communications** — Scale C-suite messaging without recording sessions
+- **Training content** — Generate hours of training materials from text
+
+**Critical detail**: Voice model selection matters enormously. Using the wrong model produces empty audio files or garbled output. The eleven_multilingual_v2 model handles cloned voices correctly. Newer models (v3) can produce silent audio with cloned voices — a subtle bug that's cost many teams days of debugging.
+
+## Real-Time Voice Conversations
+
+The most demanding use case is live voice conversations — AI phone agents that listen, think, and respond in real-time. This requires:
+
+- **WebSocket streaming** — Audio chunks sent as they're generated, not waiting for full synthesis
+- **Turn detection** — Knowing when the human has finished speaking (harder than it sounds)
+- **Interrupt handling** — The human can speak mid-response, requiring graceful interruption
+- **Context memory** — Remembering what was discussed earlier in the conversation
+
+Our Closer AI sales agent handles 200+ calls per day using this exact pipeline. Sub-2-second response times. Full conversation memory. Zero sick days.
+
+## Cost Reality
+
+Voice AI pricing varies dramatically:
+
+| Use Case | Monthly Volume | Estimated Cost |
+|----------|---------------|---------------|
+| Customer support IVR | 10,000 calls | $150-$400 |
+| Sales outreach | 5,000 calls | $200-$600 |
+| Content narration | 500,000 chars | $50-$150 |
+| Training materials | 1M chars | $100-$300 |
+
+Compare this to human costs: a single customer service rep costs $3,000-$5,000/month. An AI voice system handling the same volume runs $150-$400/month — a 10-15x cost reduction.
+
+## Getting Started
+
+The [Echo Voice Studio](/voice) provides:
+- 6 AI voices on the free tier
+- Custom voice cloning on Professional ($149/mo)
+- Real-time streaming with WebSocket API
+- STT transcription for inbound audio
+- 19 emotion tags for contextual delivery
+
+---
+
+*Try AI voice synthesis at [echo-ept.com/voice](/voice). Start free at [echo-ept.com/free](/free). See how Closer AI uses voice in [case studies](/case-studies).*`,
+  },
+  {
+    slug: 'real-time-data-pipelines-ai-enterprise',
+    title: 'Building Real-Time Data Pipelines That Feed AI Decision Engines',
+    excerpt: 'AI is only as good as its data. Most enterprise AI fails not because the model is wrong, but because the data pipeline is stale, incomplete, or fragmented. Here\'s how to build pipelines that keep your AI engines fed with fresh, structured data.',
+    category: 'AI & Engineering',
+    date: '2026-03-21',
+    readTime: '9 min',
+    author: 'Echo Prime',
+    tags: ['data-pipelines', 'etl', 'cloudflare-workers', 'real-time', 'knowledge-base', 'architecture'],
+    featured: false,
+    content: `Every AI system has the same Achilles' heel: data freshness. You can have the most sophisticated reasoning engine ever built, but if it's reasoning over stale data, you get stale answers. The pipeline is the product.
+
+## The Data Freshness Problem
+
+Most enterprise AI systems suffer from what we call **the Tuesday Problem**: data ingested on Monday doesn't appear in AI responses until Wednesday (or later). By then, the world has moved on.
+
+The root causes:
+- **Batch processing** — ETL runs nightly or weekly, creating permanent staleness
+- **Single-source dependency** — One data source goes down, everything goes stale
+- **No freshness tracking** — Nobody knows *when* the AI last saw new data
+- **Schema fragmentation** — Different sources use different formats, requiring manual mapping
+
+## Architecture: The 5-Stage Pipeline
+
+Our [data pipeline architecture](/pipelines) processes data through 5 stages, each running as an independent Cloudflare Worker:
+
+### Stage 1: Acquisition
+Data enters the system from multiple sources simultaneously:
+- **Web scrapers** — ShadowGlass v8 monitors 56 sources across 18 categories
+- **API feeds** — Direct integration with 30+ data providers
+- **Document uploads** — PDF, DOCX, HTML, and plain text ingestion
+- **Real-time streams** — WebSocket feeds for market data, news, and social signals
+
+Each source has a dedicated scraper Worker with its own health check, error tracking, and retry logic. If one source fails, the others continue independently.
+
+### Stage 2: Normalization
+Raw data arrives in dozens of formats. The normalization layer:
+- Strips HTML, extracts text content
+- Identifies document type (legal filing, technical spec, news article, etc.)
+- Applies source-specific parsing rules
+- Generates content hashes for deduplication
+- Assigns category tags using a 575-category taxonomy
+
+### Stage 3: Chunking
+Large documents must be split into chunks that are small enough for embedding but large enough to preserve context. Our domain-aware chunking strategy:
+
+| Document Type | Chunk Size | Overlap | Strategy |
+|--------------|-----------|---------|----------|
+| Legal filings | 800 tokens | 200 | Section-aware (by article/clause) |
+| Technical docs | 600 tokens | 150 | Heading-aware (preserves hierarchy) |
+| News articles | 400 tokens | 100 | Paragraph-aligned |
+| Code files | 500 tokens | 100 | Function-level splitting |
+
+Generic chunking (split every N tokens) destroys meaning. A legal clause split mid-sentence is useless. Domain-aware chunking respects document structure.
+
+### Stage 4: Embedding + Indexing
+Each chunk gets vector-embedded and indexed for semantic search:
+- **Vectorize** indexes for similarity search (170,000+ chunks indexed)
+- **D1 database** for metadata, categories, and full-text search
+- **KV cache** for hot documents accessed frequently
+
+The embedding pipeline processes ~500 chunks/minute with automatic retry and deduplication.
+
+### Stage 5: Knowledge Synthesis
+The final stage doesn't just store data — it synthesizes knowledge:
+- **Cross-reference detection** — Links related documents across categories
+- **Conflict detection** — Flags contradictory information from different sources
+- **Gap analysis** — Identifies topics with sparse coverage
+- **Freshness scoring** — Tracks when each knowledge domain was last updated
+
+## The Knowledge Forge
+
+Our [Knowledge Forge](/knowledge) is the production implementation of this pipeline. Current stats:
+
+- **24,900+ documents** indexed from 575+ categories
+- **170,500+ chunks** vector-embedded and searchable
+- **5 pending embeddings** at any time (near real-time)
+- **Sub-500ms** query latency for semantic search
+
+The top knowledge domains by volume:
+
+| Category | Documents | Tokens |
+|----------|-----------|--------|
+| Legal/Bankruptcy | 4,016 | 25.3M |
+| Research | 2,929 | 11.4M |
+| IRC Title 26 | 2,040 | 6.8M |
+| Court Opinions | 1,998 | 6.0M |
+| API Documentation | 1,200+ | 3.8M |
+
+## Feeding AI Decision Engines
+
+The pipeline's output feeds directly into our [Intelligence Engine](/engines) system (5,486 engines across 120+ categories). When an engine processes a query:
+
+1. **Query analysis** — Determines which knowledge domains are relevant
+2. **Knowledge retrieval** — Pulls the freshest, most relevant chunks from the Knowledge Forge
+3. **Doctrine lookup** — Retrieves domain-specific reasoning rules (529,900+ doctrine blocks)
+4. **Synthesis** — Combines retrieved knowledge with doctrine-backed reasoning
+5. **Citation** — Every claim links back to source documents with timestamps
+
+This is why our engines can cite specific IRC sections, court cases, or NIST frameworks — the pipeline ensures that source material is always available and always current.
+
+## Error Handling at Scale
+
+At 24,900+ documents and growing, errors are inevitable. Our error handling strategy:
+
+- **Circuit breakers** — If a source fails 3 times in 5 minutes, it's circuit-broken for 15 minutes
+- **Dead letter queues** — Failed documents go to a retry queue, not /dev/null
+- **Content hash dedup** — Same document from multiple sources is stored once
+- **Schema validation** — Documents that don't match expected format are quarantined, not discarded
+
+## Building Your Own Pipeline
+
+For teams building AI-powered products, the key takeaways:
+
+- **Multi-source from day one** — Never depend on a single data source
+- **Domain-aware chunking** — Generic splitting destroys meaning
+- **Freshness tracking** — If you can't answer "when was this last updated?", your pipeline is broken
+- **Deduplication** — Content-hash based, not URL-based (same content, different URLs is common)
+- **Independent failure** — Each pipeline stage should fail independently without taking down the whole system
+
+---
+
+*Explore the Knowledge Forge at [echo-ept.com/knowledge](/knowledge). See our data pipeline tools at [echo-ept.com/pipelines](/pipelines). Start building at [echo-ept.com/sdk](/sdk).*`,
+  },
+  {
+    slug: 'ai-for-independent-oil-gas-operators',
+    title: 'How Independent Oil & Gas Operators Use AI to Compete with Majors',
+    excerpt: 'Independent operators in the Permian Basin run on thin margins with small teams. AI levels the playing field — automating title work, optimizing drilling plans, and detecting production anomalies that would take a full engineering department to catch.',
+    category: 'Oilfield Tech',
+    date: '2026-03-20',
+    readTime: '9 min',
+    author: 'Echo Prime',
+    tags: ['oil-gas', 'permian-basin', 'independent-operators', 'ai-automation', 'title-examination', 'drilling'],
+    featured: false,
+    content: `In the Permian Basin, independent operators — companies running 5-50 wells — compete against majors with 10,000+ well inventories and massive engineering teams. The independents' advantage has always been agility. Now AI adds another advantage: intelligence infrastructure that would cost a major $2M+/year to build, available for a fraction of the cost.
+
+## The Independent Operator's Challenge
+
+A typical independent in the Permian faces:
+
+- **2-3 person land department** reviewing title on 20-40 leases per year
+- **No dedicated data science team** for production optimization
+- **Manual AFE reviews** that miss cost overruns until it's too late
+- **Title examination backlog** — 40-80 hours per section at $150-200/hour
+- **Decline curve analysis** done in spreadsheets, updated quarterly at best
+
+The majors solve these problems by throwing headcount at them. Independents need a different approach.
+
+## 5 AI Applications That Move the Needle
+
+### 1. Automated Title Examination
+
+Traditional title examination in the Permian requires a landman to physically visit the county courthouse, pull deed records, trace the chain of title, identify gaps, and produce a title opinion. For a single section (640 acres), this takes 40-80 hours.
+
+Our [Title Intelligence](/title-intelligence) system automates the heaviest parts:
+
+- **259,000+ deed records** indexed across 80 Texas counties
+- **Automated chain of title** — AI traces ownership from sovereignty to present
+- **Gap detection** — Missing links in the chain flagged automatically
+- **Mineral/surface split tracking** — Handles severed estates correctly
+
+A title examiner using AI completes the same work in 8-12 hours instead of 40-80. That's a 70-80% time reduction. At $175/hour, that's $5,000-$12,000 saved per section.
+
+### 2. Drilling Plan Optimization
+
+Drilling a horizontal well in the Permian costs $6-12M. A 10% efficiency improvement saves $600K-$1.2M per well. AI optimization targets:
+
+- **Well spacing** — ML models analyze offset well performance to optimize inter-lateral spacing
+- **Mud weight optimization** — Real-time recommendation based on formation pressure data
+- **Torque & drag prediction** — Identifies stuck pipe risk before it happens
+- **Bit selection** — Matches bit type to formation based on historical ROP data
+
+Our [DRL engines](/engines) (DRL01-DRL15) cover 15 drilling domains:
+
+| Engine | Domain | Impact |
+|--------|--------|--------|
+| DRL01 | Well Planning | 15-25% faster planning |
+| DRL03 | Mud & Fluids | $50K-150K saved/well |
+| DRL05 | BHA Design | 20% fewer trips |
+| DRL07 | Directional | Tighter target hits |
+| DRL10 | Torque & Drag | 30% fewer stuck events |
+
+### 3. Production Anomaly Detection
+
+Most independents review production data monthly — or less. By the time someone notices a well is underperforming, weeks of revenue have been lost.
+
+AI production monitoring runs continuously:
+- **Decline curve deviation alerts** — Flags wells producing below forecast
+- **Gas-oil ratio spikes** — Early warning of mechanical issues
+- **Water cut anomalies** — Identifies casing leaks or water breakthrough
+- **Downtime prediction** — Pattern matching against historical failure modes
+
+One independent operator told us: "We caught a casing leak three weeks earlier than we would have manually. That saved us a $180,000 workover that would have been $400,000 if we'd waited."
+
+### 4. AFE Analysis and Cost Control
+
+Authorization for Expenditure (AFE) documents are the financial blueprints of oil and gas operations. AI AFE analysis provides:
+
+- **Historical cost comparison** — Compares proposed AFE line items against actual costs from similar operations
+- **Overrun risk scoring** — Identifies AFE items that historically run over budget
+- **Vendor rate benchmarking** — Compares proposed service costs against market rates
+- **Cash flow modeling** — Projects actual spend timing vs. budgeted timeline
+
+### 5. Regulatory Compliance Monitoring
+
+Texas Railroad Commission compliance requirements change frequently. Missing a filing deadline or environmental reporting requirement can result in fines, shut-ins, or lost operating permits.
+
+AI compliance monitoring:
+- **Filing deadline tracking** — Automated alerts for W-2, W-1, P-4 filings
+- **Regulation change detection** — Monitors RRC rulemaking for changes affecting your operations
+- **Environmental reporting** — Automated air quality and water disposal reporting
+- **Spacing rule analysis** — Checks proposed well locations against current spacing rules
+
+## The Cost Comparison
+
+Here's what this intelligence infrastructure costs an independent vs. building in-house:
+
+| Capability | In-House Cost | AI-Powered Cost |
+|-----------|--------------|----------------|
+| Title Examination | $150-200/hr × 50hr avg | $199/mo + AI-assisted landman |
+| Production Engineering | $120K-180K/yr salary | $499/mo for engine access |
+| Data Science | $150K-200K/yr salary | Included in engine subscription |
+| Compliance Monitoring | $80K-120K/yr (consultant) | $199/mo automated monitoring |
+| Drilling Optimization | $200K-300K/yr (team) | $499/mo engine access |
+
+Total in-house: $700K-$1M+/year. Total AI-powered: $1,400-$2,000/month.
+
+The independent doesn't need to hire a 10-person technical team. They need a 2-3 person team with AI tools that multiply their capacity by 10x.
+
+## Getting Started
+
+For independent operators in the Permian Basin:
+
+1. **Start with title work** — Highest immediate ROI, lowest risk. [Title Intelligence](/title-intelligence) reduces examination time by 70-80%.
+2. **Add production monitoring** — Set up anomaly detection on your highest-value wells first.
+3. **Layer in drilling optimization** — Use DRL engines for your next AFE to benchmark against historical data.
+4. **Build toward compliance automation** — Reduces regulatory risk and frees up administrative time.
+
+The free tier includes access to [Sentinel AI](/sentinel) for ad-hoc queries across all engine domains — tax, legal, oilfield, cybersecurity. Start there and expand as you see results.
+
+---
+
+*Explore Permian Basin AI at [echo-ept.com/permian](/permian). Search county records at [echo-ept.com/county-records](/county-records). Start free at [echo-ept.com/free](/free).*`,
+  },
 ];
 
 export function formatDate(dateStr: string): string {
