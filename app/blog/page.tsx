@@ -180,10 +180,11 @@ export default function BlogPage() {
           <p className="text-sm mb-4" style={{ color: 'var(--ept-text-muted)' }}>
             Built with 5,400+ intelligence engines, 697K+ doctrine blocks, and zero VC funding.
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-4 flex-wrap">
+            <Link href="/free" className="text-sm font-medium" style={{ color: 'var(--ept-accent)' }}>Start Free</Link>
             <Link href="/engines" className="text-sm font-medium" style={{ color: 'var(--ept-accent)' }}>Explore Engines</Link>
+            <Link href="/case-studies" className="text-sm font-medium" style={{ color: 'var(--ept-accent)' }}>Case Studies</Link>
             <Link href="/sdk" className="text-sm font-medium" style={{ color: 'var(--ept-accent)' }}>Developer SDK</Link>
-            <Link href="/pricing" className="text-sm font-medium" style={{ color: 'var(--ept-accent)' }}>Pricing</Link>
           </div>
         </div>
       </div>
