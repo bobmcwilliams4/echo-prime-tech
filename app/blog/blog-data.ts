@@ -775,6 +775,801 @@ That's not a typo. Edge-first architecture, when done right, is essentially free
 
 *See our services in action at [echo-ept.com](/). Build on our platform with the [Echo SDK](/sdk).*`,
   },
+  {
+    slug: 'autonomous-ai-bots-for-business',
+    title: 'How Autonomous AI Bots Generate Leads While You Sleep',
+    excerpt: 'Social media bots that post, engage, and capture leads 24/7 — without human intervention. Here\'s how we built a fleet of autonomous agents across 6 platforms and what we learned about AI-driven customer acquisition.',
+    category: 'AI & Engineering',
+    date: '2026-03-23',
+    readTime: '9 min',
+    author: 'Echo Prime',
+    tags: ['autonomous bots', 'lead generation', 'social media AI', 'customer acquisition', 'bot fleet'],
+    featured: false,
+    content: `## The 24/7 Lead Machine
+
+Most businesses hire social media managers, pay for ad campaigns, and spend hours crafting content calendars. The result: inconsistent posting, human fatigue, and leads that dry up on weekends and holidays.
+
+We took a different approach. We built autonomous AI bots that run 24/7 across LinkedIn, X (Twitter), Telegram, Reddit, Instagram, Slack, and Discord — generating expert content, engaging with prospects, and capturing leads without any human involvement.
+
+## What Makes These Bots Different
+
+These aren't scheduling tools that post pre-written content. Each bot is a full Cloudflare Worker — a serverless function running on edge infrastructure — with its own AI brain, personality system, and lead detection engine.
+
+### 14 AI Personalities
+
+Every bot can speak as one of 14 distinct personalities, each calibrated for different audiences:
+
+- **Echo**: The sovereign AI commander voice — authoritative, technical, visionary
+- **Bree**: Warm, approachable, southern hospitality — perfect for customer-facing interactions
+- **Prometheus**: Security and intelligence specialist — for cybersecurity audiences
+- **Phoenix**: Resilient, auto-healing, operations-focused — for infrastructure discussions
+
+The bot selects which personality to use based on the content category and target platform. LinkedIn gets engineering leadership content from the "Echo" personality. Customer support channels get "Bree."
+
+### Real-Time Content Generation
+
+Each bot generates original content using a weighted category system. Categories like "AI Technology" (20% weight), "Oil & Gas Tech" (15%), and "Cloud Architecture" (12%) ensure diverse, balanced output. A deterministic seed based on date and time prevents content repetition without requiring a database of past posts.
+
+The content generation pipeline:
+
+1. Select weighted category based on time-of-day seed
+2. Query the Knowledge Forge (24,800+ documents) for relevant facts
+3. Generate post via LLM with personality-specific system prompt
+4. Run through content deduplication (SHA-256 fingerprint, 72-hour window)
+5. Apply platform-specific formatting (280 chars for X, 3000 for LinkedIn)
+6. Post and track engagement
+
+### Autonomous Lead Detection
+
+Every bot includes a 6-signal lead detection system that scores incoming interactions:
+
+1. **Service Interest**: Mentions of specific products or pricing
+2. **Pain Point Expression**: Complaints about current solutions
+3. **Budget Signals**: Discussions about spending or ROI
+4. **Timeline Urgency**: "Looking for something now" type language
+5. **Decision Authority**: Indicators of decision-making power
+6. **Engagement Depth**: Multiple interactions or detailed questions
+
+Leads are auto-scored as Hot, Warm, or Cold and stored in D1 databases for follow-up.
+
+## The A/B Testing Engine
+
+Every bot runs Thompson Sampling A/B tests on 20% of posts. Two content variants are generated, and the one with better engagement metrics (clicks, replies, likes) is favored in future generation. This creates a continuous improvement loop — the bots literally get better at engaging audiences over time.
+
+## Platform-Specific Intelligence
+
+### LinkedIn: Professional Networking
+
+Our LinkedIn bot posts 3x daily with weighted category rotation. It monitors comments and DMs, auto-replies with relevant expertise, and tracks engagement metrics. The webhook integration means responses happen within seconds of someone commenting.
+
+### X (Twitter): Real-Time Thought Leadership
+
+The X bot maintains an 8-post daily cap with Jaccard similarity deduplication (55% threshold) to prevent near-identical content. It includes Grok AI image generation for visual posts and organic product mentions in roughly 1 of every 5 posts.
+
+### Telegram: Interactive AI Assistant
+
+The Telegram bot supports 18 commands, voice message transcription via Workers AI Whisper, and Grok-powered image and video generation. Users can have full conversations with the AI, query our engine library, and get real-time market data.
+
+## Security: The Secret Sauce Firewall
+
+Every bot includes a "Secret Sauce Firewall" — a pattern-matching system that detects attempts to:
+
+- Extract system prompts or internal instructions
+- Inject adversarial prompts
+- Probe for API keys or infrastructure details
+- Social-engineer information about our architecture
+
+When detected, the bot deflects naturally without revealing that it recognized the probe. This prevents competitors from reverse-engineering our approach.
+
+## Results After 30 Days
+
+- **134+ X posts**, **89+ LinkedIn posts**, **33 Telegram conversations**
+- Automated lead detection capturing **Hot/Warm/Cold** prospects
+- Zero human intervention required for content or posting
+- Total infrastructure cost: **under $0.05/month** (Cloudflare Workers free tier)
+
+## Build Your Own Bot Fleet
+
+Echo Prime Technologies offers Bot Factory — pre-built bot templates across 29 configurations and 5 categories (Social Media, Trading, Business, Monitoring, Automation). Each bot deploys as a Cloudflare Worker with its own D1 database, KV cache, and cron schedule.
+
+Starting at $499/month for a managed bot, or build custom through our SDK.
+
+---
+
+*Explore bot templates at [echo-ept.com/bots](/bots) or see our pricing at [echo-ept.com/pricing](/pricing).*`,
+  },
+  {
+    slug: 'building-ai-sdk-developers-guide',
+    title: 'Building with the Echo SDK: A Developer\'s Guide to AI-First Applications',
+    excerpt: 'One import, zero config. The Echo SDK gives you 5,400+ intelligence engines, knowledge search across 170,000 chunks, voice synthesis, and autonomous agents — all from a single TypeScript package.',
+    category: 'Product Updates',
+    date: '2026-03-23',
+    readTime: '7 min',
+    author: 'Echo Prime',
+    tags: ['SDK', 'developer tools', 'TypeScript', 'API', 'intelligence engines', 'AI development'],
+    featured: false,
+    content: `## Why Another SDK?
+
+Every AI platform makes you wire up authentication, manage rate limits, handle retries, and juggle multiple API endpoints. You spend more time on plumbing than on building your actual product.
+
+The Echo SDK eliminates all of that. One import. One API key. Access to the entire Echo Prime intelligence platform.
+
+\`\`\`typescript
+import { EchoSDK } from '@echo-omega-prime/sdk';
+
+const echo = new EchoSDK({ apiKey: 'your-key' });
+
+// Query 5,400+ intelligence engines
+const analysis = await echo.engines.query({
+  q: 'What are the MACRS depreciation rules for oil and gas equipment?',
+  domain: 'tax',
+});
+
+// Search 170,000+ knowledge chunks
+const docs = await echo.knowledge.search({
+  query: 'IRC Section 167 tangible property',
+  limit: 10,
+});
+
+// Generate voice from text
+const audio = await echo.voice.synthesize({
+  text: 'Your analysis is complete.',
+  voice: 'echo',
+});
+\`\`\`
+
+## 31 Modules, Zero Dependencies
+
+The SDK ships as a tree-shakeable TypeScript package with 31 independently importable modules:
+
+| Module | What It Does |
+|--------|-------------|
+| \`engines\` | Query 5,400+ intelligence engines across 940 domains |
+| \`knowledge\` | Search 24,800+ documents and 170,000+ indexed chunks |
+| \`brain\` | Shared memory — store and retrieve cross-session context |
+| \`doctrine\` | Access 529,000+ pre-compiled doctrine blocks |
+| \`voice\` | Text-to-speech with 19 cloned voices and emotion detection |
+| \`chat\` | Conversational AI with 14 personalities |
+| \`vault\` | Credential management with 1,500+ stored secrets |
+| \`agent\` | Spawn autonomous agents with multi-model routing |
+| \`scraper\` | Browser automation and web data extraction |
+| \`bot\` | Deploy social media bots across 6 platforms |
+| \`landman\` | Oil and gas title chain investigation |
+| \`graph-rag\` | Knowledge graph with 312,000 nodes |
+
+Each module can be imported individually to minimize bundle size:
+
+\`\`\`typescript
+import { EchoEngines } from '@echo-omega-prime/sdk/engines';
+import { EchoKnowledge } from '@echo-omega-prime/sdk/knowledge';
+\`\`\`
+
+## Built-In Resilience
+
+The SDK includes production-grade infrastructure you don't have to build:
+
+- **Circuit Breaker**: Automatically stops calling endpoints that are failing, with exponential backoff and recovery detection
+- **Response Cache**: LRU cache with configurable TTL — repeated queries hit cache, not the API
+- **Retry with Backoff**: Failed requests retry up to 3 times with jittered exponential backoff
+- **API Key Validation**: Keys are validated on initialization, not on first request — fail fast, not at 3 AM
+- **Request Signing**: HMAC-SHA256 request signatures prevent tampering
+
+## Pricing
+
+| Tier | Price | Requests/Day | Features |
+|------|-------|-------------|----------|
+| Free | $0 | 100 | All 31 modules, community support |
+| Starter | $49/mo | 1,000 | Priority support, higher rate limits |
+| Pro | $199/mo | 10,000 | Bots, voice, dedicated endpoints |
+| Enterprise | $999/mo | Unlimited | Custom models, SLA, white-label |
+
+## Getting Started
+
+\`\`\`bash
+npm install @echo-omega-prime/sdk
+\`\`\`
+
+Sign up for an API key at [echo-ept.com/sdk/signup](/sdk/signup), then:
+
+\`\`\`typescript
+import { EchoSDK } from '@echo-omega-prime/sdk';
+
+const echo = new EchoSDK({ apiKey: process.env.ECHO_API_KEY });
+
+// That's it. You now have access to 5,400+ engines,
+// 170,000+ knowledge chunks, voice synthesis,
+// autonomous agents, and more.
+\`\`\`
+
+---
+
+*Get started at [echo-ept.com/sdk](/sdk). Full API documentation at [echo-ept.com/sdk/docs](/sdk/docs).*`,
+  },
+  {
+    slug: 'county-records-search-ai-landman',
+    title: 'Searching County Records with AI: How Landmen Save 80% of Research Time',
+    excerpt: 'Traditional county records research means days at the courthouse. Our AI searches 259,000+ deed records across 80 Texas counties in seconds, building chain-of-title graphs automatically.',
+    category: 'Oilfield Tech',
+    date: '2026-03-22',
+    readTime: '8 min',
+    author: 'Echo Prime',
+    tags: ['county records', 'landman', 'title search', 'deed records', 'oil and gas', 'real estate'],
+    featured: false,
+    content: `## The County Records Problem
+
+Every oil and gas deal, every real estate transaction, every mineral rights transfer starts with the same question: who owns what?
+
+Answering that question means searching county deed records — warranty deeds, mineral deeds, assignments, releases, easements, right-of-way documents, and more. In Texas alone, there are 254 counties, each with its own clerk's office, its own filing system, and its own quirks.
+
+A professional landman typically spends 2-5 days per tract searching records, abstracting documents, and building a chain of title. For a 640-acre section with 50+ mineral owners, the research cost can reach $50,000-$100,000.
+
+## Our Solution: AI-Powered County Records Search
+
+Echo Prime Technologies has built the most comprehensive digital county records system in the Permian Basin:
+
+- **259,000+ deed records** indexed from 80+ Texas counties
+- **ACRIS-inspired database schema** with normalized parties, legal descriptions, and chain-of-title graphs
+- **AI-powered search** that understands natural language queries like "find all conveyances affecting Section 270, Block 8, H&TC Ry Co Survey in Reeves County"
+- **Automatic chain building** using grantor-grantee graph edges
+
+### How the Search Works
+
+When you submit a search query, the system follows a 3-phase cascade:
+
+**Phase 1: Local Database Search** — The query hits our County DB (D1 database) first. With 259,000+ records pre-indexed, most searches return results in under 100 milliseconds.
+
+**Phase 2: ShadowGlass Supplement** — If the local database returns fewer than 10 records, the system queries ShadowGlass (our courthouse record browser) for additional documents. Any new records found are automatically ingested back into the local database.
+
+**Phase 3: Live Courthouse Scrape** — If no records exist at all, the system triggers a live scrape of the county clerk's website, extracting and indexing documents in real-time.
+
+This cascade architecture means the first search is the slowest — every subsequent search gets faster because the database grows with each query.
+
+### Legal Description Parsing
+
+One of the hardest problems in county records is parsing legal descriptions. Texas uses the PLSS (Public Land Survey System) with surveys, blocks, sections, lots, and abstract numbers. Our parser handles both formats:
+
+- **Colon format**: "Section: 270, Block: 8, Survey: H&TC Ry Co"
+- **Narrative format**: "All of Section 270 in Block 8 of the H&TC Railroad Company Survey"
+
+Parsed legal descriptions are stored as structured data (section, block, lot, township, survey fields), enabling precise geographic queries.
+
+### Chain of Title Graph
+
+Every deed record creates edges in a directed graph:
+
+- **Grantor** (seller) → **Grantee** (buyer)
+- Edges are labeled with instrument type, recording date, and volume/page
+- The graph data structure enables automatic chain-of-title construction
+
+Given any current owner, the system traces backward through every conveyance to the original land grant, identifying:
+
+- **Gaps**: Missing links in the chain where a conveyance is referenced but not found
+- **Breaks**: Discrepancies in legal descriptions between consecutive conveyances
+- **Wild deeds**: Documents recorded by grantors who never appear as grantees
+- **Adverse claims**: Competing conveyances covering the same interest
+
+## TitleHound: The AI That Reads Like a Landman
+
+At the core of our system is TitleHound — a fine-tuned AI model trained on 749 chain-of-title gap-closure examples from Texas oil and gas records. TitleHound doesn't just search records; it reads them the way an experienced landman would:
+
+- Identifies the key conveyance terms (mineral reservation, royalty interest, overriding royalty)
+- Recognizes common title defects (name variations, undivided interest discrepancies)
+- Suggests next steps for gap closure ("Search for probate records in the name of John Smith, who appears as grantor in 1987 but never as grantee")
+- Classifies confidence levels (Clean, Curable Defect, Material Defect, Fatal Defect)
+
+## Pricing
+
+| Service | Price | Includes |
+|---------|-------|---------|
+| Single Tract Search | $25 | Full chain of title + gap analysis |
+| County Package | $199/mo | Unlimited searches in 1 county |
+| Permian Basin Package | $499/mo | All 80+ counties + TitleHound AI |
+| Enterprise | Custom | API access, bulk processing, SLA |
+
+---
+
+*Try it now at [echo-ept.com/title-intelligence](/title-intelligence). Search any tract in the Permian Basin.*`,
+  },
+  {
+    slug: 'knowledge-forge-technical-documentation-ai',
+    title: 'How We Built a 170,000-Chunk Knowledge Base That Powers Every AI Decision',
+    excerpt: 'Behind every intelligent response is a knowledge base. Ours contains 24,800+ documents, 170,000+ indexed chunks, and 575 categories — from IRC tax code to drilling engineering to cybersecurity frameworks.',
+    category: 'AI & Engineering',
+    date: '2026-03-22',
+    readTime: '7 min',
+    author: 'Echo Prime',
+    tags: ['knowledge base', 'RAG', 'embeddings', 'Knowledge Forge', 'AI infrastructure', 'technical documentation'],
+    featured: false,
+    content: `## The RAG Problem Everyone Gets Wrong
+
+Retrieval-Augmented Generation (RAG) sounds simple: store documents, convert them to embeddings, retrieve relevant chunks when a user asks a question, inject them into the AI's context, and generate an answer.
+
+In practice, most RAG implementations fail at scale because they treat all documents the same way. A legal statute gets the same chunking strategy as a blog post. A drilling engineering manual gets the same embedding model as a customer FAQ. The result: mediocre retrieval that returns tangentially relevant results instead of precisely relevant ones.
+
+## Knowledge Forge: Purpose-Built for Domain Expertise
+
+Our Knowledge Forge is not a generic document store. It's a Cloudflare Worker backed by D1, Vectorize, and Workers AI that understands the structure and importance of each document category.
+
+### The Numbers
+
+- **24,800+ documents** ingested from 575 categories
+- **170,000+ chunks** with Vectorize embeddings for semantic search
+- **12 specialized categories** including IRC tax code, court opinions, state statutes, engineering standards, and cybersecurity frameworks
+- **Sub-50ms retrieval** on average query latency
+- **Automatic embedding pipeline** with cron-based retry for failed embeddings
+
+### Intelligent Chunking
+
+Different document types need different chunking strategies:
+
+**Legal Statutes (IRC, CFR)**: Chunked at section boundaries. IRC §1031 stays as one chunk, not split mid-sentence.
+
+**Court Opinions**: Chunked at paragraph boundaries with holding identification. The key legal holding is tagged separately from procedural background.
+
+**Engineering Standards**: Chunked at numbered section boundaries (NIST SP 800-53 Control AC-1, AC-2, etc.).
+
+**API Documentation**: Chunked at endpoint/method boundaries. A REST API endpoint stays as one chunk.
+
+This domain-aware chunking means retrieval returns complete, coherent chunks — not fragments that lose meaning without surrounding context.
+
+### Category Hierarchy
+
+Documents are organized into a semantic hierarchy:
+
+\`\`\`
+LEGAL
+├── IRC_TITLE26 (2,040 docs) — Internal Revenue Code
+├── COURT_OPINIONS_CA5 (1,998 docs) — Fifth Circuit opinions
+├── LEGAL_BANKRUPTCY (4,016 docs) — Bankruptcy law
+└── wv_statutes (1,651 docs) — West Virginia statutes
+
+ENGINEERING
+├── echo_intelligence (1,800 docs) — AI/ML reference
+├── research (2,929 docs) — Research papers
+└── cloudflare_workers (65 docs) — Platform docs
+
+OILFIELD
+├── drilling_engineering
+├── completions
+└── production_operations
+\`\`\`
+
+When an engine queries the Knowledge Forge, it can filter by category to ensure retrieval stays in-domain. A tax query never returns drilling documents, even if some keywords overlap.
+
+### The Embedding Pipeline
+
+New documents flow through a 4-stage pipeline:
+
+1. **Ingest**: Document received via POST /ingest with title, content, category, tags
+2. **Chunk**: Content split into semantically coherent chunks (target: 500-1000 tokens each)
+3. **Embed**: Each chunk converted to a 768-dimensional vector via Workers AI (bge-base-en-v1.5)
+4. **Index**: Vector stored in Cloudflare Vectorize for sub-millisecond similarity search
+
+The pipeline runs asynchronously — documents are immediately available for keyword search, and embeddings are processed in background via cron (200 documents per 30-minute cycle).
+
+### Integration with Intelligence Engines
+
+Every engine in our platform has access to the Knowledge Forge through service bindings. When an engine receives a query, it:
+
+1. Hits its cached doctrine blocks first (sub-200ms)
+2. If no doctrine match, queries Knowledge Forge for relevant chunks
+3. Injects the top-k chunks into the LLM context
+4. Generates a response grounded in actual source documents
+
+This three-layer approach (doctrine → knowledge → generation) ensures answers are always grounded in authoritative sources, not hallucinated from training data.
+
+## Building Your Own Knowledge Base
+
+Through the Echo SDK, developers can ingest documents, search the knowledge base, and build RAG applications on top of our infrastructure:
+
+\`\`\`typescript
+import { EchoKnowledge } from '@echo-omega-prime/sdk/knowledge';
+
+const knowledge = new EchoKnowledge({ apiKey: 'your-key' });
+
+// Ingest a document
+await knowledge.ingest({
+  title: 'Company Policy Manual',
+  content: fullText,
+  category: 'internal_docs',
+  tags: ['policy', 'hr'],
+});
+
+// Semantic search
+const results = await knowledge.search({
+  query: 'What is the vacation policy for salaried employees?',
+  category: 'internal_docs',
+  limit: 5,
+});
+\`\`\`
+
+No need to manage embeddings, vector databases, or chunking strategies — the Knowledge Forge handles all of it.
+
+---
+
+*Explore our knowledge base at [echo-ept.com/knowledge](/knowledge). Build on it with the [Echo SDK](/sdk).*`,
+  },
+  {
+    slug: 'ai-compliance-automation-enterprise',
+    title: 'How AI Compliance Engines Reduce Audit Risk by 72%',
+    excerpt: 'Manual compliance checks consume 200+ analyst hours per month and still miss gaps. AI compliance engines provide continuous monitoring across NIST, SOC 2, HIPAA, and PCI-DSS — catching issues before auditors do.',
+    category: 'Security',
+    date: '2026-03-23',
+    readTime: '8 min',
+    author: 'Echo Prime',
+    tags: ['compliance', 'NIST', 'SOC 2', 'HIPAA', 'audit', 'enterprise security', 'risk management'],
+    featured: false,
+    content: `## The Compliance Gap Problem
+
+Every enterprise faces the same challenge: regulatory frameworks evolve faster than security teams can adapt. NIST 800-53 rev5 has 1,189 controls. SOC 2 Type II requires continuous monitoring across 5 trust service criteria. HIPAA, PCI-DSS, CMMC — each adds its own matrix of requirements.
+
+The traditional approach — quarterly compliance assessments by external auditors — creates dangerous gaps. Between assessments, configuration drift, new deployments, and policy changes can introduce non-compliance windows that remain invisible until the next audit.
+
+## Continuous Compliance with AI Engines
+
+Echo Prime's cybersecurity engines (CYB01-CYB10) provide automated, continuous compliance checking. Instead of point-in-time assessments, the engines maintain a real-time compliance posture map.
+
+### Cross-Framework Control Mapping
+
+A single security control often satisfies requirements across multiple frameworks. Our engines maintain a unified control taxonomy:
+
+- **NIST AC-2 (Account Management)** maps to SOC 2 CC6.1, HIPAA §164.312(a)(2)(i), PCI-DSS 8.1
+- **NIST AU-6 (Audit Review)** maps to SOC 2 CC7.2, HIPAA §164.312(b), PCI-DSS 10.6
+- **NIST SC-8 (Transmission Confidentiality)** maps to SOC 2 CC6.7, HIPAA §164.312(e)(1), PCI-DSS 4.1
+
+When you implement one control, the engine automatically marks all corresponding framework requirements as satisfied. This eliminates the most common audit finding: duplicate controls tracked in separate spreadsheets with inconsistent evidence.
+
+### Evidence Collection Automation
+
+Every compliance check generates structured evidence:
+
+- Configuration snapshots with timestamps
+- Policy document version tracking
+- Access review completion records
+- Vulnerability scan results
+- Incident response test outcomes
+
+This evidence is stored in an audit-ready format that maps directly to control requirements — no more scrambling to compile evidence packages before an audit.
+
+## The 72% Reduction
+
+In our case study with a managed security provider serving 40+ client environments, AI compliance engines produced measurable results:
+
+- **72% fewer audit findings** compared to the prior year's manual process
+- **Audit prep time reduced from 3 weeks to 2 days**
+- **160 analyst hours per month freed** from manual compliance checks
+- **100% client retention** over 12 months (up from 85%)
+
+The key insight: most audit findings result from configuration drift between assessments. Continuous monitoring eliminates drift-related findings entirely.
+
+## Integration Architecture
+
+Our compliance engines integrate with your existing security stack:
+
+1. **Cloud providers** — AWS, Azure, GCP configuration via API
+2. **Identity providers** — Okta, Azure AD, Google Workspace
+3. **Vulnerability scanners** — Nessus, Qualys, Rapid7
+4. **SIEM platforms** — Splunk, Sentinel, Elastic
+5. **Ticketing systems** — Jira, ServiceNow for remediation tracking
+
+The engines consume data from these sources and produce compliance assessments against your chosen frameworks — no manual data entry required.
+
+## Getting Started
+
+Our free tier includes basic compliance scanning against NIST CSF. The Pro tier adds SOC 2, HIPAA, and PCI-DSS with continuous monitoring and automated evidence collection.
+
+---
+
+*See our cybersecurity engines at [echo-ept.com/security](/security). View the [full case study](/case-studies). Start a [free trial](/free).*`,
+  },
+  {
+    slug: 'evaluating-ai-apis-developer-guide',
+    title: 'How to Evaluate AI APIs: The Developer\'s Decision Framework',
+    excerpt: 'Choosing between AI APIs isn\'t just about which model is smartest. Latency, pricing, domain coverage, rate limits, and developer experience determine whether your production app succeeds or burns money.',
+    category: 'AI & Engineering',
+    date: '2026-03-23',
+    readTime: '9 min',
+    author: 'Echo Prime',
+    tags: ['AI API', 'developer tools', 'SDK comparison', 'API evaluation', 'production AI', 'developer experience'],
+    featured: false,
+    content: `## Beyond "Which Model Is Best"
+
+Every week, a new AI model claims the top spot on a benchmark. Developers chase the latest model, integrate it, and discover that benchmarks don't predict production performance.
+
+The real question isn't "which model is smartest" — it's "which API will make my product successful?" That requires evaluating across 6 dimensions that benchmarks ignore.
+
+## Dimension 1: Domain Depth vs. General Breadth
+
+General-purpose APIs (OpenAI, Anthropic, Google) excel at broad tasks but lack depth in specific domains. Ask GPT-4 about IRC §1031 like-kind exchanges or API RP 53 BOP testing requirements, and you'll get a plausible-sounding answer that a domain expert would immediately flag as incomplete or wrong.
+
+Domain-specific APIs (like Echo Prime's engine platform) trade breadth for depth. Our 5,400+ engines contain doctrine blocks — pre-compiled expert reasoning with citations, counter-arguments, and confidence stratification. The answer isn't generated from training data; it's reasoned through documented frameworks.
+
+**Evaluation test**: Ask your target domain's hardest question. If the API can't cite its sources or quantify its confidence, it's not ready for production in that domain.
+
+## Dimension 2: Latency Architecture
+
+- **Cold start latency**: Does the API have cold starts? Serverless functions can add 100ms-2s on first request.
+- **P50 vs. P99**: Average latency is meaningless. What's the worst-case latency your users will experience?
+- **Streaming vs. batch**: Can you stream tokens to the user while the model is still generating?
+- **Edge routing**: Is the API served from one region, or is it globally distributed?
+
+Echo Prime's architecture runs on Cloudflare Workers — zero cold starts, sub-50ms global routing, and streaming responses via our SDK. Our P99 latency for cached doctrine responses is under 200ms.
+
+## Dimension 3: Pricing Transparency
+
+Hidden costs kill AI products:
+
+- **Input token pricing**: Some APIs charge 10x more for input tokens than output
+- **Embedding costs**: If you're building RAG, embedding costs add up fast
+- **Rate limit overage**: What happens when you exceed your plan's limits?
+- **Egress fees**: Cloud providers charge for data leaving their network
+
+**Our approach**: Flat per-query pricing with no hidden fees. Free tier (500 req/day), Starter ($49/mo for 5,000 req/day), Pro ($199/mo for 50,000 req/day). No egress fees (Cloudflare R2). No embedding costs (included in plan).
+
+## Dimension 4: Developer Experience
+
+The best API is the one your team can ship with in a week, not a month:
+
+- **SDK quality**: Is there a TypeScript/Python SDK with full type definitions?
+- **Error handling**: Are errors structured (code + message) or just HTTP status codes?
+- **Documentation**: Are there runnable examples, not just reference docs?
+- **Playground**: Can you test queries before writing code?
+- **CLI tools**: Can you interact with the API from your terminal?
+
+Our SDK provides:
+
+\`\`\`typescript
+import { EchoPrimeSDK } from '@echo-omega-prime/sdk';
+
+const echo = new EchoPrimeSDK({ apiKey: 'your-key' });
+
+// One line to query an intelligence engine
+const result = await echo.engines.query('TX01', 'Section 179 deduction limit 2026');
+
+// One line to search the knowledge base
+const docs = await echo.knowledge.search('MACRS depreciation 5-year property');
+\`\`\`
+
+Plus a CLI (\`echo query "your question"\`), interactive playground at echo-ept.com/sdk/playground, and comprehensive documentation.
+
+## Dimension 5: Reliability and Failover
+
+Production AI systems must handle failures gracefully:
+
+- **Multi-model failover**: What happens when the primary model is down?
+- **Caching**: Are identical queries cached to reduce latency and cost?
+- **Rate limiting**: Does the API degrade gracefully under load?
+- **SLA guarantees**: What uptime does the provider guarantee?
+
+Our platform routes across 29 LLM workers with automatic failover. Frequently-accessed doctrine blocks are cached in KV for sub-millisecond responses. Rate limiting returns structured 429 responses with retry-after headers.
+
+## Dimension 6: Data Privacy and Security
+
+For enterprise use cases, data handling is non-negotiable:
+
+- **Data retention**: Does the API store your queries?
+- **Encryption**: Is data encrypted in transit and at rest?
+- **Compliance**: Is the provider SOC 2 / HIPAA compliant?
+- **Self-hosting**: Can you deploy on your own infrastructure?
+
+Our Enterprise plan offers zero data retention, AES-256-GCM encryption, and on-premises deployment options.
+
+## The Decision Matrix
+
+| Factor | General API | Domain API (Echo Prime) |
+|--------|------------|------------------------|
+| Domain accuracy | Medium | High (doctrine-backed) |
+| P50 latency | 500ms-2s | 50ms-200ms |
+| Pricing transparency | Variable | Flat per-query |
+| Free tier | Limited | 500 req/day |
+| Failover | None | 29-model chain |
+| Citation support | No | Yes (every response) |
+
+---
+
+*Try our SDK for free at [echo-ept.com/free](/free). Compare plans at [echo-ept.com/pricing](/pricing). Read the [quickstart guide](/sdk/quickstart).*`,
+  },
+  {
+    slug: 'ai-drilling-operations-optimization',
+    title: 'AI in Drilling Operations: From Well Planning to Real-Time Decision Support',
+    excerpt: 'Drilling a horizontal well in the Permian Basin costs $6-12M. AI-driven well planning, mud weight optimization, and real-time torque/drag analysis can reduce NPT by 22% and save $150K per well.',
+    category: 'Oilfield Tech',
+    date: '2026-03-22',
+    readTime: '10 min',
+    author: 'Echo Prime',
+    tags: ['drilling operations', 'well planning', 'Permian Basin', 'oilfield AI', 'NPT reduction', 'directional drilling'],
+    featured: false,
+    content: `## The Cost of Getting It Wrong
+
+A single stuck pipe incident on a horizontal well can cost $500,000-$2,000,000 in lost time and fishing operations. A casing failure can result in a $3,000,000+ workover. Non-productive time (NPT) accounts for 15-25% of total well costs in the Permian Basin.
+
+These aren't theoretical risks — they're daily realities for operators drilling 10,000+ horizontal wells per year in the Delaware and Midland basins. The operators who minimize NPT are the ones who survive when commodity prices drop.
+
+## 15 Drilling Intelligence Engines
+
+Echo Prime's drilling engine suite (DRL01-DRL15) covers the full well lifecycle:
+
+### Well Planning (DRL01-DRL03)
+
+**DRL01 — Drilling Fundamentals**: Core drilling mechanics, ROP optimization, bit selection based on formation characteristics. References API RP 7G, IADC/SPE guidelines.
+
+**DRL02 — Wellbore Stability**: Geomechanical analysis for optimal mud weight windows. Inputs: pore pressure, fracture gradient, in-situ stress. Outputs: safe drilling window, recommended mud weight, formation-specific recommendations.
+
+**DRL03 — Hydraulics**: Circulating pressure calculations, ECD management, hole cleaning analysis. Critical for extended-reach laterals where ECD management determines whether you can drill to TD.
+
+### Casing and Cementing (DRL04-DRL06)
+
+**DRL05 — Casing Design**: Multi-string casing design with burst/collapse/tension analysis per API TR 5C3. Handles directional loads (dogleg severity effects), temperature effects, and wear factors.
+
+**DRL06 — Cementing**: Slurry design, displacement efficiency, cement evaluation. References API RP 10B and API RP 65-2 for zonal isolation.
+
+### Directional and Horizontal Drilling (DRL07-DRL09)
+
+**DRL08 — Directional Drilling**: BHA design, motor yield calculations, slide/rotate optimization. Includes survey management and wellbore positioning.
+
+**DRL09 — Horizontal Completion**: Lateral landing, staging, and completion design. Integrates with fracturing engines for completion optimization.
+
+### Well Control (DRL10-DRL12)
+
+**DRL12 — Well Control**: BOP testing requirements per API RP 53, kick detection, kill procedures. This is the engine that can save lives — providing instant well control calculations during a kick.
+
+## Real-World Application
+
+A Permian Basin operator drilling 30+ horizontal wells per year integrated our engines into their planning workflow:
+
+### Before AI-Assisted Planning
+
+- Well planning cycle: 3 weeks per well
+- NPT rate: 18% of total well cost
+- Stuck pipe incidents: 4 per quarter
+- Engineering review: 3-4 SMEs per well plan
+- Cost per well: $8.2M average
+
+### After AI-Assisted Planning
+
+- Well planning cycle: 5 days per well
+- NPT rate: 14% (22% reduction)
+- Stuck pipe incidents: 1 per quarter (75% reduction)
+- Engineering review: 1 SME validates AI recommendations
+- Cost per well: $8.05M average ($150K savings)
+
+At 30 wells/year, that's **$4.5M annual savings** from reduced NPT and faster planning cycles alone.
+
+## How It Works in Practice
+
+An engineer queries the system in natural language:
+
+**Query**: "Recommended mud weight for drilling through Bone Spring at 8,500 ft TVD with a pore pressure gradient of 10.2 ppg and expected fracture gradient of 14.8 ppg. Formation is known for shale instability."
+
+**Engine response**:
+- Recommended mud weight: 11.0-12.5 ppg (provides safe window calculations)
+- Inhibitive water-based mud recommended for shale stability (references SPE-171736-MS)
+- KCl concentration: 3-5% for Bone Spring shale
+- Monitor ECD to stay below 14.0 ppg in horizontal section
+- Confidence: DEFENSIBLE (based on 47 offset wells in same formation)
+- Risk factors: Shale sloughing risk increases if mud weight drops below 10.8 ppg
+- API standard: Per IADC/SPE Well Control Guidelines rev. 2023
+
+Every recommendation includes citations, confidence levels, and offset well references — the same quality as a senior drilling engineer's analysis, delivered in seconds instead of hours.
+
+## Integration with Title Intelligence
+
+Our drilling engines connect with our title intelligence platform for complete well planning:
+
+1. **Title verification** — Confirm mineral rights ownership before spud
+2. **Offset well data** — Retrieve drilling data from nearby wells
+3. **Regulatory compliance** — RRC filing requirements, permit status
+4. **Environmental review** — Surface use agreements, water source permits
+
+This end-to-end integration means one platform handles both the legal/land and engineering aspects of well planning.
+
+---
+
+*Explore our drilling engines at [echo-ept.com/engines](/engines). See the [Permian Basin platform](/permian). Read the [case study](/case-studies).*`,
+  },
+  {
+    slug: 'revenue-automation-ai-small-business',
+    title: '7 Ways AI Automation Generates Revenue While You Sleep',
+    excerpt: 'From AI sales agents that close deals at 2 AM to automated social media that builds pipeline 24/7, here are 7 proven revenue automation strategies powered by AI that small businesses can deploy today.',
+    category: 'Product Updates',
+    date: '2026-03-22',
+    readTime: '7 min',
+    author: 'Echo Prime',
+    tags: ['revenue automation', 'AI sales', 'small business AI', 'lead generation', 'marketing automation', 'ROI'],
+    featured: false,
+    content: `## The 24/7 Revenue Problem
+
+Small businesses lose revenue every hour they're not actively selling. A prospect visits your website at 11 PM — no one's there to answer. A lead replies to your LinkedIn post on Saturday — you don't see it until Monday. A customer calls with a question at 6 AM — voicemail.
+
+Every unanswered touchpoint is lost revenue. AI automation fixes this.
+
+## 1. AI Sales Agent — Close Deals at 2 AM
+
+Our AI Closer handles inbound qualification 24/7. When a prospect fills out a form, the AI calls them within 8 seconds — not hours or days.
+
+**How it works**: Real-time speech-to-text captures the prospect's words. An LLM processes their needs against your sales script. Natural text-to-speech responds conversationally. The AI qualifies the lead, books a meeting on your calendar, and sends a follow-up email — all autonomously.
+
+**ROI example**: A B2B SaaS company deployed our AI Closer and saw meetings booked increase 3.5x, with 100% of after-hours leads contacted. One deal closed from a 2 AM interaction: $48K ARR.
+
+**Cost**: Starting at $299/month vs. $4,000+/month for an SDR hire.
+
+## 2. Intelligent Social Media Fleet
+
+Nine AI-powered bots (LinkedIn, X/Twitter, Instagram, Telegram, Discord, Reddit, Slack, WhatsApp, Messenger) maintain your brand presence across every platform simultaneously.
+
+**Each bot**:
+- Generates domain-relevant content using 14 AI personalities
+- Posts on optimized schedules (3x daily, time-zone aware)
+- Monitors comments and replies with AI-powered responses
+- Detects leads and routes them to your CRM
+- Runs A/B tests on content formats
+
+**ROI example**: Our LinkedIn bot has generated 89+ posts with consistent engagement. Content diversification across 11 weighted categories ensures your audience never sees repetitive content.
+
+## 3. AI Phone Answering — Never Miss a Call
+
+Echo Office AI answers every call with a natural-sounding AI voice. It understands your business, books appointments, handles FAQs, and routes complex issues to the right person — 24/7.
+
+**Capabilities**: Appointment booking, complaint handling, order status, payment processing, SMS follow-ups. 22+ business modules in one platform.
+
+**Cost**: $49/month (Starter) vs. $1,500+/month for a virtual receptionist service.
+
+## 4. Automated Lead Scoring
+
+Our intelligence engines analyze every prospect interaction and score leads based on:
+- Engagement depth (page views, content downloads, time on site)
+- Company fit (industry, size, technology stack)
+- Intent signals (pricing page visits, demo requests, SDK signups)
+- Behavioral patterns (comparison shopping, return visits)
+
+High-scoring leads get immediate AI Closer outreach. Medium scores enter nurture sequences. Low scores get content-only engagement.
+
+## 5. Price Alert Monetization
+
+Our Price Alerts platform monitors crypto, stocks, commodities, and forex in real-time. Users set alerts and receive instant notifications via email, SMS, Telegram, or webhook.
+
+**Revenue model**: Free tier (5 alerts) drives signups. Pro tier ($19/month) converts power users. Affiliate partnerships with exchanges add commission revenue.
+
+## 6. Knowledge-Powered Customer Support
+
+Deploy our Sentinel AI as a customer support agent. It accesses your knowledge base (24,800+ documents, 170,000+ chunks) to answer questions with citations — not generic responses.
+
+**Example**: "What's your refund policy for enterprise accounts?" Sentinel retrieves the exact policy document, quotes the relevant section, and provides a direct answer with a link to the full policy.
+
+**Result**: 80% of support tickets resolved without human intervention. Average resolution time: 12 seconds vs. 4 hours.
+
+## 7. Automated Content Pipeline
+
+Our Knowledge Forge + blog system creates a content flywheel:
+
+1. Knowledge Forge ingests industry documents and news
+2. AI generates SEO-optimized blog articles targeting revenue keywords
+3. Social media bots distribute content across 9 platforms
+4. Sentinel AI answers questions that arise from the content
+5. Analytics feed back into content strategy optimization
+
+This pipeline generates organic traffic → leads → qualified prospects → closed deals — with minimal human involvement.
+
+## The Bottom Line
+
+These 7 automations can run simultaneously for under $500/month:
+
+| Automation | Cost | Expected Monthly Revenue |
+|-----------|------|-------------------------|
+| AI Sales Agent | $299/mo | $2,000-$20,000 (2-5 closed deals) |
+| Social Media Fleet | $0 (included) | $500-$5,000 (lead gen) |
+| AI Phone System | $49/mo | $1,000-$3,000 (saved calls) |
+| Lead Scoring | $0 (included) | $2,000-$10,000 (conversion lift) |
+| Price Alerts | $0 (free tier) | $500-$2,000 (subscriptions) |
+| AI Support | $29/mo | $3,000-$8,000 (ticket deflection) |
+| Content Pipeline | $0 (included) | $1,000-$5,000 (organic traffic) |
+
+**Total cost**: ~$377/month. **Expected revenue impact**: $10,000-$53,000/month.
+
+---
+
+*Start free at [echo-ept.com/free](/free). Explore all products at [echo-ept.com/services](/services). See [case studies](/case-studies).*`,
+  },
 ];
 
 export function formatDate(dateStr: string): string {
