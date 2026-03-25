@@ -2465,6 +2465,222 @@ Echo Call Center is built for businesses that:
 
 *Try Echo Call Center at [echo-ept.com/call-center](/call-center). See all products at [echo-ept.com/pricing](/pricing). Enterprise plans include dedicated onboarding and custom integrations.*`,
   },
+  {
+    slug: 'church-management-software-ai-2026',
+    title: 'Church Management Software Gets an AI Upgrade in 2026',
+    excerpt: 'Traditional church management tools handle member rosters and donations. Echo Shepherd AI adds AI-powered sermon prep, volunteer optimization, worship planning, and multi-denomination support — all from one Cloudflare Worker.',
+    category: 'Product Updates',
+    date: '2026-03-25',
+    readTime: '7 min',
+    author: 'Echo Prime',
+    tags: ['church management', 'shepherd AI', 'ministry software', 'volunteer management', 'sermon planning'],
+    content: `# Church Management Software Gets an AI Upgrade in 2026
+
+Most church management software was built in the 2010s. It handles member directories, donation tracking, and maybe event calendars. But running a modern ministry demands more — sermon research, volunteer scheduling across multiple services, worship set planning, pastoral care tracking, and compliance with denomination-specific requirements.
+
+## The Problem with Legacy Church Software
+
+Tools like Planning Center, Breeze, and ChurchTrac solve the basics. But they fall short in areas that consume the most pastoral time:
+
+- **Sermon preparation**: Pastors spend 15-20 hours per week researching, outlining, and writing sermons. No existing tool provides AI-assisted research across biblical texts, commentaries, and topical databases.
+- **Volunteer burnout**: Most churches rely on the same 20% of members. Without predictive scheduling and load balancing, burnout drives volunteers away.
+- **Multi-site coordination**: Churches with multiple campuses or services need unified scheduling without conflicts.
+- **Denomination compliance**: Baptist, Methodist, Presbyterian, Catholic, Pentecostal — each has distinct liturgical calendars, governance structures, and reporting requirements. Generic software ignores these.
+
+## What Echo Shepherd AI Does Differently
+
+Echo Shepherd AI is a purpose-built Cloudflare Worker with 56 API endpoints, 17 database tables, and native support for 9 denomination configurations. It runs at the edge with sub-100ms response times globally.
+
+### Sermon Engine
+
+The sermon preparation module connects to Echo's Engine Runtime (5,486+ intelligence engines, 601,000+ doctrine documents). When a pastor enters a scripture reference or topic:
+
+1. **Cross-reference search**: Finds related passages, Greek/Hebrew word studies, and commentary excerpts
+2. **Outline generation**: Produces 3-point and 5-point sermon structures with supporting citations
+3. **Illustration suggestions**: Matches sermon themes to real-world examples from curated databases
+4. **Series planning**: Maps multi-week sermon series with thematic continuity
+
+This cuts sermon prep from 15+ hours to 3-4 hours while improving depth and citation quality.
+
+### Volunteer Intelligence
+
+Instead of manual sign-up sheets:
+
+- **Availability prediction**: Learns which members serve best on which days/times
+- **Load balancing**: Distributes shifts evenly to prevent burnout
+- **Skills matching**: Routes volunteers to positions matching their gifts and training
+- **Gap alerts**: Flags upcoming services with unfilled critical roles 48 hours in advance
+- **Certification tracking**: Manages background checks, safe sanctuary training, and first aid certs
+
+### Worship Planning
+
+- **Set list builder**: Suggests songs based on sermon theme, liturgical season, and congregation familiarity
+- **Key/tempo management**: Ensures musical flow between songs
+- **CCLI compliance**: Tracks license usage for copyright reporting
+- **Rehearsal scheduling**: Coordinates band/choir practice with room availability
+
+### CRM & Pastoral Care
+
+- **Congregant profiles**: Family units, attendance patterns, giving history, small group participation
+- **Care tracking**: Hospital visits, grief support, new member follow-up with automated reminders
+- **Tithing analytics**: Giving trends, pledge fulfillment, campaign progress without the awkwardness
+- **Communication**: Segment-based email/SMS for prayer chains, event updates, and emergency alerts
+
+### Multi-Denomination Support
+
+Shepherd AI ships with 9 denomination configurations:
+
+| Denomination | Calendar | Governance | Special Features |
+|---|---|---|---|
+| Baptist | Standard | Congregational | Baptism tracking, deacon rotation |
+| Methodist | Lectionary | Connectional | Charge conference reporting, itinerant scheduling |
+| Presbyterian | Lectionary | Session/Presbytery | Elder terms, committee structures |
+| Catholic | Liturgical | Parish/Diocese | Sacrament records, feast days, RCIA tracking |
+| Pentecostal | Flexible | Pastoral | Ministry gifts inventory, prayer chain management |
+| Lutheran | Lectionary | Synodical | Confirmation classes, stewardship drives |
+| Episcopal | BCP Calendar | Vestry | Altar guild scheduling, liturgical color automation |
+| Non-Denominational | Custom | Board | Flexible structure, mission trip planning |
+| Church of Christ | Standard | Elder-led | A cappella worship planning, benevolence fund |
+
+Each configuration adjusts the UI, reporting, calendar integration, and default workflows.
+
+## Architecture
+
+- **Runtime**: Cloudflare Workers (zero cold start, $0 idle cost)
+- **Database**: Cloudflare D1 (SQLite at the edge, 17 tables)
+- **AI Backend**: Service bindings to Engine Runtime + Shared Brain
+- **Voice**: Optional Echo Speak Cloud integration for audio announcements
+- **Crons**: Sunday 5am pre-service checks, Monday 8am weekly reports
+
+## Pricing
+
+| Plan | Monthly | Includes |
+|---|---|---|
+| Starter | $29 | 1 campus, 500 members, basic sermon tools |
+| Growth | $79 | 3 campuses, 2,000 members, full AI features |
+| Enterprise | $199 | Unlimited campuses, API access, custom denomination configs |
+
+## Getting Started
+
+Shepherd AI is live at [echo-ept.com/shepherd](/shepherd). Sign up takes 2 minutes. Import your existing member directory from CSV or connect to Planning Center for migration.
+
+*See the full product lineup at [echo-ept.com/pricing](/pricing). Questions? Talk to Sentinel AI at [echo-ept.com/sentinel](/sentinel).*`,
+  },
+  {
+    slug: 'ai-call-center-roi-calculator',
+    title: 'AI Call Center ROI: How to Calculate Your Savings Before You Switch',
+    excerpt: 'Switching from a traditional call center platform to AI-native infrastructure cuts costs by 60-85%. Here\'s the math — with real numbers from our 230-endpoint Call Center Worker.',
+    category: 'Product Updates',
+    date: '2026-03-25',
+    readTime: '6 min',
+    author: 'Echo Prime',
+    tags: ['call center', 'ROI', 'cost savings', 'AI call center', 'Five9 alternative', 'contact center'],
+    content: `# AI Call Center ROI: How to Calculate Your Savings Before You Switch
+
+Enterprise call center platforms charge $150-300 per agent per month. With 50 agents, that's $90,000-180,000 annually — before telecom costs, WFM add-ons, and integration fees. AI-native call centers change the economics fundamentally.
+
+## The Traditional Cost Stack
+
+A typical 50-agent call center running Five9, Talkdesk, or Genesys:
+
+| Line Item | Monthly Cost |
+|---|---|
+| Platform license (50 agents × $175 avg) | $8,750 |
+| Telecom (inbound + outbound) | $3,500 |
+| WFM/QM add-on | $2,000 |
+| CRM integration | $1,500 |
+| Recording & analytics | $1,000 |
+| IT overhead (admin, upgrades) | $2,000 |
+| **Total** | **$18,750/mo ($225,000/yr)** |
+
+And that's before you hire the 50 human agents at $35,000-45,000 each.
+
+## The AI-Native Cost Stack
+
+Echo Call Center replaces the entire platform AND a significant portion of agent headcount:
+
+| Line Item | Monthly Cost |
+|---|---|
+| Echo Call Center (Enterprise) | $499 |
+| Cloudflare Workers compute | $5 (usage-based) |
+| Telecom (Twilio/Telnyx) | $2,000 |
+| ElevenLabs voice (AI agents) | $330 |
+| Human agents (10 instead of 50) | $33,000 |
+| **Total** | **$35,834/mo ($430,008/yr)** |
+
+Wait — that's $430K vs $225K for platform alone? Not quite. Add the 50 human agents to the traditional stack:
+
+| | Traditional | AI-Native |
+|---|---|---|
+| Platform | $225,000 | $6,048 |
+| Agents (salary) | $2,000,000 | $400,000 |
+| Telecom | $42,000 | $24,000 |
+| Voice AI | $0 | $3,960 |
+| **Total** | **$2,267,000** | **$434,008** |
+| **Savings** | — | **$1,832,992 (81%)** |
+
+The savings come from replacing 40 of 50 agents with AI agents that handle routine calls — appointment scheduling, FAQ, order status, payment processing, basic support. Human agents focus on complex escalations.
+
+## What 230 Endpoints Actually Means
+
+Most call center platforms expose 20-30 API endpoints. Echo Call Center has 230+ because every feature is API-first:
+
+- **Queue management**: 5 routing strategies, real-time depth monitoring, priority override
+- **Agent management**: Skills-based routing, availability, performance scoring
+- **AI scoring**: Every call gets automated quality scores against custom rubrics
+- **Gamification**: Points, badges, leaderboards — agent engagement without micromanagement
+- **Workflow automation**: Trigger chains on call events (post-call survey, CRM update, follow-up task)
+- **Conference calls**: Multi-party with dynamic add/remove
+- **Knowledge base**: Versioned articles that AI agents reference in real-time
+- **Recording analytics**: Talk-to-listen ratios, keyword spotting, silence detection
+- **Predictive forecasting**: Call volume predictions for staffing optimization
+- **Full audit log**: Every action tracked for compliance
+
+## The ROI Formula
+
+Calculate your specific savings:
+
+\`\`\`
+Current Annual Cost = (Platform × 12) + (Agents × Salary) + (Telecom × 12) + Add-ons
+
+AI Annual Cost = $6,048 + (Remaining Agents × Salary) + (Telecom × 12) + $3,960
+
+Savings = Current - AI
+ROI % = (Savings / Current) × 100
+\`\`\`
+
+For most 25-100 agent operations, this yields 60-85% total cost reduction.
+
+## Factors That Increase ROI
+
+- **High call volume, low complexity**: More calls that AI can handle = fewer human agents needed
+- **24/7 operations**: AI agents don't need night shift premiums
+- **Multi-language support**: AI handles language switching without bilingual agent premiums
+- **Seasonal spikes**: Scale AI agents instantly vs. hiring/training temp staff
+- **Compliance-heavy industries**: Automated TCPA compliance, call recording, consent tracking
+
+## Factors That Decrease ROI
+
+- **Highly complex calls**: If every call needs a senior specialist, AI deflection rates will be lower
+- **Small teams**: Under 10 agents, the platform cost difference is smaller (though still significant)
+- **Existing long-term contracts**: Early termination fees may delay the switch
+
+## Migration Path
+
+1. **Week 1**: Deploy Echo Call Center, configure queues and routing rules
+2. **Week 2**: Import contacts, scripts, and knowledge base articles
+3. **Week 3**: Run parallel — AI handles overflow and after-hours
+4. **Week 4**: Gradually increase AI agent percentage as confidence grows
+5. **Month 2**: Full cutover, human agents on complex queue only
+
+Most enterprises see positive ROI within 45 days of deployment.
+
+## Try It
+
+Echo Call Center is live with a full demo tenant at [echo-ept.com/call-center](/call-center). The API documentation covers all 230+ endpoints. Enterprise plans include dedicated onboarding, custom IVR flows, and Twilio/Telnyx number porting.
+
+*Compare all Echo Prime products at [echo-ept.com/pricing](/pricing). Enterprise inquiries: [echo-ept.com/support](/support).*`,
+  },
 ];
 
 export function formatDate(dateStr: string): string {
