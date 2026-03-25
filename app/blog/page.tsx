@@ -178,7 +178,7 @@ export default function BlogPage() {
         {/* Footer CTA */}
         <div className="mt-12 text-center">
           <p className="text-sm mb-4" style={{ color: 'var(--ept-text-muted)' }}>
-            Built with 5,486+ intelligence engines, 529K+ doctrine blocks, and zero VC funding.
+            Built with 5,486+ intelligence engines, 601K+ doctrine blocks, and zero VC funding.
           </p>
           <div className="flex justify-center gap-4 flex-wrap">
             <Link href="/free" className="text-sm font-medium" style={{ color: 'var(--ept-accent)' }}>Start Free</Link>

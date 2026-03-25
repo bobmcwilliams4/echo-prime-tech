@@ -276,7 +276,7 @@ export default function FreePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
               { value: '5,486', label: 'AI Engines' },
-              { value: '529K+', label: 'Doctrine Blocks' },
+              { value: '601K+', label: 'Doctrine Blocks' },
               { value: '24,800+', label: 'Knowledge Docs' },
               { value: '940+', label: 'Domains Covered' },
             ].map((stat) => (

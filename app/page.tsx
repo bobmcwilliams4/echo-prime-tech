@@ -16,7 +16,7 @@ interface LiveStats {
 }
 
 function useLiveStats(): LiveStats {
-  const [stats, setStats] = useState<LiveStats>({ engines: '5,486+', categories: '940+', doctrines: '529K+', industries: [] });
+  const [stats, setStats] = useState<LiveStats>({ engines: '5,486+', categories: '940+', doctrines: '601K+', industries: [] });
   useEffect(() => {
     fetch('https://echo-engine-runtime.bmcii1976.workers.dev/stats')
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
@@ -173,7 +173,7 @@ const CAPABILITIES = [
   },
   {
     title: 'SDK & Developer Portal',
-    description: 'Access every Echo Prime capability through a unified REST API. OpenAPI spec, interactive playground, code samples in 6 languages, webhook support, and usage analytics. Build on top of 5,486+ engines and 529K+ doctrine blocks.',
+    description: 'Access every Echo Prime capability through a unified REST API. OpenAPI spec, interactive playground, code samples in 6 languages, webhook support, and usage analytics. Build on top of 5,486+ engines and 601K+ doctrine blocks.',
     stat: '17+',
     statLabel: 'API Endpoints',
     icon: '🔗',

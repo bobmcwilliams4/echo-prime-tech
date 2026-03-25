@@ -14,7 +14,7 @@ const NAV_ITEMS = [
 const STATS = [
   { value: '5,486+', label: 'AI Engines' },
   { value: '940+', label: 'Domains' },
-  { value: '529K+', label: 'Doctrine Blocks' },
+  { value: '601K+', label: 'Doctrine Blocks' },
   { value: '99.9%', label: 'Uptime' },
 ];
 
@@ -55,7 +55,7 @@ const TIMELINE = [
   { year: '2024', event: 'Founded by Bobby Don McWilliams II after 30 years in the oilfield industry' },
   { year: '2025', event: 'First intelligence engines deployed — Tax, Legal, and Landman domains' },
   { year: '2025', event: 'ShadowGlass privacy browser launched with 120+ anti-detection measures' },
-  { year: '2026', event: 'Scaled to 5,486+ engines across 940+ domains with 529K+ doctrine blocks' },
+  { year: '2026', event: 'Scaled to 5,486+ engines across 940+ domains with 601K+ doctrine blocks' },
   { year: '2026', event: 'AI Closer, Hephaestion Forge, and Daedalus Forge enter production' },
   { year: '2026', event: 'Full autonomous operations — bots, scrapers, monitoring across all platforms' },
 ];
