@@ -44,13 +44,12 @@ export default function InvoicesPage() {
 
   useEffect(() => {
     if (!loading && !user) router.push('/login');
-    if (!loading && user && role !== 'owner') router.push('/');
-  }, [user, loading, role, router]);
+  }, [user, loading, router]);
 
   useEffect(() => {
-    if (!user || role !== 'owner') return;
+    if (!user) return;
     loadInvoices();
-  }, [user, role, statusFilter]);
+  }, [user, statusFilter]);
 
   async function loadInvoices() {
     setLoadingData(true);

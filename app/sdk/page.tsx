@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, FormEvent } from 'react';
+import { useState, useEffect, useRef, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
@@ -219,7 +219,14 @@ export default function SDKPage() {
   const [signupError, setSignupError] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [copied, setCopied] = useState(false);
+  const [showRegenerate, setShowRegenerate] = useState(false);
   const signupRef = useRef<HTMLDivElement>(null);
+
+  // Auto-fill from logged-in user
+  useEffect(() => {
+    if (user?.email && !signupEmail) setSignupEmail(user.email);
+    if (user?.displayName && !signupName) setSignupName(user.displayName);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const RED = '#dc2626';
   const RED_GLOW = 'rgba(220, 38, 38, 0.15)';
@@ -235,6 +242,7 @@ export default function SDKPage() {
     setSignupLoading(true);
     setSignupError('');
     setApiKey('');
+    setShowRegenerate(false);
     try {
       const res = await fetch(`${GATEWAY}/auth/signup`, {
         method: 'POST',
@@ -242,10 +250,43 @@ export default function SDKPage() {
         body: JSON.stringify({ email: signupEmail, name: signupName }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-      setApiKey(data.api_key || data.apiKey || data.key || '');
+      if (!res.ok) {
+        const errCode = typeof data.error === 'object' ? data.error?.code : undefined;
+        if (res.status === 409 || errCode === 'ECHO_DUPLICATE') {
+          setShowRegenerate(true);
+          setSignupError('An account with this email already exists.');
+          return;
+        }
+        const errMsg = typeof data.error === 'string' ? data.error : data.error?.message || `HTTP ${res.status}`;
+        throw new Error(errMsg);
+      }
+      setApiKey(data.data?.api_key || data.api_key || data.apiKey || data.key || '');
     } catch (err: unknown) {
       setSignupError(err instanceof Error ? err.message : 'Signup failed. Please try again.');
+    } finally {
+      setSignupLoading(false);
+    }
+  };
+
+  const handleRegenerate = async () => {
+    setSignupLoading(true);
+    setSignupError('');
+    setApiKey('');
+    setShowRegenerate(false);
+    try {
+      const res = await fetch(`${GATEWAY}/auth/reset-key`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: signupEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const errMsg = typeof data.error === 'string' ? data.error : data.error?.message || `HTTP ${res.status}`;
+        throw new Error(errMsg);
+      }
+      setApiKey(data.data?.api_key || data.api_key || data.apiKey || data.key || '');
+    } catch (err: unknown) {
+      setSignupError(err instanceof Error ? err.message : 'Key regeneration failed. Please try again.');
     } finally {
       setSignupLoading(false);
     }
@@ -796,6 +837,17 @@ export default function SDKPage() {
                 {signupError && (
                   <div className="text-sm font-medium rounded-xl px-4 py-3" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
                     {signupError}
+                    {showRegenerate && (
+                      <button
+                        type="button"
+                        onClick={handleRegenerate}
+                        disabled={signupLoading}
+                        className="mt-2 w-full py-2.5 rounded-lg font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-50"
+                        style={{ background: RED, color: '#fff', border: 'none', cursor: signupLoading ? 'not-allowed' : 'pointer' }}
+                      >
+                        {signupLoading ? 'Regenerating...' : 'Regenerate API Key (revokes old key)'}
+                      </button>
+                    )}
                   </div>
                 )}
 

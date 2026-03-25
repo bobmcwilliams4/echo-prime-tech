@@ -747,6 +747,20 @@ export default function AppointmentsPage() {
 
 // ─── Appointment Card ───────────────────────────────────────────────────────
 
+function buildGoogleCalendarUrl(appt: Appointment): string {
+  const dt = appt.appointment_time || `${appt.date}T${appt.time}:00`;
+  const start = dt.replace(/[-:]/g, '').replace('T', 'T').split('.')[0];
+  // Add 30 min for end time
+  const startDate = new Date(dt);
+  startDate.setMinutes(startDate.getMinutes() + 30);
+  const end = startDate.toISOString().replace(/[-:]/g, '').split('.')[0];
+  const title = encodeURIComponent(`Call: ${appt.lead_name || 'Lead'}`);
+  const details = encodeURIComponent(
+    [appt.notes, appt.phone ? `Phone: ${appt.phone}` : '', appt.email ? `Email: ${appt.email}` : '', appt.company ? `Company: ${appt.company}` : ''].filter(Boolean).join('\n')
+  );
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&sf=true&output=xml`;
+}
+
 interface AppointmentCardProps {
   appt: Appointment;
   editingId: string | null;
@@ -1111,6 +1125,28 @@ function AppointmentCard({
           onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--ept-border)'; }}
         >
           <IconEdit /> Edit
+        </button>
+        <button
+          onClick={() => window.open(buildGoogleCalendarUrl(appt), '_blank')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            padding: '5px 12px',
+            fontSize: 11,
+            fontWeight: 600,
+            color: '#3b82f6',
+            backgroundColor: 'transparent',
+            border: '1px solid var(--ept-border)',
+            borderRadius: 8,
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+          }}
+          onMouseOver={(e) => { e.currentTarget.style.borderColor = '#3b82f6'; }}
+          onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--ept-border)'; }}
+        >
+          <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Google Cal
         </button>
         <button
           onClick={() => { if (confirm(`Delete appointment for "${appt.lead_name}"?`)) onDelete(appt.id); }}

@@ -473,7 +473,7 @@ function DoctrineResultCard({ result }: { result: EngineQueryResult }) {
 
 export default function SentinelPage() {
   const router = useRouter();
-  const { user, loading, role } = useAuth();
+  const { user, loading, role, grants } = useAuth();
   const { isDark, toggle } = useTheme();
 
   // Chat state
@@ -2136,7 +2136,8 @@ export default function SentinelPage() {
 
       {/* ─── Upgrade Banner + Cross-Sell (below chat) ─── */}
       <div className="relative z-20 px-4 pt-6 pb-6 space-y-4" style={{ backgroundColor: 'var(--ept-bg)' }}>
-        {/* Upgrade CTA */}
+        {/* Upgrade CTA — hidden for users with paid/sovereign tier or owner role */}
+        {(!grants?.custom_tier || grants.custom_tier === 'free') && role !== 'owner' ? (
         <div className="max-w-3xl mx-auto p-4 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
           <p className="text-sm font-semibold mb-1" style={{ color: 'var(--ept-text)' }}>
             Unlock Unlimited Queries &amp; Priority Models
@@ -2153,6 +2154,13 @@ export default function SentinelPage() {
             </Link>
           </div>
         </div>
+        ) : (
+        <div className="max-w-3xl mx-auto p-3 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-accent)' }}>
+          <p className="text-xs font-semibold" style={{ color: 'var(--ept-accent)' }}>
+            {grants.custom_tier === 'sovereign' ? 'Sovereign' : grants.custom_tier?.charAt(0).toUpperCase() + grants.custom_tier?.slice(1)} Plan &middot; {grants.sentinel_queries_limit === 'unlimited' ? 'Unlimited' : grants.sentinel_queries_limit} queries {grants.sentinel_voice === 'true' && ' · Voice enabled'} {grants.sentinel_memory === 'true' && ' · Memory enabled'}
+          </p>
+        </div>
+        )}
 
         {/* Cross-sell */}
         <div className="max-w-4xl mx-auto">

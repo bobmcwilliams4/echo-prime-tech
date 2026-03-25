@@ -44,7 +44,6 @@ const CATEGORIES = [
   { id: 'security', label: 'Security' },
   { id: 'monitoring', label: 'Intelligence & Monitoring' },
   { id: 'data', label: 'Data & Knowledge' },
-  { id: 'manufacturing', label: 'Manufacturing & CAD' },
   { id: 'creative', label: 'Creative & Media' },
   { id: 'professional', label: 'Professional Services' },
 ];
@@ -71,28 +70,6 @@ const SERVICES: EcomService[] = [
       { tier: 'Enterprise', price: null, interval: 'month', features: ['Unlimited queries', 'Custom engines', 'Dedicated infra'], custom: true },
     ],
     learnMore: '/engines', workerHealthy: true,
-  },
-  {
-    id: 'multi-model-ai', name: 'Multi-Model Orchestration', tagline: 'One API, 30+ AI models, zero waste',
-    description: 'Intelligent routing across 30+ AI models. Automatic failover, cost optimization, and model selection tuned per query. GPT, Claude, Llama, DeepSeek, and more.',
-    icon: '\u2B22', category: 'ai',
-    pricing: [
-      { tier: 'Developer', price: 49, interval: 'month', features: ['5K requests/mo', '10 models', 'Auto-routing'] },
-      { tier: 'Business', price: 199, interval: 'month', features: ['50K requests/mo', '30+ models', 'Smart routing', 'Webhooks'], popular: true },
-      { tier: 'Enterprise', price: null, interval: 'month', features: ['Unlimited', 'Custom models', 'SLA guarantee'], custom: true },
-    ],
-    learnMore: '/orchestration', workerHealthy: true,
-  },
-  {
-    id: 'hephaestion-forge', name: 'Hephaestion Forge', tagline: 'AI-powered code factory',
-    description: 'Autonomous software factory. 13-stage pipeline, 15 archetypes, 42+ LLM providers. From concept to production-ready code in hours.',
-    icon: '\u26A1', category: 'ai', badge: 'Popular',
-    pricing: [
-      { tier: 'Starter', price: 199, interval: 'month', features: ['3 projects/mo', '5 build guilds', 'Code generation'] },
-      { tier: 'Professional', price: 499, interval: 'month', features: ['15 projects/mo', 'All 12 guilds', 'Full pipeline', 'Multi-language'], popular: true },
-      { tier: 'Enterprise', price: null, interval: 'month', features: ['Unlimited', 'Custom templates', 'On-premise'], custom: true },
-    ],
-    learnMore: '/hephaestion-forge', workerHealthy: true,
   },
   {
     id: 'cyber-defense', name: 'Cyber Defense Suite', tagline: 'AI-powered defensive security',
@@ -161,28 +138,6 @@ const SERVICES: EcomService[] = [
     learnMore: '/sentinel', workerHealthy: true,
   },
   {
-    id: 'daedalus-forge', name: 'Daedalus Forge', tagline: 'AI manufacturing intelligence platform',
-    description: '50-stage manufacturing pipeline with 15 specialized guilds and 80 AI agents. 8 industry verticals with built-in compliance checking.',
-    icon: '\u2692', category: 'manufacturing',
-    pricing: [
-      { tier: 'Starter', price: 299, interval: 'month', features: ['5 projects/mo', '5 guilds', 'Quality gate checks'] },
-      { tier: 'Professional', price: 799, interval: 'month', features: ['25 projects/mo', 'All 15 guilds', '50-stage pipeline', '8 domains'], popular: true },
-      { tier: 'Enterprise', price: null, interval: 'month', features: ['Unlimited', 'Custom guild agents', 'On-premise'], custom: true },
-    ],
-    learnMore: '/daedalus-forge', workerHealthy: true,
-  },
-  {
-    id: 'echocad', name: 'EchoCAD', tagline: 'AI-native parametric CAD engine',
-    description: '20 engineering alloys, 8 geometry primitives, stress/pressure/tolerance analysis, DFM scoring, BOM generation, and OpenSCAD export.',
-    icon: '\u2B20', category: 'manufacturing',
-    pricing: [
-      { tier: 'Starter', price: 49, interval: 'month', features: ['500 operations/mo', '20 materials', 'Stress analysis'] },
-      { tier: 'Professional', price: 149, interval: 'month', features: ['5K operations/mo', 'All analyses', 'OpenSCAD export', 'DFM'], popular: true },
-      { tier: 'Enterprise', price: null, interval: 'month', features: ['Unlimited', 'Custom materials', 'On-premise'], custom: true },
-    ],
-    learnMore: '/echocad', workerHealthy: true,
-  },
-  {
     id: 'voice-ai', name: 'Voice AI & TTS', tagline: 'Voices that sound human, at scale',
     description: 'Custom voice cloning, emotion-aware TTS, real-time voice synthesis for AI agents, IVR systems, and content creation. Sub-200ms latency.',
     icon: '\u25C7', category: 'creative',
@@ -225,17 +180,6 @@ const SERVICES: EcomService[] = [
       { tier: 'Business', price: 600, interval: 'one-time', features: ['Self-employment', 'Schedule C/SE', 'QBI deduction', 'MACRS'] },
     ],
     learnMore: '/tax-returns', workerHealthy: true,
-  },
-  {
-    id: 'website-creation', name: 'Website Creation', tagline: 'AI-built websites, globally deployed',
-    description: 'Full-service website design, development, and deployment. Next.js, auto-adaptive themes, edge-deployed globally with sub-second load times.',
-    icon: '\u25C9', category: 'professional',
-    pricing: [
-      { tier: 'Launch', price: 99, interval: 'month', features: ['1 website', '10 pages', 'Custom domain', 'Mobile responsive'] },
-      { tier: 'Growth', price: 249, interval: 'month', features: ['3 websites', 'Unlimited pages', 'AI builder', 'E-commerce ready'], popular: true },
-      { tier: 'Agency', price: 499, interval: 'month', features: ['Unlimited websites', 'White-label', 'Team collaboration'] },
-    ],
-    learnMore: '/websites', workerHealthy: true,
   },
   // ═══════════════════════════════════════════════════════════════
   // BOTS & AUTOMATION
@@ -295,64 +239,9 @@ const SERVICES: EcomService[] = [
     ],
     learnMore: '/reddit', workerHealthy: true,
   },
-  {
-    id: 'ebay-automation', name: 'eBay Automation', tagline: 'AI-powered listing and selling at scale',
-    description: 'Automated listing creation, price optimization, competitor monitoring, inventory management. AI-generated descriptions and pricing intelligence.',
-    icon: '\uD83D\uDED2', category: 'bots',
-    pricing: [
-      { tier: 'Seller', price: 49, interval: 'month', features: ['100 listings/mo', 'AI descriptions', 'Price monitoring', 'Basic analytics'] },
-      { tier: 'Power Seller', price: 149, interval: 'month', features: ['1K listings/mo', 'Auto-repricing', 'Competitor tracking', 'Bulk upload'], popular: true },
-      { tier: 'Enterprise', price: null, interval: 'month', features: ['Unlimited', 'Multi-store', 'API integration'], custom: true },
-    ],
-    learnMore: '/ebay', workerHealthy: true,
-  },
   // ═══════════════════════════════════════════════════════════════
   // INTELLIGENCE & MONITORING
   // ═══════════════════════════════════════════════════════════════
-  {
-    id: 'dark-web-intel', name: 'Dark Web Intelligence', tagline: 'Know when your data is exposed',
-    description: 'Continuous dark web monitoring, credential breach detection, brand mention tracking, threat intelligence feed. 16 OSINT sources scanned every 10 minutes.',
-    icon: '\uD83D\uDD76', category: 'monitoring', badge: 'Critical',
-    pricing: [
-      { tier: 'Essential', price: 199, interval: 'month', features: ['Brand monitoring', 'Credential alerts', 'Weekly reports', '16 sources'] },
-      { tier: 'Advanced', price: 499, interval: 'month', features: ['Real-time alerts', 'Threat intelligence', 'API feed', 'Telegram/Slack alerts'], popular: true },
-      { tier: 'Enterprise', price: null, interval: 'month', features: ['Custom keywords', 'Incident response', 'SOC integration'], custom: true },
-    ],
-    learnMore: '/dark-web-intel', workerHealthy: true,
-  },
-  {
-    id: 'surveillance-platform', name: 'Surveillance Platform', tagline: 'AI-powered monitoring and alerting',
-    description: 'Multi-source surveillance with AI analysis. Social media monitoring, competitive intelligence, market tracking, anomaly detection.',
-    icon: '\uD83D\uDCE1', category: 'monitoring',
-    pricing: [
-      { tier: 'Basic', price: 199, interval: 'month', features: ['5 targets', 'Daily reports', 'Email alerts', 'Basic analytics'] },
-      { tier: 'Professional', price: 499, interval: 'month', features: ['25 targets', 'Real-time monitoring', 'AI analysis', 'API access'], popular: true },
-      { tier: 'Enterprise', price: null, interval: 'month', features: ['Unlimited targets', 'Custom AI models', 'SLA'], custom: true },
-    ],
-    learnMore: '/surveillance', workerHealthy: true,
-  },
-  {
-    id: 'sec-intel', name: 'SEC Intelligence', tagline: 'AI-powered SEC filing analysis',
-    description: 'Automated SEC EDGAR monitoring, filing analysis, insider trading detection, earnings prediction. 10-K, 10-Q, 8-K, and Schedule 13D tracking.',
-    icon: '\uD83D\uDCC8', category: 'monitoring',
-    pricing: [
-      { tier: 'Investor', price: 99, interval: 'month', features: ['10 companies', '10-K/10-Q alerts', 'Filing summaries', 'Email alerts'] },
-      { tier: 'Analyst', price: 299, interval: 'month', features: ['50 companies', 'All filing types', 'AI analysis', 'Insider tracking', 'API'], popular: true },
-      { tier: 'Institutional', price: null, interval: 'month', features: ['Unlimited', 'Custom alerts', 'Bulk API'], custom: true },
-    ],
-    learnMore: '/sec-intel', workerHealthy: true,
-  },
-  {
-    id: 'news-intelligence', name: 'News Intelligence', tagline: 'AI-curated news from 100+ sources',
-    description: 'Real-time news aggregation, sentiment analysis, topic clustering, trend detection. Custom feeds with AI-generated summaries and alerts.',
-    icon: '\uD83D\uDCF0', category: 'monitoring',
-    pricing: [
-      { tier: 'Personal', price: 29, interval: 'month', features: ['5 topics', '100+ sources', 'Daily digest', 'Email alerts'] },
-      { tier: 'Business', price: 149, interval: 'month', features: ['25 topics', 'Real-time alerts', 'Sentiment analysis', 'API feed'], popular: true },
-      { tier: 'Enterprise', price: null, interval: 'month', features: ['Unlimited', 'Custom sources', 'White-label'], custom: true },
-    ],
-    learnMore: '/news', workerHealthy: true,
-  },
   {
     id: 'price-alerts', name: 'Price & Market Alerts', tagline: 'Never miss a market move',
     description: 'Real-time price monitoring for crypto, stocks, commodities. Custom alert rules, trend detection, portfolio tracking. Supports BTC, ETH, SOL, and 100+ assets.',
@@ -364,31 +253,9 @@ const SERVICES: EcomService[] = [
     ],
     learnMore: '/price-alerts', workerHealthy: true,
   },
-  {
-    id: 'crypto-trading', name: 'Autonomous Crypto Trading', tagline: 'AI trading strategies, zero emotion',
-    description: 'Grid trading, momentum strategies, portfolio rebalancing. Backtested algorithms running 24/7 on Coinbase and Binance. Risk management built in.',
-    icon: '\u20BF', category: 'monitoring',
-    pricing: [
-      { tier: 'Starter', price: 99, interval: 'month', features: ['1 strategy', '$10K portfolio cap', 'Daily reports', 'Paper trading'] },
-      { tier: 'Trader', price: 299, interval: 'month', features: ['5 strategies', '$100K cap', 'Real-time monitoring', 'Multi-exchange'], popular: true },
-      { tier: 'Whale', price: null, interval: 'month', features: ['Unlimited', 'Custom strategies', 'Dedicated infra'], custom: true },
-    ],
-    learnMore: '/crypto-trading', workerHealthy: true,
-  },
   // ═══════════════════════════════════════════════════════════════
   // AI & INTELLIGENCE (additional)
   // ═══════════════════════════════════════════════════════════════
-  {
-    id: 'bree-assistant', name: 'Bree AI Office Assistant', tagline: 'Your warm, capable AI office manager',
-    description: 'AI assistant with southern charm. Email management, scheduling, document drafting, customer follow-ups, data entry. Works 24/7, never complains.',
-    icon: '\uD83D\uDC69\u200D\uD83D\uDCBB', category: 'ai',
-    pricing: [
-      { tier: 'Personal', price: 49, interval: 'month', features: ['Email management', 'Scheduling', 'Task tracking', '1 inbox'] },
-      { tier: 'Business', price: 149, interval: 'month', features: ['5 inboxes', 'Document drafting', 'CRM integration', 'Custom training'], popular: true },
-      { tier: 'Enterprise', price: null, interval: 'month', features: ['Unlimited inboxes', 'White-label', 'API access'], custom: true },
-    ],
-    learnMore: '/bree-assistant', workerHealthy: true,
-  },
   {
     id: 'office-ai', name: 'Office AI Platform', tagline: 'AI-powered office productivity suite',
     description: 'Complete AI office: document generation, meeting transcription, email automation, project management, calendar optimization. Replaces 10 SaaS subscriptions.',
@@ -417,17 +284,6 @@ const SERVICES: EcomService[] = [
   // ═══════════════════════════════════════════════════════════════
   // PROFESSIONAL SERVICES (additional)
   // ═══════════════════════════════════════════════════════════════
-  {
-    id: 'business-manager', name: 'Business Manager', tagline: 'AI command center for your business',
-    description: 'Unified dashboard: financials, inventory, employees, customers, projects, documents. AI-powered insights, forecasting, and automated workflows.',
-    icon: '\uD83D\uDCCB', category: 'professional',
-    pricing: [
-      { tier: 'Starter', price: 99, interval: 'month', features: ['1 business', 'Financial dashboard', 'Invoice generation', 'Basic reports'] },
-      { tier: 'Growth', price: 249, interval: 'month', features: ['3 businesses', 'AI forecasting', 'Employee management', 'Inventory tracking'], popular: true },
-      { tier: 'Enterprise', price: null, interval: 'month', features: ['Unlimited', 'Custom modules', 'API integration'], custom: true },
-    ],
-    learnMore: '/business-manager', workerHealthy: true,
-  },
   {
     id: 'sdk-portal', name: 'SDK & Developer Portal', tagline: 'Build on the ECHO platform',
     description: '17+ API endpoints, OpenAPI documentation, playground, code examples. Access Intelligence Engines, Knowledge Forge, and Shared Brain via REST API.',

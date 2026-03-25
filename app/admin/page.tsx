@@ -336,7 +336,7 @@ export default function AdminPage() {
                           <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>{(u.display_name || u.email || '?')[0].toUpperCase()}</div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate" style={{ color: 'var(--ept-text)' }}>{u.display_name || u.email}</p>
+                          <p className="text-sm font-medium truncate" style={{ color: 'var(--ept-text)' }}>{u.display_name || u.email?.split('@')[0] || u.email}</p>
                           <p className="text-xs truncate" style={{ color: 'var(--ept-text-muted)' }}>{u.email}</p>
                         </div>
                         <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{u.role}</span>
@@ -428,7 +428,7 @@ export default function AdminPage() {
                         <div className="flex items-center gap-2">
                           {u.photo_url ? <img src={u.photo_url} alt="" className="w-7 h-7 rounded-full" /> : <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>{(u.display_name || u.email || '?')[0].toUpperCase()}</div>}
                           <div>
-                            <p className="text-sm font-medium" style={{ color: 'var(--ept-text)' }}>{u.display_name || 'Unknown'}</p>
+                            <p className="text-sm font-medium" style={{ color: 'var(--ept-text)' }}>{u.display_name || u.email?.split('@')[0] || 'Unknown'}</p>
                             <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{u.email}</p>
                           </div>
                         </div>
@@ -548,7 +548,7 @@ Authorization: Bearer <firebase-token>
                     )}
                     <div>
                       <div className="flex items-center gap-2">
-                        <h2 className="text-lg font-extrabold" style={{ color: 'var(--ept-text)' }}>{editUser.user.display_name || 'Unknown'}</h2>
+                        <h2 className="text-lg font-extrabold" style={{ color: 'var(--ept-text)' }}>{editUser.user.display_name || editUser.user.email?.split('@')[0] || 'Unknown'}</h2>
                         {editUser.grants.is_bloodline === 'true' && (
                           <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>BLOODLINE</span>
                         )}
@@ -579,7 +579,7 @@ Authorization: Bearer <firebase-token>
                       type="text"
                       value={editDisplayName}
                       onChange={e => setEditDisplayName(e.target.value)}
-                      placeholder="Full name..."
+                      placeholder={editUser?.user.email ? `Defaults to ${editUser.user.email.split('@')[0]}` : 'Full name...'}
                       className="w-full px-4 py-2.5 rounded-xl border text-sm outline-none"
                       style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
                     />

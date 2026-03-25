@@ -12,9 +12,9 @@ const ANNUAL_DISCOUNT = 0.20; // 20% off annual
 
 const FALLBACK_SERVICES: Service[] = [
   { id: 'ai-closer', name: 'AI Sales Agent', tagline: 'Autonomous voice closer with full CRM', pricing: [
-    { tier: 'Starter', price: 349, interval: 'mo', features: ['1 AI closer agent', '500 calls/mo', 'CRM dashboard', 'Email follow-ups'], popular: false },
-    { tier: 'Growth', price: 599, interval: 'mo', features: ['3 AI closer agents', '2,000 calls/mo', 'Custom scripts', 'Analytics dashboard', 'Priority support'], popular: true },
-    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited agents', 'Unlimited calls', 'White-label', 'Dedicated account manager', 'Custom integrations'], popular: false, custom: true },
+    { tier: 'Starter', price: 299, interval: 'mo', features: ['1 AI closer agent', '500 calls/mo', 'CRM dashboard', 'Branded website', 'Call recordings'], popular: false },
+    { tier: 'Growth', price: 499, interval: 'mo', features: ['3 AI closer agents', '2,000 calls/mo', 'Custom scripts', 'Analytics dashboard', 'Priority support'], popular: true },
+    { tier: 'Enterprise', price: 999, interval: 'mo', features: ['Unlimited agents', 'Unlimited calls', 'White-label', 'Dedicated account manager', 'Custom integrations'], popular: false },
   ] },
   { id: 'engines', name: 'Intelligence Engines', tagline: '5,486+ domain-specific AI engines', pricing: [
     { tier: 'API Access', price: 199, interval: 'mo', features: ['100 queries/day', 'All engine categories', 'REST API', 'JSON responses'], popular: false },
@@ -51,11 +51,6 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Professional', price: 499, interval: 'mo', features: ['Unlimited posts', '14 personalities', 'AI image generation', 'Engagement analytics', 'Thread builder'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Multi-account', 'Custom personalities', 'White-label', 'API access'], popular: false, custom: true },
   ] },
-  { id: 'ebay', name: 'eBay Automation', tagline: 'AI-powered eBay listing, repricing, and inventory management', pricing: [
-    { tier: 'Starter', price: 149, interval: 'mo', features: ['100 listings', 'Auto-repricer', 'Basic analytics', 'Template builder'], popular: false },
-    { tier: 'Professional', price: 399, interval: 'mo', features: ['Unlimited listings', 'AI descriptions', 'Competitor tracking', 'Bulk operations', 'Priority support'], popular: true },
-    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Multi-store', 'Custom integrations', 'Warehouse sync', 'SLA guarantee'], popular: false, custom: true },
-  ] },
   { id: 'linkedin', name: 'LinkedIn AI', tagline: 'AI-powered LinkedIn content, lead generation, and professional networking', pricing: [
     { tier: 'Starter', price: 199, interval: 'mo', features: ['3 posts/week', 'AI content generator', 'Basic analytics', 'Profile optimization'], popular: false },
     { tier: 'Professional', price: 499, interval: 'mo', features: ['Daily posts', 'Lead generation', 'InMail automation', 'Engagement analytics', 'Network mapping'], popular: true },
@@ -71,11 +66,6 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Professional', price: 149, interval: 'mo', features: ['Custom voice cloning', '500,000 characters/mo', 'Streaming TTS', 'STT transcription', '19 emotion tags'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited characters', 'Multi-language', 'White-label API', 'SLA guarantee'], popular: false, custom: true },
   ] },
-  { id: 'websites', name: 'Website Builder', tagline: 'AI-powered Next.js websites with auto-deploy and edge hosting', pricing: [
-    { tier: 'Starter', price: 149, interval: 'mo', features: ['5-page website', 'Day/night themes', 'Mobile responsive', 'SSL + CDN'], popular: false },
-    { tier: 'Professional', price: 399, interval: 'mo', features: ['20+ pages', 'Custom design', 'CMS dashboard', 'Analytics', 'Priority support'], popular: true },
-    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited pages', 'E-commerce', 'API integration', 'SLA guarantee'], popular: false, custom: true },
-  ] },
   { id: 'office-ai', name: 'Echo Office AI', tagline: 'AI phone system + office management + business operations — 22 modules in one platform', pricing: [
     { tier: 'Starter', price: 49, interval: 'mo', features: ['1 business, 5 users', 'AI Phone Answering', 'Voicemail AI + Transcription', 'SMS & Text AI (100/mo)', 'Invoicing & Billing', 'Online Bookings', 'Customer Directory', 'Expense Tracking'], popular: false },
     { tier: 'Professional', price: 149, interval: 'mo', features: ['3 businesses, 25 users', 'Full Conversational AI (8 modules)', 'AI Receptionist + Outbound Calls', 'Sentiment Analysis + Call Scoring', 'Route & Fleet Management', 'Inventory + AR/AP', 'Employee Mgmt + Timesheets', 'Analytics Dashboard'], popular: true },
@@ -86,15 +76,22 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Professional', price: 2999, interval: 'mo', features: ['Weekly scans', '10 domains', 'API testing', 'Remediation guidance', 'Priority support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Continuous testing', 'Red team exercises', 'Compliance reporting', 'SLA guarantee'], popular: false, custom: true },
   ] },
-  { id: 'orchestration', name: 'AI Orchestration', tagline: 'Multi-model AI routing with automatic failover and cost optimization', pricing: [
-    { tier: 'Starter', price: 99, interval: 'mo', features: ['5 AI models', '10K requests/mo', 'Auto-failover', 'Basic analytics'], popular: false },
-    { tier: 'Professional', price: 299, interval: 'mo', features: ['30+ models', '100K requests/mo', 'Cost optimization', 'Custom routing rules', 'API access'], popular: true },
-    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited requests', 'Private models', 'On-prem option', 'SLA guarantee'], popular: false, custom: true },
-  ] },
   { id: 'knowledge', name: 'Knowledge Systems', tagline: 'Enterprise knowledge graphs with semantic search and AI reasoning', pricing: [
     { tier: 'Starter', price: 199, interval: 'mo', features: ['10K documents', 'Semantic search', 'Auto-categorization', 'API access'], popular: false },
     { tier: 'Professional', price: 499, interval: 'mo', features: ['100K documents', 'Knowledge graph', 'Custom embeddings', 'RAG pipeline', 'Priority support'], popular: true },
     { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited documents', 'Private deployment', 'Custom models', 'SLA guarantee'], popular: false, custom: true },
+  ] },
+  { id: 'home-ai', name: 'Echo Home AI', tagline: 'Whole-home intelligence — devices, bills, tutoring, robots, energy', pricing: [
+    { tier: 'Starter', price: 15, interval: 'mo', features: ['20 devices', 'Basic automation', '1 voice line', 'Bill tracking'], popular: false },
+    { tier: 'Family', price: 30, interval: 'mo', features: ['50 devices', 'Homework tutoring (2 kids)', 'Full bill management', 'Robot control', 'Family tasks'], popular: true },
+    { tier: 'Premium', price: 50, interval: 'mo', features: ['100 devices', 'Unlimited tutoring', 'Energy optimization', 'Multi-property (2)', 'Priority support'], popular: false },
+    { tier: 'Estate', price: 100, interval: 'mo', features: ['Unlimited devices', 'Unlimited everything', 'Multi-property', 'Dedicated account manager'], popular: false },
+  ] },
+  { id: 'shepherd', name: 'Echo Shepherd AI', tagline: 'Ministry platform — sermons, CRM, tithing, worship, volunteers', pricing: [
+    { tier: 'Shepherd', price: 49, interval: 'mo', features: ['1 campus', '200 members', 'Sermon builder', 'Basic CRM', 'Scripture engine'], popular: false },
+    { tier: 'Flock', price: 149, interval: 'mo', features: ['1 campus', '500 members', 'Full CRM', 'Worship planning', 'Giving reports', 'Volunteer mgmt'], popular: true },
+    { tier: 'Congregation', price: 349, interval: 'mo', features: ['3 campuses', '2,000 members', 'All features', 'Analytics', 'Small groups'], popular: false },
+    { tier: 'Cathedral', price: 799, interval: 'mo', features: ['Unlimited campuses', 'Unlimited members', 'White-label', 'API access', 'Priority support'], popular: false },
   ] },
 ];
 
@@ -150,7 +147,7 @@ export default function PricingPage() {
     mainEntity: [
       { '@type': 'Question', name: 'Can I switch plans anytime?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Upgrade or downgrade at any time. Changes take effect on your next billing cycle. No lock-in contracts.' } },
       { '@type': 'Question', name: 'Do you offer a free trial?', acceptedAnswer: { '@type': 'Answer', text: 'Many services have free tiers or trial periods. Sentinel AI, Grading, and the Knowledge systems all offer free access to get started.' } },
-      { '@type': 'Question', name: 'What payment methods do you accept?', acceptedAnswer: { '@type': 'Answer', text: 'We accept all major credit cards via Stripe and PayPal. Enterprise clients can request invoicing with NET 30 terms.' } },
+      { '@type': 'Question', name: 'What payment methods do you accept?', acceptedAnswer: { '@type': 'Answer', text: 'We accept PayPal, Venmo, and Pay Later. Enterprise clients can request invoicing with NET 30 terms.' } },
       { '@type': 'Question', name: 'How does the AI engine pricing work?', acceptedAnswer: { '@type': 'Answer', text: 'Engine queries are priced per-use or via monthly subscriptions. Each query hits our doctrine cache first (free, under 200ms), then semantic retrieval, then deep analysis.' } },
       { '@type': 'Question', name: 'Is there a setup fee?', acceptedAnswer: { '@type': 'Answer', text: 'No setup fees for any self-service plan. Enterprise and custom deployments may include onboarding costs depending on scope.' } },
       { '@type': 'Question', name: 'Can I combine multiple services?', acceptedAnswer: { '@type': 'Answer', text: 'Absolutely. Our services are designed to work together. Data Pipelines feed into Title Intelligence, engines power the AI Closer, and Sentinel monitors everything. Contact us for bundle pricing.' } },
@@ -187,7 +184,7 @@ export default function PricingPage() {
             </span>
             <span className="inline-flex items-center gap-1.5 text-xs font-medium" style={{ color: 'var(--ept-text-muted)' }}>
               <svg className="w-4 h-4" style={{ color: 'var(--ept-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-              Stripe &amp; PayPal accepted
+              PayPal &amp; Venmo accepted
             </span>
           </div>
           <div className="mt-4"><ReadAloudButton label="Read pricing" getText={() => {
@@ -380,7 +377,7 @@ export default function PricingPage() {
             {[
               { q: 'Can I switch plans anytime?', a: 'Yes. Upgrade or downgrade at any time. Changes take effect on your next billing cycle. No lock-in contracts.' },
               { q: 'Do you offer a free trial?', a: 'Many services have free tiers or trial periods. Sentinel AI, Grading, and the Knowledge systems all offer free access to get started.' },
-              { q: 'What payment methods do you accept?', a: 'We accept all major credit cards via Stripe and PayPal. Enterprise clients can request invoicing with NET 30 terms.' },
+              { q: 'What payment methods do you accept?', a: 'We accept PayPal, Venmo, and Pay Later options. Enterprise clients can request invoicing with NET 30 terms.' },
               { q: 'Is there a setup fee?', a: 'No setup fees for any self-service plan. Enterprise and custom deployments may include onboarding costs depending on scope.' },
               { q: 'How does the AI engine pricing work?', a: 'Engine queries are priced per-use or via monthly subscriptions. Each query hits our doctrine cache first (free, <200ms), then semantic retrieval, then deep analysis. Most queries resolve at the cache layer.' },
               { q: 'How does annual billing save me money?', a: 'Annual billing gives you 20% off every service. You pay for 12 months upfront at the discounted rate. Switch between monthly and annual using the toggle above to compare pricing.' },

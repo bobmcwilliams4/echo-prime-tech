@@ -9,19 +9,21 @@ import { useTheme } from '../../lib/theme-context';
 import {
   LayoutDashboard, Brain, Briefcase, BarChart3,
   Cpu, ShoppingBag, CreditCard, Settings, ChevronLeft,
-  Shield, Search, BookOpen, Zap,
+  Shield, Search, BookOpen, Zap, Gamepad2, Eye,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
   { href: '/sentinel', label: 'Sentinel AI', icon: Brain },
   { href: '/engines', label: 'Engines', icon: Cpu },
+  { href: '/gamer-companion', label: 'GGI Apex Predator', icon: Gamepad2 },
   { href: '/dashboard/business', label: 'Business Manager', icon: Briefcase },
   { href: '/dashboard/permian-pulse', label: 'Permian Pulse', icon: BarChart3, ownerOnly: true },
   { href: '/services', label: 'Services', icon: ShoppingBag },
   { href: '/sdk', label: 'SDK', icon: Zap },
   { href: '/knowledge', label: 'Knowledge', icon: BookOpen },
   { href: '/security', label: 'Security', icon: Shield },
+  { href: '/surveillance', label: 'Surveillance', icon: Eye, ownerOnly: true },
   { href: '/scanner', label: 'Scanner', icon: Search },
   { href: '/pricing', label: 'Pricing', icon: CreditCard },
   { href: '/settings', label: 'Settings', icon: Settings },

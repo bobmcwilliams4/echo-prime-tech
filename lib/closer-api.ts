@@ -50,7 +50,11 @@ export const updateCampaign = (id: string, data: any) => closerFetch(`/campaigns
 export const deleteCampaign = (id: string) => closerFetch(`/campaigns/${id}`, { method: 'DELETE' });
 export const assignLeadsToCampaign = (campaignId: string, leadIds: string[]) => closerFetch(`/campaigns/${campaignId}/leads`, { method: 'POST', body: JSON.stringify({ lead_ids: leadIds }) });
 export const getCampaignLeads = (campaignId: string) => closerFetch(`/campaigns/${campaignId}/leads`);
+export const dialNextLead = (campaignId: string) => closerFetch(`/campaigns/${campaignId}/dial-next`, { method: 'POST' });
 export const getLeadCategories = () => closerFetch('/leads/categories');
+export const renameLeadCategory = (old_name: string, new_name: string) => closerFetch('/leads/categories/rename', { method: 'POST', body: JSON.stringify({ old_name, new_name }) });
+export const deleteLeadCategory = (name: string) => closerFetch('/leads/categories/delete', { method: 'POST', body: JSON.stringify({ name }) });
+export const moveLeadsToCategory = (lead_ids: string[], category: string | null) => closerFetch('/leads/categories/move', { method: 'POST', body: JSON.stringify({ lead_ids, category }) });
 
 // --- Scripts ---
 export const getScripts = () => closerFetch('/scripts');

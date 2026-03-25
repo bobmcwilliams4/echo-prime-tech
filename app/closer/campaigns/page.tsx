@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../../lib/auth-context';
-import { getCampaigns, createCampaign, updateCampaign, deleteCampaign, getScripts, getLeads, assignLeadsToCampaign, getLeadCategories } from '../../../lib/closer-api';
+import { getCampaigns, createCampaign, updateCampaign, deleteCampaign, getScripts, getLeads, assignLeadsToCampaign, getLeadCategories, dialNextLead } from '../../../lib/closer-api';
 
 /* ──────────────────── Types ──────────────────── */
 
@@ -332,14 +332,24 @@ function CampaignCard({
           </button>
         )}
         {campaign.status === 'active' && (
-          <button
-            onClick={() => onAction(campaign.id, 'pause')}
-            disabled={isLoading}
-            className="flex-1 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-            style={{ backgroundColor: '#f59e0b' }}
-          >
-            {isLoading ? 'Pausing...' : 'Pause'}
-          </button>
+          <>
+            <button
+              onClick={() => onAction(campaign.id, 'dial_next')}
+              disabled={isLoading}
+              className="flex-1 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{ backgroundColor: '#3b82f6' }}
+            >
+              {isLoading ? 'Dialing...' : 'Dial Next'}
+            </button>
+            <button
+              onClick={() => onAction(campaign.id, 'pause')}
+              disabled={isLoading}
+              className="flex-1 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{ backgroundColor: '#f59e0b' }}
+            >
+              {isLoading ? 'Pausing...' : 'Pause'}
+            </button>
+          </>
         )}
         {campaign.status === 'paused' && (
           <button
@@ -401,7 +411,22 @@ interface FormState {
   schedule_start: string;
   schedule_end: string;
   schedule_days: string[];
+  voice_preset: string;
+  greeting: string;
 }
+
+const VOICE_PRESETS = [
+  { id: '', label: 'Default (ConvAI Agent)' },
+  { id: 'bree', label: 'Bree - Humor & Charm Sales Agent' },
+  { id: 'prof_male', label: 'Echo - Professional Male' },
+  { id: 'prof_female', label: 'Alice - Professional Female' },
+  { id: 'warm_male', label: 'Bobby - Warm Male' },
+  { id: 'warm_female', label: 'Jessica - Warm Female' },
+  { id: 'energy_male', label: 'Prometheus - Energetic Male' },
+  { id: 'energy_female', label: 'Laura - Energetic Female' },
+  { id: 'calm_male', label: 'Echo - Calm Male' },
+  { id: 'calm_female', label: 'Catherine - Calm Female' },
+];
 
 const INITIAL_FORM: FormState = {
   name: '',
@@ -412,6 +437,8 @@ const INITIAL_FORM: FormState = {
   schedule_start: '09:00',
   schedule_end: '17:00',
   schedule_days: ['mon', 'tue', 'wed', 'thu', 'fri'],
+  voice_preset: '',
+  greeting: '',
 };
 
 function NewCampaignForm({
@@ -525,7 +552,47 @@ function NewCampaignForm({
           </div>
         </div>
 
-        {/* Row 2: Campaign Type */}
+        {/* Row 2: Voice Preset + Greeting */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ept-text-muted)' }}>
+              Voice / Agent
+            </label>
+            <select
+              value={form.voice_preset}
+              onChange={(e) => updateField('voice_preset', e.target.value)}
+              className="w-full px-3 py-2.5 rounded-lg border text-sm outline-none transition-colors appearance-none cursor-pointer"
+              style={{
+                backgroundColor: 'var(--ept-surface)',
+                borderColor: 'var(--ept-border)',
+                color: form.voice_preset ? 'var(--ept-text)' : 'var(--ept-text-muted)',
+              }}
+            >
+              {VOICE_PRESETS.map((v) => (
+                <option key={v.id} value={v.id}>{v.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ept-text-muted)' }}>
+              Custom Greeting
+            </label>
+            <input
+              type="text"
+              value={form.greeting}
+              onChange={(e) => updateField('greeting', e.target.value)}
+              placeholder="e.g. Hi, this is Sarah from Echo Prime..."
+              className="w-full px-3 py-2.5 rounded-lg border text-sm outline-none transition-colors"
+              style={{
+                backgroundColor: 'var(--ept-surface)',
+                borderColor: 'var(--ept-border)',
+                color: 'var(--ept-text)',
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Row 3: Campaign Type */}
         <div>
           <label className="block text-xs font-medium mb-2" style={{ color: 'var(--ept-text-muted)' }}>
             Campaign Type
@@ -802,6 +869,8 @@ export default function CampaignsPage() {
         schedule_start: formData.schedule_start,
         schedule_end: formData.schedule_end,
         schedule_days: formData.schedule_days,
+        voice_preset: formData.voice_preset || null,
+        greeting: formData.greeting || null,
       });
       setShowForm(false);
       await loadCampaigns();
@@ -886,6 +955,8 @@ export default function CampaignsPage() {
         schedule_start: formData.schedule_start,
         schedule_end: formData.schedule_end,
         schedule_days: formData.schedule_days,
+        voice_preset: formData.voice_preset || null,
+        greeting: formData.greeting || null,
       });
       setEditingCampaignId(null);
       setShowForm(false);
@@ -927,6 +998,21 @@ export default function CampaignsPage() {
     }
     if (action === 'assign_leads') {
       openAssignLeads(campaignId);
+      return;
+    }
+    if (action === 'dial_next') {
+      setActionLoading(campaignId);
+      try {
+        const result = await dialNextLead(campaignId) as any;
+        if (result.error && !result.success) {
+          setError(result.error);
+        }
+        await loadCampaigns();
+      } catch (err: any) {
+        setError(err.message || 'Failed to dial next lead');
+      } finally {
+        setActionLoading(null);
+      }
       return;
     }
 
@@ -1020,6 +1106,8 @@ export default function CampaignsPage() {
                 : typeof c.schedule_days === 'string'
                   ? JSON.parse(c.schedule_days)
                   : ['mon', 'tue', 'wed', 'thu', 'fri'],
+              voice_preset: (c as any).voice_preset || '',
+              greeting: (c as any).greeting || '',
             } as FormState;
           })() : undefined}
         />

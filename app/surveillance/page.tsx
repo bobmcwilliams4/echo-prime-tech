@@ -1,458 +1,355 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
-import ReadAloudButton from '../../components/ReadAloudButton';
-import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import { useAuth } from '../../lib/auth-context';
 
-const SERVICE_ID = 'surveillance';
+/* ==============================================================================
+   ECHO PROMETHEUS SURVEILLANCE — AI-Powered Intelligence & Monitoring
+   Product page: hero, modules, features, comparison, pricing, FAQ
+   Backend: echo-prometheus-surveillance.bmcii1976.workers.dev
+   ============================================================================== */
 
-/* ================================================================
-   FEATURE CARDS — 8 location intelligence capabilities
-   ================================================================ */
-const FEATURES = [
-  {
-    icon: (
-      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-      </svg>
-    ),
-    title: 'GPS Fleet Tracking',
-    desc: 'Real-time GPS tracking for vehicles, equipment, and mobile assets. Sub-meter accuracy using multi-constellation GNSS (GPS, GLONASS, Galileo, BeiDou). Track speed, heading, altitude, and status across unlimited assets with configurable reporting intervals from 1-second to hourly. Historical breadcrumb trails, trip replay, mileage calculations, idle time detection, and driver behavior scoring included.',
-    sources: ['Multi-GNSS', 'Sub-Meter Accuracy', 'Speed/Heading', 'Trip Replay', 'Idle Detection', 'Driver Scoring'],
-  },
-  {
-    icon: (
-      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" />
-      </svg>
-    ),
-    title: 'Cell Tower Analysis',
-    desc: 'Cell tower triangulation and network analysis for location intelligence. Map cell tower infrastructure, analyze signal propagation patterns, identify coverage gaps, and correlate device presence with tower connection logs. Supports historical cell tower data analysis for movement pattern reconstruction. Integration with carrier APIs for authorized law enforcement and corporate security investigations.',
-    sources: ['Triangulation', 'Signal Analysis', 'Coverage Mapping', 'Connection Logs', 'Pattern Reconstruction', 'Carrier Integration'],
-  },
-  {
-    icon: (
-      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-      </svg>
-    ),
-    title: 'IP Geolocation',
-    desc: 'High-accuracy IP geolocation with city-level precision and ISP identification. Resolve IP addresses to physical locations using proprietary databases updated daily from BGP routing tables, Wi-Fi positioning data, and ground-truth validation. Detect VPN, proxy, and Tor usage. Identify hosting providers, ASN ownership, and network topology. Batch processing for large-scale IP analysis with sub-second response times.',
-    sources: ['City-Level Accuracy', 'ISP Identification', 'VPN Detection', 'Proxy Detection', 'ASN Lookup', 'Batch Processing'],
-  },
-  {
-    icon: (
-      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
-      </svg>
-    ),
-    title: 'Carrier Intelligence',
-    desc: 'Mobile carrier network intelligence for authorized investigations. Identify carrier associations, device types, number portability history, and roaming patterns. Cross-reference phone numbers with known databases for ownership verification. Supports HLR (Home Location Register) lookups, number validation, and carrier routing analysis. All carrier intelligence operations require proper legal authorization.',
-    sources: ['HLR Lookups', 'Number Validation', 'Carrier ID', 'Port History', 'Roaming Patterns', 'Device Type'],
-  },
-  {
-    icon: (
-      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-      </svg>
-    ),
-    title: 'Physical Surveillance Coordination',
-    desc: 'Team coordination platform for physical surveillance operations. Real-time operative positioning on shared maps, encrypted team communications, target tracking with handoff protocols, observation logging with timestamps and GPS coordinates, and evidence chain-of-custody management. Supports multi-team operations with role-based access and compartmentalized intelligence sharing.',
-    sources: ['Team Mapping', 'Encrypted Comms', 'Target Tracking', 'Handoff Protocols', 'Evidence Management', 'Role-Based Access'],
-  },
-  {
-    icon: (
-      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
-      </svg>
-    ),
-    title: 'Geofence Alerts',
-    desc: 'Define custom geographic boundaries (circles, polygons, or corridors) and receive instant alerts when tracked assets enter, exit, or dwell within zones. Configurable dwell time thresholds, multi-zone rule engines, and time-based scheduling for geofence activation/deactivation. Supports nested geofences, exclusion zones, and speed-triggered alerts within defined corridors. Unlimited geofences per account.',
-    sources: ['Custom Polygons', 'Entry/Exit Alerts', 'Dwell Time', 'Speed Triggers', 'Nested Zones', 'Time Scheduling'],
-  },
-  {
-    icon: (
-      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605" />
-      </svg>
-    ),
-    title: 'Route Analysis',
-    desc: 'Reconstruct and analyze movement patterns from historical tracking data. Identify routine routes, habitual stops, deviation patterns, and time-of-day behaviors. AI-powered anomaly detection flags unusual route changes, unexpected stops, and pattern breaks. Generate heat maps showing frequency of visits to specific locations, corridor analysis for fleet optimization, and predictive modeling for future movements.',
-    sources: ['Pattern Detection', 'Route Reconstruction', 'Anomaly Flags', 'Heat Maps', 'Corridor Analysis', 'Predictive Models'],
-  },
-  {
-    icon: (
-      <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-      </svg>
-    ),
-    title: 'Real-Time Dashboard',
-    desc: 'Unified command-and-control dashboard displaying all tracked assets, geofence status, active alerts, team positions, and intelligence feeds on a single interactive map. Multi-layer map view with satellite imagery, street maps, terrain, and custom overlays. Supports picture-in-picture for multiple simultaneous views, timeline scrubbing for historical playback, and full-screen command center mode for operations rooms.',
-    sources: ['Interactive Map', 'Multi-Layer View', 'Satellite Imagery', 'Timeline Scrub', 'Command Center', 'Live Feed'],
-  },
+const MODULES = [
+  { id: 'gps', title: 'GPS Fleet Tracking', status: 'active', desc: 'Real-time GPS device tracking with historical playback, predictive movement analysis, and multi-device fleet management.', icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z' },
+  { id: 'cell', title: 'Cell Tower Intelligence', status: 'active', desc: 'Cell tower triangulation via OpenCelliD, Google, BeaconDB, and Mylnikov. Carrier-level location intel via Twilio Lookup.', icon: 'M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.858 15.355-5.858 21.213 0' },
+  { id: 'intercept', title: 'Active Intercept', status: 'active', desc: 'Packet capture coordination, MITM proxy management, WiFi monitoring (aircrack-ng), DNS interception, SSL/TLS inspection routing.', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
+  { id: 'camera', title: 'Camera Integration', status: 'active', desc: 'IP camera RTSP integration via ONVIF protocol. License plate recognition (ALPR) and facial recognition routing.', icon: 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
+  { id: 'ip', title: 'IP Intelligence', status: 'active', desc: 'IP geolocation (3 free providers), threat intelligence (proxy/tor/bot/attacker/spam detection), bulk lookup (100/req), geo-search.', icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9' },
+  { id: 'phys', title: 'Physical Surveillance', status: 'active', desc: 'Geofencing with real-time alerts, SIM swap detection, CDR pattern analysis, SS7/Diameter protocol analysis.', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' },
 ];
 
-/* ================================================================
-   HOW IT WORKS — 4-step process
-   ================================================================ */
-const HOW_IT_WORKS = [
-  {
-    step: '01',
-    title: 'Deploy Assets',
-    desc: 'Install GPS trackers on vehicles and equipment, configure mobile device tracking, set up IP monitoring rules, and define your area of operations. Our onboarding team helps configure optimal reporting intervals and alert thresholds for your specific use case.',
-  },
-  {
-    step: '02',
-    title: 'Monitor',
-    desc: 'All tracked assets appear on your real-time dashboard with live position updates, speed, heading, and status. Geofence alerts fire automatically when assets enter or exit defined zones. Team coordination tools keep operatives synchronized.',
-  },
-  {
-    step: '03',
-    title: 'Analyze',
-    desc: 'AI analyzes movement patterns, identifies anomalies, and generates intelligence reports. Route analysis reveals habitual behaviors, heat maps show frequency patterns, and predictive models forecast future movements based on historical data.',
-  },
-  {
-    step: '04',
-    title: 'Act',
-    desc: 'Use actionable intelligence to make decisions. Export reports for legal proceedings, share intelligence with authorized teams, and coordinate response operations through encrypted channels. Full audit trail for compliance and chain-of-custody requirements.',
-  },
+const CAPABILITIES = [
+  'Real-time GPS device tracking',
+  'Cell tower triangulation (4 providers)',
+  'Carrier-level location intelligence',
+  'SS7/Diameter protocol analysis',
+  'SIM swap detection',
+  'CDR pattern analysis',
+  'IP camera RTSP integration (ONVIF)',
+  'License plate recognition (ALPR)',
+  'Facial recognition routing',
+  'Geofencing with real-time alerts',
+  'Packet capture coordination',
+  'MITM proxy management',
+  'WiFi monitoring (aircrack-ng)',
+  'DNS interception',
+  'SSL/TLS inspection routing',
+  'Multi-device fleet tracking',
+  'Historical location playback',
+  'Predictive movement analysis',
+  'IP geolocation (3 free providers)',
+  'IP threat intelligence',
+  'Bulk IP lookup (up to 100/req)',
+  'IP threat feed tracking',
+  'IP geo-search by area',
 ];
 
-/* ================================================================
-   STATS
-   ================================================================ */
-const STATS = [
-  { value: 'Sub-Meter', label: 'GPS Accuracy' },
-  { value: '<1s', label: 'Position Update' },
-  { value: '4', label: 'GNSS Constellations' },
-  { value: '24/7', label: 'Live Monitoring' },
-  { value: 'AES-256', label: 'Encryption' },
-  { value: 'Unlimited', label: 'Geofences' },
+const COMPARISON = [
+  { feature: 'GPS fleet tracking', echo: true, maltego: false, palantir: true, splunk: false },
+  { feature: 'Cell tower triangulation', echo: true, maltego: false, palantir: true, splunk: false },
+  { feature: 'IP threat intelligence', echo: true, maltego: true, palantir: true, splunk: true },
+  { feature: 'ONVIF camera integration', echo: true, maltego: false, palantir: 'Partial', splunk: false },
+  { feature: 'License plate recognition', echo: true, maltego: false, palantir: true, splunk: false },
+  { feature: 'Packet capture / MITM', echo: true, maltego: false, palantir: false, splunk: 'Partial' },
+  { feature: 'WiFi monitoring', echo: true, maltego: false, palantir: false, splunk: false },
+  { feature: 'Geofencing alerts', echo: true, maltego: false, palantir: true, splunk: false },
+  { feature: 'SIM swap detection', echo: true, maltego: false, palantir: false, splunk: false },
+  { feature: 'Predictive movement', echo: true, maltego: false, palantir: true, splunk: false },
+  { feature: 'No per-seat licensing', echo: true, maltego: false, palantir: false, splunk: false },
 ];
 
-/* ================================================================
-   PRICING TIERS
-   ================================================================ */
 const PRICING = [
-  {
-    tier: 'Standard',
-    price: 499,
-    interval: 'mo',
-    popular: false,
-    custom: false,
-    features: [
-      'Up to 25 tracked assets',
-      'Real-time GPS tracking',
-      'Geofence alerts (50 zones)',
-      'IP geolocation lookups (1,000/mo)',
-      'Basic route analysis',
-      'Email + Telegram alerts',
-      'Dashboard access',
-      '90-day data retention',
-    ],
-  },
-  {
-    tier: 'Professional',
-    price: 999,
-    interval: 'mo',
-    popular: true,
-    custom: false,
-    features: [
-      'Up to 100 tracked assets',
-      'Sub-second position updates',
-      'Unlimited geofences',
-      'Cell tower analysis',
-      'AI route anomaly detection',
-      'Team coordination platform',
-      'Encrypted communications',
-      'Evidence management system',
-      'API access (REST + WebSocket)',
-      'Multi-channel alerts',
-      '1-year data retention',
-    ],
-  },
-  {
-    tier: 'Enterprise',
-    price: null,
-    interval: null,
-    popular: false,
-    custom: true,
-    features: [
-      'Unlimited tracked assets',
-      'Carrier intelligence (HLR)',
-      'Custom GNSS configurations',
-      'Multi-team operations',
-      'Compartmentalized intel sharing',
-      'On-prem deployment option',
-      'Dedicated operations support',
-      'Custom integrations',
-      'SLA with guaranteed uptime',
-      'Compliance & audit packages',
-      'White-label option',
-      'Unlimited data retention',
-    ],
-  },
+  { tier: 'Recon', price: 99, features: ['5 tracked devices', 'IP intelligence (1K lookups/mo)', 'Geofencing (10 zones)', 'Cell tower lookups (500/mo)', 'Email alerts', '7-day history'], cta: 'Start Free Trial', href: '/checkout?service=surveillance&tier=recon', popular: false },
+  { tier: 'Operator', price: 299, features: ['25 tracked devices', 'IP intelligence (10K lookups/mo)', 'Geofencing (unlimited)', 'Cell tower (5K/mo)', 'Camera integration (10 feeds)', 'ALPR + facial routing', '90-day history', 'API access'], cta: 'Start Free Trial', href: '/checkout?service=surveillance&tier=operator', popular: true },
+  { tier: 'Command', price: 799, features: ['Unlimited devices', 'Unlimited IP lookups', 'Full intercept suite', 'Unlimited cameras', 'Predictive analytics', 'SS7/Diameter analysis', '1-year history', 'Dedicated support', 'Custom integrations'], cta: 'Contact Sales', href: 'mailto:bob@echo-op.com?subject=Prometheus%20Command%20Tier', popular: false },
 ];
 
-/* ================================================================
-   PAGE COMPONENT
-   ================================================================ */
-export default function SurveillancePage() {
-  const { user } = useAuth();
-  const { isDark } = useTheme();
-  const [expandedFeature, setExpandedFeature] = useState<number | null>(null);
+const FAQS = [
+  { q: 'Who is this for?', a: 'Prometheus Surveillance is built for licensed private investigators, corporate security teams, law enforcement agencies, and enterprise security operations. All use must comply with applicable laws and regulations. We provide the tools — you provide the legal authority.' },
+  { q: 'Is this legal?', a: 'The platform provides intelligence tools. Legality depends on your jurisdiction and authorization. GPS tracking of assets you own, monitoring your own network, and querying public IP data are generally lawful. Intercepting communications or tracking individuals without consent may require legal authority. Consult your legal team.' },
+  { q: 'How does cell tower triangulation work?', a: 'We query 4 cell tower databases (OpenCelliD, Google Geolocation, BeaconDB, Mylnikov) to estimate device location based on visible cell towers. Accuracy ranges from 50m in urban areas to 2km in rural areas. Carrier-level lookups via Twilio provide additional precision.' },
+  { q: 'What cameras are supported?', a: 'Any ONVIF-compatible IP camera. This includes most commercial brands: Hikvision, Dahua, Axis, Reolink, Amcrest, and hundreds more. We connect via RTSP streams and support PTZ control, motion detection events, and snapshot capture.' },
+  { q: 'How does IP threat intelligence work?', a: 'We aggregate data from 3 free geolocation providers (ip-api, ipwhois, ipapi) and maintain a threat feed tracking proxies, Tor exit nodes, known botnets, attackers, and spam sources. Bulk lookups process up to 100 IPs per request. Geo-search finds all tracked IPs within a geographic radius.' },
+  { q: 'Can I self-host?', a: 'The platform runs on Cloudflare Workers with D1 database storage. Enterprise customers can deploy to their own Cloudflare account for full data sovereignty. Contact sales for self-hosted deployment.' },
+];
 
-  const handleCheckout = (tierIndex: number) => {
-    const tier = PRICING[tierIndex];
-    if (tier.custom) {
-      window.location.href = 'mailto:bob@echo-op.com?subject=Surveillance%20Platform%20-%20Enterprise%20Inquiry';
-      return;
-    }
-    if (!user) {
-      window.location.href = `/signup?redirect=/checkout?service=${SERVICE_ID}&tier=${tier.tier.toLowerCase()}`;
-      return;
-    }
-    window.location.href = `/checkout?service=${SERVICE_ID}&tier=${tier.tier.toLowerCase()}`;
-  };
+const USE_CASES = [
+  { title: 'Corporate Security', desc: 'Monitor company assets, track fleet vehicles, detect unauthorized network access, and protect executive travel routes.', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
+  { title: 'Private Investigation', desc: 'GPS tracking, cell tower analysis, historical location playback, and predictive movement patterns for authorized investigations.', icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' },
+  { title: 'Law Enforcement', desc: 'Real-time surveillance coordination, ALPR integration, facial recognition routing, geofencing, and evidence-grade audit trails.', icon: 'M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3' },
+  { title: 'Network Security', desc: 'IP threat detection, packet capture analysis, DNS monitoring, WiFi security auditing, and SSL/TLS inspection for SOC teams.', icon: 'M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z' },
+];
+
+function ComparisonCell({ value }: { value: boolean | string }) {
+  if (value === true) return <span style={{ color: 'var(--ept-accent)' }} className="font-bold">Yes</span>;
+  if (value === false) return <span style={{ color: 'var(--ept-text-muted)' }}>No</span>;
+  return <span style={{ color: 'var(--ept-text-secondary)' }}>{value}</span>;
+}
+
+interface HealthData {
+  status: string;
+  modules: Record<string, string>;
+  stats: Record<string, number>;
+}
+
+export default function SurveillancePage() {
+  const { isDark } = useTheme();
+  const { user } = useAuth();
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [health, setHealth] = useState<HealthData | null>(null);
+
+  useEffect(() => {
+    fetch('https://echo-prometheus-surveillance.bmcii1976.workers.dev/health')
+      .then(r => r.json())
+      .then((d: HealthData) => setHealth(d))
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
-      {/* --- Nav --- */}
+      {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">
-          <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority />
+          <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority />
         </Link>
-        <div className="flex items-center gap-3">
-          <Link href="/security" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Cyber Defense</Link>
-          <Link href="/dark-web-intel" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Dark Web Intel</Link>
-          <Link href="/pricing" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Pricing</Link>
-          {user ? (
-            <Link href="/dashboard" className="text-sm font-semibold px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Dashboard</Link>
-          ) : (
-            <Link href="/login" className="text-sm font-semibold px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started</Link>
-          )}
+        <div className="flex items-center gap-4">
+          <Link href="/security" className="text-sm font-medium hidden sm:block" style={{ color: 'var(--ept-text-secondary)' }}>Cyber Defense</Link>
+          <Link href="/pricing" className="text-sm font-medium hidden sm:block" style={{ color: 'var(--ept-text-secondary)' }}>Pricing</Link>
+          <Link href="/checkout?service=surveillance&tier=recon" className="px-5 py-2.5 rounded-xl text-sm font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Trial</Link>
         </div>
       </nav>
 
-      {/* --- Hero --- */}
+      {/* Hero */}
       <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-6 border" style={{ borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)', backgroundColor: 'var(--ept-accent-glow)' }}>
-          <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#f59e0b' }} /> Location Intelligence &bull; Fleet Tracking &bull; Geofence Alerts
+        <div className="inline-block px-4 py-1.5 rounded-full text-xs font-bold mb-6 animate-fade-up" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>
+          CODENAME: ARGUS PANOPTES
         </div>
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1]" style={{ color: 'var(--ept-text)' }}>
-          Location Intelligence<br />
-          Platform<br />
-          <span className="gradient-text">Multi-Modal Tracking.</span>
-        </h1>
-        <p className="mt-6 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
-          Multi-modal surveillance and tracking with <strong>sub-meter GPS accuracy</strong>, cell tower analysis, IP geolocation, geofence alerting, AI-powered route analysis, and real-time command-and-control dashboards &mdash; built for fleet management, corporate security, and authorized investigations.
+        <h1 className="text-4xl md:text-6xl font-extrabold leading-tight gradient-text animate-fade-up">Prometheus Surveillance</h1>
+        <p className="text-xl md:text-2xl font-semibold mt-4 animate-fade-up-delay-1" style={{ color: 'var(--ept-text)' }}>AI-Powered Intelligence & Physical Monitoring</p>
+        <p className="text-lg mt-6 max-w-2xl mx-auto animate-fade-up-delay-2" style={{ color: 'var(--ept-text-secondary)' }}>
+          GPS tracking, cell tower triangulation, IP intelligence, camera integration, network interception, and predictive analytics — all in one platform on the edge.
         </p>
-        <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
-          <Link href={user ? '/dashboard' : `/signup?redirect=/checkout?service=${SERVICE_ID}&tier=standard`} className="px-8 py-3.5 rounded-xl font-semibold text-sm shadow-lg transition-transform hover:scale-105" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
-            Deploy Location Intelligence
-          </Link>
-          <Link href="/security" className="px-8 py-3.5 rounded-xl font-semibold text-sm border transition-all hover:shadow-md" style={{ borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)' }}>
-            Need Full Cyber Defense?
-          </Link>
+        <div className="flex flex-wrap justify-center gap-4 mt-10 animate-fade-up-delay-3">
+          <Link href="/checkout?service=surveillance&tier=operator" className="px-8 py-4 rounded-xl text-base font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
+          <Link href="#modules" className="px-8 py-4 rounded-xl text-base font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>View Modules</Link>
         </div>
-        <div className="mt-4">
-          <ReadAloudButton label="Read page" getText={() => document.querySelector('main, .max-w-5xl')?.textContent?.trim().slice(0, 3000) || ''} />
-        </div>
-      </section>
-
-      {/* --- Stats Grid --- */}
-      <section className="max-w-6xl mx-auto px-6 pb-16">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {STATS.map((s, i) => (
-            <div key={i} className="text-center p-4 rounded-xl border backdrop-blur-sm" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-              <div className="text-2xl md:text-3xl font-extrabold font-mono gradient-text">{s.value}</div>
-              <div className="text-[11px] mt-1 uppercase tracking-wide font-medium" style={{ color: 'var(--ept-text-muted)' }}>{s.label}</div>
-            </div>
-          ))}
+        <div className="flex flex-wrap justify-center gap-8 mt-12" style={{ color: 'var(--ept-text-muted)' }}>
+          <span className="text-sm">6 Active Modules</span>
+          <span className="text-sm">23 Capabilities</span>
+          <span className="text-sm">Cloudflare Edge</span>
+          <span className="text-sm">Zero Idle Cost</span>
         </div>
       </section>
 
-      {/* --- Feature Grid (expandable) --- */}
-      <section className="max-w-7xl mx-auto px-6 pb-20">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold" style={{ color: 'var(--ept-text)' }}>8 Intelligence Layers</h2>
-          <p className="mt-3 text-sm max-w-2xl mx-auto" style={{ color: 'var(--ept-text-muted)' }}>
-            From GPS coordinates to actionable location intelligence &mdash; each layer operates independently and feeds into a unified surveillance platform.
-          </p>
-        </div>
-        <div className="grid md:grid-cols-4 gap-4">
-          {FEATURES.map((f, i) => {
-            const isExpanded = expandedFeature === i;
-            return (
-              <button key={i} onClick={() => setExpandedFeature(isExpanded ? null : i)} className="text-left p-5 rounded-2xl border transition-all hover:shadow-lg" style={{
-                backgroundColor: 'var(--ept-card-bg)',
-                borderColor: isExpanded ? 'var(--ept-accent)' : 'var(--ept-card-border)',
-                boxShadow: isExpanded ? '0 0 25px var(--ept-accent-glow)' : undefined,
-                gridColumn: isExpanded ? 'span 2' : undefined,
-                gridRow: isExpanded ? 'span 2' : undefined,
-              }}>
-                <div className="text-2xl mb-3" style={{ color: 'var(--ept-accent)' }}>{f.icon}</div>
-                <h3 className="text-sm font-bold mb-1.5" style={{ color: 'var(--ept-text)' }}>{f.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>
-                  {isExpanded ? f.desc : f.desc.slice(0, 120) + '...'}
-                </p>
-                {isExpanded && (
-                  <div className="mt-4">
-                    <div className="text-[10px] uppercase tracking-wide font-bold mb-1.5" style={{ color: 'var(--ept-accent)' }}>Sources &amp; Methods</div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {f.sources.map((s, j) => (
-                        <span key={j} className="px-2 py-0.5 rounded text-[10px] font-mono" style={{ backgroundColor: 'var(--ept-accent-glow)', color: 'var(--ept-text-secondary)' }}>{s}</span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                <div className="mt-2 text-[10px] font-medium" style={{ color: 'var(--ept-accent)' }}>{isExpanded ? 'Click to collapse' : 'Click for details'}</div>
-              </button>
-            );
-          })}
-        </div>
-      </section>
+      {/* Live Status */}
+      {health && (
+        <section className="max-w-4xl mx-auto px-6 pb-8">
+          <div className="p-4 rounded-xl border flex flex-wrap items-center justify-center gap-6 text-xs" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <span className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: health.status === 'healthy' ? '#10b981' : '#ef4444' }} />
+              <span style={{ color: 'var(--ept-text)' }}>System: {health.status === 'healthy' ? 'Operational' : health.status}</span>
+            </span>
+            {Object.entries(health.modules).map(([mod, status]) => (
+              <span key={mod} className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: status === 'active' ? '#10b981' : '#f59e0b' }} />
+                <span style={{ color: 'var(--ept-text-muted)' }}>{mod.replace(/_/g, ' ')}</span>
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* --- How It Works --- */}
-      <section className="max-w-4xl mx-auto px-6 pb-20">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>How It Works</h2>
-        <div className="space-y-6">
-          {HOW_IT_WORKS.map((s, i) => (
-            <div key={i} className="flex gap-6 items-start p-5 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-              <div className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center font-mono font-bold text-lg" style={{ backgroundColor: 'var(--ept-accent-glow)', color: 'var(--ept-accent)' }}>{s.step}</div>
-              <div>
-                <h3 className="text-lg font-bold mb-1" style={{ color: 'var(--ept-text)' }}>{s.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>{s.desc}</p>
+      {/* Modules */}
+      <section id="modules" className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>6 Intelligence Modules</h2>
+        <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>Each module operates independently. Activate what you need.</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {MODULES.map((m, i) => (
+            <div key={i} className="p-6 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="flex items-center gap-3 mb-3">
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} style={{ color: 'var(--ept-accent)' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d={m.icon} />
+                </svg>
+                <h3 className="font-bold text-sm" style={{ color: 'var(--ept-text)' }}>{m.title}</h3>
+                <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: 'rgba(16,185,129,0.15)', color: '#10b981' }}>{m.status}</span>
               </div>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>{m.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* --- Pricing --- */}
-      <section className="max-w-5xl mx-auto px-6 pb-20">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Pricing</h2>
-        <p className="text-center text-sm mb-12" style={{ color: 'var(--ept-text-muted)' }}>Location intelligence scaled to your operational needs</p>
-        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          {PRICING.map((tier, i) => (
-            <div key={i} className="relative p-8 rounded-2xl border transition-all" style={{
-              backgroundColor: 'var(--ept-card-bg)',
-              borderColor: tier.popular ? 'var(--ept-accent)' : 'var(--ept-card-border)',
-              boxShadow: tier.popular ? '0 0 40px var(--ept-accent-glow)' : 'none',
-            }}>
-              {tier.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Most Popular</div>
+      {/* Full Capability List */}
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>23 Capabilities</h2>
+        <p className="text-center mb-10" style={{ color: 'var(--ept-text-secondary)' }}>Every capability from the Prometheus engine, available via API and dashboard.</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+          {CAPABILITIES.map((cap, i) => (
+            <div key={i} className="flex items-center gap-2 p-3 rounded-lg" style={{ backgroundColor: i % 2 === 0 ? 'var(--ept-card-bg)' : 'transparent' }}>
+              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ color: 'var(--ept-accent)' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-sm" style={{ color: 'var(--ept-text)' }}>{cap}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Use Cases */}
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Built For</h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-10">
+          {USE_CASES.map((uc, i) => (
+            <div key={i} className="p-5 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <svg className="w-7 h-7 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} style={{ color: 'var(--ept-accent)' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d={uc.icon} />
+              </svg>
+              <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--ept-text)' }}>{uc.title}</h3>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>{uc.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Competitor Comparison */}
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>How We Compare</h2>
+        <p className="text-center mb-10" style={{ color: 'var(--ept-text-secondary)' }}>Enterprise-grade intelligence without enterprise pricing or per-seat licenses.</p>
+        <div className="overflow-x-auto rounded-xl border" style={{ borderColor: 'var(--ept-card-border)' }}>
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ backgroundColor: 'var(--ept-surface)' }}>
+                <th className="text-left px-4 py-3 font-semibold" style={{ color: 'var(--ept-text)' }}>Capability</th>
+                <th className="px-4 py-3 font-semibold" style={{ color: 'var(--ept-accent)' }}>Prometheus</th>
+                <th className="px-4 py-3 font-semibold" style={{ color: 'var(--ept-text-secondary)' }}>Maltego</th>
+                <th className="px-4 py-3 font-semibold" style={{ color: 'var(--ept-text-secondary)' }}>Palantir</th>
+                <th className="px-4 py-3 font-semibold" style={{ color: 'var(--ept-text-secondary)' }}>Splunk</th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARISON.map((row, i) => (
+                <tr key={i} className="border-t" style={{ borderColor: 'var(--ept-card-border)', backgroundColor: i % 2 === 0 ? 'var(--ept-card-bg)' : 'var(--ept-surface)' }}>
+                  <td className="px-4 py-3 font-medium" style={{ color: 'var(--ept-text)' }}>{row.feature}</td>
+                  <td className="px-4 py-3 text-center"><ComparisonCell value={row.echo} /></td>
+                  <td className="px-4 py-3 text-center"><ComparisonCell value={row.maltego} /></td>
+                  <td className="px-4 py-3 text-center"><ComparisonCell value={row.palantir} /></td>
+                  <td className="px-4 py-3 text-center"><ComparisonCell value={row.splunk} /></td>
+                </tr>
+              ))}
+              <tr className="border-t" style={{ borderColor: 'var(--ept-card-border)', backgroundColor: 'var(--ept-card-bg)' }}>
+                <td className="px-4 py-3 font-medium" style={{ color: 'var(--ept-text)' }}>Starting Price</td>
+                <td className="px-4 py-3 text-center font-bold" style={{ color: 'var(--ept-accent)' }}>$99/mo</td>
+                <td className="px-4 py-3 text-center" style={{ color: 'var(--ept-text-muted)' }}>$999/mo</td>
+                <td className="px-4 py-3 text-center" style={{ color: 'var(--ept-text-muted)' }}>Custom</td>
+                <td className="px-4 py-3 text-center" style={{ color: 'var(--ept-text-muted)' }}>$1,800/mo</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Stats Bar */}
+      <section className="border-y py-12 px-6" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-surface)' }}>
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          {[
+            { value: '6', label: 'Active Modules' },
+            { value: '23', label: 'Capabilities' },
+            { value: '4', label: 'Cell Tower DBs' },
+            { value: '3', label: 'IP Geo Providers' },
+          ].map((stat, i) => (
+            <div key={i}>
+              <div className="text-2xl md:text-3xl font-extrabold" style={{ color: 'var(--ept-accent)' }}>{stat.value}</div>
+              <div className="text-xs mt-1 font-medium" style={{ color: 'var(--ept-text-muted)' }}>{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Pricing</h2>
+        <p className="text-center mb-12" style={{ color: 'var(--ept-text-secondary)' }}>No per-seat licensing. No data caps on core features. Scale up when you need to.</p>
+        <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          {PRICING.map((plan, i) => (
+            <div key={i} className="relative p-6 rounded-xl border flex flex-col" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: plan.popular ? 'var(--ept-accent)' : 'var(--ept-card-border)', borderWidth: plan.popular ? 2 : 1 }}>
+              {plan.popular && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Most Popular</span>
               )}
-              <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--ept-text)' }}>{tier.tier}</h3>
-              <div className="mb-6">
-                {tier.price !== null ? (
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold font-mono gradient-text">${tier.price.toLocaleString()}</span>
-                    <span className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>/{tier.interval}</span>
-                  </div>
-                ) : (
-                  <div className="text-2xl font-bold" style={{ color: 'var(--ept-accent)' }}>Custom</div>
-                )}
+              <h3 className="text-lg font-bold mb-1" style={{ color: 'var(--ept-text)' }}>{plan.tier}</h3>
+              <div className="mb-4">
+                <span className="text-3xl font-extrabold" style={{ color: 'var(--ept-text)' }}>${plan.price}</span>
+                <span className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>/mo</span>
               </div>
-              <ul className="space-y-3 mb-8">
-                {tier.features.map((f, j) => (
+              <ul className="flex-1 space-y-2 mb-6">
+                {plan.features.map((feat, j) => (
                   <li key={j} className="flex items-start gap-2 text-sm" style={{ color: 'var(--ept-text-secondary)' }}>
-                    <svg className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'var(--ept-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                    {f}
+                    <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ color: 'var(--ept-accent)' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {feat}
                   </li>
                 ))}
               </ul>
-              <button onClick={() => handleCheckout(i)} className="w-full text-center py-3 rounded-lg font-semibold text-sm transition-all" style={{
-                backgroundColor: tier.popular ? 'var(--ept-accent)' : 'transparent',
-                color: tier.popular ? '#fff' : 'var(--ept-accent)',
-                border: tier.popular ? 'none' : '1px solid var(--ept-accent)',
-              }}>
-                {tier.custom ? 'Contact Sales' : 'Get Started'}
+              {plan.href.startsWith('mailto:') ? (
+                <a href={plan.href} className="block text-center px-6 py-3 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>{plan.cta}</a>
+              ) : (
+                <Link href={plan.href} className="block text-center px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: plan.popular ? 'var(--ept-accent)' : 'var(--ept-surface)', color: plan.popular ? '#fff' : 'var(--ept-text)' }}>{plan.cta}</Link>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="max-w-3xl mx-auto px-6 py-16">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-10" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-3">
+          {FAQS.map((faq, i) => (
+            <div key={i} className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--ept-card-border)', backgroundColor: 'var(--ept-card-bg)' }}>
+              <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full text-left px-5 py-4 flex items-center justify-between font-semibold text-sm" style={{ color: 'var(--ept-text)' }}>
+                {faq.q}
+                <svg className={`w-5 h-5 shrink-0 transition-transform ${openFaq === i ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ color: 'var(--ept-text-muted)' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
+              {openFaq === i && (
+                <div className="px-5 pb-4 text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</div>
+              )}
             </div>
           ))}
         </div>
       </section>
 
-      {/* --- Legal Disclaimer --- */}
-      <section className="max-w-4xl mx-auto px-6 pb-12">
-        <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: '#f59e0b33' }}>
-          <div className="flex items-start gap-4">
-            <svg className="w-8 h-8 flex-shrink-0 mt-1" style={{ color: '#f59e0b' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-            </svg>
-            <div>
-              <h2 className="text-lg font-bold mb-2" style={{ color: '#f59e0b' }}>Authorized Use Only</h2>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>
-                This platform is designed for <strong>authorized use only</strong>, including fleet management, corporate asset protection, law enforcement investigations with proper legal authority, and insurance fraud investigations with court orders. Users are solely responsible for ensuring compliance with all applicable federal, state, and local laws, including but not limited to wiretapping laws, GPS tracking consent requirements, and privacy regulations. Echo Prime Technologies does not condone unauthorized surveillance. All operations are logged for audit and compliance purposes. By using this platform, you certify that you have proper legal authorization for all tracking and surveillance activities conducted through our services.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* --- Intelligence Engine --- */}
-      <section className="max-w-4xl mx-auto px-6 pb-12">
-        <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-          <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Location Intelligence Engine</h2>
-          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>Query our surveillance and tracking doctrine library &mdash; backed by engines covering geospatial analysis, OSINT, network intelligence, and security operations.</p>
-          <EngineQueryPanel
-            domains={['CYBER', 'INTELL', 'NET', 'GEO', 'SECURITY']}
-            title="Location Intelligence Search"
-            placeholder="Ask about GPS tracking, geofencing, IP geolocation, surveillance techniques..."
-            exampleQueries={[
-              'Best practices for fleet GPS tracking deployment',
-              'How does cell tower triangulation work?',
-              'IP geolocation accuracy vs VPN detection',
-              'Geofence alert configuration strategies',
-            ]}
-            showStats
-          />
-        </div>
-      </section>
-
-      {/* --- Related Services --- */}
-      <section className="max-w-5xl mx-auto px-6 pb-16">
-        <h2 className="text-2xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Related Services</h2>
-        <p className="text-center text-sm mb-10" style={{ color: 'var(--ept-text-muted)' }}>Combine location intelligence with these capabilities for comprehensive security operations.</p>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { title: 'Cyber Defense', desc: 'AI-powered threat hunting, credential vault, SIEM operations, digital forensics, and compliance automation across 16 defensive layers.', href: '/security', price: 'From $499/mo' },
-            { title: 'Dark Web Intelligence', desc: 'Continuous dark web monitoring, breach intelligence, paste site surveillance, and real-time threat alerting across 2,500+ sources.', href: '/dark-web-intel', price: 'From $999/mo' },
-            { title: 'Penetration Testing', desc: 'Offensive security engagements with 300+ attack tools, 8 C2 frameworks, and red team operators.', href: '/pentesting', price: 'From $2,500' },
-          ].map((svc, i) => (
-            <Link key={i} href={svc.href} className="block p-6 rounded-2xl border transition-all hover:scale-[1.02]" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-              <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{svc.title}</h3>
-              <p className="text-sm mb-3" style={{ color: 'var(--ept-text-muted)' }}>{svc.desc}</p>
-              <span className="text-xs font-semibold" style={{ color: 'var(--ept-accent)' }}>{svc.price} &rarr;</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* --- CTA --- */}
-      <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
-        <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-          <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>Know where your assets are. Always.</h2>
-          <p className="text-sm mb-6 max-w-lg mx-auto" style={{ color: 'var(--ept-text-muted)' }}>
-            Deploy location intelligence in under 24 hours. Track up to 25 assets, set unlimited geofences, and receive real-time alerts — starting at $499/month.
+      {/* Legal Notice */}
+      <section className="max-w-4xl mx-auto px-6 py-16">
+        <div className="p-8 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <svg className="w-10 h-10 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} style={{ color: 'var(--ept-accent)' }}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <h3 className="text-xl font-extrabold mb-2" style={{ color: 'var(--ept-text)' }}>Authorized Use Only</h3>
+          <p className="text-sm leading-relaxed max-w-xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
+            Prometheus Surveillance tools are intended for authorized security professionals, licensed investigators,
+            and law enforcement agencies operating within their legal jurisdiction. Unauthorized surveillance,
+            interception, or tracking of individuals is illegal. Users are solely responsible for compliance
+            with all applicable federal, state, and local laws.
           </p>
-          <Link href={`/checkout?service=${SERVICE_ID}&tier=standard`} className="inline-block px-10 py-3.5 rounded-xl font-semibold shadow-lg transition-transform hover:scale-105" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
-            Deploy Standard &mdash; $499/mo
-          </Link>
         </div>
       </section>
 
-      {/* --- Footer --- */}
-      <footer className="border-t py-8 text-center" style={{ borderColor: 'var(--ept-border)' }}>
+      {/* Footer */}
+      <footer className="border-t py-8 px-6 text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
-          Questions? <a href="mailto:bob@echo-op.com" className="underline" style={{ color: 'var(--ept-accent)' }}>Contact us</a> | <Link href="/security" className="underline" style={{ color: 'var(--ept-accent)' }}>Cyber Defense</Link> | <Link href="/dark-web-intel" className="underline" style={{ color: 'var(--ept-accent)' }}>Dark Web Intel</Link> | <Link href="/pricing" className="underline" style={{ color: 'var(--ept-accent)' }}>All Pricing</Link> | <Link href="/" className="underline" style={{ color: 'var(--ept-accent)' }}>Home</Link>
+          Prometheus Surveillance by Echo Prime Technologies. Authorized use only.
         </p>
+        <div className="flex justify-center gap-4 mt-3">
+          <Link href="/legal/terms" className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Terms</Link>
+          <Link href="/legal/privacy" className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Privacy</Link>
+          <Link href="/security" className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Cyber Defense</Link>
+          <Link href="/" className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Echo Prime</Link>
+        </div>
       </footer>
     </div>
   );

@@ -65,6 +65,7 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
 ];
 
 const VOICE_PRESETS: VoicePreset[] = [
+  { id: 'bree', name: 'Bree - Humor & Charm', description: 'Witty, warm, and disarming — closes deals with personality and laughs', gender: 'female' },
   { id: 'prof_male', name: 'Echo - Professional Male', description: 'Authoritative and clear, ideal for B2B outreach', gender: 'male' },
   { id: 'prof_female', name: 'Alice - Professional Female', description: 'Clear British accent, confident and polished, great for corporate sales', gender: 'female' },
   { id: 'warm_male', name: 'Bobby - Warm Male', description: 'Friendly and approachable, perfect for relationship building', gender: 'male' },
@@ -85,6 +86,7 @@ const TIMEZONES = [
 const SPEAK_CLOUD_URL = 'https://echo-speak-cloud.bmcii1976.workers.dev';
 
 const VOICE_ID_MAP: Record<string, string> = {
+  bree: 'pzKXffibtCDxnrVO8d1U',             // Bree - humor & charm sales agent
   prof_male: 'keDMh3sQlEXKM4EQxvvi',      // Echo - sovereign AI commander
   prof_female: 'Xb7hH8MSUJpSbSDYk0k2',     // Alice - clear British educator
   warm_male: 'B5SCR8VDENzUF0L4eZY8',        // Bobby - Commander voice clone
@@ -326,7 +328,7 @@ export default function CloserSettingsPage() {
       try {
         const res = await fetch(`${SPEAK_CLOUD_URL}/tts`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': 'echo-omega-prime-forge-x-2026' },
           body: JSON.stringify({ text, voice_id: voiceId, provider: 'elevenlabs', speed: v.speed }),
         });
         if (res.ok && res.headers.get('content-type')?.includes('audio')) {

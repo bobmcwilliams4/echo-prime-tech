@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '../../../lib/auth-context';
-import { getLeads, createLead, updateLead, deleteLead, initiateCall, importLeads, getLeadCategories } from '../../../lib/closer-api';
+import { getLeads, createLead, updateLead, deleteLead, initiateCall, importLeads, getLeadCategories, renameLeadCategory, deleteLeadCategory, moveLeadsToCategory } from '../../../lib/closer-api';
 import { Conversation } from '@11labs/client';
 
 // ─── ConvAI Widget — Browser-based voice via ElevenLabs SDK ─────────────────
@@ -69,6 +69,7 @@ interface Lead {
   status: LeadStatus;
   priority: number;
   notes: string;
+  category: string | null;
   last_contact: string | null;
   created_at: string;
   updated_at: string;
@@ -288,7 +289,15 @@ export default function LeadsPage() {
   const [importError, setImportError] = useState<string | null>(null);
   const [importSubmitting, setImportSubmitting] = useState(false);
   const [importResult, setImportResult] = useState<{ imported: number; skipped: number; errors: string[] } | null>(null);
+  const [importFolder, setImportFolder] = useState('none');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Folder management state
+  const [showFolderManager, setShowFolderManager] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [renamingFolder, setRenamingFolder] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [folderActionLoading, setFolderActionLoading] = useState(false);
 
   // ─── Data Fetching ──────────────────────────────────────────────────────
 
@@ -328,9 +337,13 @@ export default function LeadsPage() {
       result = result.filter((l) => l.status === statusFilter);
     }
 
-    // Category filter
+    // Category/folder filter
     if (categoryFilter !== 'all') {
-      result = result.filter((l) => (l as any).category === categoryFilter);
+      if (categoryFilter === '__uncategorized__') {
+        result = result.filter((l) => !l.category);
+      } else {
+        result = result.filter((l) => l.category === categoryFilter);
+      }
     }
 
     // Search filter (name, phone, email, company)
@@ -406,7 +419,7 @@ export default function LeadsPage() {
       notes: lead.notes || '',
       priority: lead.priority || 5,
       status: lead.status || 'new',
-      category: (lead as any).category || '',
+      category: lead.category || '',
     });
     setExpandedId(lead.id);
   };
@@ -436,6 +449,48 @@ export default function LeadsPage() {
       setFormError(err?.message || 'Failed to update lead');
     } finally {
       setEditSubmitting(false);
+    }
+  };
+
+  // ─── Folder Management ──────────────────────────────────────────────────
+
+  const handleCreateFolder = async () => {
+    const name = newFolderName.trim();
+    if (!name || categories.includes(name)) return;
+    // Create folder by assigning it to no leads — it will appear after we manually add it
+    setCategories([...categories, name].sort());
+    setNewFolderName('');
+  };
+
+  const handleRenameFolder = async (oldName: string) => {
+    const name = renameValue.trim();
+    if (!name || name === oldName) { setRenamingFolder(null); return; }
+    setFolderActionLoading(true);
+    try {
+      await renameLeadCategory(oldName, name);
+      await fetchLeads();
+      await fetchCategories();
+      setRenamingFolder(null);
+      setRenameValue('');
+    } catch (err: any) {
+      setError(err?.message || 'Failed to rename folder');
+    } finally {
+      setFolderActionLoading(false);
+    }
+  };
+
+  const handleDeleteFolder = async (name: string) => {
+    if (!confirm(`Delete folder "${name}"? Leads will be moved to Uncategorized.`)) return;
+    setFolderActionLoading(true);
+    try {
+      await deleteLeadCategory(name);
+      await fetchLeads();
+      await fetchCategories();
+      if (categoryFilter === name) setCategoryFilter('all');
+    } catch (err: any) {
+      setError(err?.message || 'Failed to delete folder');
+    } finally {
+      setFolderActionLoading(false);
     }
   };
 
@@ -549,15 +604,16 @@ export default function LeadsPage() {
     setImportError(null);
     try {
       const leadsToImport = importPreview.map((row) => ({
-        first_name: row.first_name || row.firstname || row.name?.split(' ')[0] || '',
-        last_name: row.last_name || row.lastname || row.name?.split(' ').slice(1).join(' ') || '',
-        phone: row.phone || row.phone_number || row.tel || '',
-        email: row.email || row.email_address || '',
-        company: row.company || row.organization || row.business || '',
+        first_name: row.first_name || row.firstname || row.first || row.name?.split(' ')[0] || '',
+        last_name: row.last_name || row.lastname || row.last || row.surname || row.name?.split(' ').slice(1).join(' ') || '',
+        phone: row.phone || row.phone_number || row.tel || row.mobile || row.cell || row.cell_phone || '',
+        email: row.email || row.email_address || row.e_mail || '',
+        company: row.company || row.organization || row.business || row.org || row.company_name || '',
         source: 'csv' as LeadSource,
-        notes: row.notes || row.description || '',
+        notes: row.notes || row.note || row.description || row.comment || row.comments || row.memo || row.remark || row.remarks || row.details || row.additional_info || row.info || row.additional_notes || '',
         priority: parseInt(row.priority || '5', 10) || 5,
         status: (row.status as LeadStatus) || 'new',
+        category: importFolder !== 'none' ? importFolder : (row.category || row.folder || row.group || row.directory || row.list || ''),
       }));
 
       const result = await importLeads({ leads: leadsToImport });
@@ -581,6 +637,7 @@ export default function LeadsPage() {
     setImportError(null);
     setImportResult(null);
     setImportDragging(false);
+    setImportFolder('none');
   };
 
   const openImport = () => {
@@ -1019,8 +1076,43 @@ export default function LeadsPage() {
                     ...and {importPreview.length - 8} more rows
                   </p>
                 )}
+
+                {/* Folder assignment for import */}
+                <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ept-text-secondary)', whiteSpace: 'nowrap' }}>Import into folder:</label>
+                  <select
+                    value={importFolder}
+                    onChange={(e) => setImportFolder(e.target.value)}
+                    style={{
+                      padding: '6px 10px', fontSize: 12, color: 'var(--ept-text)',
+                      backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)',
+                      borderRadius: 6, outline: 'none', cursor: 'pointer', flex: 1, maxWidth: 200,
+                    }}
+                  >
+                    <option value="none">Auto-detect from file</option>
+                    {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="or type new folder..."
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && (e.target as HTMLInputElement).value.trim()) {
+                        const val = (e.target as HTMLInputElement).value.trim();
+                        setImportFolder(val);
+                        if (!categories.includes(val)) setCategories([...categories, val].sort());
+                        (e.target as HTMLInputElement).value = '';
+                      }
+                    }}
+                    style={{
+                      padding: '6px 10px', fontSize: 12, color: 'var(--ept-text)',
+                      backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)',
+                      borderRadius: 6, outline: 'none', flex: 1, maxWidth: 180,
+                    }}
+                  />
+                </div>
+
                 <p style={{ fontSize: 11, color: 'var(--ept-text-muted)', marginTop: 10, lineHeight: 1.5 }}>
-                  Columns auto-mapped: <strong>first_name</strong> (or firstname, name), <strong>last_name</strong> (or lastname, surname), <strong>phone</strong> (or phone_number, tel), <strong>email</strong> (or email_address), <strong>company</strong> (or organization, org)
+                  Columns auto-mapped: <strong>first_name</strong>, <strong>last_name</strong>, <strong>phone</strong>, <strong>email</strong>, <strong>company</strong>, <strong>notes</strong> (or note, comment, memo, description, remark, details), <strong>category</strong> (or folder, group)
                 </p>
               </div>
             )}
@@ -1104,7 +1196,7 @@ export default function LeadsPage() {
           ))}
         </select>
 
-        {/* Category Dropdown */}
+        {/* Folder Dropdown */}
         <select
           data-tutorial="leads-category-filter"
           value={categoryFilter}
@@ -1123,11 +1215,31 @@ export default function LeadsPage() {
             minWidth: 130,
           }}
         >
-          <option value="all">All Categories</option>
+          <option value="all">All Folders</option>
+          <option value="__uncategorized__">Uncategorized</option>
           {categories.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
+
+        {/* Manage Folders */}
+        <button
+          onClick={() => setShowFolderManager(!showFolderManager)}
+          style={{
+            padding: '7px 10px',
+            fontSize: 11,
+            fontWeight: 600,
+            color: showFolderManager ? 'var(--ept-accent)' : 'var(--ept-text-muted)',
+            backgroundColor: 'var(--ept-surface)',
+            border: `1px solid ${showFolderManager ? 'var(--ept-accent)' : 'var(--ept-border)'}`,
+            borderRadius: 8,
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {showFolderManager ? 'Close' : 'Manage Folders'}
+        </button>
 
         {/* Search */}
         <div style={{ flex: 1, minWidth: 180, position: 'relative' }}>
@@ -1206,6 +1318,135 @@ export default function LeadsPage() {
           Refresh
         </button>
       </div>
+
+      {/* ── Folder Manager Panel ─────────────────────────────────────────── */}
+      {showFolderManager && (
+        <div
+          style={{
+            padding: 16,
+            borderRadius: 12,
+            backgroundColor: 'var(--ept-card-bg)',
+            border: '1px solid var(--ept-card-border)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ept-accent)" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
+              </svg>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--ept-text)' }}>Folders</span>
+              <span style={{ fontSize: 11, color: 'var(--ept-text-muted)' }}>({categories.length})</span>
+            </div>
+          </div>
+
+          {/* Create new folder */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+            <input
+              type="text"
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleCreateFolder(); }}
+              placeholder="New folder name..."
+              style={{
+                flex: 1, padding: '8px 12px', fontSize: 12, color: 'var(--ept-text)',
+                backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)',
+                borderRadius: 8, outline: 'none',
+              }}
+            />
+            <button
+              onClick={handleCreateFolder}
+              disabled={!newFolderName.trim() || categories.includes(newFolderName.trim())}
+              style={{
+                padding: '8px 16px', fontSize: 12, fontWeight: 600, color: '#fff',
+                backgroundColor: 'var(--ept-accent)', border: 'none', borderRadius: 8,
+                cursor: !newFolderName.trim() ? 'not-allowed' : 'pointer',
+                opacity: !newFolderName.trim() ? 0.5 : 1,
+              }}
+            >
+              Create
+            </button>
+          </div>
+
+          {/* Folder list */}
+          {categories.length === 0 ? (
+            <p style={{ fontSize: 12, color: 'var(--ept-text-muted)', textAlign: 'center', padding: '12px 0' }}>
+              No folders yet. Create one above or assign a folder when importing leads.
+            </p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {categories.map((cat) => {
+                const count = leads.filter((l) => l.category === cat).length;
+                const isRenaming = renamingFolder === cat;
+                return (
+                  <div
+                    key={cat}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px',
+                      borderRadius: 8, backgroundColor: categoryFilter === cat ? 'rgba(20,184,166,0.08)' : 'transparent',
+                      border: `1px solid ${categoryFilter === cat ? 'var(--ept-accent)' : 'transparent'}`,
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={categoryFilter === cat ? 'var(--ept-accent)' : 'var(--ept-text-muted)'} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
+                    </svg>
+
+                    {isRenaming ? (
+                      <input
+                        autoFocus
+                        value={renameValue}
+                        onChange={(e) => setRenameValue(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleRenameFolder(cat); if (e.key === 'Escape') setRenamingFolder(null); }}
+                        onBlur={() => handleRenameFolder(cat)}
+                        style={{
+                          flex: 1, padding: '4px 8px', fontSize: 12, color: 'var(--ept-text)',
+                          backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-accent)',
+                          borderRadius: 4, outline: 'none',
+                        }}
+                      />
+                    ) : (
+                      <button
+                        onClick={() => setCategoryFilter(categoryFilter === cat ? 'all' : cat)}
+                        style={{
+                          flex: 1, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer',
+                          fontSize: 13, fontWeight: 500, color: 'var(--ept-text)', padding: 0,
+                        }}
+                      >
+                        {cat}
+                      </button>
+                    )}
+
+                    <span style={{ fontSize: 11, color: 'var(--ept-text-muted)', fontWeight: 500, minWidth: 20, textAlign: 'right' }}>
+                      {count}
+                    </span>
+
+                    {!isRenaming && (
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <button
+                          onClick={() => { setRenamingFolder(cat); setRenameValue(cat); }}
+                          title="Rename"
+                          disabled={folderActionLoading}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ept-text-muted)', padding: 2, opacity: folderActionLoading ? 0.4 : 1 }}
+                        >
+                          <IconEdit />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteFolder(cat)}
+                          title="Delete folder"
+                          disabled={folderActionLoading}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ept-text-muted)', padding: 2, opacity: folderActionLoading ? 0.4 : 1 }}
+                        >
+                          <IconTrash />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Empty State ───────────────────────────────────────────────────── */}
       {filteredLeads.length === 0 && (
@@ -1369,12 +1610,12 @@ export default function LeadsPage() {
                   <span style={{
                     fontSize: 10,
                     fontWeight: 500,
-                    color: (lead as any).category ? 'var(--ept-accent)' : 'var(--ept-text-muted)',
+                    color: lead.category ? 'var(--ept-accent)' : 'var(--ept-text-muted)',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                   }}>
-                    {(lead as any).category || '--'}
+                    {lead.category || '--'}
                   </span>
 
                   {/* Priority Bar */}
@@ -1594,7 +1835,7 @@ export default function LeadsPage() {
                           <DetailField label="Email" value={lead.email || '--'} />
                           <DetailField label="Company" value={lead.company || '--'} />
                           <DetailField label="Source" value={lead.source || '--'} capitalize />
-                          <DetailField label="Category" value={(lead as any).category || '--'} />
+                          <DetailField label="Category" value={lead.category || '--'} />
                           <DetailField label="Priority" value={`${lead.priority || 5} / 10`} color={pColor} />
                           <DetailField label="Created" value={formatDate(lead.created_at)} />
                         </div>

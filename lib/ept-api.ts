@@ -69,7 +69,7 @@ export interface AdminAnalytics {
   services: Service[];
 }
 
-export async function syncUser(): Promise<{ uid: string; email: string; role: string; subscriptions: string[] }> {
+export async function syncUser(): Promise<{ uid: string; email: string; role: string; subscriptions: string[]; grants?: Record<string, string> }> {
   return fetchApi('/api/user/sync', { method: 'POST' });
 }
 

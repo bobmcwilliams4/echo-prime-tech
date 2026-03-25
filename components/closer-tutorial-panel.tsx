@@ -434,7 +434,7 @@ export default function CloserTutorialPanel() {
           onClick={() => setOpen(true)}
           title="Tutorials & Help"
           style={{
-            position: 'fixed', right: 16, bottom: 80, zIndex: 9998,
+            position: 'fixed', right: 24, bottom: 156, zIndex: 9998,
             width: 44, height: 44, borderRadius: '50%',
             backgroundColor: 'var(--ept-accent)', color: '#fff',
             border: 'none', cursor: 'pointer', fontSize: 20, fontWeight: 700,

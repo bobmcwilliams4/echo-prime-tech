@@ -11,6 +11,7 @@ interface AuthContextType {
   displayName: string | null;
   trustLevel: { level: number; title: string } | null;
   subscriptions: string[];
+  grants: Record<string, string>;
   signOut: () => Promise<void>;
 }
 
@@ -18,7 +19,7 @@ const TRUST_LEVELS: Record<string, { level: number; title: string }> = {
   owner: { level: 11, title: 'Sovereign Architect' },
 };
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true, role: null, displayName: null, trustLevel: null, subscriptions: [], signOut: async () => {} });
+const AuthContext = createContext<AuthContextType>({ user: null, loading: true, role: null, displayName: null, trustLevel: null, subscriptions: [], grants: {}, signOut: async () => {} });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<EPTUser | null>(null);
@@ -27,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [trustLevel, setTrustLevel] = useState<{ level: number; title: string } | null>(null);
   const [subscriptions, setSubscriptions] = useState<string[]>([]);
+  const [grants, setGrants] = useState<Record<string, string>>({});
 
   useEffect(() => {
     handleRedirectResult().catch(() => {});
@@ -41,6 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const userRole = sync.role as 'owner' | 'user';
           setRole(userRole);
           setSubscriptions(sync.subscriptions || []);
+          setGrants(sync.grants || {});
           setTrustLevel(TRUST_LEVELS[userRole] || null);
           // Fetch display_name from profile API (backend stores edited names)
           try {
@@ -62,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setDisplayName(null);
         setTrustLevel(null);
         setSubscriptions([]);
+        setGrants({});
       }
       setLoading(false);
     });
@@ -75,9 +79,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setDisplayName(null);
     setTrustLevel(null);
     setSubscriptions([]);
+    setGrants({});
   };
 
-  return <AuthContext.Provider value={{ user, loading, role, displayName, trustLevel, subscriptions, signOut }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, loading, role, displayName, trustLevel, subscriptions, grants, signOut }}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => useContext(AuthContext);

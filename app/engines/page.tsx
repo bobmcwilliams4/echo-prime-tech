@@ -397,12 +397,12 @@ export default function EnginesPage() {
           </div>
         )}
 
-        {/* ═══ Coming Soon / Under Construction — authenticated only ═══ */}
+        {/* ═══ Planned Domains — authenticated only ═══ */}
         {user && <div className="mt-12 rounded-2xl overflow-hidden" style={{ border: '1px solid #8b5cf620', backgroundColor: 'var(--ept-card-bg)' }}>
           <div className="px-6 py-4" style={{ backgroundColor: '#8b5cf608' }}>
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: '#8b5cf6', boxShadow: '0 0 8px #8b5cf633' }} />
-              <span className="text-lg font-bold" style={{ color: 'var(--ept-text)' }}>Under Construction</span>
+              <span className="text-lg font-bold" style={{ color: 'var(--ept-text)' }}>Expanding Domains</span>
               <span className="text-xs px-2 py-0.5 rounded-full font-mono" style={{ backgroundColor: '#8b5cf620', color: '#8b5cf6' }}>
                 3,500+ engines planned
               </span>
@@ -432,7 +432,7 @@ export default function EnginesPage() {
             ].map(d => (
               <div key={d.code} className="p-4 rounded-xl relative overflow-hidden" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)', opacity: 0.85 }}>
                 <div className="absolute top-2 right-2 text-[9px] px-1.5 py-0.5 rounded font-bold" style={{ backgroundColor: '#8b5cf620', color: '#8b5cf6' }}>
-                  BUILDING
+                  PLANNED
                 </div>
                 <h4 className="text-xs font-bold mb-1" style={{ color: 'var(--ept-text)' }}>{d.name}</h4>
                 <span className="text-[10px] font-mono" style={{ color: 'var(--ept-text-muted)' }}>{d.code}</span>

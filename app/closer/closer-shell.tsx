@@ -304,7 +304,7 @@ function EchoPrimeCopilot() {
         onClick={() => setOpen(true)}
         title="Echo Prime AI"
         style={{
-          position: 'fixed', bottom: 24, right: 24, zIndex: 50,
+          position: 'fixed', bottom: 90, right: 24, zIndex: 50,
           width: 52, height: 52, borderRadius: 16,
           backgroundColor: 'var(--ept-accent)', color: '#fff',
           border: 'none', cursor: 'pointer',
@@ -324,7 +324,7 @@ function EchoPrimeCopilot() {
   return (
     <div
       style={{
-        position: 'fixed', bottom: 24, right: 24, zIndex: 50,
+        position: 'fixed', bottom: 90, right: 24, zIndex: 50,
         width: 380, maxHeight: 520,
         borderRadius: 16, overflow: 'hidden',
         border: '1px solid var(--ept-border)',

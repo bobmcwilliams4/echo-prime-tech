@@ -400,7 +400,7 @@ export default function LiveCallMonitorPage() {
   /* ─── Fetch active calls ─── */
   const fetchActiveCalls = useCallback(async () => {
     try {
-      const data = await getCalls('status=active&status=in_progress');
+      const data = await getCalls('status=initiated,ringing,in_progress');
       const list: ActiveCall[] = Array.isArray(data) ? data : data?.calls ?? data?.results ?? [];
       setActiveCalls(list);
       if (list.length > 0 && (!selectedCallId || !list.find((c) => c.id === selectedCallId))) {

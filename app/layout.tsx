@@ -71,7 +71,7 @@ const jsonLd = {
       url: 'https://echo-ept.com/title-intelligence',
       offers: {
         '@type': 'AggregateOffer',
-        lowPrice: '200',
+        lowPrice: '199',
         highPrice: '1500',
         priceCurrency: 'USD',
         offerCount: 3,
