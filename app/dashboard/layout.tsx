@@ -10,13 +10,18 @@ import {
   LayoutDashboard, Brain, Briefcase, BarChart3,
   Cpu, ShoppingBag, CreditCard, Settings, ChevronLeft,
   Shield, Search, BookOpen, Zap, Gamepad2, Eye,
+  Phone, Crosshair, Home,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
   { href: '/sentinel', label: 'Sentinel AI', icon: Brain },
   { href: '/engines', label: 'Engines', icon: Cpu },
+  { href: '/closer', label: 'AI Closer', icon: Phone },
+  { href: '/call-center', label: 'Call Center', icon: Phone },
   { href: '/gamer-companion', label: 'GGI Apex Predator', icon: Gamepad2 },
+  { href: '/home-ai', label: 'Home AI', icon: Home },
+  { href: '/intel-hub', label: 'Intel Hub', icon: Crosshair, ownerOnly: true },
   { href: '/dashboard/business', label: 'Business Manager', icon: Briefcase },
   { href: '/dashboard/permian-pulse', label: 'Permian Pulse', icon: BarChart3, ownerOnly: true },
   { href: '/services', label: 'Services', icon: ShoppingBag },

@@ -647,6 +647,7 @@ export default function HomePage() {
                   { label: 'Website Builder', href: '/websites' },
                   { label: 'Surveillance', href: '/surveillance' },
                   { label: 'Call Center', href: '/call-center' },
+                  { label: 'Intel Hub', href: '/intel-hub' },
                   { label: 'Store', href: '/ecommerce' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
