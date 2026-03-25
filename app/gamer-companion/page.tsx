@@ -332,6 +332,23 @@ export default function GamerCompanionPage() {
         </div>
       </section>
 
+      {/* ── Related Reading ── */}
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-2xl font-bold mb-8" style={{ color: 'var(--ept-text)' }}>Related Reading</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          <Link href="/blog/ai-gaming-companion-competitive-advantage" className="p-6 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-accent)' }}>Blog</span>
+            <h3 className="text-lg font-bold mt-2 mb-2" style={{ color: 'var(--ept-text)' }}>How AI Gaming Companions Give Competitive Players a Real Edge</h3>
+            <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>Real-time overlay stats, opponent pattern recognition, and build optimization.</p>
+          </Link>
+          <Link href="/blog/building-autonomous-ai-agents-2026" className="p-6 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-accent)' }}>Blog</span>
+            <h3 className="text-lg font-bold mt-2 mb-2" style={{ color: 'var(--ept-text)' }}>Building Autonomous AI Agents in 2026</h3>
+            <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>The architecture behind AI systems that observe, reason, and act independently.</p>
+          </Link>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t py-8 px-6 text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>

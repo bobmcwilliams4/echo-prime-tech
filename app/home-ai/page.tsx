@@ -298,6 +298,23 @@ export default function HomeAIPage() {
         </div>
       </section>
 
+      {/* ── Related Reading ── */}
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-2xl font-bold mb-8" style={{ color: 'var(--ept-text)' }}>Related Reading</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          <Link href="/blog/smart-home-ai-automation-beyond-alexa" className="p-6 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-accent)' }}>Blog</span>
+            <h3 className="text-lg font-bold mt-2 mb-2" style={{ color: 'var(--ept-text)' }}>Smart Home AI That Goes Beyond "Hey Alexa"</h3>
+            <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>Predictive automation, energy optimization, and contextual security for 2026.</p>
+          </Link>
+          <Link href="/blog/edge-computing-cloudflare-workers-ai" className="p-6 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-accent)' }}>Blog</span>
+            <h3 className="text-lg font-bold mt-2 mb-2" style={{ color: 'var(--ept-text)' }}>Edge Computing with Cloudflare Workers</h3>
+            <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>How we build always-on AI services with zero cold starts at the edge.</p>
+          </Link>
+        </div>
+      </section>
+
       {/* ── Footer CTA ── */}
       <section className="max-w-4xl mx-auto px-6 py-20 text-center">
         <h2 className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Take Control of Your Home?</h2>

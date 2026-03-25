@@ -1971,6 +1971,28 @@ function TaxReturnPageContent() {
         </div>
       </section>
 
+      {/* ── Related Reading ── */}
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-2xl font-bold mb-8" style={{ color: 'var(--ept-text)' }}>Related Reading</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          <Link href="/blog/ai-tax-strategies-oil-gas-royalty-owners" className="p-5 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-accent)' }}>Blog</span>
+            <h3 className="text-base font-bold mt-2 mb-2" style={{ color: 'var(--ept-text)' }}>AI Tax Strategies for O&G Royalty Owners</h3>
+            <p className="text-xs" style={{ color: 'var(--ept-text-secondary)' }}>Percentage depletion, working interest exceptions, and 5 strategies most CPAs miss.</p>
+          </Link>
+          <Link href="/blog/ai-tax-preparation-macrs-depreciation" className="p-5 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-accent)' }}>Blog</span>
+            <h3 className="text-base font-bold mt-2 mb-2" style={{ color: 'var(--ept-text)' }}>AI Tax Preparation & MACRS Depreciation</h3>
+            <p className="text-xs" style={{ color: 'var(--ept-text-secondary)' }}>How AI engines optimize depreciation schedules and identify missed deductions.</p>
+          </Link>
+          <Link href="/blog/ai-compliance-automation-enterprise" className="p-5 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--ept-accent)' }}>Blog</span>
+            <h3 className="text-base font-bold mt-2 mb-2" style={{ color: 'var(--ept-text)' }}>AI Compliance Automation for Enterprise</h3>
+            <p className="text-xs" style={{ color: 'var(--ept-text-secondary)' }}>Automating regulatory compliance with doctrine-backed AI intelligence.</p>
+          </Link>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="mt-16 py-8 text-center text-xs" style={{ borderTop: '1px solid var(--ept-border)', color: 'var(--ept-text-muted)' }}>
         <p>Echo Prime Technologies | Tax Return Preparation Service | Powered by 14 TX Engines</p>
