@@ -10,6 +10,14 @@
 
     <!-- Blog Articles -->
     <item>
+      <title>Why AI-Native Call Centers Are Replacing Five9 and Talkdesk</title>
+      <link>https://echo-ept.com/blog/ai-call-center-replaces-five9-talkdesk</link>
+      <pubDate>Tue, 25 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/ai-call-center-replaces-five9-talkdesk</guid>
+      <category>Product</category>
+      <description>Legacy call center platforms bolt AI onto 20-year-old architectures. We built one from scratch on Cloudflare Workers — and it changes everything about how businesses handle customer calls.</description>
+    </item>
+    <item>
       <title>How AI Gaming Companions Give Competitive Players a Real Edge</title>
       <link>https://echo-ept.com/blog/ai-gaming-companion-competitive-advantage</link>
       <pubDate>Tue, 25 Mar 2026 00:00:00 GMT</pubDate>
