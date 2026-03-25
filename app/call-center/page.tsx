@@ -155,6 +155,30 @@ const FEATURES = [
     icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
     color: '#64748b',
   },
+  {
+    title: 'SMS/MMS Omnichannel',
+    desc: 'Handle SMS alongside calls in one unified view. Auto-create conversations, assign to agents, track sentiment. AI auto-replies with canned responses.',
+    icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
+    color: '#06b6d4',
+  },
+  {
+    title: 'Queue Announcements',
+    desc: 'Position updates, wait-time estimates, callback offers, and custom messages with ElevenLabs TTS. Configurable intervals and triggers.',
+    icon: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z',
+    color: '#f97316',
+  },
+  {
+    title: 'Usage Billing',
+    desc: 'Track call minutes, SMS, AI usage, recordings, and API calls per tenant. Auto-generate invoices with line items. Full billing history.',
+    icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z',
+    color: '#22c55e',
+  },
+  {
+    title: 'Supervisor Dashboard',
+    desc: 'Real-time supervisor view with monitor/whisper/barge/takeover modes. Configurable alerts for long holds, negative sentiment, escalations, and VIP calls.',
+    icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z',
+    color: '#8b5cf6',
+  },
 ];
 
 const SCALE_COMPARISON = [
@@ -187,7 +211,11 @@ const SCALE_COMPARISON = [
   { metric: 'Agent Skill Routing', closer: 'No', callCenter: 'Proficiency-based + certified' },
   { metric: 'Canned Responses', closer: 'No', callCenter: 'Shortcuts + categories + tracking' },
   { metric: 'Audit Log', closer: 'No', callCenter: 'Full compliance trail' },
-  { metric: 'API Endpoints', closer: '~20', callCenter: '150+ REST endpoints' },
+  { metric: 'SMS/MMS Channel', closer: 'No', callCenter: 'Omnichannel + auto-assign' },
+  { metric: 'Queue Announcements', closer: 'No', callCenter: 'TTS + position + callback offer' },
+  { metric: 'Usage Billing', closer: 'No', callCenter: 'Metered + invoices' },
+  { metric: 'Supervisor Dashboard', closer: 'No', callCenter: 'Monitor/whisper/barge/takeover' },
+  { metric: 'API Endpoints', closer: '~20', callCenter: '180+ REST endpoints' },
 ];
 
 const PRICING = [
@@ -234,6 +262,8 @@ const PRICING = [
       'Business hours + overflow routing',
       'Agent skill routing (proficiency)',
       'Canned responses (/shortcuts)',
+      'SMS/MMS channel',
+      'Queue announcements (TTS)',
       'Advanced analytics + heatmaps',
       'Priority support',
     ],
@@ -251,7 +281,7 @@ const PRICING = [
       'Predictive dialer with pacing',
       'Multi-tenant white-label',
       'Custom voice cloning',
-      'Full API (150+ endpoints)',
+      'Full API (180+ endpoints)',
       'Custom webhook integrations',
       'Full TCPA + SOC 2 compliance',
       'Custom SLA rules + dashboards',
@@ -261,6 +291,10 @@ const PRICING = [
       'Business hours + holiday overrides',
       'Canned responses + shortcut engine',
       'Full audit log + compliance dashboard',
+      'SMS/MMS omnichannel',
+      'Queue announcements with TTS',
+      'Metered billing + invoicing',
+      'Supervisor dashboard (monitor/whisper/barge)',
       'Bulk operations + data import',
       'Dedicated success manager',
       'SLA guarantee (99.99%)',
@@ -286,7 +320,7 @@ function LiveWallboardDemo() {
     inQueue: 12, active: 47, available: 8, busy: 39, away: 3,
     longestWait: 23, avgWait: 8, avgHandle: 194, sla: 94.2,
     todayCalls: 1847, sales: 127, abandoned: 31, sentiment: 0.72,
-    callbacks: 5, voicemails: 3, slaAlerts: 0, qualityScore: 87.3, nps: 62,
+    callbacks: 5, voicemails: 3, slaAlerts: 0, qualityScore: 87.3, nps: 62, smsOpen: 8, supervisors: 2,
   });
 
   useEffect(() => {
@@ -310,6 +344,8 @@ function LiveWallboardDemo() {
         slaAlerts: Math.max(0, prev.slaAlerts + (Math.random() > 0.95 ? 1 : Math.random() > 0.3 ? -1 : 0)),
         qualityScore: Math.min(100, Math.max(70, prev.qualityScore + (Math.random() - 0.45) * 1.5)),
         nps: Math.min(100, Math.max(20, prev.nps + Math.floor(Math.random() * 5) - 2)),
+        smsOpen: Math.max(0, prev.smsOpen + (Math.random() > 0.6 ? 1 : Math.random() > 0.4 ? -1 : 0)),
+        supervisors: Math.max(0, Math.min(5, prev.supervisors + (Math.random() > 0.85 ? 1 : Math.random() > 0.85 ? -1 : 0))),
       }));
     }, 2000);
     return () => clearInterval(interval);
@@ -336,6 +372,8 @@ function LiveWallboardDemo() {
     { label: 'SLA Alerts', value: fmt(data.slaAlerts), color: data.slaAlerts > 0 ? '#ef4444' : '#22c55e' },
     { label: 'Avg Quality', value: `${data.qualityScore.toFixed(1)}`, color: data.qualityScore >= 85 ? '#22c55e' : data.qualityScore >= 70 ? '#f59e0b' : '#ef4444' },
     { label: 'NPS Score', value: `+${data.nps}`, color: data.nps >= 50 ? '#22c55e' : data.nps >= 30 ? '#f59e0b' : '#ef4444' },
+    { label: 'SMS Open', value: fmt(data.smsOpen), color: data.smsOpen > 10 ? '#f59e0b' : '#06b6d4' },
+    { label: 'Supervisors', value: fmt(data.supervisors), color: '#8b5cf6' },
   ];
 
   return (
@@ -769,7 +807,7 @@ export default function CallCenterPage() {
       {/* Footer */}
       <footer className="border-t py-8 px-6 text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
-          &copy; {new Date().getFullYear()} Echo Prime Technologies. AI Call Center v3.1 — 37 tables, 150+ endpoints, built on Cloudflare&apos;s global edge.
+          &copy; {new Date().getFullYear()} Echo Prime Technologies. AI Call Center v3.2 — 44 tables, 180+ endpoints, built on Cloudflare&apos;s global edge.
         </p>
         <div className="flex justify-center gap-6 mt-3">
           <Link href="/closer" className="text-xs font-medium" style={{ color: 'var(--ept-text-secondary)' }}>AI Closer (Solo)</Link>
