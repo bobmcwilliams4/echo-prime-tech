@@ -9,7 +9,7 @@ import { useAuth } from '../../lib/auth-context';
 /* ==============================================================================
    ECHO HOME AI — Whole-Home Intelligence & Automation
    Product page: hero, features, comparison, pricing, FAQ, footer CTA
-   Backend: echo-home-ai.bmcii1976.workers.dev (30 endpoints, 8 D1 tables)
+   Backend: echo-home-ai.bmcii1976.workers.dev (53 endpoints, 12 D1 tables, v2.0)
    ============================================================================== */
 
 const FEATURES = [
@@ -23,6 +23,10 @@ const FEATURES = [
   { title: 'Home Security Command', desc: 'Cameras, smart locks, alarm systems, and motion sensors in a unified security dashboard.', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' },
   { title: 'Scene Automation', desc: '"Movie Night", "Good Morning", "Away Mode" — build custom scenes that trigger multiple devices at once.', icon: 'M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664zM21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
   { title: 'Multi-Property', desc: 'Manage vacation homes, rental properties, and your primary residence all from a single account.', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
+  { title: 'School & Homework Supervisor', desc: 'Track assignments, due dates, and grades across all your children. AI-powered test prep for SAT, ACT, and AP exams with adaptive difficulty.', icon: 'M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658-.813A59.906 59.906 0 0112 3.493a59.903 59.903 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5' },
+  { title: 'Google Home & Alexa Bridge', desc: 'Control Echo Home AI through your existing Google Home and Alexa devices. Ask for bills, homework status, or arm your security — all by voice.', icon: 'M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z' },
+  { title: 'Security System Integration', desc: 'Ring, SimpliSafe, ADT, Wyze, Abode — unified in one dashboard. Arm/disarm, lock control, camera feeds, and activity timeline.', icon: 'M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a7.464 7.464 0 01-1.15 3.993m1.989 3.559A11.209 11.209 0 008.25 10.5a3.75 3.75 0 117.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 01-3.6 9.75m6.633-4.596a18.666 18.666 0 01-2.485 5.33' },
+  { title: 'Smart TV & Parental Controls', desc: 'Roku, Samsung, LG, Fire TV, Apple TV, Chromecast — all from one remote. Bedtime cutoffs, content ratings, and per-kid screen time limits.', icon: 'M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z' },
 ];
 
 const COMPARISON = [
@@ -35,14 +39,19 @@ const COMPARISON = [
   { feature: '40+ device brands', echo: true, google: true, alexa: true, apple: 'Limited' },
   { feature: 'Scene automation', echo: true, google: true, alexa: true, apple: true },
   { feature: 'Multi-property support', echo: true, google: false, alexa: false, apple: false },
+  { feature: 'SAT/ACT/AP test prep AI', echo: true, google: false, alexa: false, apple: false },
+  { feature: 'School assignment tracking', echo: true, google: false, alexa: false, apple: false },
+  { feature: 'Works WITH Google/Alexa (bridge)', echo: true, google: 'N/A', alexa: 'N/A', apple: false },
+  { feature: 'Unified security dashboard', echo: true, google: 'Partial', alexa: 'Partial', apple: true },
+  { feature: 'Smart TV parental controls', echo: true, google: false, alexa: false, apple: 'Basic' },
   { feature: 'No hardware required', echo: true, google: false, alexa: false, apple: false },
 ];
 
 const PRICING = [
-  { tier: 'Starter', price: 14.99, features: ['20 devices', 'Basic automation', '1 voice line', 'Bill tracking', 'Scene builder'], cta: 'Start Free Trial', href: '/checkout?service=home-ai&tier=starter', popular: false },
-  { tier: 'Family', price: 29.99, features: ['50 devices', 'Homework tutoring (2 kids)', 'Full bill management', 'Robot control', 'Family task boards', 'Energy reports'], cta: 'Get Family Plan', href: '/checkout?service=home-ai&tier=family', popular: true },
-  { tier: 'Premium', price: 49.99, features: ['100 devices', 'Unlimited tutoring', 'Energy optimization AI', 'Multi-property (2 homes)', 'Priority support', 'Call screening'], cta: 'Start Free Trial', href: '/checkout?service=home-ai&tier=premium', popular: false },
-  { tier: 'Estate', price: 99.99, features: ['Unlimited devices', 'Unlimited everything', 'Dedicated account manager', 'Priority support', 'Multi-property (unlimited)', 'Custom integrations'], cta: 'Contact Sales', href: 'mailto:bob@echo-op.com', popular: false },
+  { tier: 'Starter', price: 14.99, features: ['20 devices', 'Basic automation', '1 voice line', 'Bill tracking', 'Scene builder', 'TV remote control'], cta: 'Start Free Trial', href: '/checkout?service=home-ai&tier=starter', popular: false },
+  { tier: 'Family', price: 29.99, features: ['50 devices', 'Homework supervisor (2 kids)', 'AI test prep (SAT/ACT/AP)', 'Full bill management', 'Google Home & Alexa bridge', 'Security dashboard', 'Smart TV parental controls', 'Energy reports'], cta: 'Get Family Plan', href: '/checkout?service=home-ai&tier=family', popular: true },
+  { tier: 'Premium', price: 49.99, features: ['100 devices', 'Unlimited kids & test prep', 'Energy optimization AI', 'Multi-property (2 homes)', 'Full security system integration', 'Siri Shortcuts', 'Priority support'], cta: 'Start Free Trial', href: '/checkout?service=home-ai&tier=premium', popular: false },
+  { tier: 'Estate', price: 99.99, features: ['Unlimited devices', 'Unlimited everything', 'Multi-property (unlimited)', 'Dedicated account manager', 'Custom integrations', 'White-glove onboarding', 'SLA guarantee'], cta: 'Contact Sales', href: 'mailto:bob@echo-op.com', popular: false },
 ];
 
 const FAQS = [
@@ -51,6 +60,10 @@ const FAQS = [
   { q: 'Is my data private?', a: 'Absolutely. We do not sell your data, serve ads, or share information with third parties. All data is encrypted at rest and in transit. Voice commands are processed and discarded — we do not store recordings.' },
   { q: 'Can I manage a rental property remotely?', a: 'Yes. Multi-property support lets you manage multiple homes from one account. Set guest access codes, monitor energy usage, and receive security alerts for each property independently.' },
   { q: 'What happens if I cancel?', a: 'You can cancel anytime. Your data is retained for 30 days in case you reactivate. After that, it is permanently deleted per our privacy policy. No cancellation fees, no contracts.' },
+  { q: 'How does the homework supervisor work?', a: 'Add your children with their grade level. Track assignments from any school with due dates, subjects, and grades. The AI test prep module generates adaptive practice questions for SAT, ACT, AP exams, and state assessments. It analyzes scores to identify weak areas and adjusts difficulty automatically.' },
+  { q: 'Does it replace my Google Home or Alexa?', a: 'No — it works WITH them. Our voice assistant bridges let you control Echo Home AI through your existing Google Home and Alexa devices. Ask Alexa about your bills, check homework status through Google Home, or arm your security via Siri Shortcuts. We enhance your existing setup, not replace it.' },
+  { q: 'Which security systems are supported?', a: 'We integrate with Ring, SimpliSafe, ADT, Wyze, Abode, and any device that exposes a local API or webhook. Unified dashboard shows all cameras, locks, sensors, and alarm panels. Arm/disarm, lock/unlock, and view camera feeds from one place.' },
+  { q: 'Can I set screen time limits on my kids TVs?', a: 'Yes. Smart TV parental controls let you set weekday/weekend screen time limits, bedtime cutoffs, content rating caps (G, PG, PG-13, R), and block specific apps per device. Works with Roku, Samsung, LG, Fire TV, Apple TV, and Chromecast.' },
 ];
 
 function ComparisonCell({ value }: { value: boolean | string }) {
@@ -91,8 +104,9 @@ export default function HomeAIPage() {
         </div>
         <div className="flex flex-wrap justify-center gap-8 mt-12" style={{ color: 'var(--ept-text-muted)' }}>
           <span className="text-sm">40+ Device Brands</span>
-          <span className="text-sm">30 API Endpoints</span>
-          <span className="text-sm">8 D1 Tables</span>
+          <span className="text-sm">53 API Endpoints</span>
+          <span className="text-sm">12 D1 Tables</span>
+          <span className="text-sm">Google + Alexa + Siri</span>
           <span className="text-sm">Zero Hardware Required</span>
         </div>
       </section>
@@ -198,8 +212,8 @@ export default function HomeAIPage() {
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
             { value: '40+', label: 'Device Brands' },
-            { value: '30', label: 'API Endpoints' },
-            { value: '10', label: 'Core Modules' },
+            { value: '53', label: 'API Endpoints' },
+            { value: '14', label: 'Core Modules' },
             { value: '99.9%', label: 'Uptime SLA' },
           ].map((stat, i) => (
             <div key={i}>
