@@ -93,6 +93,21 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Congregation', price: 349, interval: 'mo', features: ['3 campuses', '2,000 members', 'All features', 'Analytics', 'Small groups'], popular: false },
     { tier: 'Cathedral', price: 799, interval: 'mo', features: ['Unlimited campuses', 'Unlimited members', 'White-label', 'API access', 'Priority support'], popular: false },
   ] },
+  { id: 'intel-hub', name: 'Echo Intel Hub', tagline: 'Digital intelligence — messages, traffic, apps, contacts, anomaly AI', pricing: [
+    { tier: 'Personal', price: 30, interval: 'mo', features: ['1 device', 'Message capture', 'App tracking', 'Basic alerts', '30-day retention'], popular: false },
+    { tier: 'Family', price: 60, interval: 'mo', features: ['5 devices', 'Keyword watchlist', 'DNS detection', 'Network analysis', '90-day retention', 'SMS alerts'], popular: true },
+    { tier: 'Enterprise', price: 150, interval: 'mo', features: ['Unlimited devices', 'Anomaly AI', 'Custom alerts', 'Kill switch', '1-year retention', 'API access'], popular: false },
+  ] },
+  { id: 'call-center', name: 'AI Call Center', tagline: 'Enterprise call center — queues, AI agents, wallboard, supervisor', pricing: [
+    { tier: 'Team', price: 299, interval: 'mo', features: ['5 queues', '10 AI agents', 'Basic routing', 'Call recording', 'Dashboard'], popular: false },
+    { tier: 'Business', price: 799, interval: 'mo', features: ['20 queues', '50 AI agents', 'Skills routing', 'Supervisor dashboard', 'SMS', 'Analytics'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited queues', '100+ AI agents', 'Predictive dialer', 'White-label', 'Full API', 'SLA guarantee'], popular: false },
+  ] },
+  { id: 'gamer-companion', name: 'Gamer Companion', tagline: 'AI gaming assistant — overlay, strategy, builds, voice commands', pricing: [
+    { tier: 'Free', price: 0, interval: 'mo', features: ['Basic strategy tips', '3 game profiles', 'Community guides'], popular: false },
+    { tier: 'Pro', price: 10, interval: 'mo', features: ['Real-time overlay', 'Screen analysis AI', 'Unlimited profiles', 'Build optimizer', 'Voice commands'], popular: true },
+    { tier: 'Team', price: 25, interval: 'mo', features: ['Everything in Pro', 'Team analytics', 'Shared strategies', 'Tournament prep', 'API access'], popular: false },
+  ] },
 ];
 
 // Commander emails — owner gets ALL services at Enterprise tier, no checkout ever
