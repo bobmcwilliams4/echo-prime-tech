@@ -1062,6 +1062,44 @@ export default function CampaignsPage() {
         )}
       </div>
 
+      {/* Aggregate Stats Bar */}
+      {campaigns.length > 0 && (() => {
+        const totals = campaigns.reduce((acc, c) => {
+          const s = c.stats || DEFAULT_STATS;
+          return {
+            leads: acc.leads + (s.total_leads || 0),
+            dialed: acc.dialed + (s.dialed || 0),
+            connected: acc.connected + (s.connected || 0),
+            appointments: acc.appointments + (s.appointments || 0),
+            cost: acc.cost + (s.cost || 0),
+          };
+        }, { leads: 0, dialed: 0, connected: 0, appointments: 0, cost: 0 });
+        const answerRate = totals.dialed > 0 ? Math.round((totals.connected / totals.dialed) * 100) : 0;
+        const conversionRate = totals.connected > 0 ? Math.round((totals.appointments / totals.connected) * 100) : 0;
+        const items = [
+          { label: 'Total Leads', value: formatNumber(totals.leads) },
+          { label: 'Calls Made', value: formatNumber(totals.dialed) },
+          { label: 'Answer Rate', value: `${answerRate}%` },
+          { label: 'Appointments', value: formatNumber(totals.appointments) },
+          { label: 'Conversion', value: `${conversionRate}%` },
+          { label: 'Campaigns', value: String(campaigns.length) },
+        ];
+        return (
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+            {items.map((item) => (
+              <div
+                key={item.label}
+                className="text-center p-3 rounded-xl border"
+                style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}
+              >
+                <div className="text-lg font-extrabold" style={{ color: 'var(--ept-accent)' }}>{item.value}</div>
+                <div className="text-[10px] font-medium uppercase tracking-wider mt-0.5" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</div>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
+
       {/* Error Banner */}
       {error && (
         <div
