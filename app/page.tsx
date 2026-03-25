@@ -620,7 +620,7 @@ export default function HomePage() {
                   { label: 'GGI Apex Predator', href: '/gamer-companion' },
                   { label: 'Engine Catalog', href: '/engines' },
                   { label: 'AI Closer', href: '/closer' },
-                  { label: 'Data Pipelines', href: '/pipelines' },
+                  { label: 'Call Center', href: '/call-center' },
                   { label: 'Title Intelligence', href: '/title-intelligence' },
                   { label: 'Permian Basin AI', href: '/permian' },
                   { label: 'Tax Preparation', href: '/tax-returns' },
@@ -631,7 +631,7 @@ export default function HomePage() {
                   { label: 'Immortality Vault', href: '/immortality-vault' },
                   { label: 'SDK Gateway', href: '/sdk' },
                   { label: 'Bot Factory', href: '/bots' },
-                  { label: 'Scraper Factory', href: '/scrapers' },
+                  { label: 'Business Manager', href: '/business-manager' },
                   { label: 'REVENG Scanner', href: '/scanner' },
                   { label: 'Price Alerts', href: '/price-alerts' },
                   { label: 'Reddit Intel', href: '/reddit' },
@@ -646,7 +646,6 @@ export default function HomePage() {
                   { label: 'Hephaestion Forge', href: '/hephaestion-forge' },
                   { label: 'Website Builder', href: '/websites' },
                   { label: 'Surveillance', href: '/surveillance' },
-                  { label: 'Call Center', href: '/call-center' },
                   { label: 'Intel Hub', href: '/intel-hub' },
                   { label: 'Store', href: '/ecommerce' },
                 ].map(item => (
@@ -664,6 +663,7 @@ export default function HomePage() {
                   { label: 'Pen Testing', href: '/pentesting' },
                   { label: 'County Records', href: '/county-records' },
                   { label: 'Case Studies', href: '/case-studies' },
+                  { label: 'Reviews', href: '/reviews' },
                   { label: 'Free Tools', href: '/free' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
