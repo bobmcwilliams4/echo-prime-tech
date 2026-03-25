@@ -2043,6 +2043,308 @@ No hardware required. No complex setup. Just structured digital awareness.
 
 *Start monitoring at [echo-ept.com/intel-hub](/intel-hub). Explore our full security stack at [echo-ept.com/security](/security). Free consultation at [echo-ept.com/free](/free).*`,
   },
+  {
+    slug: 'ai-tax-strategies-oil-gas-royalty-owners',
+    title: 'AI-Powered Tax Strategies for Oil & Gas Royalty Owners',
+    excerpt: 'Mineral rights and royalty income create complex tax obligations most CPAs overlook. AI engines trained on IRC, Treasury Regulations, and IRS rulings can find deductions and strategies that save thousands annually.',
+    category: 'Tax Intelligence',
+    date: '2026-03-25',
+    readTime: '9 min',
+    author: 'Echo Prime',
+    tags: ['tax AI', 'oil and gas', 'royalty income', 'mineral rights', 'depletion', 'IRC'],
+    content: `## The Royalty Owner's Tax Problem
+
+Oil and gas royalty owners face a unique tax situation that many CPAs handle poorly. Royalty income flows through on a 1099-MISC, gets reported on Schedule E, and involves deductions that require deep knowledge of IRC Subchapter I (Natural Resources) — sections most tax professionals rarely touch.
+
+The result? Royalty owners routinely overpay by thousands of dollars annually because their CPA doesn't know about percentage depletion, intangible drilling cost elections, or the complex interplay between passive activity rules and working interest exceptions.
+
+## How AI Tax Engines Change the Equation
+
+Echo Prime's tax intelligence engines contain 14 purpose-built models covering every aspect of oil and gas taxation:
+
+- **TX01 (1040 Analysis)**: Full individual return analysis with royalty income optimization
+- **TX03 (Deduction Optimizer)**: Identifies every allowable deduction including IDC elections, depletion methods, and severance tax credits
+- **TX07 (IRC Deep Analysis)**: Direct citation of IRC §611-§638 (depletion and natural resource provisions) with Treasury Regulation cross-references
+- **TX10 (Audit Defense)**: Pre-identifies positions likely to trigger IRS scrutiny and builds documentation packages
+
+Each engine contains doctrine blocks — pre-compiled expert reasoning with full legal citations — not just generic AI summaries.
+
+## Five Strategies Most CPAs Miss
+
+### 1. Percentage Depletion vs. Cost Depletion Election
+
+IRC §613 allows independent producers and royalty owners to claim percentage depletion at 15% of gross income, even after recovering their full cost basis. This is one of the few "tax magic" provisions in the code — you can deduct more than you paid.
+
+**The catch**: The deduction is limited to 65% of taxable income (IRC §613A(d)(1)) and 100% of net income from the property. Most CPAs either don't calculate both methods or miss the annual election opportunity.
+
+**AI advantage**: Our engines calculate both methods for every property, every year, and recommend the optimal choice with full IRC citation.
+
+### 2. Working Interest Exception to Passive Activity Rules
+
+Under IRC §469(c)(3), a working interest in an oil or gas property held through a non-limited entity is NOT subject to passive activity limitations — even if you don't materially participate.
+
+**The catch**: This only applies to working interests, not royalty interests, and only when held directly or through an entity where liability isn't limited.
+
+**AI advantage**: The engine analyzes your ownership structure and identifies which interests qualify for this exception, potentially unlocking deductions against ordinary income.
+
+### 3. State Severance Tax Credits
+
+Texas, Oklahoma, New Mexico, and other producing states assess severance taxes on production. These are deductible under IRC §164, but many CPAs report them on the wrong line or miss the credit opportunity.
+
+**AI advantage**: Our engines track severance tax rates across all 33 producing states and calculate the optimal treatment (deduction vs. credit) based on your overall tax position.
+
+### 4. Lease Bonus and Delay Rental Treatment
+
+Lease bonus payments are ordinary income in the year received. Delay rentals are ordinary income when received. But the distinction between the two — and the potential for installment sale treatment under IRC §453 — is often missed.
+
+**AI advantage**: The engine classifies each payment type correctly and identifies installment sale opportunities that defer tax liability.
+
+### 5. Post-Production Cost Deductions
+
+Gathering, processing, compression, and transportation costs between the wellhead and the point of sale are deductible against royalty income. Many royalty owners don't realize these costs (often deducted by the operator on the check stub) are already reducing their taxable income — or that they may be entitled to additional deductions.
+
+**AI advantage**: The engine analyzes operator check stubs, identifies all post-production deductions, and verifies they're correctly reported.
+
+## Real Results: A Case Study
+
+A Permian Basin royalty owner with $180,000 in annual royalty income across 12 properties was paying $47,000 in federal tax. After running their situation through our tax engines:
+
+- Switched 4 properties from cost to percentage depletion: **$8,400 savings**
+- Identified unreported state severance tax credits: **$2,100 savings**
+- Reclassified a lease bonus for installment treatment: **$3,200 deferral**
+- Found missing post-production cost deductions: **$1,800 savings**
+
+**Total first-year impact: $15,500** — a 33% reduction in federal tax liability, all fully supported by IRC citations and defensible under audit.
+
+## Confidence Stratification
+
+Every recommendation from our tax engines includes a confidence level:
+
+- **DEFENSIBLE**: Position supported by clear statutory authority and IRS guidance. Safe to claim.
+- **AGGRESSIVE**: Position supported by statute but with limited IRS guidance or conflicting case law. Document thoroughly.
+- **DISCLOSURE**: Position requires Form 8275 or 8275-R disclosure to avoid penalties.
+- **HIGH_RISK**: Position likely to be challenged. Only pursue with explicit client consent and penalty protection strategy.
+
+This isn't generic AI hedging — it's the same framework a Big 4 tax partner uses when signing off on a return.
+
+## Getting Started
+
+1. Visit [echo-ept.com/tax-returns](/tax-returns) to access the tax intelligence platform
+2. Upload your 1099s, check stubs, and prior returns
+3. The engine analyzes every position and generates a prioritized list of optimizations
+4. Each recommendation includes full IRC citations and confidence levels
+5. Share the analysis with your CPA — or use it to verify their work
+
+---
+
+*Explore tax intelligence at [echo-ept.com/tax-returns](/tax-returns). Query engines directly at [echo-ept.com/engines](/engines). Free consultation at [echo-ept.com/free](/free).*`,
+  },
+  {
+    slug: 'smart-home-ai-automation-beyond-alexa',
+    title: 'Smart Home AI That Goes Beyond "Hey Alexa" — Predictive Automation for 2026',
+    excerpt: 'Consumer smart home assistants react to commands. AI-powered home automation predicts needs, optimizes energy, manages security, and learns your household patterns without cloud dependency.',
+    category: 'Product Updates',
+    date: '2026-03-25',
+    readTime: '7 min',
+    author: 'Echo Prime',
+    tags: ['smart home', 'home automation', 'AI', 'IoT', 'energy optimization', 'security'],
+    content: `## The Problem with "Smart" Homes
+
+Most smart home setups aren't smart — they're remote-controlled. You tell Alexa to turn off the lights. You set a schedule in Google Home. You tap a button in the Tuya app. Every action requires a human command or a rigid schedule.
+
+True smart home AI should understand your patterns, predict your needs, and optimize your home without you thinking about it. That's what Echo Home AI was built to do.
+
+## What Predictive Home AI Looks Like
+
+### Energy Optimization
+
+Echo Home AI monitors your energy consumption patterns across every connected device and learns:
+
+- When you typically leave and return home
+- Which rooms are occupied at what times (via motion sensors, not cameras)
+- Your temperature preferences by time of day and day of week
+- External factors: weather forecasts, electricity rate schedules, solar production
+
+With this data, the system pre-conditions rooms before you arrive, shifts high-energy tasks (water heating, EV charging, laundry) to off-peak rate periods, and reduces HVAC output in unoccupied zones. Average savings: 18-32% on electricity bills.
+
+### Security That Thinks
+
+Traditional security systems have two modes: armed and disarmed. Echo Home AI understands context:
+
+- If you're home and a door opens at 2 AM, that's different than at 2 PM
+- If your teenager's phone connects to home WiFi at 11:30 PM, the system disarms their entry zone
+- If a package delivery is expected (parsed from your email), the front camera records but doesn't alert
+- If motion is detected in an area that should be unoccupied based on learned patterns, escalation triggers immediately
+
+The system adapts to your actual life rather than forcing you to arm/disarm constantly.
+
+### Household Awareness
+
+The AI builds a model of your household's rhythms:
+
+- **Morning routines**: Lights, coffee maker, thermostat, news briefing — all triggered by your first movement, not a fixed time
+- **Work-from-home detection**: If you don't leave by your usual time, the system switches to WFH mode (office zone climate, reduced doorbell volume, focused lighting)
+- **Guest mode**: Additional devices on the network trigger guest mode — shared spaces stay at default settings, privacy zones remain locked
+- **Vacation mode**: After 48 hours of no occupancy, the system enters smart vacation mode — randomized lighting patterns, mail hold reminders, irrigation adjustments
+
+## Technical Architecture
+
+Echo Home AI runs as a Cloudflare Worker with 30 REST API endpoints and 8 D1 database tables:
+
+| Component | Function |
+|-----------|----------|
+| Device Registry | Tracks all IoT devices, capabilities, and current state |
+| Scene Engine | Complex multi-device automations triggered by conditions |
+| Routine Analyzer | ML-based pattern detection from device telemetry |
+| Energy Optimizer | Rate-aware scheduling with weather and solar integration |
+| Security Context | Multi-factor situational awareness for threat assessment |
+| Voice Bridge | Echo Speak Cloud integration for natural language control |
+
+The Worker runs on cron (every 5 minutes) to evaluate conditions and trigger automations. Critical security events use Durable Objects for sub-second response.
+
+## Privacy First
+
+Unlike Alexa, Google Home, or Ring:
+
+- **No audio recording**: Voice processing happens on-device via wake word detection; only parsed commands reach the cloud
+- **No video storage**: Camera feeds are processed for events, not recorded continuously
+- **Your data stays yours**: All data in Cloudflare D1 under your account — not in Amazon's or Google's data lake
+- **Local-first processing**: Critical automations run even if internet is down via local hub fallback
+- **No third-party sharing**: Period. No advertising profiles, no data partnerships, no "anonymized" telemetry
+
+## Integration Ecosystem
+
+Echo Home AI works with:
+
+- **Tuya/SmartLife**: 200,000+ compatible devices (lights, plugs, sensors, cameras, locks)
+- **Z-Wave/Zigbee**: Via compatible hub (Hubitat, SmartThings)
+- **Matter**: Native support for the new smart home standard
+- **MQTT**: Direct integration for DIY and industrial IoT devices
+- **Echo Speak Cloud**: Voice control via our own TTS/STT system (no Alexa required)
+
+## Pricing
+
+| Plan | Price | Devices |
+|------|-------|---------|
+| Starter | $14.99/mo | Up to 25 devices |
+| Family | $29.99/mo | Up to 75 devices, energy optimization |
+| Premium | $49.99/mo | Unlimited devices, security context, voice |
+| Estate | $99.99/mo | Multi-property, priority support, custom integrations |
+
+Every plan includes predictive automation, pattern learning, and the privacy guarantee.
+
+---
+
+*Set up Echo Home AI at [echo-ept.com/home-ai](/home-ai). Explore voice integration at [echo-ept.com/voice](/voice). Free consultation at [echo-ept.com/free](/free).*`,
+  },
+  {
+    slug: 'ai-gaming-companion-competitive-advantage',
+    title: 'How AI Gaming Companions Give Competitive Players a Real Edge',
+    excerpt: 'From real-time overlay stats to opponent pattern recognition and build optimization, AI gaming companions are transforming competitive play. Here is how the technology works and why it matters.',
+    category: 'Product Updates',
+    date: '2026-03-25',
+    readTime: '6 min',
+    author: 'Echo Prime',
+    tags: ['gaming', 'AI companion', 'competitive gaming', 'esports', 'game overlay', 'performance analytics'],
+    content: `## Beyond Simple Game Guides
+
+Traditional gaming tools are static: wiki pages, YouTube guides, tier lists updated weekly. But competitive games move fast — meta shifts, patches drop, opponents adapt. Static information decays within days.
+
+An AI gaming companion operates in real-time, watching your gameplay, analyzing your patterns, and providing contextual intelligence that adapts to what's actually happening in your match.
+
+## What GGI Apex Predator Does
+
+Echo Prime's Gamer Companion (GGI Apex Predator) is a 63-module Python application that provides:
+
+### Real-Time Performance Analytics
+
+The overlay tracks your gameplay metrics live:
+
+- **K/D trends** across sessions, maps, and weapon loadouts
+- **Positioning heatmaps** showing where you die most and where you get kills
+- **Economy tracking** for games with buy phases (CS2, Valorant) — optimal buy recommendations based on team economy
+- **Ability/cooldown tracking** for MOBA and hero shooters
+
+### Opponent Pattern Recognition
+
+When you face the same players repeatedly (ranked lobbies, scrims, tournaments), the companion builds profiles:
+
+- Preferred agents/characters and their win rates
+- Common strategies on each map
+- Tendencies under pressure (do they push or play passive when losing?)
+- Historical performance data from public APIs
+
+### Build and Loadout Optimization
+
+For games with builds, items, or loadouts:
+
+- **Meta analysis**: Current win rates and pick rates across all skill brackets
+- **Counter-picking**: Given the enemy composition, what maximizes your win probability?
+- **Itemization paths**: When to deviate from standard builds based on game state
+- **Rune/talent optimization**: Calculated from millions of matches, filtered to your skill bracket
+
+### Coaching Intelligence
+
+After each session, the companion generates a coaching report:
+
+- Top 3 mistakes that cost you the most (with timestamps)
+- Skill trends: what's improving, what's stagnating
+- Practice recommendations targeted at your weakest areas
+- Comparison to players at the next rank tier
+
+## Supported Games
+
+| Game | Features |
+|------|----------|
+| Counter-Strike 2 | Economy advisor, spray analysis, positioning, utility usage |
+| Valorant | Agent counters, ability economy, site execution analysis |
+| League of Legends | Draft advisor, jungle pathing, item optimization, wave management |
+| Apex Legends | Loadout optimizer, rotation timing, ring predictions |
+| Fortnite | Build efficiency, loot pathing, storm positioning |
+| Overwatch 2 | Hero counters, ultimate tracking, team composition analysis |
+
+More games added regularly via the plugin system.
+
+## How It Works Technically
+
+The companion runs locally on your PC with minimal resource usage:
+
+1. **Screen capture** (10 FPS) feeds a lightweight vision model that recognizes game state
+2. **OCR + template matching** extracts scores, health, economy, minimap data
+3. **Game API integration** (where available) provides authoritative data
+4. **Local inference** via ONNX models keeps latency under 50ms
+5. **Overlay renderer** displays insights without impacting game performance
+
+No data is sent to external servers during gameplay. Post-session analytics sync to the cloud for historical tracking and cross-device access.
+
+## Is This Cheating?
+
+No. GGI Apex Predator does not:
+
+- Aim for you (no aimbot)
+- Move for you (no automation)
+- See through walls (no wallhack)
+- Modify game files or memory
+
+It provides the same information a human coach sitting behind you would provide — pattern analysis, strategic suggestions, and performance tracking. Major esports organizations use similar tools for team practice sessions.
+
+Think of it like a chess engine that analyzes your games after you play them, plus a real-time advisor that suggests strategic considerations (not moves).
+
+## The Free Tier
+
+GGI Apex Predator offers a genuinely useful free tier:
+
+- 1 game supported
+- Basic performance tracking (K/D, win rate, session history)
+- Post-game analysis (top 3 insights per session)
+- Weekly coaching report
+
+The Pro tier ($9.99/mo) unlocks all games, real-time overlay, opponent profiling, and unlimited coaching reports. Team tier ($24.99/mo) adds team analytics, scrim analysis, and shared dashboards.
+
+---
+
+*Download GGI Apex Predator at [echo-ept.com/gamer-companion](/gamer-companion). Explore the full product catalog at [echo-ept.com/pricing](/pricing). Free tier available at [echo-ept.com/free](/free).*`,
+  },
 ];
 
 export function formatDate(dateStr: string): string {

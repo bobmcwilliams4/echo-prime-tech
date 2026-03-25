@@ -39,6 +39,25 @@ const EXEMPT_PREFIXES = [
   '/websites',           // Website Builder
   '/price-alerts',       // Price & Market Alerts
 
+  // ── Tier 5: New product pages ──
+  '/call-center',        // AI Call Center
+  '/gamer-companion',    // GGI Apex Predator
+  '/home-ai',            // Echo Home AI
+  '/intel-hub',          // Echo Intel Hub
+  '/shepherd',           // Echo Shepherd AI
+  '/surveillance',       // Prometheus Surveillance
+  '/dark-web-intel',     // Dark Web Intelligence
+  '/rewards',            // Echo Rewards
+  '/permian',            // Permian Basin
+  '/reviews',            // Reviews
+
+  // ── Content pages ──
+  '/blog',               // Blog articles
+  '/changelog',          // Changelog
+  '/news',               // News
+  '/case-studies',       // Case Studies
+  '/free',               // Free landing page
+
   // ── Infrastructure / User pages ──
   '/services',           // Professional Services
   '/dashboard',          // User Dashboard
@@ -48,15 +67,12 @@ const EXEMPT_PREFIXES = [
   '/business-manager',   // Business Manager
 
   // ── BLOCKED (redirect to /coming-soon): ──
-  // '/dark-web-intel'   — no backend, liability risk
-  // '/surveillance'     — no backend, scary product name
   // '/sec-intel'        — duplicate of /security, UI shell
   // '/crypto-trading'   — no execution engine, regulatory risk
   // '/scrapers'         — internal tool, looks shady
   // '/pipelines'        — internal infra, not customer product
   // '/orchestration'    — internal infra, 190 lines
   // '/sandbox'          — CTF training, not a product
-  // '/rewards'          — no rewards system exists
 ];
 
 // Utility/non-service pages — do NOT redirect
