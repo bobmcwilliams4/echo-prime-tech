@@ -5,10 +5,18 @@
     <link>https://echo-ept.com</link>
     <description>Technical blog and changelog from Echo Prime Technologies — AI engineering, intelligence engines, oilfield tech, tax intelligence, and autonomous systems.</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 23 Mar 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 25 Mar 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
 
     <!-- Blog Articles -->
+    <item>
+      <title>Digital Intelligence: How AI-Powered Monitoring Protects Families and Businesses</title>
+      <link>https://echo-ept.com/blog/digital-intelligence-monitoring-family-corporate-security</link>
+      <pubDate>Tue, 25 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/digital-intelligence-monitoring-family-corporate-security</guid>
+      <category>Security</category>
+      <description>From parental oversight to corporate device management, modern digital intelligence platforms use AI anomaly detection, keyword watchlists, and network analysis to keep people safe without being intrusive.</description>
+    </item>
     <item>
       <title>Why Intelligence Engines Beat Chatbot Wrappers for Enterprise AI</title>
       <link>https://echo-ept.com/blog/why-intelligence-engines-beat-chatbot-wrappers</link>

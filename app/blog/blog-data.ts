@@ -1917,6 +1917,132 @@ The free tier includes access to [Sentinel AI](/sentinel) for ad-hoc queries acr
 
 *Explore Permian Basin AI at [echo-ept.com/permian](/permian). Search county records at [echo-ept.com/county-records](/county-records). Start free at [echo-ept.com/free](/free).*`,
   },
+  {
+    slug: 'digital-intelligence-monitoring-family-corporate-security',
+    title: 'Digital Intelligence: How AI-Powered Monitoring Protects Families and Businesses',
+    excerpt: 'From parental oversight to corporate device management, modern digital intelligence platforms use AI anomaly detection, keyword watchlists, and network analysis to keep people safe without being intrusive.',
+    category: 'Security',
+    date: '2026-03-25',
+    readTime: '7 min',
+    author: 'Echo Prime',
+    tags: ['digital intelligence', 'monitoring', 'family safety', 'corporate security', 'anomaly detection', 'OSINT'],
+    content: `## The Digital Visibility Problem
+
+Every day, your family members and employees interact with hundreds of apps, websites, and contacts. Most of this activity is invisible to you — until something goes wrong. A child encounters a predator. An employee leaks sensitive data. A device is compromised.
+
+Traditional monitoring tools fall into two categories: **too invasive** (keyloggers that record everything) or **too shallow** (screen time reports that tell you nothing useful). Neither approach gives you the intelligence-grade visibility that modern threats demand.
+
+## What Digital Intelligence Actually Means
+
+Digital intelligence isn't surveillance — it's structured awareness. The difference matters:
+
+- **Surveillance** records everything and dumps it on you to review. It's a firehose of data.
+- **Digital Intelligence** captures metadata and content, classifies it, detects anomalies, and alerts you to what matters.
+
+A good digital intelligence platform should:
+
+1. **Capture comprehensively** — messages, network traffic, app usage, DNS queries, and contact patterns
+2. **Classify automatically** — categorize domains, detect app signatures from DNS, score contact frequency
+3. **Detect anomalies** — flag unusual patterns like new contacts, late-night activity, or sudden app installs
+4. **Alert intelligently** — priority-based notifications so you're not drowning in noise
+5. **Purge completely** — a kill switch when operational security demands it
+
+## The 8-Pillar Approach
+
+Echo Intel Hub organizes digital intelligence into 8 categories, each with its own dashboard tab:
+
+### 1. Messages
+Full SMS, iMessage, and app message capture with metadata (sender, timestamp, thread ID). Search across all conversations, flag suspicious messages, and add investigator notes.
+
+### 2. Network Traffic
+Real-time HTTP and DNS traffic analysis. Every domain your device connects to is logged, categorized, and timestamped. See bandwidth consumption, connection frequency, and traffic timelines.
+
+### 3. App Usage
+Track every app session — when it opened, how long it was active, foreground vs. background time, and data consumed. Detect hidden apps that don't appear on the home screen.
+
+### 4. Contacts
+Build relationship profiles from communication patterns. Who does this device communicate with most? When did a new contact first appear? What's the communication frequency trend?
+
+### 5. DNS Intelligence
+DNS queries reveal more than most people realize. Every app, every website, every background service makes DNS requests. Intel Hub fingerprints apps by their DNS patterns — detecting VPN usage, encrypted messaging apps, and services that try to hide.
+
+### 6. Alerts
+Configurable rules that generate alerts at four priority levels: info, warning, high, and critical. Keyword matches, anomaly detections, new contact appearances, and threshold breaches all generate alerts.
+
+### 7. Watchlist
+Define the keywords and phrases that matter to your situation. Cyberbullying terms, competitor names, restricted topics, or any string you need to monitor. Matches trigger instant alerts.
+
+### 8. Settings
+Data retention controls, export scheduling, and the kill switch. One click purges all stored data when the situation demands it.
+
+## AI Anomaly Detection
+
+Static rule-based monitoring misses novel threats. Echo Intel Hub uses behavioral analysis to establish baselines and flag deviations:
+
+- **Communication Pattern Changes**: Sudden increase in messaging with a new contact
+- **Temporal Anomalies**: Device activity at unusual hours (2 AM texting for a 12-year-old)
+- **App Install Spikes**: Multiple new apps installed in a short period
+- **Network Anomalies**: Connections to unusual geographic regions or known malicious domains
+- **Behavioral Drift**: Gradual changes in usage patterns that individually seem normal but collectively indicate a shift
+
+Each anomaly is scored by severity and tagged with the evidence that triggered it. No black boxes — you can see exactly why the system flagged something.
+
+## Use Case: Parental Monitoring
+
+A parent configures Intel Hub for their 13-year-old's phone:
+
+1. Sets keyword watchlist: common cyberbullying terms, drug references, predatory language patterns
+2. Enables anomaly detection with age-appropriate baselines
+3. Configures alerts: critical for watchlist matches, warning for new unknown contacts
+
+Within the first week, the system establishes normal patterns. On day 9, it flags a new contact that appeared in messages 14 times in 2 days — well above the baseline for new contact frequency. The parent reviews the flagged messages, which are age-appropriate but from someone not in the child's school. A conversation follows. No crisis, just informed parenting.
+
+## Use Case: Corporate Device Management
+
+A company deploys Intel Hub across 50 employee devices:
+
+1. DNS monitoring detects unauthorized cloud storage usage (personal Dropbox on a work device)
+2. App tracking reveals a departing employee installed a competitor's app two weeks before submitting resignation
+3. Network analysis flags unusual data uploads to an unrecognized API endpoint
+4. Kill switch is triggered when a device is reported lost at a conference
+
+The compliance team exports a full audit trail for the legal department. Every data point is timestamped and verifiable.
+
+## Privacy and Legal Framework
+
+Monitoring devices you own or manage is legal in most jurisdictions — but the legal landscape varies. Echo Intel Hub includes:
+
+- **Consent templates** for corporate deployments (employee acknowledgement forms)
+- **Transparency options** for family use (age-appropriate notification that monitoring is active)
+- **Data retention controls** (you choose how long data is kept)
+- **Geographic compliance** settings (GDPR, COPPA, state-level privacy laws)
+- **Audit logs** showing when data was accessed and by whom
+
+## Technical Architecture
+
+Built on Cloudflare Workers with D1 for structured data and KV for real-time caching:
+
+- **27 REST API endpoints** for full programmatic access
+- **8 D1 database tables** for messages, traffic, contacts, apps, DNS, alerts, watchlist, and config
+- **Real-time cron** (*/5 minutes) for anomaly detection sweeps
+- **Encrypted at rest** — data never leaves Cloudflare's network
+- **Kill switch** purges all data in under 5 seconds
+
+## Getting Started
+
+Intel Hub deploys in minutes:
+
+1. Create an account at [echo-ept.com/intel-hub](/intel-hub)
+2. Install the configuration profile on target devices (or configure DNS resolver for network-level monitoring)
+3. Define your watchlist and alert rules
+4. The system starts capturing and analyzing immediately
+
+No hardware required. No complex setup. Just structured digital awareness.
+
+---
+
+*Start monitoring at [echo-ept.com/intel-hub](/intel-hub). Explore our full security stack at [echo-ept.com/security](/security). Free consultation at [echo-ept.com/free](/free).*`,
+  },
 ];
 
 export function formatDate(dateStr: string): string {
