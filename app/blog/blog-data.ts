@@ -2681,6 +2681,131 @@ Echo Call Center is live with a full demo tenant at [echo-ept.com/call-center](/
 
 *Compare all Echo Prime products at [echo-ept.com/pricing](/pricing). Enterprise inquiries: [echo-ept.com/support](/support).*`,
   },
+  {
+    slug: 'permian-basin-landman-ai-title-search',
+    title: 'How AI Is Cutting Permian Basin Title Search Time by 80%',
+    excerpt: 'Running title in the Permian Basin means digging through 100+ years of conveyances across Ector, Midland, Martin, and Reeves counties. AI pipelines now automate chain-of-title assembly, gap detection, and run sheet generation — turning weeks of work into hours.',
+    category: 'Oilfield Tech',
+    date: '2026-03-25',
+    readTime: '9 min',
+    author: 'Echo Prime',
+    tags: ['landman', 'Permian Basin', 'title search', 'chain of title', 'oil and gas', 'mineral rights', 'run sheet'],
+    content: `# How AI Is Cutting Permian Basin Title Search Time by 80%
+
+The Permian Basin produces 6.2 million barrels per day — more than most OPEC nations. Behind every well sits a chain of title that took a landman days or weeks to assemble. The typical mineral title in Reeves County touches 40-80 conveyances spanning 100+ years, with severances, assignments, pooling agreements, and probate proceedings buried across multiple county clerks' systems.
+
+## The Manual Title Process
+
+A traditional title examination in the Permian follows this workflow:
+
+1. **County records search**: Visit or access the county clerk's online portal (if one exists). Search grantor/grantee indexes by section, block, and survey.
+2. **Document retrieval**: Pull every deed, assignment, release, and probate document touching the target mineral interest.
+3. **Chain assembly**: Manually trace ownership from patent/sovereign grant forward, linking each conveyance.
+4. **Gap identification**: Find breaks in the chain — missing assignments, unreleased liens, dissolved entities, heir problems.
+5. **Run sheet preparation**: Summarize current mineral ownership with fractional interests.
+6. **Title opinion**: Attorney reviews the chain and issues a formal title opinion.
+
+For a single section in Midland County, step 1-5 takes an experienced landman 3-5 days. In Reeves County — where records are less digitized and Spanish land grants complicate the sovereign chain — it can take a week or more.
+
+## Where AI Changes the Game
+
+Echo's Landman Pipeline automates the most time-consuming steps while keeping human expertise where it matters.
+
+### Automated County Records Search
+
+The pipeline connects to county clerk systems across the Permian Basin. When you submit a legal description (Section 270, Block 13, H&TC RR Survey, Reeves County):
+
+- **ShadowGlass v9** crawls the county portal, pulling all matching records
+- **259,000+ deed records** already indexed across 80 counties in R2 cloud storage
+- **Instrument type classification**: Deeds, assignments, releases, probates, mineral reservations — auto-categorized by 32 instrument types
+- **OCR + extraction**: Scanned documents run through AI text extraction to identify grantor, grantee, legal description, consideration, and recording data
+
+### Chain of Title Assembly
+
+This is where the Landman Pipeline's intelligence engines do the heavy lifting:
+
+1. **Entity resolution**: "Bobby D. McWilliams" and "B.D. McWilliams" and "Bobby Don McWilliams II" are recognized as the same person
+2. **Forward tracing**: Starting from the earliest grant, each conveyance links to the next based on grantor/grantee matching
+3. **Fractional interest calculation**: As mineral interests are divided through conveyances, the pipeline tracks fractional ownership through every split
+4. **Severance detection**: Surface/mineral severances are flagged and tracked separately
+5. **Pooling unit analysis**: If the target tract is pooled, the pipeline identifies the pooling order and calculates participating interest
+
+### Gap Detection
+
+The pipeline automatically identifies:
+
+- **Missing links**: Grantor conveyed an interest they never received
+- **Unreleased liens**: Mortgages or deeds of trust without recorded releases
+- **Probate gaps**: Deceased owners without probate records in the chain
+- **Dissolved entities**: Corporate grantors that no longer exist
+- **Recording errors**: Mismatched legal descriptions, wrong section/block references
+- **Tax sale issues**: Delinquent tax records that could cloud title
+
+Each gap is classified by severity: CRITICAL (blocks drilling), WARNING (needs curative work), or INFO (cosmetic issue).
+
+### Run Sheet Generation
+
+The final output is a professional run sheet showing:
+
+| Owner | Interest Type | Fraction | Source Document | Notes |
+|---|---|---|---|---|
+| McWilliams Dynasty LLC | Mineral | 1/4 | Vol. 2847, Pg. 112 | Acquired from Smith 2019 |
+| Permian Royalties Trust | ORRI | 1/16 | Vol. 3201, Pg. 45 | Retained in 2021 assignment |
+| Texas GLO | Surface | — | Patent #4521 | Original sovereign grant |
+
+## The Numbers
+
+| Metric | Manual | AI Pipeline |
+|---|---|---|
+| Single section title search | 3-5 days | 4-8 hours |
+| Document retrieval | $200-500/section | $0 (pre-indexed) |
+| Gap detection accuracy | 85-90% | 97%+ |
+| Run sheet generation | 2-4 hours | 15 minutes |
+| Multi-section project (40 sections) | 6-8 weeks | 5-7 days |
+
+The 80% time reduction comes primarily from automated document retrieval (already indexed), AI chain assembly, and automatic gap detection. Human landmen still review the output and handle curative work — but they start from a completed first draft rather than a blank page.
+
+## Architecture
+
+The Landman Pipeline is a Cloudflare Worker with service bindings to:
+
+- **Engine Runtime**: 5,486 intelligence engines including 22 Landman engines (LM01-LM22) with 601,000+ doctrines covering mineral title, lease analysis, easements, water rights, and chain-of-title methodology
+- **ShadowGlass v9**: County records scraping across 80 Texas counties
+- **Knowledge Forge**: 24,886 documents indexed, including Texas property code, RRC regulations, and county-specific recording requirements
+- **Shared Brain**: Cross-session memory so the pipeline remembers previously researched tracts
+
+### Sentinel AI Integration
+
+For interactive title queries, Sentinel AI (at [echo-ept.com/sentinel](/sentinel)) provides a conversational interface. Ask:
+
+- *"Run title on Section 270, Block 13, Reeves County"*
+- *"Who owns the minerals in the NE/4 of Section 15, Block A-52?"*
+- *"Find all assignments from Devon Energy in Midland County since 2020"*
+
+Sentinel routes title queries through the Landman Pipeline automatically, with progress tracking and a 5-tab results view (Summary, Run Sheet, Ownership, Gaps, Full Report).
+
+## Who This Is For
+
+- **Independent landmen** billing hourly who want to take on more projects
+- **Land companies** staffing title examinations for operators
+- **Oil companies** with in-house land departments doing due diligence on acquisitions
+- **Title attorneys** who want draft run sheets and gap analysis before starting their opinion
+- **Mineral buyers** evaluating purchases who need quick ownership verification
+
+## Pricing
+
+| Plan | Monthly | Includes |
+|---|---|---|
+| Individual | $149 | 10 title searches/month, 5 counties |
+| Professional | $499 | 50 searches, all 80 counties, batch processing |
+| Enterprise | $1,499 | Unlimited searches, API access, white-label reports |
+
+## Try It
+
+The Landman Pipeline is live. Start a title search at [echo-ept.com/sentinel](/sentinel) or explore county records at [echo-ept.com/county-records](/county-records).
+
+*See all Echo Prime products at [echo-ept.com/pricing](/pricing). Built in Midland, TX — by people who actually run title.*`,
+  },
 ];
 
 export function formatDate(dateStr: string): string {
