@@ -179,6 +179,30 @@ const FEATURES = [
     icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z',
     color: '#8b5cf6',
   },
+  {
+    title: 'Agent Gamification',
+    desc: 'Points, badges, leaderboards, and redeemable rewards. 8 rarities from Common to Legendary. Motivate agents with streaks, milestones, and competitions.',
+    icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
+    color: '#f59e0b',
+  },
+  {
+    title: 'Call Volume Forecasting',
+    desc: 'Predict call volumes by hour using historical patterns. Auto-calculate agents needed. Compare forecasts vs actuals for accuracy tracking.',
+    icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
+    color: '#3b82f6',
+  },
+  {
+    title: 'Conference Calls',
+    desc: 'Multi-party conferencing with mute, hold, and participant management. Up to 10 participants per conference. Full recording support.',
+    icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+    color: '#10b981',
+  },
+  {
+    title: 'Number Masking & Caller ID',
+    desc: 'Anonymous calling with proxy numbers. Per-queue and per-campaign caller ID profiles. Local presence dialing. Auto-expiring masks.',
+    icon: 'M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88',
+    color: '#64748b',
+  },
 ];
 
 const SCALE_COMPARISON = [
@@ -215,7 +239,11 @@ const SCALE_COMPARISON = [
   { metric: 'Queue Announcements', closer: 'No', callCenter: 'TTS + position + callback offer' },
   { metric: 'Usage Billing', closer: 'No', callCenter: 'Metered + invoices' },
   { metric: 'Supervisor Dashboard', closer: 'No', callCenter: 'Monitor/whisper/barge/takeover' },
-  { metric: 'API Endpoints', closer: '~20', callCenter: '180+ REST endpoints' },
+  { metric: 'Gamification', closer: 'No', callCenter: 'Points + badges + rewards' },
+  { metric: 'Call Forecasting', closer: 'No', callCenter: 'Historical patterns + staffing' },
+  { metric: 'Conference Calls', closer: 'No', callCenter: 'Multi-party (10 participants)' },
+  { metric: 'Number Masking', closer: 'No', callCenter: 'Proxy + caller ID profiles' },
+  { metric: 'API Endpoints', closer: '~20', callCenter: '200+ REST endpoints' },
 ];
 
 const PRICING = [
@@ -264,6 +292,8 @@ const PRICING = [
       'Canned responses (/shortcuts)',
       'SMS/MMS channel',
       'Queue announcements (TTS)',
+      'Gamification + badges',
+      'Conference calls',
       'Advanced analytics + heatmaps',
       'Priority support',
     ],
@@ -281,7 +311,7 @@ const PRICING = [
       'Predictive dialer with pacing',
       'Multi-tenant white-label',
       'Custom voice cloning',
-      'Full API (180+ endpoints)',
+      'Full API (200+ endpoints)',
       'Custom webhook integrations',
       'Full TCPA + SOC 2 compliance',
       'Custom SLA rules + dashboards',
@@ -295,6 +325,10 @@ const PRICING = [
       'Queue announcements with TTS',
       'Metered billing + invoicing',
       'Supervisor dashboard (monitor/whisper/barge)',
+      'Agent gamification + leaderboard',
+      'Call volume forecasting + staffing',
+      'Conference calls (10 participants)',
+      'Number masking + caller ID profiles',
       'Bulk operations + data import',
       'Dedicated success manager',
       'SLA guarantee (99.99%)',
@@ -807,7 +841,7 @@ export default function CallCenterPage() {
       {/* Footer */}
       <footer className="border-t py-8 px-6 text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
-          &copy; {new Date().getFullYear()} Echo Prime Technologies. AI Call Center v3.2 — 44 tables, 180+ endpoints, built on Cloudflare&apos;s global edge.
+          &copy; {new Date().getFullYear()} Echo Prime Technologies. AI Call Center v3.3 — 55 tables, 200+ endpoints, built on Cloudflare&apos;s global edge.
         </p>
         <div className="flex justify-center gap-6 mt-3">
           <Link href="/closer" className="text-xs font-medium" style={{ color: 'var(--ept-text-secondary)' }}>AI Closer (Solo)</Link>
