@@ -90,6 +90,7 @@ const EXEMPT_PREFIXES = [
   '/expense-management', // Echo Expense Management
   '/okr',                // Echo OKR
   '/subscription',       // Echo Subscription
+  '/customer-success',   // Echo Customer Success
 
   // ── Content pages ──
   '/blog',               // Blog articles
