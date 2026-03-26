@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Automated payroll runs with hour-based pay calculation, approvals, and exports.',
     url: 'https://echo-ept.com/office-ai/payroll',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Payroll Management — Echo Prime Technologies',
+    description: 'Automated payroll runs with hour-based pay calculation, approvals, and exports.',
+  },
+  alternates: { canonical: '/office-ai/payroll' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

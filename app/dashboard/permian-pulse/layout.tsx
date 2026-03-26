@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Permian Basin competitive intelligence with competitor tracking and market analysis.',
     url: 'https://echo-ept.com/dashboard/permian-pulse',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Permian Pulse — Echo Prime Technologies',
+    description: 'Permian Basin competitive intelligence with competitor tracking and market analysis.',
+  },
+  alternates: { canonical: '/dashboard/permian-pulse' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

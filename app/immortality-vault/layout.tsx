@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://echo-ept.com/immortality-vault',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Immortality Vault — Preserve Your Legacy Forever',
+    description: 'Capture voice, memories, personality, and wisdom. Then talk to your loved ones anytime.',
+  },
   alternates: { canonical: '/immortality-vault' },
 };
 

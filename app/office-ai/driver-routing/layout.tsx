@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Fleet route planning, driver dispatch, and stop tracking for service businesses.',
     url: 'https://echo-ept.com/office-ai/driver-routing',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Driver Routing & Dispatch — Echo Prime Technologies',
+    description: 'Fleet route planning, driver dispatch, and stop tracking for service businesses.',
+  },
+  alternates: { canonical: '/office-ai/driver-routing' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

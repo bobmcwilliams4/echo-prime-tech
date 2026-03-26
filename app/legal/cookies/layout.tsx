@@ -8,6 +8,11 @@ export const metadata: Metadata = {
     description: 'Cookies used across the Echo Prime Technologies platform.',
     url: 'https://echo-ept.com/legal/cookies',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cookie Policy — Echo Prime Technologies',
+    description: 'Cookies used across the Echo Prime Technologies platform.',
+  },
   alternates: { canonical: '/legal/cookies' },
 };
 

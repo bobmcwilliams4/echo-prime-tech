@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     description: 'AI-powered personal finance with multi-account tracking, auto-categorization, budgets, and net worth tracking.',
     url: 'https://echo-ept.com/finance',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Personal Finance — Echo Prime Technologies',
+    description: 'AI-powered personal finance with multi-account tracking, auto-categorization, budgets, and net worth tracking.',
+  },
+  alternates: { canonical: '/finance' },
 };
 
 export default function FinanceLayout({ children }: { children: React.ReactNode }) {

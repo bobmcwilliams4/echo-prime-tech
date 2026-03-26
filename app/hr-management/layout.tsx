@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     description: 'AI-powered HR for growing teams. Employee directory, time-off management, AI performance reviews, compensation analytics, org charts.',
     url: 'https://echo-ept.com/hr-management',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI HR Management — Echo Prime Technologies',
+    description: 'AI-powered HR for growing teams. Employee directory, time-off management, AI performance reviews, compensation analytics, org charts.',
+  },
+  alternates: { canonical: '/hr-management' },
 };
 
 export default function HRManagementLayout({ children }: { children: React.ReactNode }) {

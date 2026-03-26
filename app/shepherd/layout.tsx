@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/shepherd',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Shepherd AI — Church & Ministry Management Platform',
+    description: 'AI-powered church management with sermon prep, congregation care, volunteer scheduling, and denomination-specific configurations.',
+  },
   alternates: { canonical: 'https://echo-ept.com/shepherd' },
 };
 

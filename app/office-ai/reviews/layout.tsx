@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Customer review management with moderation, ratings, and reputation tracking.',
     url: 'https://echo-ept.com/office-ai/reviews',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Customer Reviews — Echo Prime Technologies',
+    description: 'Customer review management with moderation, ratings, and reputation tracking.',
+  },
+  alternates: { canonical: '/office-ai/reviews' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

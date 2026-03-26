@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Workforce management with employee profiles, roles, rates, and status tracking.',
     url: 'https://echo-ept.com/dashboard/business/employees',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Employee Management — Echo Prime Technologies',
+    description: 'Workforce management with employee profiles, roles, rates, and status tracking.',
+  },
+  alternates: { canonical: '/dashboard/business/employees' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

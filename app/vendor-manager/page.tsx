@@ -68,7 +68,7 @@ export default function VendorManagerPage() {
 
   return (
     <>
-      <FaqSchema faqs={faqs} />
+      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
 
         {/* Hero */}

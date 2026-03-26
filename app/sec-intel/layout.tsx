@@ -8,6 +8,11 @@ export const metadata: Metadata = {
     description: 'AI-powered SEC filing analysis with watchlists, alerts, and automated intelligence.',
     url: 'https://echo-ept.com/sec-intel',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SEC EDGAR Intelligence | Echo Prime Technologies',
+    description: 'AI-powered SEC filing analysis with watchlists, alerts, and automated intelligence.',
+  },
   alternates: { canonical: '/sec-intel' },
 };
 

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Full lead profile with contact info, call history, notes, and one-click AI calling.',
     url: 'https://echo-ept.com/closer/leads/detail',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Lead Detail — Echo Prime Technologies',
+    description: 'Full lead profile with contact info, call history, notes, and one-click AI calling.',
+  },
+  alternates: { canonical: '/closer/leads/detail' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

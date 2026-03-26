@@ -288,6 +288,7 @@
   <url><loc>https://echo-ept.com/subscription</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/customer-success</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/data-room</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/asset-manager</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- New Blog Articles (2026-03-26 session 45f) -->
   <url><loc>https://echo-ept.com/blog/estate-planning-ai-trust-administration-wealth-transfer-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
@@ -327,4 +328,31 @@
   <url><loc>https://echo-ept.com/case-studies</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://echo-ept.com/free</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/waitlist</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+
+  <!-- Blog Articles Wave 5 -->
+  <url><loc>https://echo-ept.com/blog/ai-esignature-vs-docusign-adobe-sign-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-project-management-vs-monday-asana-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-live-chat-vs-intercom-drift-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-document-management-vs-notion-sharepoint-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- Additional product pages (2026-03-26 session D metadata sprint) -->
+  <url><loc>https://echo-ept.com/business-manager</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/checkout</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/sdk/signup</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://echo-ept.com/immortality-vault/app</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://echo-ept.com/vendor-manager</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/incident-manager</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/whatsapp-bot</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/ab-testing</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/telegram-bot</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/chat-ai</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/app-forge</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/prompt-forge</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/agentic-engine</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/shopify</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/graph-rag</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/domain-harvester</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/drive-intelligence</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/revenue-engine</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/swarm-brain</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 </urlset>

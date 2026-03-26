@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Payroll processing with period management, employee breakdowns, and approval tracking.',
     url: 'https://echo-ept.com/dashboard/business/payroll',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Payroll — Echo Prime Technologies',
+    description: 'Payroll processing with period management, employee breakdowns, and approval tracking.',
+  },
+  alternates: { canonical: '/dashboard/business/payroll' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

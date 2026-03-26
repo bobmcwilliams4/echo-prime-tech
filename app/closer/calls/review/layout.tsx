@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Review individual AI sales calls with transcripts, event timelines, and sentiment analysis.',
     url: 'https://echo-ept.com/closer/calls/review',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Call Review — Echo Prime Technologies',
+    description: 'Review individual AI sales calls with transcripts, event timelines, and sentiment analysis.',
+  },
+  alternates: { canonical: '/closer/calls/review' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

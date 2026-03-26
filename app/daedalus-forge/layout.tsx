@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/daedalus-forge',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Daedalus Forge — Manufacturing AI',
+    description: 'AI manufacturing: CNC programming, stress analysis, DFM scoring, cost estimation. 8 industry verticals.',
+  },
   alternates: { canonical: '/daedalus-forge' },
 };
 

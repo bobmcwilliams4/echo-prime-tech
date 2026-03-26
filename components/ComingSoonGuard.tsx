@@ -92,6 +92,22 @@ const EXEMPT_PREFIXES = [
   '/subscription',       // Echo Subscription
   '/customer-success',   // Echo Customer Success
   '/data-room',          // Echo Data Room
+  '/asset-manager',      // Echo Asset Manager
+  '/vendor-manager',     // Echo Vendor Manager
+  '/incident-manager',   // Echo Incident Manager
+  '/whatsapp-bot',       // Echo WhatsApp Bot
+  '/ab-testing',         // Echo A/B Testing
+  '/telegram-bot',       // Echo Telegram Bot
+  '/chat-ai',            // Echo Chat AI
+  '/app-forge',          // Echo App Forge
+  '/prompt-forge',       // Echo Prompt Forge
+  '/agentic-engine',     // Echo Agentic Engine
+  '/shopify',            // Echo Shopify
+  '/graph-rag',          // Echo Graph RAG
+  '/domain-harvester',   // Echo Domain Harvester
+  '/drive-intelligence',  // Echo Drive Intelligence
+  '/revenue-engine',     // Echo Revenue Engine
+  '/swarm-brain',        // Echo Swarm Brain
 
   // ── Content pages ──
   '/blog',               // Blog articles

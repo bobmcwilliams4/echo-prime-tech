@@ -11,6 +11,11 @@ export const metadata: Metadata = {
     siteName: 'Echo Prime Technologies',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Intel Hub — Digital Intelligence & Monitoring',
+    description: 'Monitor devices, analyze traffic, track apps, and detect anomalies from one encrypted dashboard.',
+  },
   alternates: { canonical: 'https://echo-ept.com/intel-hub' },
 };
 

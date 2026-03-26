@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Bidirectional Zoho CRM and Closer AI lead sync with AI-powered intelligence and engine analysis.',
     url: 'https://echo-ept.com/admin/zoho',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Zoho CRM Integration — Echo Prime Technologies',
+    description: 'Bidirectional Zoho CRM and Closer AI lead sync with AI-powered intelligence and engine analysis.',
+  },
+  alternates: { canonical: '/admin/zoho' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Time tracking with project budgets, weekly timesheets, invoice generation, and AI productivity insights.',
     url: 'https://echo-ept.com/timesheet',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Timesheet — AI Time Tracking',
+    description: 'Time tracking with project budgets, weekly timesheets, invoice generation, and AI productivity insights.',
+  },
+  alternates: { canonical: '/timesheet' },
 };
 
 export default function TimesheetLayout({ children }: { children: React.ReactNode }) {

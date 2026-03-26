@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/websites',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Website Development — AI-Powered Web Solutions',
+    description: 'Professional website development powered by AI. Next.js, React, Cloudflare Workers, and Vercel.',
+  },
   alternates: { canonical: '/websites' },
 };
 

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Real-time AI call monitoring with live transcription, whisper coaching, and takeover controls.',
     url: 'https://echo-ept.com/closer/calls/live',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Live Call Monitor — Echo Prime Technologies',
+    description: 'Real-time AI call monitoring with live transcription, whisper coaching, and takeover controls.',
+  },
+  alternates: { canonical: '/closer/calls/live' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

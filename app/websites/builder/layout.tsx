@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: '20 industry templates, AI content generation, and drag-and-drop editing. Build and deploy professional websites in minutes.',
     url: 'https://echo-ept.com/websites/builder',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Website Builder — Echo Prime Technologies',
+    description: '20 industry templates, AI content generation, and drag-and-drop editing. Build and deploy professional websites in minutes.',
+  },
+  alternates: { canonical: '/websites/builder' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

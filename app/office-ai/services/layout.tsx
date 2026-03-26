@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Service catalog management with flexible pricing, categories, and billing cycles.',
     url: 'https://echo-ept.com/office-ai/services',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Service Catalog — Echo Prime Technologies',
+    description: 'Service catalog management with flexible pricing, categories, and billing cycles.',
+  },
+  alternates: { canonical: '/office-ai/services' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

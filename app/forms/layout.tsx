@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/forms',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Forms — AI-Powered Form Builder & Survey System',
+    description: 'Build smarter forms with AI question suggestions, automatic response analysis, quiz scoring, and real-time analytics.',
+  },
+  alternates: { canonical: '/forms' },
 };
 
 export default function FormsLayout({ children }: { children: React.ReactNode }) {

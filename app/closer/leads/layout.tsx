@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'AI-powered lead management with bulk import, categorization, and one-click AI calling.',
     url: 'https://echo-ept.com/closer/leads',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Lead Management — Echo Prime Technologies',
+    description: 'AI-powered lead management with bulk import, categorization, and one-click AI calling.',
+  },
+  alternates: { canonical: '/closer/leads' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

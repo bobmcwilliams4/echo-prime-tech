@@ -8,6 +8,11 @@ export const metadata: Metadata = {
     description: 'How we collect, use, and protect your data.',
     url: 'https://echo-ept.com/legal/privacy',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Privacy Policy — Echo Prime Technologies',
+    description: 'How we collect, use, and protect your data.',
+  },
   alternates: { canonical: '/legal/privacy' },
 };
 

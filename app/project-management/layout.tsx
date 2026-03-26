@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     description: 'AI-powered project management with Kanban boards, sprint planning, time tracking, burndown charts, and AI task estimation.',
     url: 'https://echo-ept.com/project-management',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Project Management — Echo Prime Technologies',
+    description: 'AI-powered project management with Kanban boards, sprint planning, time tracking, burndown charts, and AI task estimation.',
+  },
+  alternates: { canonical: '/project-management' },
 };
 
 export default function ProjectManagementLayout({ children }: { children: React.ReactNode }) {

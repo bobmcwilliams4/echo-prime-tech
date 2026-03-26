@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Invoice management with creation, payment tracking, and multi-status workflows.',
     url: 'https://echo-ept.com/dashboard/business/invoices',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Invoices — Echo Prime Technologies',
+    description: 'Invoice management with creation, payment tracking, and multi-status workflows.',
+  },
+  alternates: { canonical: '/dashboard/business/invoices' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

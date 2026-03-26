@@ -8,6 +8,11 @@ export const metadata: Metadata = {
     description: 'Autonomous X/Twitter bot with AI content generation, 14 personalities, and Grok images.',
     url: 'https://echo-ept.com/x-bot',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'X/Twitter AI Bot | Echo Prime Technologies',
+    description: 'Autonomous X/Twitter bot with AI content generation, 14 personalities, and Grok images.',
+  },
   alternates: { canonical: '/x-bot' },
 };
 

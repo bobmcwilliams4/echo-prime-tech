@@ -9,6 +9,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/vault',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Commander Vault — Echo Prime Technologies',
+    description: 'Secure credential management vault with AES-256-GCM encryption, Argon2id key derivation, and comprehensive audit logging.',
+  },
   alternates: { canonical: '/vault' },
 };
 

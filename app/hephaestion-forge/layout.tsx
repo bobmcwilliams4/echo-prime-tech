@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/hephaestion-forge',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Hephaestion Forge — AI Code Factory',
+    description: 'AI code factory: 13-stage pipeline, 15 archetypes, multi-LLM validation. Production-ready applications.',
+  },
   alternates: { canonical: '/hephaestion-forge' },
 };
 

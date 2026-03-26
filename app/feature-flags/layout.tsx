@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Boolean, percentage, and targeted feature flags with rules engine, audit trail, and instant evaluation.',
     url: 'https://echo-ept.com/feature-flags',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Feature Flags — Controlled Rollouts',
+    description: 'Boolean, percentage, and targeted feature flags with rules engine, audit trail, and instant evaluation.',
+  },
+  alternates: { canonical: '/feature-flags' },
 };
 
 export default function FeatureFlagsLayout({ children }: { children: React.ReactNode }) {

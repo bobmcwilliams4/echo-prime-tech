@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/hr',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo HR — AI-Powered Employee & HR Management',
+    description: 'Complete HR platform with AI-powered retention risk prediction and performance insights.',
+  },
+  alternates: { canonical: '/hr' },
 };
 
 export default function HRLayout({ children }: { children: React.ReactNode }) {

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Turn signups into growth. Referral-powered waitlists with position tracking and milestone rewards.',
     url: 'https://echo-ept.com/waitlist',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Waitlist — Viral Launch Pages & Referral Waitlists',
+    description: 'Turn signups into growth. Referral-powered waitlists with position tracking and milestone rewards.',
+  },
+  alternates: { canonical: '/waitlist' },
 };
 
 export default function WaitlistLayout({ children }: { children: React.ReactNode }) {

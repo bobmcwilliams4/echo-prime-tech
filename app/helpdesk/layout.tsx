@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Smart ticketing, SLA tracking, AI auto-responses, knowledge base, multi-channel support.',
     url: 'https://echo-ept.com/helpdesk',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Helpdesk — AI Customer Support Platform',
+    description: 'Smart ticketing, SLA tracking, AI auto-responses, knowledge base, multi-channel support.',
+  },
+  alternates: { canonical: '/helpdesk' },
 };
 
 export default function HelpdeskLayout({ children }: { children: React.ReactNode }) {

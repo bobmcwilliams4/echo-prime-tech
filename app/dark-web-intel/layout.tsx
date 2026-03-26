@@ -6,7 +6,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Dark Web Intelligence | Echo Prime Technologies',
     description: 'AI-powered dark web monitoring, credential leak detection, and threat intelligence.',
+    url: 'https://echo-ept.com/dark-web-intel',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Dark Web Intelligence | Echo Prime Technologies',
+    description: 'AI-powered dark web monitoring, credential leak detection, and threat intelligence.',
+  },
+  alternates: { canonical: '/dark-web-intel' },
 };
 
 export default function DarkWebIntelLayout({ children }: { children: React.ReactNode }) {

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Real-time business KPIs, revenue summaries, and operational overview in one dashboard.',
     url: 'https://echo-ept.com/office-ai/dashboard',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Business Dashboard — Echo Prime Technologies',
+    description: 'Real-time business KPIs, revenue summaries, and operational overview in one dashboard.',
+  },
+  alternates: { canonical: '/office-ai/dashboard' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

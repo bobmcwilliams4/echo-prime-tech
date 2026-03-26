@@ -9,6 +9,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/admin',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Admin Panel — Echo Prime Technologies',
+    description: 'Echo Prime Technologies administration panel. Manage users, services, engines, and system configuration.',
+  },
   alternates: { canonical: '/admin' },
 };
 

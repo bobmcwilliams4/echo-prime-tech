@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Expense reports, receipt scanning, policy enforcement, and reimbursement management for teams.',
     url: 'https://echo-ept.com/expense-management',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Expense — AI Expense Management',
+    description: 'Expense reports, receipt scanning, policy enforcement, and reimbursement management for teams.',
+  },
+  alternates: { canonical: '/expense-management' },
 };
 
 export default function ExpenseLayout({ children }: { children: React.ReactNode }) {

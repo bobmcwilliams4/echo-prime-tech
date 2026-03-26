@@ -6,7 +6,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'LinkedIn AI Bot | Echo Prime Technologies',
     description: 'AI-powered LinkedIn content generation and professional engagement automation.',
+    url: 'https://echo-ept.com/linkedin',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'LinkedIn AI Bot | Echo Prime Technologies',
+    description: 'AI-powered LinkedIn content generation and professional engagement automation.',
+  },
+  alternates: { canonical: '/linkedin' },
 };
 
 export default function LinkedInLayout({ children }: { children: React.ReactNode }) {

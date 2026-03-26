@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/knowledge',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Knowledge Systems — Doctrine Intelligence',
+    description: '30,000+ doctrine blocks with semantic search and court-defensible reasoning across 65 verticals.',
+  },
   alternates: { canonical: '/knowledge' },
 };
 

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Real-time revenue tracking, expense analytics, and trend insights for your business.',
     url: 'https://echo-ept.com/office-ai/analytics',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Business Analytics — Echo Prime Technologies',
+    description: 'Real-time revenue tracking, expense analytics, and trend insights for your business.',
+  },
+  alternates: { canonical: '/office-ai/analytics' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

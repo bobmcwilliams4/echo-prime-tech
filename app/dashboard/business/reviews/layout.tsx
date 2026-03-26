@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Customer review management with ratings, approval workflows, and service feedback.',
     url: 'https://echo-ept.com/dashboard/business/reviews',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Customer Reviews — Echo Prime Technologies',
+    description: 'Customer review management with ratings, approval workflows, and service feedback.',
+  },
+  alternates: { canonical: '/dashboard/business/reviews' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

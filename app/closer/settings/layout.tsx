@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Configure AI Closer voice, calling hours, Twilio integration, and compliance settings.',
     url: 'https://echo-ept.com/closer/settings',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Closer Settings — Echo Prime Technologies',
+    description: 'Configure AI Closer voice, calling hours, Twilio integration, and compliance settings.',
+  },
+  alternates: { canonical: '/closer/settings' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

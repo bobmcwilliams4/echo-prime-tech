@@ -7,6 +7,12 @@ export const metadata: Metadata = {
     title: 'GGI Apex Predator — AI Gaming Companion | Echo Prime Technologies',
     description: 'AI gaming companion with 45+ games, 8 play modes, and real-time screen analysis.',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'GGI Apex Predator — AI Gaming Companion | Echo Prime Technologies',
+    description: 'AI gaming companion with 45+ games, 8 play modes, and real-time screen analysis.',
+  },
+  alternates: { canonical: '/gamer-companion' },
 };
 
 export default function GamerCompanionLayout({ children }: { children: React.ReactNode }) {

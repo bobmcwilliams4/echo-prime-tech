@@ -6,7 +6,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Echo Prime Store',
     description: 'AI-powered tools and services built in Midland, Texas.',
+    url: 'https://echo-ept.com/ecommerce',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Prime Store',
+    description: 'AI-powered tools and services built in Midland, Texas.',
+  },
+  alternates: { canonical: '/ecommerce' },
 };
 
 export default function EcommerceLayout({ children }: { children: React.ReactNode }) {

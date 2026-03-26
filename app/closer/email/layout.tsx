@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Full email client for sales communications with inbox management, compose, and lead-linked history.',
     url: 'https://echo-ept.com/closer/email',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Email Center — Echo Prime Technologies',
+    description: 'Full email client for sales communications with inbox management, compose, and lead-linked history.',
+  },
+  alternates: { canonical: '/closer/email' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

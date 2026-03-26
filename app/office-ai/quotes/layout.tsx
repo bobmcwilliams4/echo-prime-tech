@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Professional quote generation with service catalog and one-click invoice conversion.',
     url: 'https://echo-ept.com/office-ai/quotes',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Quote Generator — Echo Prime Technologies',
+    description: 'Professional quote generation with service catalog and one-click invoice conversion.',
+  },
+  alternates: { canonical: '/office-ai/quotes' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

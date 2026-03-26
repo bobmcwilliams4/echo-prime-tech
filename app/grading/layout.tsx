@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/grading',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Collectibles Grading',
+    description: 'AI-powered collectibles grading with machine vision. Sports cards, comics, coins, and more. 99.2% accuracy.',
+  },
   alternates: { canonical: '/grading' },
 };
 

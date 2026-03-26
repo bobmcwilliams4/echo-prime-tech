@@ -8,6 +8,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/signup',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Create Account — Echo Prime Technologies',
+    description: 'Create your Echo Prime Technologies account. Access 900+ intelligence engines, voice synthesis, cybersecurity tools, and enterprise AI infrastructure.',
+  },
   alternates: { canonical: '/signup' },
 };
 

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Customize your Office AI platform by enabling the exact modules your business needs.',
     url: 'https://echo-ept.com/office-ai/modules',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Module Manager — Echo Prime Technologies',
+    description: 'Customize your Office AI platform by enabling the exact modules your business needs.',
+  },
+  alternates: { canonical: '/office-ai/modules' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

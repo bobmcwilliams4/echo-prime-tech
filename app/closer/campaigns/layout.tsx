@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Build and manage AI-powered outbound sales campaigns with scripts, schedules, and lead targeting.',
     url: 'https://echo-ept.com/closer/campaigns',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Campaign Manager — Echo Prime Technologies',
+    description: 'Build and manage AI-powered outbound sales campaigns with scripts, schedules, and lead targeting.',
+  },
+  alternates: { canonical: '/closer/campaigns' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

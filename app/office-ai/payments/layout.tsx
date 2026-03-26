@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Multi-method payment tracking with status monitoring and invoice linking.',
     url: 'https://echo-ept.com/office-ai/payments',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Payment Tracking — Echo Prime Technologies',
+    description: 'Multi-method payment tracking with status monitoring and invoice linking.',
+  },
+  alternates: { canonical: '/office-ai/payments' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

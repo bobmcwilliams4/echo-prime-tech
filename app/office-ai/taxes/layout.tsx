@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Quarterly tax payment tracking with YTD calculations and deadline monitoring.',
     url: 'https://echo-ept.com/office-ai/taxes',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Tax Calculator & Reporting — Echo Prime Technologies',
+    description: 'Quarterly tax payment tracking with YTD calculations and deadline monitoring.',
+  },
+  alternates: { canonical: '/office-ai/taxes' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

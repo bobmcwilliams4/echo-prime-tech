@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Service quote management with line items, approval tracking, and invoice conversion.',
     url: 'https://echo-ept.com/dashboard/business/quotes',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Quotes — Echo Prime Technologies',
+    description: 'Service quote management with line items, approval tracking, and invoice conversion.',
+  },
+  alternates: { canonical: '/dashboard/business/quotes' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

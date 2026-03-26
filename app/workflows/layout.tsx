@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     description: 'Visual workflow builder with drag-and-drop steps, cron scheduling, webhook triggers, and AI analysis actions.',
     url: 'https://echo-ept.com/workflows',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Workflow Automation — Echo Prime Technologies',
+    description: 'Visual workflow builder with drag-and-drop steps, cron scheduling, webhook triggers, and AI analysis actions.',
+  },
+  alternates: { canonical: '/workflows' },
 };
 
 export default function WorkflowsLayout({ children }: { children: React.ReactNode }) {

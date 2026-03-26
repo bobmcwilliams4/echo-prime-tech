@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'AR/AP aging reports with real-time outstanding balance tracking and cash flow monitoring.',
     url: 'https://echo-ept.com/office-ai/ar-ap',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Accounts Receivable & Payable — Echo Prime Technologies',
+    description: 'AR/AP aging reports with real-time outstanding balance tracking and cash flow monitoring.',
+  },
+  alternates: { canonical: '/office-ai/ar-ap' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

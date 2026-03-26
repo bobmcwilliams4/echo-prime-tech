@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'AR aging buckets, outstanding invoice tracking, and payment distribution insights.',
     url: 'https://echo-ept.com/dashboard/business/ar-ap',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Accounts Receivable & Payable — Echo Prime Technologies',
+    description: 'AR aging buckets, outstanding invoice tracking, and payment distribution insights.',
+  },
+  alternates: { canonical: '/dashboard/business/ar-ap' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

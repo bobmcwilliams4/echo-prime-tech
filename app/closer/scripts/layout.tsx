@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Visual AI sales script builder with state machines, objection flows, and industry templates.',
     url: 'https://echo-ept.com/closer/scripts',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Script Builder — Echo Prime Technologies',
+    description: 'Visual AI sales script builder with state machines, objection flows, and industry templates.',
+  },
+  alternates: { canonical: '/closer/scripts' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

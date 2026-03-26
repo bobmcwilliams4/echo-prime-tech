@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     description: 'AI-powered CRM with deal pipelines, lead scoring, contact management, activity tracking, and revenue analytics.',
     url: 'https://echo-ept.com/crm',
   },
+  twitter: {
+    card: 'summary',
+    title: 'Echo CRM — AI-Powered CRM',
+    description: 'Deal pipelines, AI lead scoring, activity tracking, and revenue analytics. HubSpot alternative starting at $29/mo.',
+  },
+  alternates: { canonical: '/crm' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/contracts',
     type: 'website',
   },
+  twitter: {
+    card: 'summary',
+    title: 'Echo Contracts — AI Contract Management & E-Signatures',
+    description: 'AI risk analysis, clause library, unlimited e-signatures, version control, and renewal automation. Starts at $19/mo.',
+  },
+  alternates: { canonical: '/contracts' },
 };
 
 export default function ContractsLayout({ children }: { children: React.ReactNode }) {

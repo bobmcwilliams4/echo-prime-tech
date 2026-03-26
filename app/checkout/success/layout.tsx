@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Payment confirmed. Your Echo Prime Technologies subscription is now active.',
     url: 'https://echo-ept.com/checkout/success',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Payment Successful — Echo Prime Technologies',
+    description: 'Payment confirmed. Your Echo Prime Technologies subscription is now active.',
+  },
+  alternates: { canonical: '/checkout/success' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

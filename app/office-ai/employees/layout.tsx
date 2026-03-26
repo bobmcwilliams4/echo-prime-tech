@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Staff management with role assignments, hourly rates, and employee profiles.',
     url: 'https://echo-ept.com/office-ai/employees',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Employee Management — Echo Prime Technologies',
+    description: 'Staff management with role assignments, hourly rates, and employee profiles.',
+  },
+  alternates: { canonical: '/office-ai/employees' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

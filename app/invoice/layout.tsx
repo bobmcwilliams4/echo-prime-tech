@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Smart invoicing with recurring billing, AI late payment prediction, expense tracking, estimates, and profit/loss reports.',
     url: 'https://echo-ept.com/invoice',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Invoice — AI-Powered Invoicing & Billing',
+    description: 'Smart invoicing with recurring billing, AI late payment prediction, expense tracking, estimates, and profit/loss reports.',
+  },
+  alternates: { canonical: '/invoice' },
 };
 
 export default function InvoiceLayout({ children }: { children: React.ReactNode }) {

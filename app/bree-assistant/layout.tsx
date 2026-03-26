@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/bree-assistant',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Bree AI Assistant',
+    description: 'Warm, empathetic AI assistant with voice conversations and 14 personality modes.',
+  },
   alternates: { canonical: '/bree-assistant' },
 };
 

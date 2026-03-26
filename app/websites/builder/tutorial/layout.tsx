@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Interactive step-by-step guides covering all 16 features of the Echo Prime AI Website Builder.',
     url: 'https://echo-ept.com/websites/builder/tutorial',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Website Builder Tutorial — Echo Prime Technologies',
+    description: 'Interactive step-by-step guides covering all 16 features of the Echo Prime AI Website Builder.',
+  },
+  alternates: { canonical: '/websites/builder/tutorial' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

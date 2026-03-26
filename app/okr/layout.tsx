@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Objectives and key results tracking with AI-powered suggestions, check-ins, and alignment trees.',
     url: 'https://echo-ept.com/okr',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo OKR — AI Goal Tracking',
+    description: 'Objectives and key results tracking with AI-powered suggestions, check-ins, and alignment trees.',
+  },
+  alternates: { canonical: '/okr' },
 };
 
 export default function OKRLayout({ children }: { children: React.ReactNode }) {

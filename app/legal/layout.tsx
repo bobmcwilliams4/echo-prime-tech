@@ -9,6 +9,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/legal',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Legal — Echo Prime Technologies',
+    description: 'Echo Prime Technologies legal documents including privacy policy, terms of service, and acceptable use policy.',
+  },
   alternates: { canonical: '/legal' },
 };
 

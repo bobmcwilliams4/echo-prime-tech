@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Employee time tracking with regular hours, overtime, and approval workflows.',
     url: 'https://echo-ept.com/dashboard/business/hours',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Time Tracking — Echo Prime Technologies',
+    description: 'Employee time tracking with regular hours, overtime, and approval workflows.',
+  },
+  alternates: { canonical: '/dashboard/business/hours' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

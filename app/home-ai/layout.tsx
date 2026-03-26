@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/home-ai',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Home AI — Smart Home Intelligence & Automation',
+    description: 'AI-powered smart home platform with predictive automation, energy optimization, and contextual security.',
+  },
   alternates: { canonical: 'https://echo-ept.com/home-ai' },
 };
 

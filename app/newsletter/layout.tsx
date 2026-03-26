@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'The Substack alternative that costs 90% less. AI-powered newsletter publishing with full analytics.',
     url: 'https://echo-ept.com/newsletter',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Newsletter — Email Newsletter Platform',
+    description: 'The Substack alternative that costs 90% less. AI-powered newsletter publishing with full analytics.',
+  },
+  alternates: { canonical: '/newsletter' },
 };
 
 export default function NewsletterLayout({ children }: { children: React.ReactNode }) {

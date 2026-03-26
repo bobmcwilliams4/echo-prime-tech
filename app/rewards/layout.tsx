@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/rewards',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Rewards Program — Echo Prime Technologies',
+    description: 'Earn credits on every purchase. Referral bonuses, loyalty tiers, and exclusive discounts on AI services.',
+  },
   alternates: { canonical: '/rewards' },
 };
 

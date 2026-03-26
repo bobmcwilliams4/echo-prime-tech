@@ -8,6 +8,11 @@ export const metadata: Metadata = {
     description: 'Complete your purchase of Echo Prime Technologies AI services. Secure checkout powered by PayPal.',
     url: 'https://echo-ept.com/checkout',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Checkout — Echo Prime Technologies',
+    description: 'Complete your purchase of Echo Prime Technologies AI services. Secure checkout powered by PayPal.',
+  },
   alternates: { canonical: '/checkout' },
   robots: { index: false, follow: false },
 };

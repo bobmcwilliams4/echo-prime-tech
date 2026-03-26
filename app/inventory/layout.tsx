@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Multi-warehouse stock tracking, AI demand forecasting, purchase orders, barcode/SKU management.',
     url: 'https://echo-ept.com/inventory',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Inventory — AI Inventory Management',
+    description: 'Multi-warehouse stock tracking, AI demand forecasting, purchase orders, barcode/SKU management.',
+  },
+  alternates: { canonical: '/inventory' },
 };
 
 export default function InventoryLayout({ children }: { children: React.ReactNode }) {

@@ -9,6 +9,12 @@ export const metadata: Metadata = {
     description: 'AI-powered invoicing for freelancers and small businesses. Professional invoices, recurring billing, payment tracking, multi-currency, AI payment prediction.',
     url: 'https://echo-ept.com/invoicing',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Invoicing & Billing — Echo Prime Technologies',
+    description: 'AI-powered invoicing for freelancers and small businesses. Professional invoices, recurring billing, payment tracking, multi-currency, AI payment prediction.',
+  },
+  alternates: { canonical: '/invoicing' },
 };
 
 export default function InvoicingLayout({ children }: { children: React.ReactNode }) {

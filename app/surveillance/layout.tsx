@@ -8,6 +8,11 @@ export const metadata: Metadata = {
     description: 'AI-powered surveillance with real-time threat detection and automated incident response.',
     url: 'https://echo-ept.com/surveillance',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Surveillance & Monitoring | Echo Prime Technologies',
+    description: 'AI-powered surveillance with real-time threat detection and automated incident response.',
+  },
   alternates: { canonical: '/surveillance' },
 };
 

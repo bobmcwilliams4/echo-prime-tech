@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'AI-powered Reddit monitoring with keyword tracking, sentiment analysis, and trend detection.',
     url: 'https://echo-ept.com/reddit',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Reddit AI Monitor | Echo Prime Technologies',
+    description: 'AI-powered Reddit monitoring with keyword tracking, sentiment analysis, and trend detection.',
+  },
+  alternates: { canonical: '/reddit' },
 };
 
 export default function RedditLayout({ children }: { children: React.ReactNode }) {

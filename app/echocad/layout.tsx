@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/echocad',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'EchoCAD — AI-Native Parametric CAD Engine',
+    description: 'Cloud-native parametric CAD with materials intelligence, engineering analysis, and automated manufacturing prep.',
+  },
   alternates: { canonical: '/echocad' },
 };
 

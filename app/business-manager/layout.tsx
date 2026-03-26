@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/business-manager',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Business Manager — AI-Powered Business Operations',
+    description: 'Complete business management with invoicing, payroll, inventory, CRM, scheduling, and AI analytics.',
+  },
   alternates: { canonical: 'https://echo-ept.com/business-manager' },
 };
 

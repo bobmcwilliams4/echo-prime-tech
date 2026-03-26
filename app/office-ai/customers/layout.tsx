@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Unified CRM for managing residential and commercial customer contacts and history.',
     url: 'https://echo-ept.com/office-ai/customers',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Customer CRM — Echo Prime Technologies',
+    description: 'Unified CRM for managing residential and commercial customer contacts and history.',
+  },
+  alternates: { canonical: '/office-ai/customers' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

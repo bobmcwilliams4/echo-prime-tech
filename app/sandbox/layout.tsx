@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     url: 'https://echo-ept.com/sandbox',
     images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Security Sandbox — CTF Challenges & Defense Testing',
+    description: 'Interactive cyber range with 27 CTF challenges and defense scanning for your infrastructure.',
+  },
   alternates: { canonical: '/sandbox' },
 };
 

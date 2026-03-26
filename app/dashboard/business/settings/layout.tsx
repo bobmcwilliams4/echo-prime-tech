@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Business configuration for company profile, tax rates, payment methods, and operating hours.',
     url: 'https://echo-ept.com/dashboard/business/settings',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Business Settings — Echo Prime Technologies',
+    description: 'Business configuration for company profile, tax rates, payment methods, and operating hours.',
+  },
+  alternates: { canonical: '/dashboard/business/settings' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Real-time PayPal revenue analytics, transaction history, and customer insights for Echo Prime Technologies.',
     url: 'https://echo-ept.com/admin/payments',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Payment Dashboard — Echo Prime Technologies',
+    description: 'Real-time PayPal revenue analytics, transaction history, and customer insights for Echo Prime Technologies.',
+  },
+  alternates: { canonical: '/admin/payments' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

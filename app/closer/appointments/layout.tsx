@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Manage AI-booked sales appointments with calendar views, status tracking, and CRM integration.',
     url: 'https://echo-ept.com/closer/appointments',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Appointment Manager — Echo Prime Technologies',
+    description: 'Manage AI-booked sales appointments with calendar views, status tracking, and CRM integration.',
+  },
+  alternates: { canonical: '/closer/appointments' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Public booking pages, smart slot calculation, team calendars, and automated reminders.',
     url: 'https://echo-ept.com/calendar',
   },
+  twitter: {
+    card: 'summary',
+    title: 'Echo Calendar — AI-Powered Scheduling & Booking',
+    description: 'Public booking pages, smart availability, AI scheduling suggestions, and automated reminders. Starts at $9/mo.',
+  },
+  alternates: { canonical: '/calendar' },
 };
 
 export default function CalendarLayout({ children }: { children: React.ReactNode }) {

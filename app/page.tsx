@@ -665,7 +665,7 @@ export default function HomePage() {
               <h2 className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Latest from the Blog</h2>
               <p className="mt-2 text-sm" style={{ color: 'var(--ept-text-secondary)' }}>Technical deep-dives on AI engineering, oilfield tech, tax intelligence, and security</p>
             </div>
-            <Link href="/blog" className="text-sm font-semibold hidden md:block" style={{ color: 'var(--ept-accent)' }}>View all 100 articles &rarr;</Link>
+            <Link href="/blog" className="text-sm font-semibold hidden md:block" style={{ color: 'var(--ept-accent)' }}>View all 106 articles &rarr;</Link>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
@@ -684,7 +684,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="mt-6 text-center md:hidden">
-            <Link href="/blog" className="text-sm font-semibold" style={{ color: 'var(--ept-accent)' }}>View all 100 articles &rarr;</Link>
+            <Link href="/blog" className="text-sm font-semibold" style={{ color: 'var(--ept-accent)' }}>View all 106 articles &rarr;</Link>
           </div>
         </div>
       </section>
@@ -813,6 +813,22 @@ export default function HomePage() {
                   { label: 'Subscription', href: '/subscription' },
                   { label: 'Customer Success', href: '/customer-success' },
                   { label: 'Data Room', href: '/data-room' },
+                  { label: 'Asset Manager', href: '/asset-manager' },
+                  { label: 'Vendor Manager', href: '/vendor-manager' },
+                  { label: 'Incident Manager', href: '/incident-manager' },
+                  { label: 'WhatsApp Bot', href: '/whatsapp-bot' },
+                  { label: 'A/B Testing', href: '/ab-testing' },
+                  { label: 'Telegram Bot', href: '/telegram-bot' },
+                  { label: 'Chat AI', href: '/chat-ai' },
+                  { label: 'App Forge', href: '/app-forge' },
+                  { label: 'Prompt Forge', href: '/prompt-forge' },
+                  { label: 'Agentic Engine', href: '/agentic-engine' },
+                  { label: 'Shopify', href: '/shopify' },
+                  { label: 'Graph RAG', href: '/graph-rag' },
+                  { label: 'Domain Harvester', href: '/domain-harvester' },
+                  { label: 'Drive Intelligence', href: '/drive-intelligence' },
+                  { label: 'Revenue Engine', href: '/revenue-engine' },
+                  { label: 'Swarm Brain', href: '/swarm-brain' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}

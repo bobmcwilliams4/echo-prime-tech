@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Inventory tracking with stock levels, reorder alerts, and vendor management.',
     url: 'https://echo-ept.com/dashboard/business/inventory',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Inventory Management — Echo Prime Technologies',
+    description: 'Inventory tracking with stock levels, reorder alerts, and vendor management.',
+  },
+  alternates: { canonical: '/dashboard/business/inventory' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

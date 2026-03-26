@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Configure business profile, tax rates, payment methods, and operating hours.',
     url: 'https://echo-ept.com/office-ai/settings',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Business Settings — Echo Prime Technologies',
+    description: 'Configure business profile, tax rates, payment methods, and operating hours.',
+  },
+  alternates: { canonical: '/office-ai/settings' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'AI-powered ATS with pipeline management, resume screening, scorecards, and offer tracking.',
     url: 'https://echo-ept.com/recruiting',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Recruiting — AI Applicant Tracking',
+    description: 'AI-powered ATS with pipeline management, resume screening, scorecards, and offer tracking.',
+  },
+  alternates: { canonical: '/recruiting' },
 };
 
 export default function RecruitingLayout({ children }: { children: React.ReactNode }) {

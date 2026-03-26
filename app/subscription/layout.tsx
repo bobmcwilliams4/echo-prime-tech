@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Subscription billing with plans, usage metering, proration, dunning, and AI revenue insights.',
     url: 'https://echo-ept.com/subscription',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Subscription — AI Billing & Revenue Platform',
+    description: 'Subscription billing with plans, usage metering, proration, dunning, and AI revenue insights.',
+  },
+  alternates: { canonical: '/subscription' },
 };
 
 export default function SubscriptionLayout({ children }: { children: React.ReactNode }) {

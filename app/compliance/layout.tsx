@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'SOC2, HIPAA, GDPR & ISO 27001 compliance automation with AI gap analysis and audit readiness scoring.',
     url: 'https://echo-ept.com/compliance',
   },
+  twitter: {
+    card: 'summary',
+    title: 'Echo Compliance — AI Compliance Management',
+    description: 'SOC2, HIPAA, GDPR & ISO 27001 compliance with AI gap analysis and audit readiness scoring. Starts at $49/mo.',
+  },
+  alternates: { canonical: '/compliance' },
 };
 
 export default function ComplianceLayout({ children }: { children: React.ReactNode }) {

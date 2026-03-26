@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Professional invoicing with service catalog, payment tracking, and status management.',
     url: 'https://echo-ept.com/office-ai/invoices',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Invoice Management — Echo Prime Technologies',
+    description: 'Professional invoicing with service catalog, payment tracking, and status management.',
+  },
+  alternates: { canonical: '/office-ai/invoices' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

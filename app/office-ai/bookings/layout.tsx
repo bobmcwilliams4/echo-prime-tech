@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Full appointment scheduling and service booking management with status tracking.',
     url: 'https://echo-ept.com/office-ai/bookings',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Booking Management — Echo Prime Technologies',
+    description: 'Full appointment scheduling and service booking management with status tracking.',
+  },
+  alternates: { canonical: '/office-ai/bookings' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Real-time AI sales analytics with call metrics, cost breakdowns, and conversion tracking.',
     url: 'https://echo-ept.com/closer/analytics',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sales Analytics Dashboard — Echo Prime Technologies',
+    description: 'Real-time AI sales analytics with call metrics, cost breakdowns, and conversion tracking.',
+  },
+  alternates: { canonical: '/closer/analytics' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -8,6 +8,12 @@ export const metadata: Metadata = {
     description: 'Automated payroll with federal & state tax calculations, pay stubs, compliance, and AI insights.',
     url: 'https://echo-ept.com/payroll',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Echo Payroll — AI-Powered Payroll Processing',
+    description: 'Automated payroll with federal & state tax calculations, pay stubs, compliance, and AI insights.',
+  },
+  alternates: { canonical: '/payroll' },
 };
 
 export default function PayrollLayout({ children }: { children: React.ReactNode }) {
