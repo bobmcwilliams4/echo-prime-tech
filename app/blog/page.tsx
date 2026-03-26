@@ -9,13 +9,22 @@ import { BLOG_POSTS, CATEGORIES, formatDate } from './blog-data';
 export default function BlogPage() {
   const { isDark } = useTheme();
   const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-  const filtered = useMemo(
-    () => activeCategory === 'All' ? BLOG_POSTS : BLOG_POSTS.filter(p => p.category === activeCategory),
-    [activeCategory],
-  );
+  const filtered = useMemo(() => {
+    let posts = activeCategory === 'All' ? BLOG_POSTS : BLOG_POSTS.filter(p => p.category === activeCategory);
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      posts = posts.filter(p =>
+        p.title.toLowerCase().includes(q) ||
+        p.excerpt.toLowerCase().includes(q) ||
+        p.tags.some(t => t.toLowerCase().includes(q))
+      );
+    }
+    return posts;
+  }, [activeCategory, searchQuery]);
 
   const featured = BLOG_POSTS.filter(p => p.featured);
 
@@ -70,6 +79,24 @@ export default function BlogPage() {
             ))}
           </div>
         )}
+
+        {/* Search + Count */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-6">
+          <div className="relative flex-1 max-w-md">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search articles..."
+              className="w-full px-4 py-2.5 pl-10 rounded-xl text-sm outline-none border"
+              style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
+            />
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--ept-text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" strokeLinecap="round" strokeWidth="2" /></svg>
+          </div>
+          <span className="text-sm font-medium" style={{ color: 'var(--ept-text-muted)' }}>
+            {filtered.length} article{filtered.length !== 1 ? 's' : ''}
+          </span>
+        </div>
 
         {/* Category Filter */}
         <div className="flex gap-2 flex-wrap mb-8">

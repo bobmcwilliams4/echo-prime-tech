@@ -203,6 +203,30 @@ const FEATURES = [
     icon: 'M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88',
     color: '#64748b',
   },
+  {
+    title: 'Agent Knowledge Base',
+    desc: 'Internal article library with categories, full-text search, version history, and helpfulness voting. Agents find answers instantly during live calls.',
+    icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
+    color: '#06b6d4',
+  },
+  {
+    title: 'Recording Analytics',
+    desc: 'AI analyzes every recording: talk ratios, silence detection, overtalk count, keyword spotting, competitor mentions, sentiment timeline, compliance checks.',
+    icon: 'M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3',
+    color: '#ef4444',
+  },
+  {
+    title: 'Agent Coaching & Certifications',
+    desc: 'Training modules with quizzes, role-plays, and call reviews. Track progress, award certifications, and link to gamification badges.',
+    icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
+    color: '#a855f7',
+  },
+  {
+    title: 'Workflow Automation',
+    desc: 'Build trigger-condition-action workflows: auto-tag calls, send SMS on abandonment, escalate on negative sentiment, notify on VIP detection. Zero code.',
+    icon: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15',
+    color: '#f97316',
+  },
 ];
 
 const SCALE_COMPARISON = [
@@ -243,7 +267,11 @@ const SCALE_COMPARISON = [
   { metric: 'Call Forecasting', closer: 'No', callCenter: 'Historical patterns + staffing' },
   { metric: 'Conference Calls', closer: 'No', callCenter: 'Multi-party (10 participants)' },
   { metric: 'Number Masking', closer: 'No', callCenter: 'Proxy + caller ID profiles' },
-  { metric: 'API Endpoints', closer: '~20', callCenter: '200+ REST endpoints' },
+  { metric: 'Knowledge Base', closer: 'No', callCenter: 'Versioned articles + search' },
+  { metric: 'Recording Analytics', closer: 'No', callCenter: 'Talk ratios + keyword spotting' },
+  { metric: 'Agent Coaching', closer: 'No', callCenter: 'Modules + quizzes + certs' },
+  { metric: 'Workflow Automation', closer: 'No', callCenter: 'Triggers + conditions + actions' },
+  { metric: 'API Endpoints', closer: '~20', callCenter: '230+ REST endpoints' },
 ];
 
 const PRICING = [
@@ -294,6 +322,8 @@ const PRICING = [
       'Queue announcements (TTS)',
       'Gamification + badges',
       'Conference calls',
+      'Knowledge base + coaching',
+      'Workflow automation',
       'Advanced analytics + heatmaps',
       'Priority support',
     ],
@@ -311,7 +341,7 @@ const PRICING = [
       'Predictive dialer with pacing',
       'Multi-tenant white-label',
       'Custom voice cloning',
-      'Full API (200+ endpoints)',
+      'Full API (230+ endpoints)',
       'Custom webhook integrations',
       'Full TCPA + SOC 2 compliance',
       'Custom SLA rules + dashboards',
@@ -329,6 +359,10 @@ const PRICING = [
       'Call volume forecasting + staffing',
       'Conference calls (10 participants)',
       'Number masking + caller ID profiles',
+      'Internal knowledge base (versioned)',
+      'Recording analytics (AI insights)',
+      'Agent coaching + certifications',
+      'Workflow automation engine',
       'Bulk operations + data import',
       'Dedicated success manager',
       'SLA guarantee (99.99%)',
@@ -841,7 +875,7 @@ export default function CallCenterPage() {
       {/* Footer */}
       <footer className="border-t py-8 px-6 text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
-          &copy; {new Date().getFullYear()} Echo Prime Technologies. AI Call Center v3.3 — 55 tables, 200+ endpoints, built on Cloudflare&apos;s global edge.
+          &copy; {new Date().getFullYear()} Echo Prime Technologies. AI Call Center v3.4 — 65 tables, 230+ endpoints, built on Cloudflare&apos;s global edge.
         </p>
         <div className="flex justify-center gap-6 mt-3">
           <Link href="/closer" className="text-xs font-medium" style={{ color: 'var(--ept-text-secondary)' }}>AI Closer (Solo)</Link>
