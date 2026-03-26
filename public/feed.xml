@@ -8,6 +8,48 @@
     <lastBuildDate>Thu, 26 Mar 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
 
+    <!-- 115 Articles (5 new: scheduling, compliance, recruiting, newsletter, feedback) -->
+    <item>
+      <title>AI Scheduling Software for Small Business: Stop Losing $15K/Year to No-Shows</title>
+      <link>https://echo-ept.com/blog/ai-scheduling-software-small-business-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-scheduling-software-small-business-2026</guid>
+      <category>Product Updates</category>
+      <description>Manual booking costs service businesses $15,000+ annually in no-shows and admin time. AI scheduling with smart risk prediction, automated reminders, and self-service booking pages changes everything.</description>
+    </item>
+    <item>
+      <title>SOC 2 and HIPAA Compliance With AI: Cut Audit Prep Time by 80%</title>
+      <link>https://echo-ept.com/blog/compliance-management-ai-soc2-hipaa-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/compliance-management-ai-soc2-hipaa-2026</guid>
+      <category>Security</category>
+      <description>Compliance frameworks like SOC 2 and HIPAA require hundreds of controls, evidence items, and policy documents. AI compliance management automates the tedious work.</description>
+    </item>
+    <item>
+      <title>AI Recruiting Software vs Greenhouse and Lever: The 2026 ATS Showdown</title>
+      <link>https://echo-ept.com/blog/ai-recruiting-vs-greenhouse-lever-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-recruiting-vs-greenhouse-lever-2026</guid>
+      <category>Product Updates</category>
+      <description>Greenhouse costs $6,000+/year. Lever starts at $4,800. AI-native recruiting platforms deliver resume screening, interview scheduling, and pipeline analytics for a fraction of the cost.</description>
+    </item>
+    <item>
+      <title>AI Newsletter Platforms vs Mailchimp and Substack: Why Creators Are Switching</title>
+      <link>https://echo-ept.com/blog/ai-newsletter-platform-vs-mailchimp-substack-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-newsletter-platform-vs-mailchimp-substack-2026</guid>
+      <category>Product Updates</category>
+      <description>Mailchimp takes 20% of your paid subscriptions. Substack takes 10%. AI newsletter platforms offer full tracking and automations without the revenue tax.</description>
+    </item>
+    <item>
+      <title>AI Feedback Boards vs Canny and Productboard: Prioritize What Users Actually Want</title>
+      <link>https://echo-ept.com/blog/ai-feedback-board-vs-canny-productboard-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-feedback-board-vs-canny-productboard-2026</guid>
+      <category>Product Updates</category>
+      <description>Product teams waste months building features nobody asked for. AI feedback boards with voting, roadmaps, and sentiment analysis ensure you build what moves the needle.</description>
+    </item>
+
     <!-- 100th Article Milestone -->
     <item>
       <title>Oil &amp; Gas Tax Deductions: Maximizing Working Interest and Royalty Income</title>
