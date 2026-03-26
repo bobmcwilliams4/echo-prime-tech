@@ -106,7 +106,7 @@ export default function GamerCompanionPage() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+      <section data-tutorial="gc-hero" className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
         <div className="inline-block px-4 py-1.5 rounded-full text-xs font-bold mb-6 animate-fade-up" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>
           BETA — FREE ACCESS — JOIN NOW
         </div>
@@ -149,7 +149,7 @@ export default function GamerCompanionPage() {
       </section>
 
       {/* Feature Grid */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
+      <section data-tutorial="gc-features" className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Everything a Gamer Needs</h2>
         <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>67 modules. 19 game-specific FSMs. Real computer vision. Not just another overlay.</p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
@@ -253,7 +253,7 @@ export default function GamerCompanionPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="max-w-5xl mx-auto px-6 py-16">
+      <section id="pricing" data-tutorial="gc-pricing" className="max-w-5xl mx-auto px-6 py-16">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Pricing</h2>
         <p className="text-center mb-12" style={{ color: 'var(--ept-text-secondary)' }}>Free during beta. No credit card required. Pro tiers launching soon.</p>
         <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">

@@ -516,7 +516,7 @@ export default function CallCenterPage() {
       <div className="max-w-6xl mx-auto px-6">
 
         {/* Hero */}
-        <section className="py-16 md:py-24 text-center">
+        <section data-tutorial="cc-hero" className="py-16 md:py-24 text-center">
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-8 animate-fade-up"
             style={{ borderColor: 'var(--ept-accent)', backgroundColor: isDark ? 'rgba(20,184,166,0.08)' : 'rgba(13,115,119,0.06)' }}
@@ -602,7 +602,7 @@ export default function CallCenterPage() {
         </section>
 
         {/* Features Grid */}
-        <section className="mb-16">
+        <section data-tutorial="cc-features" className="mb-16">
           <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>
             Everything You Need to Run a{' '}
             <span className="gradient-text">World-Class Call Center</span>
@@ -633,7 +633,7 @@ export default function CallCenterPage() {
         </section>
 
         {/* Closer vs Call Center Comparison */}
-        <section className="mb-16">
+        <section data-tutorial="cc-comparison" className="mb-16">
           <h2 className="text-3xl font-extrabold text-center mb-8" style={{ color: 'var(--ept-text)' }}>
             AI Closer vs AI Call Center
           </h2>
@@ -714,7 +714,7 @@ export default function CallCenterPage() {
         </section>
 
         {/* Pricing */}
-        <section className="mb-16" id="pricing">
+        <section data-tutorial="cc-pricing" className="mb-16" id="pricing">
           <h2 className="text-3xl font-extrabold text-center mb-2" style={{ color: 'var(--ept-text)' }}>
             Simple, Transparent Pricing
           </h2>
@@ -845,7 +845,7 @@ export default function CallCenterPage() {
         </section>
 
         {/* FAQ */}
-        <section className="mb-16">
+        <section data-tutorial="cc-faq" className="mb-16">
           <h2 className="text-3xl font-extrabold text-center mb-8" style={{ color: 'var(--ept-text)' }}>
             Frequently Asked Questions
           </h2>

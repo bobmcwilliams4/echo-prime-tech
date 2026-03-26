@@ -53,7 +53,7 @@ export default function InvoicePage() {
       </nav>
 
       {/* Hero */}
-      <section className="px-6 py-20 text-center max-w-4xl mx-auto">
+      <section data-tutorial="inv-hero" className="px-6 py-20 text-center max-w-4xl mx-auto">
         <div className="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-6" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-accent)' }}>AI-POWERED INVOICING</div>
         <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
           Send Invoices.<br />
@@ -70,7 +70,7 @@ export default function InvoicePage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="px-6 py-16 max-w-6xl mx-auto">
+      <section id="features" data-tutorial="inv-features" className="px-6 py-16 max-w-6xl mx-auto">
         <h2 className="text-3xl font-extrabold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Everything You Need to Get Paid</h2>
         <div className="grid md:grid-cols-4 gap-6">
           {FEATURES.map((f) => (
@@ -84,7 +84,7 @@ export default function InvoicePage() {
       </section>
 
       {/* Pricing */}
-      <section className="px-6 py-16 max-w-3xl mx-auto">
+      <section data-tutorial="inv-pricing" className="px-6 py-16 max-w-3xl mx-auto">
         <h2 className="text-3xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Simple Pricing</h2>
         <p className="text-center mb-12" style={{ color: 'var(--ept-text-secondary)' }}>Start free. Upgrade when you need more power.</p>
         <div className="grid md:grid-cols-2 gap-6">

@@ -144,7 +144,7 @@ function IntelHubContent() {
       </nav>
 
       {/* ── Hero ── */}
-      <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+      <section data-tutorial="intel-hero" className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
         <h1 className="text-4xl md:text-6xl font-extrabold leading-tight gradient-text animate-fade-up">Echo Intel Hub</h1>
         <p className="text-xl md:text-2xl font-semibold mt-4 animate-fade-up-delay-1" style={{ color: 'var(--ept-text)' }}>Digital Intelligence & Monitoring Platform</p>
         <p className="text-lg mt-6 max-w-2xl mx-auto animate-fade-up-delay-2" style={{ color: 'var(--ept-text-secondary)' }}>
@@ -163,7 +163,7 @@ function IntelHubContent() {
       </section>
 
       {/* ── Dashboard Preview ── */}
-      <section className="max-w-5xl mx-auto px-6 py-16">
+      <section data-tutorial="intel-threats" className="max-w-5xl mx-auto px-6 py-16">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>8-Tab Intelligence Dashboard</h2>
         <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
           Every angle of digital activity in one unified view. Messages, traffic, apps, contacts, DNS, alerts, watchlist, and settings.
@@ -206,7 +206,7 @@ function IntelHubContent() {
       </section>
 
       {/* ── Feature Grid ── */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
+      <section data-tutorial="intel-geo" className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Complete Digital Intelligence</h2>
         <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
           From message monitoring to anomaly detection — every tool you need to understand digital activity.
@@ -225,7 +225,7 @@ function IntelHubContent() {
       </section>
 
       {/* ── Use Cases ── */}
-      <section className="max-w-5xl mx-auto px-6 py-16">
+      <section data-tutorial="intel-breach" className="max-w-5xl mx-auto px-6 py-16">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Built For</h2>
         <p className="text-center mb-12" style={{ color: 'var(--ept-text-secondary)' }}>Three core use cases, one platform.</p>
         <div className="grid md:grid-cols-3 gap-6">
@@ -242,7 +242,7 @@ function IntelHubContent() {
       </section>
 
       {/* ── Pricing ── */}
-      <section className="max-w-5xl mx-auto px-6 py-16" id="pricing">
+      <section data-tutorial="intel-pricing" className="max-w-5xl mx-auto px-6 py-16" id="pricing">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>
           Simple, <span className="gradient-text">Transparent</span> Pricing
         </h2>

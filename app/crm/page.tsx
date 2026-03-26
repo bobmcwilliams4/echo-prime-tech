@@ -73,7 +73,7 @@ export default function CRMPage() {
       </nav>
 
       {/* Hero */}
-      <section className="text-center py-20 px-6 max-w-4xl mx-auto">
+      <section data-tutorial="crm-hero" className="text-center py-20 px-6 max-w-4xl mx-auto">
         <div className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-6" style={{ backgroundColor: isDark ? 'rgba(20,184,166,0.15)' : 'rgba(13,115,119,0.1)', color: 'var(--ept-accent)' }}>
           72 API Endpoints &middot; 12 D1 Tables &middot; AI-Powered
         </div>
@@ -97,7 +97,7 @@ export default function CRMPage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="py-16 px-6 max-w-6xl mx-auto">
+      <section id="features" data-tutorial="crm-features" className="py-16 px-6 max-w-6xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Everything You Need to Close Deals</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map(f => (
@@ -138,7 +138,7 @@ export default function CRMPage() {
       </section>
 
       {/* Pricing */}
-      <section className="py-16 px-6 max-w-5xl mx-auto">
+      <section data-tutorial="crm-pricing" className="py-16 px-6 max-w-5xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Simple, Transparent Pricing</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {PRICING.map(p => (

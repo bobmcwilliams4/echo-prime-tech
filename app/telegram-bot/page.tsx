@@ -65,7 +65,7 @@ export default function TelegramBotPage() {
       <FaqSchema faqs={faqs} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
 
-        <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
+        <section data-tutorial="tg-hero" style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 16, background: 'linear-gradient(135deg, #0088cc, #229ed9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             Echo Telegram Bot
           </h1>
@@ -83,7 +83,7 @@ export default function TelegramBotPage() {
           </div>
         </section>
 
-        <section style={{ padding: '60px 20px', maxWidth: 1100, margin: '0 auto' }}>
+        <section data-tutorial="tg-features" style={{ padding: '60px 20px', maxWidth: 1100, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>AI-Powered Telegram for Communities</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
             {features.map((f) => (
@@ -123,7 +123,7 @@ export default function TelegramBotPage() {
           </div>
         </section>
 
-        <section id="pricing" style={{ padding: '60px 20px', maxWidth: 1000, margin: '0 auto' }}>
+        <section id="pricing" data-tutorial="tg-pricing" style={{ padding: '60px 20px', maxWidth: 1000, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Simple, Transparent Pricing</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
             {[

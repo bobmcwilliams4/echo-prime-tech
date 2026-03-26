@@ -56,7 +56,7 @@ export default function BookingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-5xl mx-auto px-6 py-20 text-center">
+      <section data-tutorial="book-hero" className="max-w-5xl mx-auto px-6 py-20 text-center">
         <div className="inline-block px-4 py-1 rounded-full text-xs font-bold mb-6" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff', opacity: 0.9 }}>ONLINE BOOKING</div>
         <h1 className="text-4xl md:text-6xl font-extrabold mb-6">Your Calendar, Always Full.<br /><span className="gradient-text">Zero Phone Calls.</span></h1>
         <p className="text-lg md:text-xl max-w-2xl mx-auto mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Let clients book 24/7, sync every calendar, collect payments upfront, and eliminate no-shows with automated reminders. The booking system that runs itself.</p>
@@ -67,7 +67,7 @@ export default function BookingPage() {
       </section>
 
       {/* Features Grid */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
+      <section data-tutorial="book-features" className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-extrabold mb-10 text-center">Everything You Need to Book Smarter</h2>
         <div className="grid md:grid-cols-4 gap-6">
           {FEATURES.map((f, i) => (
@@ -81,7 +81,7 @@ export default function BookingPage() {
       </section>
 
       {/* Pricing */}
-      <section className="max-w-5xl mx-auto px-6 py-16">
+      <section data-tutorial="book-pricing" className="max-w-5xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-extrabold mb-10 text-center">Simple, Transparent Pricing</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {PRICING.map((p, i) => (

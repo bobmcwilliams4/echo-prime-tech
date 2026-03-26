@@ -65,7 +65,7 @@ export default function WhatsAppBotPage() {
       <FaqSchema faqs={faqs} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
 
-        <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
+        <section data-tutorial="wa-hero" style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 16, background: 'linear-gradient(135deg, #25d366, #128c7e)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             Echo WhatsApp Bot
           </h1>
@@ -83,7 +83,7 @@ export default function WhatsAppBotPage() {
           </div>
         </section>
 
-        <section style={{ padding: '60px 20px', maxWidth: 1100, margin: '0 auto' }}>
+        <section data-tutorial="wa-features" style={{ padding: '60px 20px', maxWidth: 1100, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>AI-Powered WhatsApp for Business</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
             {features.map((f) => (
@@ -95,7 +95,7 @@ export default function WhatsAppBotPage() {
           </div>
         </section>
 
-        <section style={{ padding: '60px 20px', maxWidth: 1000, margin: '0 auto' }}>
+        <section data-tutorial="wa-comparison" style={{ padding: '60px 20px', maxWidth: 1000, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>How We Compare</h2>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
@@ -123,7 +123,7 @@ export default function WhatsAppBotPage() {
           </div>
         </section>
 
-        <section id="pricing" style={{ padding: '60px 20px', maxWidth: 1000, margin: '0 auto' }}>
+        <section id="pricing" data-tutorial="wa-pricing" style={{ padding: '60px 20px', maxWidth: 1000, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Simple, Transparent Pricing</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
             {[

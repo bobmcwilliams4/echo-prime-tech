@@ -5,10 +5,11 @@
  * Renders structured data for Google FAQ rich results.
  * Use alongside visual FAQ sections to get rich snippets in search results.
  */
-export default function FaqSchema({ faqs }: { faqs: { q: string; a: string }[] }) {
+export default function FaqSchema({ faqs, name }: { faqs: { q: string; a: string }[]; name?: string }) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
+    ...(name ? { name } : { name: 'Frequently Asked Questions' }),
     mainEntity: faqs.map(faq => ({
       '@type': 'Question',
       name: faq.q,

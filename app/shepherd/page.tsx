@@ -284,7 +284,7 @@ export default function ShepherdPage() {
       </nav>
 
       {/* ── Hero Section ── */}
-      <section ref={heroRef.ref} className="px-6 py-20 md:py-28 text-center max-w-4xl mx-auto">
+      <section data-tutorial="shepherd-hero" ref={heroRef.ref} className="px-6 py-20 md:py-28 text-center max-w-4xl mx-auto">
         <div className={`transition-all duration-700 ${heroRef.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           <p className="text-sm font-semibold tracking-widest uppercase mb-4" style={{ color: 'var(--ept-accent)' }}>
             The Pastor&apos;s Autonomous Ministry Platform
@@ -324,7 +324,7 @@ export default function ShepherdPage() {
       </section>
 
       {/* ── Feature Grid ── */}
-      <section id="features" ref={featRef.ref} className="px-6 py-16 max-w-6xl mx-auto">
+      <section id="features" data-tutorial="shepherd-giving" ref={featRef.ref} className="px-6 py-16 max-w-6xl mx-auto">
         <div className={`transition-all duration-700 ${featRef.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>
             Everything Your Church Needs
@@ -347,7 +347,7 @@ export default function ShepherdPage() {
       </section>
 
       {/* ── Who It's For ── */}
-      <section ref={personaRef.ref} className="px-6 py-16" style={{ backgroundColor: 'var(--ept-surface)' }}>
+      <section data-tutorial="shepherd-curriculum" ref={personaRef.ref} className="px-6 py-16" style={{ backgroundColor: 'var(--ept-surface)' }}>
         <div className={`max-w-6xl mx-auto transition-all duration-700 ${personaRef.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>
             Built for Every Role in Ministry
@@ -368,7 +368,7 @@ export default function ShepherdPage() {
       </section>
 
       {/* ── Denomination Support ── */}
-      <section className="px-6 py-14 max-w-4xl mx-auto text-center">
+      <section data-tutorial="shepherd-comms" className="px-6 py-14 max-w-4xl mx-auto text-center">
         <h2 className="text-2xl md:text-3xl font-extrabold mb-3" style={{ color: 'var(--ept-text)' }}>
           Respects Your Tradition
         </h2>
@@ -385,7 +385,7 @@ export default function ShepherdPage() {
       </section>
 
       {/* ── Pricing ── */}
-      <section id="pricing" ref={pricingRef.ref} className="px-6 py-16" style={{ backgroundColor: 'var(--ept-surface)' }}>
+      <section id="pricing" data-tutorial="shepherd-pricing" ref={pricingRef.ref} className="px-6 py-16" style={{ backgroundColor: 'var(--ept-surface)' }}>
         <div className={`max-w-6xl mx-auto transition-all duration-700 ${pricingRef.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>
             Simple, Honest Pricing

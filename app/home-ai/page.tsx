@@ -109,7 +109,7 @@ export default function HomeAIPage() {
       </nav>
 
       {/* ── Hero ── */}
-      <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+      <section data-tutorial="home-hero" className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
         <h1 className="text-4xl md:text-6xl font-extrabold leading-tight gradient-text animate-fade-up">Echo Home AI</h1>
         <p className="text-xl md:text-2xl font-semibold mt-4 animate-fade-up-delay-1" style={{ color: 'var(--ept-text)' }}>Whole-Home Intelligence & Automation</p>
         <p className="text-lg mt-6 max-w-2xl mx-auto animate-fade-up-delay-2" style={{ color: 'var(--ept-text-secondary)' }}>
@@ -129,7 +129,7 @@ export default function HomeAIPage() {
       </section>
 
       {/* ── How It Works ── */}
-      <section className="max-w-5xl mx-auto px-6 py-16">
+      <section data-tutorial="home-devices" className="max-w-5xl mx-auto px-6 py-16">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>How It Works</h2>
         <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>Three steps. Five minutes. Your entire home under one roof.</p>
         <div className="grid md:grid-cols-3 gap-8">
@@ -148,7 +148,7 @@ export default function HomeAIPage() {
       </section>
 
       {/* ── Feature Grid ── */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
+      <section data-tutorial="home-education" className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Everything Your Home Needs</h2>
         <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>One platform replaces a dozen apps. Control devices, manage your family, track bills, tutor your kids, secure your property, care for pets, plan meals, track fitness, and tend your garden.</p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
@@ -203,7 +203,7 @@ export default function HomeAIPage() {
       </section>
 
       {/* ── Built For Every Household ── */}
-      <section className="max-w-5xl mx-auto px-6 py-16">
+      <section data-tutorial="home-security" className="max-w-5xl mx-auto px-6 py-16">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Built For Every Household</h2>
         <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>Whether you rent an apartment or manage a ranch, Echo Home AI scales to fit your life.</p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -242,7 +242,7 @@ export default function HomeAIPage() {
       </section>
 
       {/* ── Pricing ── */}
-      <section id="pricing" className="max-w-6xl mx-auto px-6 py-16">
+      <section id="pricing" data-tutorial="home-pricing" className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Simple, Transparent Pricing</h2>
         <p className="text-center mb-12" style={{ color: 'var(--ept-text-secondary)' }}>No contracts. No hardware fees. Cancel anytime.</p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">

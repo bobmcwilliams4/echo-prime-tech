@@ -65,7 +65,7 @@ export default function ExpensePage() {
         </div>
       </nav>
 
-      <section className="max-w-6xl mx-auto px-6 py-20 text-center">
+      <section data-tutorial="exp-hero" className="max-w-6xl mx-auto px-6 py-20 text-center">
         <div className="inline-block px-4 py-1 rounded-full text-sm font-medium mb-6" style={{ backgroundColor: isDark ? 'rgba(20,184,166,0.15)' : 'rgba(13,115,119,0.1)', color: 'var(--ept-accent)' }}>AI-Powered Expense Management</div>
         <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">Track Expenses,<br /><span className="gradient-text">Not Receipts</span></h1>
         <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Receipt scanning, mileage tracking, corporate cards, and policy enforcement — all powered by AI that categorizes, flags, and syncs your expenses automatically.</p>
@@ -75,7 +75,7 @@ export default function ExpensePage() {
         </div>
       </section>
 
-      <section id="features" className="max-w-6xl mx-auto px-6 py-16">
+      <section id="features" data-tutorial="exp-features" className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">Everything You Need to Manage Expenses</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map((f, i) => (
@@ -109,7 +109,7 @@ export default function ExpensePage() {
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-6 py-16">
+      <section data-tutorial="exp-pricing" className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold text-center mb-4">Simple Per-User Pricing</h2>
         <p className="text-center mb-12" style={{ color: 'var(--ept-text-secondary)' }}>No contracts. No setup fees. Scale as your team grows.</p>
         <div className="grid md:grid-cols-3 gap-6">

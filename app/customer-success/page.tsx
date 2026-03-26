@@ -77,7 +77,7 @@ export default function CustomerSuccessPage() {
       <FaqSchema />
 
       {/* Hero */}
-      <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
+      <section data-tutorial="cs-hero" style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
         <div style={{ display: 'inline-block', background: dark ? '#1a2a1a' : '#ecfdf5', color: dark ? '#4ade80' : '#059669', padding: '6px 16px', borderRadius: 20, fontSize: 14, fontWeight: 600, marginBottom: 20 }}>
           AI-Powered Customer Success
         </div>
@@ -99,7 +99,7 @@ export default function CustomerSuccessPage() {
       </section>
 
       {/* Features */}
-      <section style={{ padding: '60px 20px', maxWidth: 1100, margin: '0 auto' }}>
+      <section data-tutorial="cs-features" style={{ padding: '60px 20px', maxWidth: 1100, margin: '0 auto' }}>
         <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 700, marginBottom: 40 }}>Everything You Need to Drive Retention</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 24 }}>
           {features.map((f, i) => (
@@ -146,7 +146,7 @@ export default function CustomerSuccessPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" style={{ padding: '60px 20px', maxWidth: 1100, margin: '0 auto' }}>
+      <section id="pricing" data-tutorial="cs-pricing" style={{ padding: '60px 20px', maxWidth: 1100, margin: '0 auto' }}>
         <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 700, marginBottom: 10 }}>Simple, Transparent Pricing</h2>
         <p style={{ textAlign: 'center', color: dark ? '#a1a1aa' : '#6b7280', marginBottom: 40 }}>No per-seat fees. No hidden costs. Pay for what you need.</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 24 }}>
