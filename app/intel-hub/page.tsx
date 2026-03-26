@@ -11,7 +11,7 @@ import ProductTutorialButton from '../../components/product-tutorial-button';
 /* ==============================================================================
    ECHO INTEL HUB — Digital Intelligence & Monitoring Platform
    Product page: hero, features, dashboard preview, pricing, FAQ, footer CTA
-   Backend: echo-intel-hub.bmcii1976.workers.dev (27 endpoints, 8 D1 tables)
+   Backend: echo-intel-hub.bmcii1976.workers.dev (47+ endpoints, 13 D1 tables, v2.0)
    ============================================================================== */
 
 const FEATURES = [
@@ -25,6 +25,10 @@ const FEATURES = [
   { title: 'Kill Switch', desc: 'Emergency data purge with one click. Instantly wipe all stored intelligence data when operational security demands it.', icon: 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' },
   { title: 'Data Export', desc: 'Export all intelligence data as JSON with date filtering. Full audit trail, compliance-ready reports, and scheduled exports.', icon: 'M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
   { title: 'DNS App Detection', desc: 'Identify apps by their DNS footprints. Detect hidden apps, VPN usage, and encrypted messaging services automatically.', icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9' },
+  { title: 'Threat Intelligence', desc: 'Ingest IOCs (domains, IPs, hashes, emails). Auto-correlate threats with your traffic and DNS data. Real-time threat scoring.', icon: 'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z' },
+  { title: 'Geofencing', desc: 'Create virtual perimeters with GPS coordinates. Get instant alerts when devices enter or leave zones. Haversine-accurate distance calculation.', icon: 'M15 10.5a3 3 0 11-6 0 3 3 0 016 0z M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z' },
+  { title: 'Breach Monitoring', desc: 'Monitor email addresses and domains for data breaches. Automated breach report ingestion with severity tracking and instant alerts.', icon: 'M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z' },
+  { title: 'Intelligence Reports', desc: 'Daily, weekly, and threat summary reports. Risk scoring with color-coded levels. Top talkers, top domains, and trend analysis.', icon: 'M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z' },
 ];
 
 const DASHBOARD_TABS = [
@@ -36,6 +40,10 @@ const DASHBOARD_TABS = [
   { name: 'Alerts', desc: 'Alert inbox with priority levels and acknowledgement' },
   { name: 'Watchlist', desc: 'Keyword and phrase monitoring configuration' },
   { name: 'Settings', desc: 'Kill switch, data retention, export, and purge controls' },
+  { name: 'Threats', desc: 'IOC database with auto-correlation against your traffic' },
+  { name: 'Geofences', desc: 'Virtual perimeter zones with enter/exit event history' },
+  { name: 'Breaches', desc: 'Monitored emails/domains with breach report timeline' },
+  { name: 'Reports', desc: 'Daily, weekly, and threat intelligence summaries' },
 ];
 
 const PRICING = [
@@ -81,7 +89,10 @@ const PRICING = [
       'Scheduled exports',
       '1-year data retention',
       'Kill switch',
-      'API access (27 endpoints)',
+      'Threat intel feeds + breach monitoring',
+      'Geofencing with GPS alerts',
+      'API access (47+ endpoints)',
+      'Daily/weekly intelligence reports',
       'Priority support',
     ],
     cta: 'Contact Sales',
@@ -102,6 +113,9 @@ const FAQS = [
   { q: 'How is data stored?', a: 'All data is encrypted at rest in Cloudflare D1 and cached in KV for performance. Data never leaves Cloudflare\'s global network. You control retention periods and can purge all data instantly via the kill switch.' },
   { q: 'Can the monitored person detect it?', a: 'DNS-level monitoring is invisible to the end user. Proxy-based message capture requires a configuration profile. For parental monitoring, we recommend transparency — the platform includes age-appropriate notification templates.' },
   { q: 'What happens if I hit the kill switch?', a: 'All stored messages, traffic logs, contacts, app data, and alerts are permanently deleted within seconds. This action is irreversible. A confirmation code is required to prevent accidental activation.' },
+  { q: 'How does threat intelligence work?', a: 'You can ingest indicators of compromise (IOCs) — malicious domains, IPs, file hashes, and emails. The system automatically cross-references these against your actual traffic and DNS data, creating alerts when a known threat is contacted by a monitored device.' },
+  { q: 'What is geofencing used for?', a: 'Create virtual boundaries around locations (school, home, work). When a monitored device enters or leaves a zone, you get an instant alert. Uses Haversine formula for accurate GPS distance calculation.' },
+  { q: 'How do intelligence reports work?', a: 'Daily reports summarize all activity: messages, traffic, DNS, alerts, and threat correlations. Weekly reports include risk scoring (LOW to CRITICAL based on alert volume and threat hits) and trend analysis. All reports are available on-demand via API.' },
 ];
 
 function IntelHubContent() {
