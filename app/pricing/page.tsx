@@ -1,4 +1,5 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -7,6 +8,16 @@ import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { getServices, Service, createCheckout } from '../../lib/ept-api';
 import ReadAloudButton from '../../components/ReadAloudButton';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+
+const PRICING_FAQS = [
+  { q: 'What happens if I exceed my plan limits?', a: 'We notify you before you hit any limit. You can upgrade instantly from your dashboard with no downtime. Overages are never charged without your explicit approval — we pause the service and let you decide.' },
+  { q: 'Can I switch between monthly and annual billing?', a: 'Yes. Switch anytime from your account settings. Moving to annual billing applies the 20% discount immediately. Moving to monthly takes effect at the end of your current annual term.' },
+  { q: 'Do you offer refunds?', a: 'Every paid plan comes with a 30-day money-back guarantee. If you are not satisfied within the first 30 days, contact us for a full refund — no questions asked.' },
+  { q: 'Can I use multiple services under one account?', a: 'Yes. One account manages all your subscriptions. Each service has its own dashboard section, but billing, user management, and analytics are unified. Bundle discounts are available for 3+ services.' },
+  { q: 'What payment methods are accepted?', a: 'We accept PayPal, Venmo, and Pay Later options. Enterprise clients can request NET 30 invoicing. All transactions are processed securely through Stripe and PayPal.' },
+  { q: 'Is there a contract or commitment?', a: 'No contracts on any self-service plan. Monthly plans can be cancelled anytime. Annual plans are billed upfront but include the 30-day money-back guarantee.' },
+];
 
 const ANNUAL_DISCOUNT = 0.20; // 20% off annual
 
@@ -108,21 +119,72 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Pro', price: 10, interval: 'mo', features: ['Real-time overlay', 'Screen analysis AI', 'Unlimited profiles', 'Build optimizer', 'Voice commands'], popular: true },
     { tier: 'Team', price: 25, interval: 'mo', features: ['Everything in Pro', 'Team analytics', 'Shared strategies', 'Tournament prep', 'API access'], popular: false },
   ] },
-];
-
-// Commander emails — owner gets ALL services at Enterprise tier, no checkout ever
-const COMMANDER_EMAILS = [
-  'bobmcwilliams4@outlook.com',
-  'bobmcwilliams4@gmail.com',
-  'bobby@echo-op.com',
-  'bmcii1976@gmail.com',
-  'bobbymcwilliams@echo-op.com',
+  { id: 'crm', name: 'AI CRM', tagline: 'AI-powered customer relationship management with lead scoring', pricing: [
+    { tier: 'Solo', price: 29, interval: 'mo', features: ['500 contacts', '1 pipeline', 'Deal board', 'Activity tracking', 'Notes & tags'], popular: false },
+    { tier: 'Growth', price: 79, interval: 'mo', features: ['5,000 contacts', 'AI lead scoring', '5 pipelines', 'Revenue analytics', 'Email events', 'Weekly AI digest'], popular: true },
+    { tier: 'Enterprise', price: 199, interval: 'mo', features: ['Unlimited contacts', 'Unlimited pipelines', 'Full AI suite', 'Webhooks', 'API access', 'Priority support'], popular: false },
+  ] },
+  { id: 'helpdesk', name: 'AI Helpdesk', tagline: 'Smart ticket routing, AI auto-categorization, SLA tracking', pricing: [
+    { tier: 'Starter', price: 29, interval: 'mo', features: ['Up to 3 agents', '500 tickets/mo', 'Email channel', 'Basic SLA', 'Knowledge base'], popular: false },
+    { tier: 'Professional', price: 79, interval: 'mo', features: ['10 agents', 'Unlimited tickets', 'All channels', 'AI categorization', 'AI suggestions', 'CSAT surveys'], popular: true },
+    { tier: 'Enterprise', price: 199, interval: 'mo', features: ['Unlimited agents', 'Custom SLA', 'Full AI suite', 'Webhooks', 'API access', 'Custom branding'], popular: false },
+  ] },
+  { id: 'email-sender', name: 'Echo Email', tagline: 'Transactional email, drip sequences, AI subject lines', pricing: [
+    { tier: 'Starter', price: 9, interval: 'mo', features: ['10K emails/mo', 'Transactional email', '5 templates', 'Delivery analytics', 'Bounce handling'], popular: false },
+    { tier: 'Growth', price: 29, interval: 'mo', features: ['50K emails/mo', 'Broadcast campaigns', 'Drip sequences', 'AI subject optimizer', 'A/B testing'], popular: true },
+    { tier: 'Scale', price: 99, interval: 'mo', features: ['500K emails/mo', 'Multi-tenant', 'Dedicated IP', 'Priority delivery', 'Custom webhooks'], popular: false },
+  ] },
+  { id: 'appointments', name: 'Echo Appointments', tagline: 'AI scheduling with no-show prediction and utilization analytics', pricing: [
+    { tier: 'Solo', price: 19, interval: 'mo', features: ['1 provider', '1 location', 'Online booking', 'Email reminders', 'Calendar view'], popular: false },
+    { tier: 'Team', price: 49, interval: 'mo', features: ['10 providers', '3 locations', 'AI no-show prediction', 'Provider utilization', 'Recurring appointments'], popular: true },
+    { tier: 'Business', price: 129, interval: 'mo', features: ['Unlimited providers', 'Unlimited locations', 'Full AI suite', 'Revenue tracking', 'API access'], popular: false },
+  ] },
+  { id: 'invoicing', name: 'Echo Invoicing', tagline: 'AI-powered invoicing with payment prediction', pricing: [
+    { tier: 'Starter', price: 15, interval: 'mo', features: ['50 invoices/mo', 'Professional templates', 'Payment tracking', 'Auto reminders', 'Tax calculation'], popular: false },
+    { tier: 'Professional', price: 39, interval: 'mo', features: ['500 invoices/mo', 'Recurring billing', 'AI payment prediction', 'Multi-currency', 'Aging reports'], popular: true },
+    { tier: 'Business', price: 99, interval: 'mo', features: ['Unlimited invoices', 'Revenue reports', 'Batch generation', 'Webhook events', 'API access'], popular: false },
+  ] },
+  { id: 'hr-management', name: 'Echo HR', tagline: 'AI-powered HR with performance reviews and compensation analytics', pricing: [
+    { tier: 'Startup', price: 25, interval: 'mo', features: ['25 employees', 'Employee directory', 'Time-off tracking', 'Org chart', 'Document storage'], popular: false },
+    { tier: 'Growth', price: 69, interval: 'mo', features: ['100 employees', 'AI performance reviews', 'Compensation analytics', 'Custom positions', 'Turnover reports'], popular: true },
+    { tier: 'Enterprise', price: 179, interval: 'mo', features: ['Unlimited employees', 'Full AI suite', 'Headcount reports', 'API access', 'Priority support'], popular: false },
+  ] },
+  { id: 'project-management', name: 'Echo Projects', tagline: 'AI project management with Kanban boards and sprint planning', pricing: [
+    { tier: 'Free', price: 0, interval: 'mo', features: ['3 projects', '2 boards', 'Basic tasks', 'Labels & tags', 'Comments'], popular: false },
+    { tier: 'Team', price: 15, interval: 'mo', features: ['Unlimited projects', 'Sprint planning', 'Time tracking', 'AI task analysis', 'Burndown charts'], popular: true },
+    { tier: 'Business', price: 39, interval: 'mo', features: ['Everything in Team', 'Workload reports', 'Story points', 'Webhooks', 'API access'], popular: false },
+  ] },
+  { id: 'documents', name: 'Echo Documents', tagline: 'AI document management with version history and sharing', pricing: [
+    { tier: 'Starter', price: 12, interval: 'mo', features: ['5 GB storage', 'Version history', 'Folder organization', 'Public sharing', 'Search'], popular: false },
+    { tier: 'Team', price: 29, interval: 'mo', features: ['50 GB storage', 'AI summarization', 'Team collaboration', 'Access controls', 'Activity log'], popular: true },
+    { tier: 'Business', price: 79, interval: 'mo', features: ['Unlimited storage', 'Full AI suite', 'Custom branding', 'Webhooks', 'API access'], popular: false },
+  ] },
+  { id: 'workflows', name: 'Echo Workflows', tagline: 'Visual workflow automation with AI analysis and webhooks', pricing: [
+    { tier: 'Free', price: 0, interval: 'mo', features: ['5 workflows', 'Manual triggers', 'Basic actions', 'Run history', 'Email notifications'], popular: false },
+    { tier: 'Pro', price: 29, interval: 'mo', features: ['50 workflows', 'Cron + webhook triggers', 'AI analysis steps', 'Conditional logic', 'Full logs'], popular: true },
+    { tier: 'Business', price: 99, interval: 'mo', features: ['Unlimited workflows', 'Multi-step chains', 'API triggers', 'Custom integrations', 'Priority support'], popular: false },
+  ] },
+  { id: 'inventory', name: 'Echo Inventory', tagline: 'AI inventory management with demand forecasting', pricing: [
+    { tier: 'Starter', price: 19, interval: 'mo', features: ['500 SKUs', '1 warehouse', 'Stock tracking', 'Low-stock alerts', 'Barcode scanning'], popular: false },
+    { tier: 'Growth', price: 49, interval: 'mo', features: ['5,000 SKUs', '5 warehouses', 'AI demand forecasting', 'Purchase orders', 'Supplier management'], popular: true },
+    { tier: 'Enterprise', price: 149, interval: 'mo', features: ['Unlimited SKUs', 'Unlimited warehouses', 'Full AI suite', 'Webhooks', 'API access'], popular: false },
+  ] },
+  { id: 'finance', name: 'Echo Finance', tagline: 'AI personal finance with auto-categorization and budgets', pricing: [
+    { tier: 'Free', price: 0, interval: 'mo', features: ['3 accounts', 'Manual transactions', 'Basic budgets', 'Monthly reports'], popular: false },
+    { tier: 'Pro', price: 9, interval: 'mo', features: ['Unlimited accounts', 'AI categorization', 'Savings goals', 'Net worth tracking', 'Trend analysis'], popular: true },
+    { tier: 'Family', price: 19, interval: 'mo', features: ['Multi-user', 'Bill reminders', 'Tax export', 'All AI features', 'Priority support'], popular: false },
+  ] },
+  { id: 'lms', name: 'Echo LMS', tagline: 'AI course builder with quiz generation and certificates', pricing: [
+    { tier: 'Starter', price: 19, interval: 'mo', features: ['5 courses', '50 students', 'AI quiz generation', 'Certificates', 'Discussion forums'], popular: false },
+    { tier: 'Pro', price: 49, interval: 'mo', features: ['25 courses', '500 students', 'AI course outlines', 'Custom branding', 'Full analytics'], popular: true },
+    { tier: 'Business', price: 149, interval: 'mo', features: ['Unlimited courses', 'Unlimited students', 'Multi-tenant', 'API access', 'Priority support'], popular: false },
+  ] },
 ];
 
 export default function PricingPage() {
   const { user, role } = useAuth();
   const { isDark } = useTheme();
-  const isOwner = role === 'owner' || (user?.email && COMMANDER_EMAILS.some(e => e.toLowerCase() === user.email!.toLowerCase()));
+  const isOwner = role === 'owner';
   const [services, setServices] = useState<Service[]>([]);
   const [activeService, setActiveService] = useState<string | null>(null);
   const [checkingOut, setCheckingOut] = useState<string | null>(null);
@@ -171,6 +233,8 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <FaqSchema faqs={PRICING_FAQS} />
+      <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Pricing',href:'/pricing'}]} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority /></Link>
@@ -416,6 +480,18 @@ export default function PricingPage() {
             Get Bundle Pricing
           </a>
         </div>
+
+        <section className="py-16 px-6 max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+          <div className="space-y-6">
+            {PRICING_FAQS.map(faq => (
+              <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+                <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         <div className="text-center pb-8">
           <p className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>
