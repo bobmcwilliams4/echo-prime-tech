@@ -10,6 +10,46 @@
 
     <!-- Blog Articles -->
     <item>
+      <title>The Great SaaS Unbundling: How AI Is Replacing Your $500/Month Tool Stack</title>
+      <link>https://echo-ept.com/blog/ai-business-tools-vs-legacy-saas-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-business-tools-vs-legacy-saas-2026</guid>
+      <category>AI &amp; Engineering</category>
+      <description>Most businesses pay $300-$800/month across 5-10 SaaS tools. AI-native platforms are collapsing that stack into unified systems at a fraction of the cost.</description>
+    </item>
+    <item>
+      <title>How We Built 8 Multi-Tenant SaaS Products on Cloudflare Workers in 30 Days</title>
+      <link>https://echo-ept.com/blog/building-multi-tenant-saas-cloudflare-workers</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/building-multi-tenant-saas-cloudflare-workers</guid>
+      <category>AI &amp; Engineering</category>
+      <description>Cloudflare Workers, D1 databases, and KV stores let us ship 8 production SaaS products with auth, rate limiting, and tenant isolation in under a month.</description>
+    </item>
+    <item>
+      <title>AI Invoicing That Actually Gets You Paid Faster Than QuickBooks</title>
+      <link>https://echo-ept.com/blog/ai-invoicing-quickbooks-alternative-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-invoicing-quickbooks-alternative-2026</guid>
+      <category>Product Updates</category>
+      <description>QuickBooks charges $30/month and still can't auto-generate invoices or predict which clients will pay late. AI invoicing changes the game.</description>
+    </item>
+    <item>
+      <title>Calendly vs. AI Booking: Why Smart Scheduling Is Worth the Switch</title>
+      <link>https://echo-ept.com/blog/ai-appointment-scheduling-calendly-alternative</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-appointment-scheduling-calendly-alternative</guid>
+      <category>Product Updates</category>
+      <description>An AI booking system optimizes your time, predicts no-shows, adjusts availability dynamically, and follows up automatically.</description>
+    </item>
+    <item>
+      <title>Stop Paying Typeform $50/Month — AI Form Builders Do More for Less</title>
+      <link>https://echo-ept.com/blog/ai-form-builder-typeform-alternative-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-form-builder-typeform-alternative-2026</guid>
+      <category>Product Updates</category>
+      <description>Typeform charges $50/month for 100 responses. AI form builders generate questions, analyze responses in real-time, and cost a fraction of the price.</description>
+    </item>
+    <item>
       <title>AI Analytics vs Datadog: Why Edge-First Monitoring Wins in 2026</title>
       <link>https://echo-ept.com/blog/ai-analytics-vs-datadog-2026</link>
       <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>

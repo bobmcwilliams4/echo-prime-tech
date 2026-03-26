@@ -91,6 +91,9 @@
   <url><loc>https://echo-ept.com/forms</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/hr</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/contracts</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/lms</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/email-marketing</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/surveys</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- Products — Finance -->
   <url><loc>https://echo-ept.com/finance-ai</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
@@ -170,6 +173,13 @@
   <url><loc>https://echo-ept.com/blog/cybersecurity-ai-smb-affordable-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/blog/ai-email-marketing-automation-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/blog/ai-home-automation-beyond-alexa-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New Blog Articles (2026-03-26 batch 2) -->
+  <url><loc>https://echo-ept.com/blog/ai-invoicing-quickbooks-alternative-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-appointment-scheduling-calendly-alternative</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-form-builder-typeform-alternative-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-business-tools-vs-legacy-saas-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/building-multi-tenant-saas-cloudflare-workers</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 
   <!-- Helpdesk -->
   <url><loc>https://echo-ept.com/helpdesk</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
