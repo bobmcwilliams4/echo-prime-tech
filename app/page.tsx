@@ -627,6 +627,8 @@ export default function HomePage() {
                   { label: 'Inventory', href: '/inventory' },
                   { label: 'Invoice', href: '/invoice' },
                   { label: 'Booking', href: '/booking' },
+                  { label: 'Email', href: '/email-sender' },
+                  { label: 'Analytics', href: '/analytics' },
                   { label: 'Forms', href: '/forms' },
                   { label: 'Title Intelligence', href: '/title-intelligence' },
                   { label: 'Permian Basin AI', href: '/permian' },
