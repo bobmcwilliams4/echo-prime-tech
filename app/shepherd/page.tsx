@@ -9,7 +9,7 @@ import { useAuth } from '../../lib/auth-context';
 /* ==============================================================================
    ECHO SHEPHERD AI — The Pastor's Autonomous Ministry Platform
    Product page: hero, features, personas, denominations, pricing, FAQ, CTA
-   Backend: echo-shepherd-ai.bmcii1976.workers.dev (56 endpoints, 17 D1 tables)
+   Backend: echo-shepherd-ai.bmcii1976.workers.dev (80+ endpoints, 25 D1 tables, v2.0)
    ============================================================================== */
 
 function useInView(threshold = 0.15) {
@@ -109,6 +109,39 @@ function AnalyticsIcon() {
   );
 }
 
+function RecurringIcon() {
+  return (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" />
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+    </svg>
+  );
+}
+
+function CurriculumIcon() {
+  return (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+    </svg>
+  );
+}
+
+function MegaphoneIcon() {
+  return (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
+function MediaIcon() {
+  return (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+    </svg>
+  );
+}
+
 const FEATURES = [
   { title: 'AI Sermon Builder', desc: 'Scripture-backed outlines with 9+ denomination awareness, illustration suggestions, and exegetical depth. From text selection to full manuscript in minutes.', Icon: SermonIcon },
   { title: 'Scripture Engine', desc: '66 books with cross-references, Hebrew/Greek lexicon, and AI commentary that respects your theological tradition. Search by topic, theme, or passage.', Icon: ScriptureIcon },
@@ -120,6 +153,10 @@ const FEATURES = [
   { title: 'Church Calendar', desc: 'Events, RSVPs, recurring services, facility booking, and conflict detection. One calendar for the entire church.', Icon: CalendarIcon },
   { title: 'Pastoral Care', desc: 'Counseling notes, hospital visit tracking, prayer request management, and follow-up reminders. Encrypted and confidential.', Icon: CareIcon },
   { title: 'Church Analytics', desc: 'Growth trends, giving patterns, attendance metrics, and retention analysis. Data-driven decisions for kingdom impact.', Icon: AnalyticsIcon },
+  { title: 'Online Giving Portal', desc: 'Recurring donations, text-to-give, fundraising campaigns with progress tracking, and year-end tax statements. Digital tithing made simple.', Icon: RecurringIcon },
+  { title: 'Curriculum & Studies', desc: 'AI-generated study guides, multi-week Bible study curricula, group progress tracking, and discussion question builders. Feed your flock with depth.', Icon: CurriculumIcon },
+  { title: 'Communications Hub', desc: 'Church announcements, scheduled newsletters, prayer request management, and targeted group messaging. Keep your congregation connected.', Icon: MegaphoneIcon },
+  { title: 'Media Library', desc: 'Sermon recordings, podcast feed generation, daily devotionals with AI assistance, and video archive with view analytics. Your church content, organized.', Icon: MediaIcon },
 ];
 
 const PERSONAS = [
@@ -143,7 +180,7 @@ const PRICING = [
     period: '/mo',
     desc: 'For solo pastors and small churches getting started with AI ministry tools.',
     popular: false,
-    features: ['1 campus', 'Up to 200 members', 'AI Sermon Builder', 'Basic Congregation CRM', 'Scripture Engine', 'Church Calendar', 'Email support'],
+    features: ['1 campus', 'Up to 200 members', 'AI Sermon Builder', 'Basic Congregation CRM', 'Scripture Engine', 'Church Calendar', 'Prayer requests', 'Email support'],
     href: '/checkout?service=shepherd&tier=shepherd',
     cta: 'Start Free Trial',
   },
@@ -153,7 +190,7 @@ const PRICING = [
     period: '/mo',
     desc: 'Full-featured ministry platform for growing churches.',
     popular: true,
-    features: ['1 campus', 'Up to 500 members', 'Everything in Shepherd', 'Full CRM with family links', 'Worship planning + CCLI', 'Tithing & giving reports', 'Small group management', 'Priority support'],
+    features: ['1 campus', 'Up to 500 members', 'Everything in Shepherd', 'Full CRM with family links', 'Worship planning + CCLI', 'Online giving + recurring donations', 'Small groups + curriculum', 'Communications hub', 'Priority support'],
     href: '/checkout?service=shepherd&tier=flock',
     cta: 'Get Flock Plan',
   },
@@ -163,7 +200,7 @@ const PRICING = [
     period: '/mo',
     desc: 'Multi-campus tools with analytics and volunteer coordination.',
     popular: false,
-    features: ['Up to 3 campuses', 'Up to 2,000 members', 'Everything in Flock', 'Volunteer management', 'Church analytics dashboard', 'Background check integration', 'Pastoral care module', 'Dedicated account manager'],
+    features: ['Up to 3 campuses', 'Up to 2,000 members', 'Everything in Flock', 'Volunteer management', 'Church analytics dashboard', 'Media library + podcast feed', 'AI devotional generator', 'Giving campaigns + tax statements', 'Dedicated account manager'],
     href: '/checkout?service=shepherd&tier=congregation',
     cta: 'Start Free Trial',
   },
@@ -173,7 +210,7 @@ const PRICING = [
     period: '/mo',
     desc: 'Enterprise ministry platform for mega-churches and networks.',
     popular: false,
-    features: ['Unlimited campuses', 'Unlimited members', 'Everything in Congregation', 'White-label branding', 'API access', 'Custom integrations', 'Priority phone support', 'Dedicated success manager'],
+    features: ['Unlimited campuses', 'Unlimited members', 'Everything in Congregation', 'White-label branding', 'Full API access', 'Text-to-give SMS', 'Custom integrations', 'Priority phone support', 'Dedicated success manager'],
     href: 'mailto:bob@echo-op.com?subject=Cathedral%20Plan%20Inquiry',
     cta: 'Contact Sales',
   },
@@ -199,6 +236,18 @@ const FAQ = [
   {
     q: 'Is there a free trial?',
     a: 'Yes. Every plan includes a 14-day free trial with full feature access. No credit card required to start. If you love it, upgrade seamlessly. If not, your data exports cleanly.',
+  },
+  {
+    q: 'How does the online giving portal work?',
+    a: 'Members can set up recurring donations (weekly, bi-weekly, monthly, quarterly), donate to specific fundraising campaigns, or even give via text message. Year-end tax statements are auto-generated for each member with a full fund-by-fund breakdown.',
+  },
+  {
+    q: 'Can the AI generate Bible study curriculum?',
+    a: 'Yes. Provide a scripture passage or topic, select your audience and denomination, and Shepherd AI generates a multi-week study guide with discussion questions, application challenges, and prayer focuses. Assign curricula directly to small groups and track lesson progress.',
+  },
+  {
+    q: 'Does Shepherd AI support sermon video archiving?',
+    a: 'The media library stores sermon recordings (video, audio, or podcast format), links them to their corresponding sermon entries, tracks view counts, and can generate a podcast-style RSS feed for your church\'s content.',
   },
 ];
 
@@ -256,10 +305,10 @@ export default function ShepherdPage() {
           {/* Stats bar */}
           <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { value: '56', label: 'API Endpoints' },
-              { value: '9+', label: 'Denominations' },
+              { value: '80+', label: 'API Endpoints' },
+              { value: '21+', label: 'Denominations' },
               { value: '15K+', label: 'Worship Songs' },
-              { value: '66', label: 'Books Indexed' },
+              { value: '25', label: 'Database Tables' },
             ].map((s) => (
               <div key={s.label} className="text-center">
                 <div className="text-2xl md:text-3xl font-extrabold" style={{ color: 'var(--ept-accent)' }}>{s.value}</div>
@@ -277,7 +326,7 @@ export default function ShepherdPage() {
             Everything Your Church Needs
           </h2>
           <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
-            10 integrated modules purpose-built for ministry. No duct-taping five different platforms together.
+            14 integrated modules purpose-built for ministry. No duct-taping five different platforms together.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {FEATURES.map((f) => (
