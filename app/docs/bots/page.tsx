@@ -1,324 +1,129 @@
 'use client'
 
-import Link from 'next/link'
-import Image from 'next/image'
-import { useState } from 'react'
-import { useTheme } from '../../../lib/theme-context'
-import BreadcrumbSchema from '../../../components/BreadcrumbSchema'
-import FaqSchema from '../../../components/FaqSchema'
+import ProductDoc from '@/components/ProductDoc'
+import type { ProductDocProps } from '@/components/ProductDoc'
 
-const SECTIONS = [
-  { id: 'overview', label: 'Fleet Overview' },
-  { id: 'getting-started', label: 'Getting Started' },
-  { id: 'capabilities', label: 'Bot Capabilities' },
-  { id: 'configuration', label: 'Configuration' },
-  { id: 'analytics', label: 'Analytics' },
-  { id: 'opsec', label: 'OPSEC' },
-  { id: 'auditor', label: 'Bot Auditor' },
-  { id: 'api', label: 'API Reference' },
-  { id: 'faq', label: 'FAQ' },
-]
+const data: ProductDocProps = {
+  name: 'Echo Bot Fleet',
+  tagline: 'Autonomous AI bots across 8 platforms — Discord, X/Twitter, LinkedIn, Reddit, Telegram, Slack, WhatsApp, Instagram.',
+  accent: '#3b82f6',
+  productUrl: '/bots',
+  workerUrl: 'https://echo-bot-factory.bmcii1976.workers.dev',
+  version: '2.0.0',
 
-const PLATFORMS = [
-  { name: 'Discord', icon: '🎮', status: 'LIVE', deploy: 'Create a Discord Application at discord.com/developers, generate a Bot token, add the bot to your server with Message Content + Slash Command intents, then store the token in the Echo Vault. The Worker registers slash commands on deploy and listens for interactions via webhook.' },
-  { name: 'X / Twitter', icon: '🐦', status: 'LIVE', deploy: 'Apply for a Twitter Developer account, create a project with OAuth 2.0 + API v2 access, generate Bearer and user tokens. Configure tweet compose, reply, and timeline read scopes. The Worker posts on cron triggers and monitors mentions via filtered stream.' },
-  { name: 'LinkedIn', icon: '💼', status: 'LIVE', deploy: 'Create a LinkedIn App under your organization page, request Community Management API and Sign In With LinkedIn. Store the OAuth2 client_id and client_secret in the vault. Posts go through an approval queue by default.' },
-  { name: 'Telegram', icon: '✈️', status: 'LIVE', deploy: 'Message @BotFather on Telegram to create a new bot and receive the API token. Set the webhook URL to your Worker endpoint. The bot supports inline queries, group commands, and payment processing out of the box.' },
-  { name: 'Reddit', icon: '🔴', status: 'LIVE', deploy: 'Register a script-type application at reddit.com/prefs/apps, obtain client_id and client_secret. Configure target subreddits and keyword triggers. The Worker monitors new posts and comments on matching threads.' },
-  { name: 'Slack', icon: '💬', status: 'LIVE', deploy: 'Create a Slack App at api.slack.com/apps, enable Event Subscriptions pointing to your Worker URL, add bot scopes (chat:write, channels:read, commands). Install to your workspace and store the Bot User OAuth Token.' },
-  { name: 'WhatsApp', icon: '📱', status: 'READY', deploy: 'Set up a Meta Business account and WhatsApp Business API via the Meta Developer Portal. Create a phone number, configure message templates, and point the webhook to your Worker. Supports text, image, and interactive button messages.' },
-  { name: 'Messenger', icon: '📘', status: 'READY', deploy: 'Configure a Facebook Page, create a Meta App with Messenger platform, subscribe to message webhooks. The Worker handles structured replies, quick reply buttons, and persistent menu configuration.' },
-  { name: 'Instagram', icon: '📸', status: 'CUSTOM', deploy: 'Connect via the Instagram Graph API through your Meta Business account. Enable messaging and content publishing scopes. The Worker schedules story and feed posts, auto-replies to DMs, and tracks hashtag performance.' },
-]
+  overview: [
+    'Echo Bot Fleet is a unified platform for deploying and managing autonomous AI bots across 8 major social and messaging platforms: Discord, X/Twitter, LinkedIn, Reddit, Telegram, Slack, WhatsApp, and Instagram. Each bot runs on Cloudflare Workers with D1 storage, KV caching, and cron-triggered scheduling, delivering zero-downtime autonomous operation with global edge performance and no idle cost.',
+    'Every bot in the fleet is powered by AI content generation that understands platform conventions — hashtags and brevity on X, professional tone on LinkedIn, threaded discussions on Reddit, visual-first content on Instagram. The content engine generates original posts, replies, and engagement actions tailored to each platform\'s culture and algorithm preferences, while cross-platform coordination ensures consistent brand messaging without duplicate content.',
+    'The fleet management dashboard provides real-time analytics across all platforms including engagement metrics, audience growth tracking, posting performance, sentiment analysis, and A/B testing results. Smart scheduling uses machine learning to identify optimal posting windows for each platform and audience segment, while the bot auditor continuously monitors health scores, shadowban indicators, and rate limit headroom to keep every bot operating at peak effectiveness.',
+  ],
 
-const PERSONALITIES = [
-  'Professional Advisor', 'Casual Friend', 'Technical Expert', 'Sales Closer',
-  'Community Manager', 'News Anchor', 'Motivational Coach', 'Sarcastic Wit',
-  'Data Analyst', 'Customer Support', 'Brand Ambassador', 'Thought Leader',
-  'Entertainer', 'Educator',
-]
+  gettingStarted: [
+    { step: 1, title: 'Choose Your Platforms', desc: 'Select which platforms you want to deploy bots on from the 8 supported options. Each platform requires API credentials — the onboarding wizard walks you through obtaining developer access and API keys for each selected platform.' },
+    { step: 2, title: 'Connect Your Accounts', desc: 'Store your platform API tokens securely in the Echo Vault. The platform validates each connection by performing a read-only API call to confirm token validity, permission scopes, and account status before proceeding.' },
+    { step: 3, title: 'Configure Content Strategy', desc: 'Define your content categories (educational, promotional, engagement, curated, behind-the-scenes) and set distribution weights for each. Select or customize an AI personality that matches your brand voice across all platforms.' },
+    { step: 4, title: 'Set Posting Schedule', desc: 'Configure posting frequency and timing for each platform. Use preset schedules (peak hours, business hours, always-on) or define custom cron expressions with timezone-aware triggers. Enable smart scheduling to let the AI optimize timing automatically.' },
+    { step: 5, title: 'Monitor Performance', desc: 'Launch your bots and monitor real-time performance from the fleet dashboard. Track engagement metrics, audience growth, content performance, and bot health scores. Adjust strategy based on analytics and A/B test results.' },
+  ],
 
-const API_ENDPOINTS = [
-  { method: 'GET', path: '/api/bots', desc: 'List all bots with status, platform, and last activity timestamp.' },
-  { method: 'POST', path: '/api/bots', desc: 'Create a new bot instance. Accepts platform, personality, schedule config, and target channels.' },
-  { method: 'GET', path: '/api/bots/:id/analytics', desc: 'Engagement metrics, post performance, audience growth, and sentiment breakdown.' },
-  { method: 'POST', path: '/api/bots/:id/post', desc: 'Trigger an immediate post. Accepts content, media URLs, and hashtag overrides.' },
-  { method: 'PUT', path: '/api/bots/:id/schedule', desc: 'Update posting schedule. Accepts cron expression, timezone, and content categories.' },
-  { method: 'GET', path: '/api/bots/:id/audit', desc: 'Latest audit report: health score, shadowban check, rate limit status, dedup results.' },
-  { method: 'POST', path: '/api/bots/:id/personality', desc: 'Switch or customize the AI personality. Accepts preset name or full personality config object.' },
-  { method: 'GET', path: '/api/fleet/summary', desc: 'Fleet-wide dashboard: total posts, total engagement, platform breakdown, alert count.' },
-]
+  features: [
+    { title: '8-Platform Support', desc: 'Deploy bots on Discord, X/Twitter, LinkedIn, Reddit, Telegram, Slack, WhatsApp, and Instagram from a single control panel. Each platform integration handles native APIs, webhooks, rate limits, and content formatting requirements automatically.' },
+    { title: 'AI Content Generation', desc: 'LLM-powered content engine generates original posts, replies, threads, and stories tailored to each platform\'s conventions. Understands hashtag culture on X, professional formatting on LinkedIn, threaded discussion style on Reddit, and visual-first approach on Instagram.' },
+    { title: 'Smart Scheduling', desc: 'ML-driven analysis of your specific audience activity patterns determines optimal posting windows per platform. Cron-triggered schedules with timezone awareness ensure posts hit when your audience is most active and engaged.' },
+    { title: 'Engagement Automation', desc: 'Automated likes, replies, follows, and retweets based on configurable rules and AI-driven relevance scoring. Engagement actions respect platform rate limits and are spaced naturally to avoid detection patterns.' },
+    { title: 'Cross-Platform Coordination', desc: 'A single content theme is automatically adapted for each platform — shortened for X, formatted with headers for LinkedIn, threaded for Reddit, visual for Instagram. Deduplication ensures adapted content, never copy-pasted duplicates.' },
+    { title: 'Analytics Dashboard', desc: 'Unified analytics across all platforms: impressions, engagement rate, click-through rate, follower growth, sentiment breakdown, and revenue attribution. Compare performance across platforms, content categories, and posting times.' },
+    { title: 'A/B Testing', desc: 'Test different content styles, posting times, hashtag strategies, and personality tones across controlled segments. Statistical significance calculations ensure you make data-driven decisions, not gut-feel changes.' },
+    { title: 'Hashtag Optimization', desc: 'AI-powered hashtag selection that mixes high-volume and niche tags, rotates to avoid repetition, and tracks which hashtag combinations drive the highest engagement and discovery rates per platform.' },
+    { title: 'Audience Growth', desc: 'Follower and subscriber tracking with growth velocity analysis, audience demographics (where available), follow/unfollow attribution by content type, and growth projection modeling based on current trajectory.' },
+    { title: 'Sentiment Monitoring', desc: 'NLP-powered sentiment analysis on replies, comments, and mentions across all platforms. Track brand sentiment trends, identify negative sentiment spikes early, and measure how content strategy changes affect public perception.' },
+    { title: 'Brand Voice Consistency', desc: '14 pre-built AI personalities with tunable parameters: formality, emoji density, response length, humor level, and engagement aggression. Ensures every post across every platform sounds authentically on-brand.' },
+    { title: 'Competitor Tracking', desc: 'Monitor competitor posting frequency, engagement rates, and content themes using public data. Identify content gaps, trending topics in your niche, and engagement benchmarks to inform your own content strategy.' },
+  ],
 
-const FAQS = [
-  { q: 'How many platforms can a single bot manage?', a: 'Professional tier bots support up to 5 platforms simultaneously from a single control panel. Each platform gets its own posting schedule, content adaptation, and analytics stream while sharing the same AI personality and knowledge base.' },
-  { q: 'What AI personalities are available?', a: 'Echo Bot Fleet ships with 14 pre-built personalities ranging from Professional Advisor to Sarcastic Wit. Each personality controls tone, vocabulary, emoji usage, response length, and engagement style. You can also define fully custom personalities with your own prompt templates.' },
-  { q: 'How does shadowban detection work?', a: 'The Bot Auditor runs platform-specific health checks every 6 hours. For X/Twitter, it checks reply visibility and search indexing. For Reddit, it monitors post visibility in subreddit listings. For Instagram, it tracks reach-to-follower ratios. Any anomaly triggers an alert with recommended remediation steps.' },
-  { q: 'Can the bot generate images and media?', a: 'Yes. Bots can attach images, GIFs, and video clips to posts. Content can be sourced from your media library, generated via AI image models, or pulled from configured RSS/media feeds. Platform-specific formatting (Twitter cards, LinkedIn articles, Instagram carousels) is handled automatically.' },
-  { q: 'What happens if a bot hits a rate limit?', a: 'Every bot runs behind an intelligent rate limiter that tracks per-platform quotas. When approaching limits, the bot queues posts and spaces them across available windows. If hard-limited, it pauses and resumes automatically. Rate limit events are logged and visible in the audit dashboard.' },
-  { q: 'Is there a content approval workflow?', a: 'Yes. Each bot can be configured in auto-post or approval-required mode. In approval mode, generated content is queued for human review with one-click approve/reject/edit. LinkedIn bots default to approval mode given the professional context.' },
-  { q: 'How does deduplication work across platforms?', a: 'The dedup engine hashes content before posting and checks against a 90-day rolling window. Exact duplicates are blocked. Near-duplicates (>85% similarity) are flagged for review. Cross-platform dedup ensures the same message is adapted, not copy-pasted, across channels.' },
-]
+  apiEndpoints: [
+    { method: 'GET', path: '/api/bots', desc: 'List all bots in the fleet with platform, status, health score, last activity timestamp, and posting statistics summary.', auth: true },
+    { method: 'POST', path: '/api/bots/:id/post', desc: 'Trigger an immediate post on a specific bot. Accepts content text, media URLs, hashtag overrides, and platform-specific formatting options.', auth: true },
+    { method: 'GET', path: '/api/analytics/fleet', desc: 'Fleet-wide analytics summary: total posts, total engagement, platform breakdown, top-performing content, and alert count across all active bots.', auth: true },
+    { method: 'GET', path: '/api/analytics/:botId', desc: 'Per-bot analytics: engagement metrics, audience growth, post performance history, sentiment breakdown, and A/B test results for a specific bot.', auth: true },
+    { method: 'PUT', path: '/api/schedules/:botId', desc: 'Update posting schedule for a bot. Accepts cron expression, timezone, content category weights, and smart scheduling toggle.', auth: true },
+    { method: 'GET', path: '/api/platforms', desc: 'List all connected platforms with credential status, API quota usage, rate limit headroom, and platform-specific feature availability.', auth: true },
+    { method: 'POST', path: '/api/engagement/:botId', desc: 'Configure engagement automation rules: reply triggers, like criteria, follow-back rules, and interaction frequency limits per platform.', auth: true },
+    { method: 'GET', path: '/health', desc: 'Health check endpoint. Returns service status, active bot count, platform connectivity, and scheduler status.', auth: false },
+  ],
+
+  userGuide: [
+    {
+      title: 'Setting Up Bots',
+      id: 'setting-up-bots',
+      content: [
+        'Each bot requires a connected platform account with valid API credentials. Navigate to Fleet > Add Bot, select the target platform, and follow the platform-specific setup guide. Discord bots require a Bot Application token with Message Content intent. X bots need OAuth 2.0 with API v2 access. LinkedIn requires Community Management API approval.',
+        'After connecting credentials, configure the bot\'s AI personality by selecting a preset (Professional Advisor, Casual Friend, Technical Expert, etc.) or building a custom personality with tunable parameters. The personality controls tone, vocabulary, emoji usage, response length, and engagement style across all generated content.',
+        'Test your bot configuration by posting a single test message before enabling the automated schedule. Review the generated content to ensure the personality, hashtags, and formatting match your expectations. Adjust parameters as needed before going live.',
+      ],
+    },
+    {
+      title: 'Content Strategy',
+      id: 'content-strategy',
+      content: [
+        'Define content categories that map to your business goals: educational content builds authority, promotional content drives conversions, engagement content grows your audience, and curated content fills gaps without requiring original generation. Set distribution weights (e.g., 40% educational, 20% promotional, 40% engagement) to maintain a balanced feed.',
+        'The AI content engine generates original posts for each scheduled slot based on your category weights, trending topics in your niche, and historical performance data. Each post is adapted for the target platform — character limits, formatting conventions, hashtag counts, and media requirements are handled automatically.',
+        'Build a content library of evergreen themes, product highlights, and brand narratives that the AI can reference and remix. The more context you provide about your brand, products, and audience, the more relevant and on-brand the generated content becomes over time.',
+      ],
+    },
+    {
+      title: 'Scheduling',
+      id: 'scheduling',
+      content: [
+        'Posting schedules use cron syntax with timezone awareness. Common presets include peak-hours (9am, 12pm, 5pm local), business-hours (every 2 hours from 8am-6pm), and always-on (every 4 hours around the clock). Each platform can have an independent schedule optimized for its specific audience activity patterns.',
+        'Enable smart scheduling to let the ML model analyze your audience engagement patterns and automatically adjust posting times. The model learns which days and hours produce the highest engagement for your specific followers and adjusts the cron triggers accordingly on a rolling 30-day window.',
+        'Posting queues buffer content when multiple platforms are scheduled simultaneously. The queue respects per-platform rate limits and spaces posts naturally to avoid burst patterns that could trigger platform throttling or shadowban detection.',
+      ],
+    },
+    {
+      title: 'Analytics',
+      id: 'analytics',
+      content: [
+        'The fleet dashboard aggregates metrics across all platforms into a unified view. Key metrics include total impressions, engagement rate (likes + comments + shares / impressions), click-through rate for posts with links, follower growth velocity, and sentiment score based on reply and comment analysis.',
+        'Drill down into per-bot and per-post analytics to identify what content types, posting times, and hashtag strategies produce the best results. The A/B testing module lets you run controlled experiments — test two personality styles, two posting times, or two content categories against each other with statistical significance tracking.',
+        'Export analytics data as CSV or JSON for integration with external business intelligence tools. Automated weekly and monthly report emails summarize fleet performance with trend analysis and actionable recommendations for strategy adjustments.',
+      ],
+    },
+    {
+      title: 'Cross-Platform Coordination',
+      id: 'cross-platform-coordination',
+      content: [
+        'Cross-platform coordination ensures your brand message is consistent across all 8 platforms without posting identical content. When a content theme is generated, the engine creates platform-specific adaptations: a concise tweet with hashtags for X, a detailed article-format post for LinkedIn, a conversational thread opener for Reddit, and a visual story with caption for Instagram.',
+        'The deduplication engine hashes all content and checks against a 90-day rolling window. Exact duplicates across platforms are blocked. Near-duplicates (above 85% similarity) are flagged for review. This ensures every platform gets unique, adapted content that respects the audience expectations of each channel.',
+        'Campaign mode allows you to coordinate a product launch, announcement, or event across all platforms simultaneously with platform-optimized content variants, staggered timing, and unified hashtag tracking. Post-campaign analytics show aggregate reach, engagement, and conversion across the full multi-platform push.',
+      ],
+    },
+  ],
+
+  aiCapabilities: [
+    { capability: 'Content Generation', desc: 'LLM-powered engine generates original posts, replies, threads, and stories for each platform. Understands platform-specific conventions, character limits, formatting norms, and hashtag culture to produce native-feeling content at scale.' },
+    { capability: 'Optimal Timing', desc: 'Machine learning model analyzes follower activity patterns, historical engagement data, and platform-wide trends to predict the optimal posting time for each piece of content on each platform, maximizing reach and engagement.' },
+    { capability: 'Engagement Prediction', desc: 'Pre-publish scoring model estimates expected engagement (likes, replies, shares) for generated content before it posts. Low-scoring content is regenerated or held for review, ensuring only high-potential content reaches your audience.' },
+    { capability: 'Audience Analysis', desc: 'Continuous analysis of follower demographics, interest signals, engagement patterns, and growth sources. Identifies your most engaged segments and adapts content strategy to attract more of your ideal audience profile.' },
+    { capability: 'Trend Detection', desc: 'Real-time monitoring of trending topics, hashtags, and conversations across all connected platforms. The content engine can automatically incorporate relevant trends into generated posts to increase discovery and timeliness.' },
+    { capability: 'Brand Voice Learning', desc: 'The AI personality system learns from your feedback and historical content performance to refine its understanding of your brand voice over time. The more you use it, the more accurately it captures your unique tone and messaging style.' },
+  ],
+
+  troubleshooting: [
+    { issue: 'Bot hitting API rate limits on X/Twitter', solution: 'X/Twitter has strict rate limits on the free and basic API tiers. Reduce posting frequency to no more than 3-5 posts per day. Space engagement actions (likes, replies) by at least 60 seconds. Upgrade to the Pro API tier for higher quotas. Check Settings > Rate Limits for real-time quota usage.' },
+    { issue: 'Content flagged or removed by platform moderation', solution: 'Review the flagged content in the Audit log to understand which platform policy was triggered. Adjust your AI personality settings to increase the content safety filter level. Enable the pre-publish moderation queue to review all generated content before it posts. Avoid topics that commonly trigger automated moderation.' },
+    { issue: 'Bot account suspended by platform', solution: 'Platform suspensions typically result from excessive automation, rate limit violations, or content policy breaches. Pause all bot activity on the affected platform immediately. Review the suspension notice and audit log to identify the trigger. Appeal through the platform\'s official process. Reduce automation aggressiveness before re-enabling.' },
+    { issue: 'Posts not publishing at scheduled times', solution: 'Verify that the bot\'s API credentials are still valid — tokens expire and need refreshing. Check the schedule configuration for correct timezone settings. Review the posting queue for errors (Settings > Queue). Ensure the Cloudflare Worker cron trigger is active and the bot status is set to "Running" in the fleet dashboard.' },
+  ],
+
+  faq: [
+    { q: 'How many platforms can a single bot manage?', a: 'Each bot instance is dedicated to one platform for optimal performance and rate limit management. However, the fleet dashboard lets you manage all platform bots from a single interface with cross-platform coordination, unified analytics, and shared content strategy across all 8 supported platforms.' },
+    { q: 'What AI personalities are available?', a: 'Echo Bot Fleet ships with 14 pre-built personalities: Professional Advisor, Casual Friend, Technical Expert, Sales Closer, Community Manager, News Anchor, Motivational Coach, Sarcastic Wit, Data Analyst, Customer Support, Brand Ambassador, Thought Leader, Entertainer, and Educator. Each is fully customizable with tunable parameters.' },
+    { q: 'Will the bots get my accounts banned?', a: 'The fleet includes multiple safety layers: intelligent rate limiting that stays well within platform quotas, content safety filters, deduplication to avoid spam patterns, and the Bot Auditor which checks for shadowban indicators every 6 hours. Following the recommended posting frequencies and keeping content quality high minimizes platform risk.' },
+    { q: 'Can I review content before it posts?', a: 'Yes. Each bot supports auto-post mode for hands-off operation or approval-required mode where all generated content enters a review queue. In approval mode, you can approve, reject, or edit each post with one click. LinkedIn bots default to approval mode given the professional context.' },
+    { q: 'How does cross-platform deduplication work?', a: 'The dedup engine hashes content before posting and checks against a 90-day rolling window across all platforms. Exact duplicates are blocked automatically. Near-duplicates (above 85% cosine similarity) are flagged for review. Cross-platform posts are adapted to each platform\'s format and conventions rather than copy-pasted.' },
+  ],
+}
 
 export default function BotsDocsPage() {
-  const { isDark } = useTheme()
-  const [active, setActive] = useState('overview')
-
-  const sectionStyle = { backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }
-  const headingColor = { color: 'var(--ept-text)' }
-  const bodyColor = { color: 'var(--ept-text-secondary)' }
-  const mutedColor = { color: 'var(--ept-text-muted)' }
-
-  return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
-      <BreadcrumbSchema items={[
-        { name: 'Home', href: '/' },
-        { name: 'Bots', href: '/bots' },
-        { name: 'Documentation', href: '/docs/bots' },
-      ]} />
-      <FaqSchema faqs={FAQS} />
-
-      {/* Nav */}
-      <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
-        <Link href="/" className="flex items-center gap-3">
-          <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={36} height={36} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} />
-          <span className="text-lg font-bold" style={headingColor}>Bot Fleet Docs</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/bots" className="text-sm font-medium" style={mutedColor}>Bot Factory</Link>
-          <Link href="/pricing" className="text-sm font-medium" style={mutedColor}>Pricing</Link>
-          <Link href="/" className="text-sm font-medium" style={mutedColor}>Home</Link>
-        </div>
-      </nav>
-
-      <div className="max-w-5xl mx-auto px-6 py-10">
-        {/* Section Tabs */}
-        <div className="flex flex-wrap gap-2 mb-10 justify-center">
-          {SECTIONS.map(s => (
-            <button key={s.id} onClick={() => setActive(s.id)} className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-              style={{ backgroundColor: active === s.id ? 'var(--ept-accent)' : 'var(--ept-surface)', color: active === s.id ? '#fff' : 'var(--ept-text-muted)' }}>
-              {s.label}
-            </button>
-          ))}
-        </div>
-
-        {/* ── Fleet Overview ── */}
-        {active === 'overview' && (
-          <section className="space-y-6 animate-fade-up">
-            <h1 className="text-3xl md:text-4xl font-extrabold" style={headingColor}>Echo Bot Fleet Overview</h1>
-            <p style={bodyColor}>Echo Bot Fleet deploys autonomous AI bots across 9 platforms. Every bot runs on Cloudflare Workers with D1 storage, KV cache, and cron-triggered posting schedules. Bots are backed by ConvoAI intelligence for natural conversation, content generation, and real-time engagement tracking.</p>
-            <div className="grid sm:grid-cols-3 gap-4">
-              {PLATFORMS.map(p => (
-                <div key={p.name} className="p-4 rounded-xl border" style={sectionStyle}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xl">{p.icon}</span>
-                    <span className="font-bold text-sm" style={headingColor}>{p.name}</span>
-                    <span className="ml-auto px-2 py-0.5 rounded-full text-[10px] font-bold text-white"
-                      style={{ backgroundColor: p.status === 'LIVE' ? '#10b981' : p.status === 'READY' ? '#3b82f6' : '#8b5cf6' }}>{p.status}</span>
-                  </div>
-                  <p className="text-xs" style={mutedColor}>{p.deploy.slice(0, 80)}...</p>
-                </div>
-              ))}
-            </div>
-            <p className="text-xs" style={mutedColor}>LIVE = deployed and operational. READY = built, awaiting platform credentials. CUSTOM = built to order with your specifications.</p>
-          </section>
-        )}
-
-        {/* ── Getting Started ── */}
-        {active === 'getting-started' && (
-          <section className="space-y-6 animate-fade-up">
-            <h2 className="text-2xl font-extrabold" style={headingColor}>Getting Started</h2>
-            <p style={bodyColor}>Each platform requires API credentials stored in the Echo Vault. Below is the deployment process for every supported platform.</p>
-            <div className="space-y-4">
-              {PLATFORMS.map((p, i) => (
-                <div key={p.name} className="p-5 rounded-xl border" style={sectionStyle}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>{i + 1}</span>
-                    <span className="text-lg">{p.icon}</span>
-                    <h3 className="font-bold" style={headingColor}>{p.name}</h3>
-                  </div>
-                  <p className="text-sm" style={bodyColor}>{p.deploy}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── Bot Capabilities ── */}
-        {active === 'capabilities' && (
-          <section className="space-y-6 animate-fade-up">
-            <h2 className="text-2xl font-extrabold" style={headingColor}>Bot Capabilities</h2>
-            <div className="p-5 rounded-xl border" style={sectionStyle}>
-              <h3 className="font-bold mb-2" style={headingColor}>14 AI Personalities</h3>
-              <p className="text-sm mb-3" style={bodyColor}>Every bot ships with 14 pre-built personalities. Each controls tone, vocabulary, emoji frequency, response length, and engagement triggers. Switch personalities at runtime via the API or control panel.</p>
-              <div className="flex flex-wrap gap-2">
-                {PERSONALITIES.map(p => (
-                  <span key={p} className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-secondary)' }}>{p}</span>
-                ))}
-              </div>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {[
-                { t: 'ConvoAI Intelligence', d: 'LLM-powered conversation engine generates contextual replies, original posts, and thread continuations. Understands platform conventions — hashtags on X, professional tone on LinkedIn, memes on Reddit.' },
-                { t: 'Autonomous Posting', d: 'Cron-triggered schedules post content without human intervention. Configure hourly, daily, or custom intervals. Content is generated fresh each cycle based on trending topics, your knowledge base, and engagement history.' },
-                { t: 'Engagement Tracking', d: 'Every interaction is logged — likes, replies, shares, clicks, follows, and unfollows. Metrics are aggregated per post, per day, and per campaign for trend analysis.' },
-                { t: 'Multi-Platform Sync', d: 'A single piece of content is adapted per platform — shortened for X, formatted with headers for LinkedIn, conversation-style for Reddit. Posting times are optimized per platform audience.' },
-                { t: 'Content Categories', d: 'Organize content into categories (educational, promotional, engagement, curated, news) with configurable distribution ratios. Example: 40% educational, 20% promotional, 40% engagement.' },
-                { t: 'Media Generation', d: 'Auto-generate social images, infographics, and quote cards. Attach media from your library or external feeds. Platform-specific formatting handled automatically.' },
-              ].map(c => (
-                <div key={c.t} className="p-4 rounded-xl border" style={sectionStyle}>
-                  <h4 className="font-bold text-sm mb-1" style={headingColor}>{c.t}</h4>
-                  <p className="text-xs" style={bodyColor}>{c.d}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── Configuration ── */}
-        {active === 'configuration' && (
-          <section className="space-y-6 animate-fade-up">
-            <h2 className="text-2xl font-extrabold" style={headingColor}>Configuration</h2>
-            <div className="space-y-4">
-              <div className="p-5 rounded-xl border" style={sectionStyle}>
-                <h3 className="font-bold mb-2" style={headingColor}>Posting Schedules</h3>
-                <p className="text-sm mb-2" style={bodyColor}>Schedules use cron syntax and support timezone-aware triggers. Common presets include peak-hours (9am, 12pm, 5pm local), business-hours (every 2h from 8am-6pm), and always-on (every 4h around the clock).</p>
-                <div className="p-3 rounded-lg text-xs font-mono" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-muted)' }}>
-                  {`{ "cron": "0 9,12,17 * * 1-5", "timezone": "America/Chicago", "category_weights": { "educational": 40, "promotional": 20, "engagement": 40 } }`}
-                </div>
-              </div>
-              <div className="p-5 rounded-xl border" style={sectionStyle}>
-                <h3 className="font-bold mb-2" style={headingColor}>Content Categories</h3>
-                <p className="text-sm" style={bodyColor}>Define content buckets with weighted distribution. The AI selects the category for each post based on weights, then generates platform-appropriate content. Categories include educational, promotional, engagement, curated news, behind-the-scenes, and user-generated content reposts.</p>
-              </div>
-              <div className="p-5 rounded-xl border" style={sectionStyle}>
-                <h3 className="font-bold mb-2" style={headingColor}>Hashtag Strategy</h3>
-                <p className="text-sm" style={bodyColor}>Configure hashtag pools per platform and category. The bot rotates hashtags to avoid repetition, mixes high-volume and niche tags, and tracks which hashtags drive the most engagement. X bots use 2-3 hashtags per post; Instagram bots use up to 30 with relevance scoring.</p>
-              </div>
-              <div className="p-5 rounded-xl border" style={sectionStyle}>
-                <h3 className="font-bold mb-2" style={headingColor}>Personality Tuning</h3>
-                <p className="text-sm" style={bodyColor}>Each personality exposes tunable parameters: formality (0-100), emoji_density (0-10), response_length (short/medium/long), humor_level (0-5), and engagement_aggression (passive/moderate/active). Adjust these to match your brand voice exactly.</p>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* ── Analytics ── */}
-        {active === 'analytics' && (
-          <section className="space-y-6 animate-fade-up">
-            <h2 className="text-2xl font-extrabold" style={headingColor}>Analytics</h2>
-            <p style={bodyColor}>Every bot collects engagement data per post and aggregates it into actionable dashboards. Metrics update in near real-time via platform webhooks and periodic polling.</p>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {[
-                { t: 'Post Performance', d: 'Impressions, reach, engagement rate, click-through rate, and shares for every published post. Compare performance across content categories and posting times.' },
-                { t: 'Engagement Metrics', d: 'Likes, comments, reposts, saves, and profile visits broken down by platform. Track reply sentiment and identify top-performing conversation threads.' },
-                { t: 'Audience Growth', d: 'Follower/subscriber count over time, follow/unfollow velocity, audience demographics (where available), and growth attribution by content type.' },
-                { t: 'Conversion Tracking', d: 'Link click tracking with UTM parameters, landing page conversions, and revenue attribution for posts with product links or CTAs.' },
-                { t: 'Best Time to Post', d: 'ML-driven analysis of your specific audience activity patterns. Suggests optimal posting windows per platform and adjusts cron schedules automatically when enabled.' },
-                { t: 'Competitor Benchmarking', d: 'Track competitor engagement rates and posting frequency (public data only). Identify content gaps and trending topics in your niche.' },
-              ].map(a => (
-                <div key={a.t} className="p-4 rounded-xl border" style={sectionStyle}>
-                  <h4 className="font-bold text-sm mb-1" style={headingColor}>{a.t}</h4>
-                  <p className="text-xs" style={bodyColor}>{a.d}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── OPSEC ── */}
-        {active === 'opsec' && (
-          <section className="space-y-6 animate-fade-up">
-            <h2 className="text-2xl font-extrabold" style={headingColor}>OPSEC &mdash; Operational Security</h2>
-            <p style={bodyColor}>Bot operations require careful operational security to protect brand reputation and maintain platform standing. The following safeguards are built into every bot.</p>
-            <div className="space-y-4">
-              {[
-                { t: 'Brand Safety Filters', d: 'Every generated post passes through a content safety pipeline before publishing. Filters check for profanity, controversial topics, competitor mentions, confidential information leaks, and off-brand messaging. Flagged content is held for human review.' },
-                { t: 'Deduplication Engine', d: 'Content is hashed before posting and checked against a 90-day rolling window across all platforms. Exact duplicates are blocked. Near-duplicates (>85% cosine similarity) are flagged. Cross-platform posts are adapted, never copy-pasted.' },
-                { t: 'Rate Limiting', d: 'Per-platform rate limiters track API quotas in real-time. Posts are queued and spaced when approaching limits. Hard limit events trigger automatic pause-and-resume. All rate limit events are logged in the audit trail.' },
-                { t: 'Shadowban Detection', d: 'The Bot Auditor runs platform-specific visibility checks every 6 hours. Techniques include search indexing verification, reply visibility sampling, reach-to-follower ratio monitoring, and engagement rate anomaly detection. Alerts include remediation steps.' },
-                { t: 'Credential Rotation', d: 'API tokens are stored in the Echo Vault with rotation reminders. When a token approaches expiry, the system alerts and can auto-rotate for platforms that support refresh tokens (LinkedIn, Reddit, Slack).' },
-                { t: 'IP & Fingerprint Safety', d: 'All bot traffic routes through Cloudflare Workers, avoiding residential IP associations. User-agent strings match platform expectations. No headless browser fingerprints that could trigger automated detection.' },
-              ].map(o => (
-                <div key={o.t} className="p-5 rounded-xl border" style={sectionStyle}>
-                  <h3 className="font-bold mb-1" style={headingColor}>{o.t}</h3>
-                  <p className="text-sm" style={bodyColor}>{o.d}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── Bot Auditor ── */}
-        {active === 'auditor' && (
-          <section className="space-y-6 animate-fade-up">
-            <h2 className="text-2xl font-extrabold" style={headingColor}>Bot Auditor</h2>
-            <p style={bodyColor}>The Bot Auditor is an automated monitoring system that continuously validates bot health, content quality, and platform compliance. It runs independently on its own Cloudflare Worker.</p>
-            <div className="space-y-4">
-              <div className="p-5 rounded-xl border" style={sectionStyle}>
-                <h3 className="font-bold mb-2" style={headingColor}>6-Hour Audit Cycles</h3>
-                <p className="text-sm" style={bodyColor}>Every 6 hours, the Auditor runs a full sweep of each active bot. Checks include: platform connectivity, token validity, posting success rate, engagement anomalies, shadowban indicators, content quality scoring, and rate limit headroom. Results are stored in D1 with a 90-day retention window.</p>
-              </div>
-              <div className="p-5 rounded-xl border" style={sectionStyle}>
-                <h3 className="font-bold mb-2" style={headingColor}>Daily Summary Reports</h3>
-                <p className="text-sm" style={bodyColor}>At midnight UTC, the Auditor compiles a daily summary per bot and a fleet-wide rollup. Reports include: posts published, engagement totals, new followers, flagged content count, audit pass/fail status, and health score (0-100). Reports are delivered via webhook to your configured notification channels (Slack, Discord, email).</p>
-              </div>
-              <div className="p-5 rounded-xl border" style={sectionStyle}>
-                <h3 className="font-bold mb-2" style={headingColor}>Alert Escalation</h3>
-                <p className="text-sm" style={bodyColor}>Critical alerts (token expired, shadowban detected, posting failure streak) escalate immediately without waiting for the next audit cycle. Warning alerts (engagement drop, approaching rate limits) are batched into the next summary. All alerts include one-click remediation actions where possible.</p>
-              </div>
-              <div className="p-5 rounded-xl border" style={sectionStyle}>
-                <h3 className="font-bold mb-2" style={headingColor}>Health Score</h3>
-                <p className="text-sm" style={bodyColor}>Each bot receives a health score from 0-100 based on weighted factors: token validity (20%), posting success rate (25%), engagement trend (20%), shadowban status (20%), and rate limit headroom (15%). Scores below 60 trigger a warning; below 40 triggers an automatic pause with escalation.</p>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* ── API Reference ── */}
-        {active === 'api' && (
-          <section className="space-y-6 animate-fade-up">
-            <h2 className="text-2xl font-extrabold" style={headingColor}>API Reference</h2>
-            <p style={bodyColor}>All endpoints require authentication via <code className="font-mono text-xs px-1 py-0.5 rounded" style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-accent)' }}>Authorization: Bearer &lt;token&gt;</code> header. Base URL routes through the SDK Gateway.</p>
-            <div className="space-y-3">
-              {API_ENDPOINTS.map(ep => (
-                <div key={ep.path + ep.method} className="p-4 rounded-xl border flex flex-col sm:flex-row sm:items-start gap-3" style={sectionStyle}>
-                  <span className="px-2 py-0.5 rounded text-xs font-bold font-mono shrink-0"
-                    style={{ backgroundColor: ep.method === 'GET' ? 'rgba(16,185,129,0.15)' : ep.method === 'POST' ? 'rgba(59,130,246,0.15)' : 'rgba(245,158,11,0.15)',
-                      color: ep.method === 'GET' ? '#10b981' : ep.method === 'POST' ? '#3b82f6' : '#f59e0b' }}>
-                    {ep.method}
-                  </span>
-                  <div>
-                    <code className="text-sm font-mono font-bold" style={headingColor}>{ep.path}</code>
-                    <p className="text-xs mt-1" style={bodyColor}>{ep.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── FAQ ── */}
-        {active === 'faq' && (
-          <section className="space-y-6 animate-fade-up">
-            <h2 className="text-2xl font-extrabold" style={headingColor}>Frequently Asked Questions</h2>
-            <div className="space-y-4">
-              {FAQS.map(f => (
-                <div key={f.q} className="p-5 rounded-xl border" style={sectionStyle}>
-                  <h3 className="font-semibold mb-2 text-sm" style={headingColor}>{f.q}</h3>
-                  <p className="text-sm" style={bodyColor}>{f.a}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Back to Product */}
-        <div className="mt-12 text-center">
-          <Link href="/bots" className="px-6 py-3 rounded-xl font-semibold text-white transition-transform hover:scale-105 inline-block" style={{ backgroundColor: 'var(--ept-accent)' }}>
-            Explore the Bot Factory
-          </Link>
-        </div>
-      </div>
-    </div>
-  )
+  return <ProductDoc {...data} />
 }

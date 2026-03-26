@@ -665,7 +665,7 @@ export default function HomePage() {
               <h2 className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Latest from the Blog</h2>
               <p className="mt-2 text-sm" style={{ color: 'var(--ept-text-secondary)' }}>Technical deep-dives on AI engineering, oilfield tech, tax intelligence, and security</p>
             </div>
-            <Link href="/blog" className="text-sm font-semibold hidden md:block" style={{ color: 'var(--ept-accent)' }}>View all 106 articles &rarr;</Link>
+            <Link href="/blog" className="text-sm font-semibold hidden md:block" style={{ color: 'var(--ept-accent)' }}>View all 110 articles &rarr;</Link>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
@@ -684,7 +684,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="mt-6 text-center md:hidden">
-            <Link href="/blog" className="text-sm font-semibold" style={{ color: 'var(--ept-accent)' }}>View all 106 articles &rarr;</Link>
+            <Link href="/blog" className="text-sm font-semibold" style={{ color: 'var(--ept-accent)' }}>View all 110 articles &rarr;</Link>
           </div>
         </div>
       </section>
