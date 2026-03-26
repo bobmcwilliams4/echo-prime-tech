@@ -9,7 +9,7 @@ import { useAuth } from '../../lib/auth-context';
 /* ==============================================================================
    ECHO HOME AI — Whole-Home Intelligence & Automation
    Product page: hero, features, comparison, pricing, FAQ, footer CTA
-   Backend: echo-home-ai.bmcii1976.workers.dev (53 endpoints, 12 D1 tables, v2.0)
+   Backend: echo-home-ai.bmcii1976.workers.dev (83 endpoints, 18 D1 tables, v3.0)
    ============================================================================== */
 
 const FEATURES = [
@@ -27,6 +27,10 @@ const FEATURES = [
   { title: 'Google Home & Alexa Bridge', desc: 'Control Echo Home AI through your existing Google Home and Alexa devices. Ask for bills, homework status, or arm your security — all by voice.', icon: 'M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z' },
   { title: 'Security System Integration', desc: 'Ring, SimpliSafe, ADT, Wyze, Abode — unified in one dashboard. Arm/disarm, lock control, camera feeds, and activity timeline.', icon: 'M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a7.464 7.464 0 01-1.15 3.993m1.989 3.559A11.209 11.209 0 008.25 10.5a3.75 3.75 0 117.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 01-3.6 9.75m6.633-4.596a18.666 18.666 0 01-2.485 5.33' },
   { title: 'Smart TV & Parental Controls', desc: 'Roku, Samsung, LG, Fire TV, Apple TV, Chromecast — all from one remote. Bedtime cutoffs, content ratings, and per-kid screen time limits.', icon: 'M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z' },
+  { title: 'Pet Care Manager', desc: 'Pet profiles, vet records, medication schedules, feeding logs, grooming reminders, and walk tracking for every furry (or scaly) family member.', icon: 'M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904m7.846 2.338A10.49 10.49 0 0112 21.75c-1.547 0-3.032-.265-4.413-.756' },
+  { title: 'Fitness & Wellness', desc: 'Log workouts, track calories burned, monitor streaks, and set weekly fitness goals. 16 activity types from running to martial arts.', icon: 'M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z' },
+  { title: 'Meal Planning & Recipes', desc: 'Weekly meal plans, recipe library with nutrition data, AI-generated grocery lists, dietary restriction filters, and cost estimation.', icon: 'M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5m-6 1.5v-1.5m12 9.75l-1.5.75a3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0L3 16.5m15-3.379a48.474 48.474 0 00-6-.371c-2.032 0-4.034.126-6 .371m12 0c.39.049.777.102 1.163.16 1.07.16 1.837 1.094 1.837 2.175v5.169c0 .621-.504 1.125-1.125 1.125H4.125A1.125 1.125 0 013 20.625v-5.17c0-1.08.768-2.014 1.837-2.174A47.78 47.78 0 016 13.12M12.265 3.11a.375.375 0 11-.53 0L12 2.845l.265.265z' },
+  { title: 'Garden & Outdoor', desc: 'Plant inventory, watering schedules, seasonal care reminders, health tracking, and AI-powered garden planning. Never forget to water again.', icon: 'M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z' },
 ];
 
 const COMPARISON = [
@@ -45,13 +49,18 @@ const COMPARISON = [
   { feature: 'Unified security dashboard', echo: true, google: 'Partial', alexa: 'Partial', apple: true },
   { feature: 'Smart TV parental controls', echo: true, google: false, alexa: false, apple: 'Basic' },
   { feature: 'No hardware required', echo: true, google: false, alexa: false, apple: false },
+  { feature: 'Pet care management', echo: true, google: false, alexa: false, apple: false },
+  { feature: 'Fitness & workout tracking', echo: true, google: false, alexa: false, apple: 'Basic' },
+  { feature: 'AI meal planning', echo: true, google: false, alexa: false, apple: false },
+  { feature: 'Recipe library + grocery lists', echo: true, google: false, alexa: false, apple: false },
+  { feature: 'Garden & plant care', echo: true, google: false, alexa: false, apple: false },
 ];
 
 const PRICING = [
-  { tier: 'Starter', price: 14.99, features: ['20 devices', 'Basic automation', '1 voice line', 'Bill tracking', 'Scene builder', 'TV remote control'], cta: 'Start Free Trial', href: '/checkout?service=home-ai&tier=starter', popular: false },
-  { tier: 'Family', price: 29.99, features: ['50 devices', 'Homework supervisor (2 kids)', 'AI test prep (SAT/ACT/AP)', 'Full bill management', 'Google Home & Alexa bridge', 'Security dashboard', 'Smart TV parental controls', 'Energy reports'], cta: 'Get Family Plan', href: '/checkout?service=home-ai&tier=family', popular: true },
-  { tier: 'Premium', price: 49.99, features: ['100 devices', 'Unlimited kids & test prep', 'Energy optimization AI', 'Multi-property (2 homes)', 'Full security system integration', 'Siri Shortcuts', 'Priority support'], cta: 'Start Free Trial', href: '/checkout?service=home-ai&tier=premium', popular: false },
-  { tier: 'Estate', price: 99.99, features: ['Unlimited devices', 'Unlimited everything', 'Multi-property (unlimited)', 'Dedicated account manager', 'Custom integrations', 'White-glove onboarding', 'SLA guarantee'], cta: 'Contact Sales', href: 'mailto:bob@echo-op.com', popular: false },
+  { tier: 'Starter', price: 14.99, features: ['20 devices', 'Basic automation', '1 voice line', 'Bill tracking', 'Scene builder', 'TV remote control', 'Recipe library (50 recipes)', 'Basic plant tracker'], cta: 'Start Free Trial', href: '/checkout?service=home-ai&tier=starter', popular: false },
+  { tier: 'Family', price: 29.99, features: ['50 devices', 'Homework supervisor (2 kids)', 'AI test prep (SAT/ACT/AP)', 'Full bill management', 'Google Home & Alexa bridge', 'Security dashboard', 'Smart TV parental controls', 'Energy reports', 'Pet care (3 pets)', 'Fitness tracking', 'Meal planning + grocery lists', 'Garden care reminders'], cta: 'Get Family Plan', href: '/checkout?service=home-ai&tier=family', popular: true },
+  { tier: 'Premium', price: 49.99, features: ['100 devices', 'Unlimited kids & test prep', 'Energy optimization AI', 'Multi-property (2 homes)', 'Full security system integration', 'Siri Shortcuts', 'Unlimited pets + vet records', 'AI meal plan generation', 'Full garden management', 'Family fitness goals', 'Priority support'], cta: 'Start Free Trial', href: '/checkout?service=home-ai&tier=premium', popular: false },
+  { tier: 'Estate', price: 99.99, features: ['Unlimited devices', 'Unlimited everything', 'Multi-property (unlimited)', 'Dedicated account manager', 'Custom integrations', 'White-glove onboarding', 'SLA guarantee', 'API access for all modules'], cta: 'Contact Sales', href: 'mailto:bob@echo-op.com', popular: false },
 ];
 
 const FAQS = [
@@ -64,6 +73,10 @@ const FAQS = [
   { q: 'Does it replace my Google Home or Alexa?', a: 'No — it works WITH them. Our voice assistant bridges let you control Echo Home AI through your existing Google Home and Alexa devices. Ask Alexa about your bills, check homework status through Google Home, or arm your security via Siri Shortcuts. We enhance your existing setup, not replace it.' },
   { q: 'Which security systems are supported?', a: 'We integrate with Ring, SimpliSafe, ADT, Wyze, Abode, and any device that exposes a local API or webhook. Unified dashboard shows all cameras, locks, sensors, and alarm panels. Arm/disarm, lock/unlock, and view camera feeds from one place.' },
   { q: 'Can I set screen time limits on my kids TVs?', a: 'Yes. Smart TV parental controls let you set weekday/weekend screen time limits, bedtime cutoffs, content rating caps (G, PG, PG-13, R), and block specific apps per device. Works with Roku, Samsung, LG, Fire TV, Apple TV, and Chromecast.' },
+  { q: 'How does pet care tracking work?', a: 'Create profiles for each pet with breed, weight, vet info, and medication schedules. Log feedings, walks, grooming, vet visits, and vaccinations. Get reminders when care is due — never miss a flea treatment or vet appointment again. Supports dogs, cats, birds, fish, reptiles, and more.' },
+  { q: 'Can I generate meal plans with AI?', a: 'Yes. Tell us your family size, dietary restrictions, and cuisine preferences — our AI generates a full 7-day meal plan with nutritional info, prep times, and a consolidated grocery list. You can also save your own recipes and mark favorites for quick reuse.' },
+  { q: 'What fitness activities can I track?', a: 'We support 16 activity types including running, cycling, swimming, weightlifting, yoga, HIIT, hiking, martial arts, and more. Track duration, calories, distance, and heart rate. Set weekly goals and maintain streaks. Each family member gets their own profile.' },
+  { q: 'How does garden management work?', a: 'Add plants with their watering frequency, sunlight needs, and planting date. The system reminds you when watering or fertilizing is due. Track plant health, harvest dates, and get seasonal care suggestions. Works for vegetables, herbs, flowers, houseplants, and trees.' },
 ];
 
 function ComparisonCell({ value }: { value: boolean | string }) {
@@ -104,8 +117,8 @@ export default function HomeAIPage() {
         </div>
         <div className="flex flex-wrap justify-center gap-8 mt-12" style={{ color: 'var(--ept-text-muted)' }}>
           <span className="text-sm">40+ Device Brands</span>
-          <span className="text-sm">53 API Endpoints</span>
-          <span className="text-sm">12 D1 Tables</span>
+          <span className="text-sm">83 API Endpoints</span>
+          <span className="text-sm">18 D1 Tables</span>
           <span className="text-sm">Google + Alexa + Siri</span>
           <span className="text-sm">Zero Hardware Required</span>
         </div>
@@ -133,7 +146,7 @@ export default function HomeAIPage() {
       {/* ── Feature Grid ── */}
       <section className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Everything Your Home Needs</h2>
-        <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>One platform replaces a dozen apps. Control devices, manage your family, track bills, tutor your kids, and secure your property.</p>
+        <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>One platform replaces a dozen apps. Control devices, manage your family, track bills, tutor your kids, secure your property, care for pets, plan meals, track fitness, and tend your garden.</p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {FEATURES.map((f, i) => (
             <div key={i} className="p-5 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
@@ -212,7 +225,7 @@ export default function HomeAIPage() {
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
             { value: '40+', label: 'Device Brands' },
-            { value: '53', label: 'API Endpoints' },
+            { value: '83', label: 'API Endpoints' },
             { value: '14', label: 'Core Modules' },
             { value: '99.9%', label: 'Uptime SLA' },
           ].map((stat, i) => (
