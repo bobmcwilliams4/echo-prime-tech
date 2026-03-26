@@ -1,0 +1,340 @@
+'use client'
+
+import Link from 'next/link'
+import Image from 'next/image'
+import { useState } from 'react'
+import { useTheme } from '@/lib/theme-context'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
+import FaqSchema from '@/components/FaqSchema'
+
+const faqs = [
+  { q: 'Are the docs free?', a: 'Yes. All documentation, user manuals, and API references are freely available. No account required to browse.' },
+  { q: 'How do interactive tutorials work?', a: 'Click the ? button on any product page to start a guided walkthrough. An overlay highlights each UI element while explaining what it does. 75+ tutorials cover every product.' },
+  { q: 'Can I access API docs without a subscription?', a: 'API reference documentation is public. To make API calls you need an API key, available on the free tier (100 calls/day) or paid plans.' },
+  { q: 'How often are docs updated?', a: 'Documentation is auto-generated and updated with every product release. API references are generated from OpenAPI specs.' },
+  { q: 'Where can I get help if docs don\'t answer my question?', a: 'Use the Sentinel AI chat on any page for instant answers backed by our engine knowledge base. For human support, email support@echo-ept.com.' },
+]
+
+interface DocCategory {
+  title: string
+  icon: string
+  desc: string
+  items: { name: string; href: string; badge?: string }[]
+}
+
+const categories: DocCategory[] = [
+  {
+    title: 'Getting Started',
+    icon: '🚀',
+    desc: 'New to Echo Prime? Start here.',
+    items: [
+      { name: 'Platform Overview', href: '/about' },
+      { name: 'Quick Start Guide', href: '/sdk/quickstart', badge: 'Popular' },
+      { name: 'Pricing & Plans', href: '/pricing' },
+      { name: 'Free Tier Guide', href: '/free' },
+      { name: 'API Authentication', href: '/sdk' },
+    ],
+  },
+  {
+    title: 'AI Intelligence',
+    icon: '🧠',
+    desc: 'Engine-backed intelligence products.',
+    items: [
+      { name: 'Sentinel AI', href: '/sentinel', badge: 'Flagship' },
+      { name: 'Intelligence Engines', href: '/engines' },
+      { name: 'Knowledge Forge', href: '/knowledge' },
+      { name: 'Graph RAG', href: '/graph-rag' },
+      { name: 'Doctrine System', href: '/engines/marketplace' },
+      { name: 'Agentic Engine', href: '/agentic-engine' },
+    ],
+  },
+  {
+    title: 'Business Suite',
+    icon: '💼',
+    desc: 'CRM, invoicing, HR, and operations.',
+    items: [
+      { name: 'CRM', href: '/crm', badge: 'New' },
+      { name: 'Invoicing', href: '/invoicing' },
+      { name: 'HR Management', href: '/hr-management' },
+      { name: 'Project Management', href: '/project-management' },
+      { name: 'Appointments', href: '/appointments' },
+      { name: 'Payroll', href: '/payroll' },
+      { name: 'Expense Tracking', href: '/expense-management' },
+      { name: 'Inventory', href: '/inventory' },
+      { name: 'Contracts', href: '/contracts' },
+      { name: 'Proposals', href: '/proposals' },
+    ],
+  },
+  {
+    title: 'Marketing & Sales',
+    icon: '📈',
+    desc: 'Grow revenue with AI-powered tools.',
+    items: [
+      { name: 'Closer AI Sales', href: '/closer', badge: 'Popular' },
+      { name: 'Email Marketing', href: '/email-marketing' },
+      { name: 'Social Media', href: '/social-media' },
+      { name: 'Live Chat', href: '/live-chat' },
+      { name: 'Surveys', href: '/surveys' },
+      { name: 'A/B Testing', href: '/ab-testing' },
+      { name: 'Forms', href: '/forms' },
+      { name: 'LMS / Courses', href: '/lms' },
+    ],
+  },
+  {
+    title: 'Communication',
+    icon: '💬',
+    desc: 'Bots, voice, and messaging.',
+    items: [
+      { name: 'Bot Fleet', href: '/bots' },
+      { name: 'Discord Bot', href: '/bots' },
+      { name: 'LinkedIn Bot', href: '/linkedin' },
+      { name: 'Telegram Bot', href: '/telegram-bot' },
+      { name: 'WhatsApp Bot', href: '/whatsapp-bot' },
+      { name: 'X/Twitter Bot', href: '/x-bot' },
+      { name: 'Voice AI / TTS', href: '/voice' },
+      { name: 'Speak Cloud', href: '/speak-cloud' },
+    ],
+  },
+  {
+    title: 'Security & Intel',
+    icon: '🔒',
+    desc: 'Cybersecurity and intelligence.',
+    items: [
+      { name: 'Security Suite', href: '/security' },
+      { name: 'Pentesting', href: '/pentesting' },
+      { name: 'Dark Web Intel', href: '/dark-web-intel' },
+      { name: 'SEC Intelligence', href: '/sec-intel' },
+      { name: 'Surveillance', href: '/surveillance' },
+      { name: 'Scanner', href: '/scanner' },
+      { name: 'Vault', href: '/vault' },
+    ],
+  },
+  {
+    title: 'Industry Solutions',
+    icon: '🏭',
+    desc: 'Oil & gas, tax, legal, and more.',
+    items: [
+      { name: 'Permian Basin Intel', href: '/permian', badge: 'Flagship' },
+      { name: 'Title Intelligence', href: '/title-intelligence' },
+      { name: 'County Records', href: '/county-records' },
+      { name: 'Tax Returns', href: '/tax-returns' },
+      { name: 'Grading / Collectibles', href: '/grading' },
+      { name: 'EchoCAD', href: '/echocad' },
+    ],
+  },
+  {
+    title: 'Developer Tools',
+    icon: '⚡',
+    desc: 'APIs, SDKs, and integrations.',
+    items: [
+      { name: 'SDK Documentation', href: '/sdk', badge: 'Dev' },
+      { name: 'SDK Quickstart', href: '/sdk/quickstart' },
+      { name: 'API Reference', href: '/sdk' },
+      { name: 'Webhooks', href: '/sdk' },
+      { name: 'App Forge', href: '/app-forge' },
+      { name: 'Hephaestion Forge', href: '/hephaestion-forge' },
+      { name: 'Daedalus Forge', href: '/daedalus-forge' },
+      { name: 'Prompt Forge', href: '/prompt-forge' },
+    ],
+  },
+  {
+    title: 'Support & Operations',
+    icon: '🛠️',
+    desc: 'Helpdesk, workflows, and monitoring.',
+    items: [
+      { name: 'Helpdesk', href: '/helpdesk' },
+      { name: 'Call Center', href: '/call-center' },
+      { name: 'Workflow Automation', href: '/workflow-automation' },
+      { name: 'Incident Manager', href: '/incident-manager' },
+      { name: 'Vendor Manager', href: '/vendor-manager' },
+      { name: 'Orchestration', href: '/orchestration' },
+    ],
+  },
+  {
+    title: 'Specialty Products',
+    icon: '✨',
+    desc: 'Unique AI-powered solutions.',
+    items: [
+      { name: 'Immortality Vault', href: '/immortality-vault' },
+      { name: 'Home AI', href: '/home-ai' },
+      { name: 'Shepherd AI (Church)', href: '/shepherd' },
+      { name: 'Bree Assistant', href: '/bree-assistant' },
+      { name: 'Gamer Companion', href: '/gamer-companion' },
+      { name: 'Echo Coin Rewards', href: '/coin-rewards' },
+    ],
+  },
+]
+
+export default function DocsPage() {
+  const { isDark } = useTheme()
+  const [search, setSearch] = useState('')
+  const dark = isDark
+
+  const filtered = search.trim()
+    ? categories.map(cat => ({
+        ...cat,
+        items: cat.items.filter(item =>
+          item.name.toLowerCase().includes(search.toLowerCase()) ||
+          cat.title.toLowerCase().includes(search.toLowerCase())
+        ),
+      })).filter(cat => cat.items.length > 0)
+    : categories
+
+  return (
+    <>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Documentation', href: '/docs' }]} />
+      <FaqSchema faqs={faqs} />
+      <div style={{ minHeight: '100vh', background: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+
+        {/* Nav */}
+        <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
+          <Link href="/" className="flex items-center gap-3">
+            <Image src={dark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={120} height={32} style={{ mixBlendMode: dark ? 'screen' : 'multiply' }} />
+          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/sdk/quickstart" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Quickstart</Link>
+            <Link href="/blog" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Blog</Link>
+            <Link href="/support" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Support</Link>
+          </div>
+        </nav>
+
+        {/* Hero */}
+        <section style={{ padding: '60px 20px 40px', textAlign: 'center', maxWidth: 800, margin: '0 auto' }}>
+          <h1 className="text-3xl md:text-5xl font-extrabold" style={{ color: 'var(--ept-text)' }}>
+            Documentation Hub
+          </h1>
+          <p className="mt-4 text-lg" style={{ color: 'var(--ept-text-secondary)', maxWidth: 600, margin: '16px auto 0' }}>
+            User manuals, API references, interactive tutorials, and getting started guides for every Echo Prime product.
+          </p>
+
+          {/* Search */}
+          <div style={{ maxWidth: 500, margin: '32px auto 0' }}>
+            <input
+              type="text"
+              placeholder="Search documentation..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border text-base"
+              style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
+            />
+          </div>
+
+          {/* Stats */}
+          <div className="flex justify-center gap-8 mt-8 flex-wrap">
+            {[
+              { value: '130+', label: 'Product Pages' },
+              { value: '75', label: 'Interactive Tutorials' },
+              { value: '106', label: 'Blog Articles' },
+              { value: '10', label: 'Doc Categories' },
+            ].map(s => (
+              <div key={s.label} className="text-center">
+                <div className="text-2xl font-bold" style={{ color: 'var(--ept-accent)' }}>{s.value}</div>
+                <div className="text-xs mt-1" style={{ color: 'var(--ept-text-muted)' }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Quick Links */}
+        <section style={{ padding: '0 20px 40px', maxWidth: 900, margin: '0 auto' }}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { label: 'SDK Quickstart', href: '/sdk/quickstart', icon: '⚡' },
+              { label: 'API Reference', href: '/sdk', icon: '📖' },
+              { label: 'Tutorials (75)', href: '/knowledge', icon: '🎓' },
+              { label: 'Changelog', href: '/changelog', icon: '📋' },
+            ].map(link => (
+              <Link key={link.href} href={link.href} className="p-4 rounded-xl border text-center card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <span className="text-2xl">{link.icon}</span>
+                <div className="text-sm font-semibold mt-2" style={{ color: 'var(--ept-text)' }}>{link.label}</div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Documentation Categories */}
+        <section style={{ padding: '0 20px 60px', maxWidth: 1100, margin: '0 auto' }}>
+          <div className="grid md:grid-cols-2 gap-6">
+            {filtered.map(cat => (
+              <div key={cat.title} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">{cat.icon}</span>
+                  <div>
+                    <h2 className="text-lg font-bold" style={{ color: 'var(--ept-text)' }}>{cat.title}</h2>
+                    <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{cat.desc}</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {cat.items.map(item => (
+                    <Link key={item.name} href={item.href} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+                      {item.name}
+                      {item.badge && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>{item.badge}</span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Tutorial Banner */}
+        <section style={{ padding: '40px 20px', maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+          <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>Interactive Tutorials</h2>
+            <p className="mb-4" style={{ color: 'var(--ept-text-secondary)' }}>
+              Every product page has a guided tutorial. Click the <strong>?</strong> button on any product page to start a step-by-step walkthrough with spotlight overlays.
+            </p>
+            <p className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>
+              75 interactive tutorials covering: Intelligence Engines, Closer AI, CRM, Helpdesk, Tax Returns, Title Intelligence, Security, Pentesting, SDK, Voice AI, Bots, and 60+ more products.
+            </p>
+          </div>
+        </section>
+
+        {/* User Manuals Section */}
+        <section style={{ padding: '40px 20px 60px', maxWidth: 900, margin: '0 auto' }}>
+          <h2 className="text-2xl font-bold text-center mb-8" style={{ color: 'var(--ept-text)' }}>User Manuals</h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              { title: 'Platform Guide', desc: 'Complete guide to the Echo Prime platform. Account setup, navigation, settings.', href: '/about', icon: '📘' },
+              { title: 'Sentinel AI Manual', desc: 'How to use engine-backed intelligence queries with confidence scoring.', href: '/sentinel', icon: '🛡️' },
+              { title: 'Closer AI Manual', desc: 'Sales pipeline, lead management, AI calls, scripts, and analytics.', href: '/closer', icon: '📞' },
+              { title: 'SDK Developer Guide', desc: 'API authentication, endpoints, rate limits, webhooks, and code samples.', href: '/sdk', icon: '🔧' },
+              { title: 'Bot Fleet Manual', desc: 'Configure bots for Discord, LinkedIn, Telegram, X, Reddit, and more.', href: '/bots', icon: '🤖' },
+              { title: 'Permian Basin Guide', desc: 'County records, title search, mineral rights, and production analytics.', href: '/permian', icon: '🛢️' },
+            ].map(manual => (
+              <Link key={manual.title} href={manual.href} className="p-5 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <span className="text-3xl">{manual.icon}</span>
+                <h3 className="text-base font-bold mt-3" style={{ color: 'var(--ept-text)' }}>{manual.title}</h3>
+                <p className="text-sm mt-1" style={{ color: 'var(--ept-text-muted)' }}>{manual.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section style={{ padding: '40px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
+          <h2 className="text-2xl font-bold text-center mb-8" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+          {faqs.map(faq => (
+            <details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
+              <summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary>
+              <p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p>
+            </details>
+          ))}
+        </section>
+
+        {/* Footer */}
+        <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
+          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 130+ products. 75 tutorials. 611K+ doctrines.</p>
+          <div className="flex justify-center gap-6 mt-3">
+            <Link href="/" style={{ color: 'var(--ept-accent)' }}>Home</Link>
+            <Link href="/blog" style={{ color: 'var(--ept-accent)' }}>Blog</Link>
+            <Link href="/pricing" style={{ color: 'var(--ept-accent)' }}>Pricing</Link>
+            <Link href="/support" style={{ color: 'var(--ept-accent)' }}>Support</Link>
+          </div>
+        </footer>
+      </div>
+    </>
+  )
+}
