@@ -17,7 +17,7 @@ interface LiveStats {
 }
 
 function useLiveStats(): LiveStats {
-  const [stats, setStats] = useState<LiveStats>({ engines: '5,486+', categories: '940+', doctrines: '601K+', industries: [] });
+  const [stats, setStats] = useState<LiveStats>({ engines: '5,486+', categories: '940+', doctrines: '607K+', industries: [] });
   useEffect(() => {
     fetch('https://echo-engine-runtime.bmcii1976.workers.dev/stats')
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
@@ -174,7 +174,7 @@ const CAPABILITIES = [
   },
   {
     title: 'SDK & Developer Portal',
-    description: 'Access every Echo Prime capability through a unified REST API. OpenAPI spec, interactive playground, code samples in 6 languages, webhook support, and usage analytics. Build on top of 5,486+ engines and 601K+ doctrine blocks.',
+    description: 'Access every Echo Prime capability through a unified REST API. OpenAPI spec, interactive playground, code samples in 6 languages, webhook support, and usage analytics. Build on top of 5,486+ engines and 607K+ doctrine blocks.',
     stat: '17+',
     statLabel: 'API Endpoints',
     icon: '🔗',
@@ -665,7 +665,7 @@ export default function HomePage() {
               <h2 className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Latest from the Blog</h2>
               <p className="mt-2 text-sm" style={{ color: 'var(--ept-text-secondary)' }}>Technical deep-dives on AI engineering, oilfield tech, tax intelligence, and security</p>
             </div>
-            <Link href="/blog" className="text-sm font-semibold hidden md:block" style={{ color: 'var(--ept-accent)' }}>View all 98 articles &rarr;</Link>
+            <Link href="/blog" className="text-sm font-semibold hidden md:block" style={{ color: 'var(--ept-accent)' }}>View all 100 articles &rarr;</Link>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
@@ -684,7 +684,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="mt-6 text-center md:hidden">
-            <Link href="/blog" className="text-sm font-semibold" style={{ color: 'var(--ept-accent)' }}>View all 98 articles &rarr;</Link>
+            <Link href="/blog" className="text-sm font-semibold" style={{ color: 'var(--ept-accent)' }}>View all 100 articles &rarr;</Link>
           </div>
         </div>
       </section>
@@ -812,6 +812,7 @@ export default function HomePage() {
                   { label: 'OKR', href: '/okr' },
                   { label: 'Subscription', href: '/subscription' },
                   { label: 'Customer Success', href: '/customer-success' },
+                  { label: 'Data Room', href: '/data-room' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}

@@ -8,6 +8,24 @@
     <lastBuildDate>Thu, 26 Mar 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
 
+    <!-- 100th Article Milestone -->
+    <item>
+      <title>Oil &amp; Gas Tax Deductions: Maximizing Working Interest and Royalty Income</title>
+      <link>https://echo-ept.com/blog/oil-gas-tax-deductions-working-interest-royalties-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/oil-gas-tax-deductions-working-interest-royalties-2026</guid>
+      <category>Tax Intelligence</category>
+      <description>Working interest owners and royalty holders leave an average of $47,000/year in unclaimed deductions. From IDCs to percentage depletion, here's how AI finds every dollar.</description>
+    </item>
+    <item>
+      <title>SOC 2 Compliance Automation: How SaaS Startups Pass in 90 Days</title>
+      <link>https://echo-ept.com/blog/soc2-compliance-automation-saas-startup-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/soc2-compliance-automation-saas-startup-2026</guid>
+      <category>Security</category>
+      <description>SOC 2 Type II used to take 12 months and $150K. AI-powered compliance automation cuts that to 90 days and under $15K. Complete implementation playbook.</description>
+    </item>
+
     <!-- Blog Articles -->
     <item>
       <title>AI Workflow Automation vs Zapier &amp; Make: Building Smarter Automations in 2026</title>

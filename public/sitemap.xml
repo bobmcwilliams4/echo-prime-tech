@@ -287,6 +287,7 @@
   <url><loc>https://echo-ept.com/okr</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/subscription</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/customer-success</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/data-room</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- New Blog Articles (2026-03-26 session 45f) -->
   <url><loc>https://echo-ept.com/blog/estate-planning-ai-trust-administration-wealth-transfer-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
@@ -309,6 +310,10 @@
   <url><loc>https://echo-ept.com/blog/ai-lms-vs-teachable-thinkific-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/blog/ai-invoicing-vs-freshbooks-quickbooks-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/blog/ai-workflow-automation-zapier-alternative-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- 100th Article Milestone (2026-03-26 session D) -->
+  <url><loc>https://echo-ept.com/blog/oil-gas-tax-deductions-working-interest-royalties-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://echo-ept.com/blog/soc2-compliance-automation-saas-startup-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+
   <!-- Missing product pages added (2026-03-26 session D) -->
   <url><loc>https://echo-ept.com/vault</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/invoice</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>

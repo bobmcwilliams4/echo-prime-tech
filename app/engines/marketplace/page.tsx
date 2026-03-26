@@ -239,7 +239,7 @@ export default function EngineMarketplacePage() {
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           {[
             { value: '5,486+', label: 'Engines' },
-            { value: '601K+', label: 'Doctrines' },
+            { value: '607K+', label: 'Doctrines' },
             { value: '940+', label: 'Domains' },
             { value: '<50ms', label: 'Avg Response' },
           ].map(s => (
@@ -453,7 +453,7 @@ const result = await response.json();
       {/* ── Footer ── */}
       <footer className="border-t px-6 py-8 text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
-          &copy; {new Date().getFullYear()} Echo Prime Technologies. 5,486+ engines. 601K+ doctrines. 940+ domains.
+          &copy; {new Date().getFullYear()} Echo Prime Technologies. 5,486+ engines. 607K+ doctrines. 940+ domains.
         </p>
       </footer>
 

@@ -1748,7 +1748,7 @@ export default function SentinelPage() {
               </h2>
               <p className="text-lg mb-10" style={{ color: '#94a3b8' }}>
                 {chatMode === 'engine'
-                  ? 'Pure doctrine search — 5,486+ engines, 601K+ doctrines, zero hallucination'
+                  ? 'Pure doctrine search — 5,486+ engines, 607K+ doctrines, zero hallucination'
                   : 'Expert analysis across 1,000+ knowledge domains'}
               </p>
               <div className="flex flex-wrap justify-center gap-2 max-w-xl mx-auto">
@@ -2169,7 +2169,7 @@ export default function SentinelPage() {
           <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
           <div className="space-y-6">
             {[
-              { q: 'What makes Sentinel AI different from ChatGPT or other chatbots?', a: 'Sentinel is not a chatbot — it is a professional intelligence interface backed by 5,486+ domain-specific engines and 601K+ pre-compiled doctrines. Every response includes authority citations (IRC codes, case law, NIST frameworks, medical literature) with confidence stratification. Sentinel delivers court-defensible answers, not conversational guesses.' },
+              { q: 'What makes Sentinel AI different from ChatGPT or other chatbots?', a: 'Sentinel is not a chatbot — it is a professional intelligence interface backed by 5,486+ domain-specific engines and 607K+ pre-compiled doctrines. Every response includes authority citations (IRC codes, case law, NIST frameworks, medical literature) with confidence stratification. Sentinel delivers court-defensible answers, not conversational guesses.' },
               { q: 'What domains can Sentinel query?', a: 'Sentinel covers 940+ knowledge domains including tax law, legal analysis, cybersecurity, medical intelligence, oilfield engineering, financial modeling, forensics, accounting, insurance, and dozens of specialized fields. You can query a single domain or let the system auto-route across multiple relevant engines.' },
               { q: 'How does the title chain investigation feature work?', a: 'Sentinel detects natural language requests for title chain research and automatically triggers our Landman Pipeline — an async investigation system covering 80+ Texas counties and 259K+ records. Results are delivered in a professional 5-tab report: Summary, Run Sheet, Ownership Chain, Gap Analysis, and Full Report.' },
               { q: 'Can I choose which AI model processes my query?', a: 'Yes. Sentinel supports multiple fine-tuned models including Claude Opus 4.6, GPT-4.1, Grok, and specialized adapters trained on domain-specific content. You can select a specific model or use auto-routing, which matches your query to the best-performing model for that domain.' },

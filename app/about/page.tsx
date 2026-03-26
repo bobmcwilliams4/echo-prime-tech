@@ -16,7 +16,7 @@ const NAV_ITEMS = [
 const STATS = [
   { value: '5,486+', label: 'AI Engines' },
   { value: '940+', label: 'Domains' },
-  { value: '601K+', label: 'Doctrine Blocks' },
+  { value: '607K+', label: 'Doctrine Blocks' },
   { value: '99.9%', label: 'Uptime' },
 ];
 
@@ -55,18 +55,18 @@ const VALUES = [
 
 const ABOUT_FAQS = [
   { q: 'What is Echo Prime Technologies?', a: 'Echo Prime Technologies is an AI infrastructure company based in Midland, Texas. We build domain-specific intelligence engines, autonomous sales agents, and enterprise AI tools that embed real expertise from subject matter professionals — not generic chatbot wrappers.' },
-  { q: 'How many AI engines does Echo Prime offer?', a: 'Over 5,486 specialized engines across 940+ domains, backed by 601,000+ doctrine blocks. Each engine contains verified, authoritative knowledge in fields like oilfield operations, tax law, cybersecurity, legal analysis, and engineering.' },
+  { q: 'How many AI engines does Echo Prime offer?', a: 'Over 5,486 specialized engines across 940+ domains, backed by 607,000+ doctrine blocks. Each engine contains verified, authoritative knowledge in fields like oilfield operations, tax law, cybersecurity, legal analysis, and engineering.' },
   { q: 'Is Echo Prime funded by venture capital?', a: 'No. Echo Prime is 100% bootstrapped and independently owned. We have zero VC funding, zero corporate overhead, and zero investor influence. Every dollar of revenue goes directly into building better technology. We answer to customers, not investors.' },
   { q: 'Where is Echo Prime based?', a: 'Midland, Texas — the heart of the Permian Basin. Our founder has 30 years of oilfield experience, and that heritage of reliability and no-nonsense engineering is built into everything we do.' },
   { q: 'What industries does Echo Prime serve?', a: 'Our engines cover oil and gas, legal, tax preparation, cybersecurity, engineering, medical, financial services, real estate, manufacturing, and dozens more. Our largest customer segments are oilfield operators, independent landmen, tax professionals, and SMBs replacing multiple SaaS tools.' },
-  { q: 'How is Echo Prime different from ChatGPT or other AI tools?', a: 'Generic AI tools give generic answers. Our engines embed real domain expertise through 601K+ verified doctrine blocks with authoritative citations. When you ask our Tax Intelligence engine about IRC §199A, it responds with the actual code section, Treasury Regulations, and relevant case law — not a summary it made up.' },
+  { q: 'How is Echo Prime different from ChatGPT or other AI tools?', a: 'Generic AI tools give generic answers. Our engines embed real domain expertise through 607K+ verified doctrine blocks with authoritative citations. When you ask our Tax Intelligence engine about IRC §199A, it responds with the actual code section, Treasury Regulations, and relevant case law — not a summary it made up.' },
 ];
 
 const TIMELINE = [
   { year: '2024', event: 'Founded by Bobby Don McWilliams II after 30 years in the oilfield industry' },
   { year: '2025', event: 'First intelligence engines deployed — Tax, Legal, and Landman domains' },
   { year: '2025', event: 'ShadowGlass privacy browser launched with 120+ anti-detection measures' },
-  { year: '2026', event: 'Scaled to 5,486+ engines across 940+ domains with 601K+ doctrine blocks' },
+  { year: '2026', event: 'Scaled to 5,486+ engines across 940+ domains with 607K+ doctrine blocks' },
   { year: '2026', event: 'AI Closer, Hephaestion Forge, and Daedalus Forge enter production' },
   { year: '2026', event: 'Full autonomous operations — bots, scrapers, monitoring across all platforms' },
 ];
@@ -255,7 +255,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { title: 'Edge Computing', desc: 'All services run on Cloudflare Workers — 300+ data centers, sub-50ms response times globally. No traditional servers, no scaling concerns.' },
-              { title: 'Knowledge Architecture', desc: '601K+ doctrine blocks organized into domain-specific engines. Each engine embeds real expertise from subject matter professionals.' },
+              { title: 'Knowledge Architecture', desc: '607K+ doctrine blocks organized into domain-specific engines. Each engine embeds real expertise from subject matter professionals.' },
               { title: 'Multi-Model AI', desc: 'Claude, GPT-4, Gemini, DeepSeek, and local models. Each query routes to the optimal model for the task based on domain and complexity.' },
               { title: 'Real-Time Data', desc: 'Distributed databases (D1), key-value stores (KV), object storage (R2), and vector search — all at the edge, all sub-millisecond.' },
               { title: 'Security First', desc: 'Zero-trust architecture, encrypted at rest and in transit, SOC 2 controls, and AI-powered threat detection across all services.' },

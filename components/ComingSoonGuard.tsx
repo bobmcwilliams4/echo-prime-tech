@@ -91,6 +91,7 @@ const EXEMPT_PREFIXES = [
   '/okr',                // Echo OKR
   '/subscription',       // Echo Subscription
   '/customer-success',   // Echo Customer Success
+  '/data-room',          // Echo Data Room
 
   // ── Content pages ──
   '/blog',               // Blog articles
