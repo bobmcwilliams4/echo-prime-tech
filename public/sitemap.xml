@@ -182,4 +182,15 @@
   <url><loc>https://echo-ept.com/legal/privacy</loc><lastmod>2026-03-21</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://echo-ept.com/legal/terms</loc><lastmod>2026-03-21</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://echo-ept.com/legal/cookies</loc><lastmod>2026-03-21</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
+
+  <!-- New Product Pages -->
+  <url><loc>https://echo-ept.com/email-sender</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/analytics</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New Blog Articles (2026-03-26) -->
+  <url><loc>https://echo-ept.com/blog/ai-analytics-vs-datadog-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/email-automation-small-business-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-scheduling-assistant-business-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/cloud-invoicing-benefits-freelancers-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-customer-service-vs-zendesk-intercom-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>
