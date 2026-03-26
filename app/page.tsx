@@ -631,6 +631,7 @@ export default function HomePage() {
                   { label: 'Analytics', href: '/analytics' },
                   { label: 'Forms', href: '/forms' },
                   { label: 'HR Management', href: '/hr' },
+                  { label: 'Contracts', href: '/contracts' },
                   { label: 'Title Intelligence', href: '/title-intelligence' },
                   { label: 'Permian Basin AI', href: '/permian' },
                   { label: 'Tax Preparation', href: '/tax-returns' },
