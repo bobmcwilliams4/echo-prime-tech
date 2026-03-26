@@ -19,6 +19,26 @@ interface ChangelogEntry {
 const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-03-26',
+    version: 'v2026.20',
+    title: '98 Blog Articles + 81 FaqSchema + 80 BreadcrumbSchema + 271 Pages + 222 Sitemap URLs',
+    type: 'launch',
+    description: 'Massive SEO sprint: 98 blog articles, FaqSchema on 81 pages, BreadcrumbSchema on 80 pages, 4 redirect stubs expanded into full product pages, blog cross-links on 6 key pages, sitemap cleanup and expansion to 222 URLs.',
+    highlights: [
+      '98 blog articles across 5 categories (was 90)',
+      '81 pages with FaqSchema JSON-LD (was 73)',
+      '80 pages with BreadcrumbSchema JSON-LD (was 40)',
+      '271 static pages generated (was 264)',
+      '222 sitemap URLs (was 210)',
+      '4 redirect stubs expanded: invoice, booking, hr, project-manager — each 150-170 lines with full features, pricing, FAQs',
+      'Blog cross-links added to security, pentesting, tax-returns, permian, engines, sdk pages',
+      '30+ product pages received inline FAQ sections',
+      '105/105 layout.tsx files verified with SEO metadata',
+      'Fixed duplicate /helpdesk sitemap entry',
+    ],
+    link: '/blog',
+  },
+  {
+    date: '2026-03-26',
     version: 'v2026.19',
     title: '90 Blog Articles + 73 FaqSchema Pages + 40 BreadcrumbSchema Pages + 256 Static Pages',
     type: 'launch',

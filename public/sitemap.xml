@@ -216,6 +216,8 @@
   <!-- New Product Pages -->
   <url><loc>https://echo-ept.com/email-sender</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/analytics</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/expense</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/document-manager</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- New Blog Articles (2026-03-26) -->
   <url><loc>https://echo-ept.com/blog/ai-analytics-vs-datadog-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
@@ -284,6 +286,7 @@
   <url><loc>https://echo-ept.com/expense-management</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/okr</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/subscription</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/customer-success</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- New Blog Articles (2026-03-26 session 45f) -->
   <url><loc>https://echo-ept.com/blog/estate-planning-ai-trust-administration-wealth-transfer-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
@@ -306,4 +309,17 @@
   <url><loc>https://echo-ept.com/blog/ai-lms-vs-teachable-thinkific-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/blog/ai-invoicing-vs-freshbooks-quickbooks-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/blog/ai-workflow-automation-zapier-alternative-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- Missing product pages added (2026-03-26 session D) -->
+  <url><loc>https://echo-ept.com/vault</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/invoice</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/booking</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/hr</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/project-manager</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/sdk/pricing</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/sdk/docs</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/sdk/quickstart</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/sdk/playground</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/case-studies</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/free</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/waitlist</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
 </urlset>
