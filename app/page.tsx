@@ -834,6 +834,10 @@ export default function HomePage() {
                   { label: 'PayPal Integration', href: '/paypal-integration' },
                   { label: 'Coin Rewards', href: '/coin-rewards' },
                   { label: 'Model Host', href: '/model-host' },
+                  { label: 'Instagram AI', href: '/instagram-ai' },
+                  { label: 'eBay AI', href: '/ebay-ai' },
+                  { label: 'MEGA Gateway', href: '/mega-gateway' },
+                  { label: 'Phoenix Cloud', href: '/phoenix-cloud' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}

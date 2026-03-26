@@ -113,6 +113,10 @@ const EXEMPT_PREFIXES = [
   '/paypal-integration', // Echo PayPal Integration
   '/coin-rewards',       // Echo Coin Rewards
   '/model-host',         // Echo Model Host
+  '/instagram-ai',       // Echo Instagram AI
+  '/ebay-ai',            // Echo eBay AI
+  '/mega-gateway',       // Echo MEGA Gateway
+  '/phoenix-cloud',      // Echo Phoenix Cloud
 
   // ── Content pages ──
   '/blog',               // Blog articles
