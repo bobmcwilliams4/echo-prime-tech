@@ -2299,6 +2299,176 @@ const GUIDED_STEPS: Record<string, GuidedStep[]> = {
     { id: 'cs-features', route: '/customer-success', selector: '[data-tutorial="cs-features"]', action: 'observe', title: 'Success Features', callout: 'Health scores, usage analytics, NPS tracking, playbook automation, and renewal management.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
     { id: 'cs-pricing', route: '/customer-success', selector: '[data-tutorial="cs-pricing"]', action: 'click', title: 'Get Started', callout: 'From $49/mo. All plans include AI health scoring and churn prediction.', tooltipPosition: 'top' },
   ]),
+  /* ═══════════════════════════════════════════════════════
+     SENTINEL AI (/sentinel)
+     ═══════════════════════════════════════════════════════ */
+  'sentinel': makeSteps('sentinel', [
+    { id: 'sent-hero', route: '/sentinel', selector: '[data-tutorial="sentinel-hero"]', action: 'observe', title: 'Welcome to Sentinel AI', callout: 'Sentinel is a professional intelligence interface — not a chatbot. It queries 5,486+ engines and 611K+ doctrine blocks for court-defensible answers with citations.', autoAdvance: true, autoAdvanceDelay: 6000, tooltipPosition: 'bottom' },
+    { id: 'sent-input', route: '/sentinel', selector: '[data-tutorial="sentinel-input"]', action: 'type', title: 'Ask a Domain Question', callout: 'Type a question in any domain: tax law, cybersecurity, oilfield engineering, medical, legal. Try "What are the IRC §199A deductions for pass-through entities?"', exampleValue: 'IRC 199A deductions', tooltipPosition: 'bottom' },
+    { id: 'sent-response', route: '/sentinel', selector: '[data-tutorial="sentinel-response"]', action: 'observe', title: 'Engine-Backed Response', callout: 'Every response includes authority citations (IRC codes, case law, NIST frameworks), confidence levels, and risk stratification. No hallucinations — only verified doctrines.', autoAdvance: true, autoAdvanceDelay: 8000, tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     PERMIAN BASIN (/permian)
+     ═══════════════════════════════════════════════════════ */
+  'permian': makeSteps('permian', [
+    { id: 'per-hero', route: '/permian', selector: '[data-tutorial="permian-hero"]', action: 'observe', title: 'Permian Basin Intelligence', callout: 'The most comprehensive oilfield intelligence platform for the Permian Basin. Title search, well data, production analytics, and AI-powered mineral rights analysis.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'per-features', route: '/permian', selector: '[data-tutorial="permian-features"]', action: 'observe', title: 'Platform Features', callout: 'County records search (224K+ Ector Co.), chain-of-title automation, mineral rights mapping, production data, and AI landman analysis.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'per-pricing', route: '/permian', selector: '[data-tutorial="permian-pricing"]', action: 'click', title: 'Explore Pricing', callout: 'Permian Pilot packages from $7,500 for 30-day engagements. Enterprise custom pricing available.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     HELPDESK (/helpdesk)
+     ═══════════════════════════════════════════════════════ */
+  'helpdesk': makeSteps('helpdesk', [
+    { id: 'hd-hero', route: '/helpdesk', selector: '[data-tutorial="helpdesk-hero"]', action: 'observe', title: 'AI Helpdesk', callout: 'AI-powered ticket management with auto-categorization, sentiment detection, SLA tracking, and smart agent routing.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'hd-features', route: '/helpdesk', selector: '[data-tutorial="helpdesk-features"]', action: 'observe', title: 'Key Features', callout: 'Multi-channel support (email, chat, phone), knowledge base integration, canned responses, and customer satisfaction surveys.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'hd-pricing', route: '/helpdesk', selector: '[data-tutorial="helpdesk-pricing"]', action: 'click', title: 'Start Free', callout: 'Free tier with 100 tickets/month. Pro from $29/agent/month with AI auto-routing.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     LIVE CHAT (/live-chat)
+     ═══════════════════════════════════════════════════════ */
+  'live-chat': makeSteps('live-chat', [
+    { id: 'lc-hero', route: '/live-chat', selector: '[data-tutorial="live-chat-hero"]', action: 'observe', title: 'AI Live Chat', callout: 'Resolve 70% of customer queries autonomously with AI chat that understands context, sentiment, and intent. Smart routing to human agents when needed.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'lc-features', route: '/live-chat', selector: '[data-tutorial="live-chat-features"]', action: 'observe', title: 'Chat Features', callout: 'Visitor tracking, proactive chat triggers, canned responses, file sharing, chat transcripts, and CRM integration.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'lc-pricing', route: '/live-chat', selector: '[data-tutorial="live-chat-pricing"]', action: 'click', title: 'Try Live Chat', callout: 'From $19/mo. AI auto-resolution included on all plans.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     CRM (/crm)
+     ═══════════════════════════════════════════════════════ */
+  'crm-full': makeSteps('crm-full', [
+    { id: 'crm-hero', route: '/crm', selector: '[data-tutorial="crm-hero"]', action: 'observe', title: 'Echo CRM', callout: 'AI-powered customer relationship management with lead scoring, pipeline automation, email sequences, and revenue forecasting.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'crm-pipeline', route: '/crm', selector: '[data-tutorial="crm-pipeline"]', action: 'observe', title: 'Sales Pipeline', callout: 'Drag-and-drop pipeline with AI deal scoring. Automatic next-best-action suggestions and win probability predictions.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'crm-pricing', route: '/crm', selector: '[data-tutorial="crm-pricing"]', action: 'click', title: 'Get Started', callout: 'From $29/user/month. Unlimited contacts on all plans. No per-contact pricing traps.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     SOCIAL MEDIA MANAGEMENT (/social-media)
+     ═══════════════════════════════════════════════════════ */
+  'social-media': makeSteps('social-media', [
+    { id: 'sm-hero', route: '/social-media', selector: '[data-tutorial="social-media-hero"]', action: 'observe', title: 'Social Media Management', callout: 'AI content generation, multi-platform scheduling, engagement analytics, and competitor monitoring. Manage all social accounts from one dashboard.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'sm-features', route: '/social-media', selector: '[data-tutorial="social-media-features"]', action: 'observe', title: 'Platform Features', callout: 'Auto-generate posts with AI, schedule across 8+ platforms, track engagement metrics, and get content suggestions based on trending topics.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'sm-pricing', route: '/social-media', selector: '[data-tutorial="social-media-pricing"]', action: 'click', title: 'Start Managing', callout: 'From $19/mo for 5 social accounts. AI content generation on all plans.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     EMAIL MARKETING (/email-marketing)
+     ═══════════════════════════════════════════════════════ */
+  'email-marketing': makeSteps('email-marketing', [
+    { id: 'em-hero', route: '/email-marketing', selector: '[data-tutorial="email-marketing-hero"]', action: 'observe', title: 'AI Email Marketing', callout: 'AI-powered email campaigns with smart segmentation, subject line optimization, send time prediction, and A/B testing built in.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'em-features', route: '/email-marketing', selector: '[data-tutorial="email-marketing-features"]', action: 'observe', title: 'Campaign Features', callout: 'Drag-and-drop email builder, automation workflows, deliverability monitoring, and AI-generated content suggestions.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'em-pricing', route: '/email-marketing', selector: '[data-tutorial="email-marketing-pricing"]', action: 'click', title: 'Start Free', callout: 'Free up to 500 subscribers. Pro from $19/mo with unlimited sends and AI optimization.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     SURVEYS (/surveys)
+     ═══════════════════════════════════════════════════════ */
+  'surveys': makeSteps('surveys', [
+    { id: 'sur-hero', route: '/surveys', selector: '[data-tutorial="surveys-hero"]', action: 'observe', title: 'AI Surveys', callout: 'Create intelligent surveys with AI-powered question generation, response analysis, and sentiment scoring. NPS, CSAT, and custom survey types.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'sur-features', route: '/surveys', selector: '[data-tutorial="surveys-features"]', action: 'observe', title: 'Survey Features', callout: 'Conditional logic, multi-language, custom branding, response analytics with AI insights, and integrations with CRM and helpdesk.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'sur-pricing', route: '/surveys', selector: '[data-tutorial="surveys-pricing"]', action: 'click', title: 'Create Survey', callout: 'Free tier with 100 responses/month. Pro from $29/mo with AI analysis.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     FORMS (/forms)
+     ═══════════════════════════════════════════════════════ */
+  'forms': makeSteps('forms', [
+    { id: 'frm-hero', route: '/forms', selector: '[data-tutorial="forms-hero"]', action: 'observe', title: 'AI Form Builder', callout: 'Drag-and-drop form builder with AI field suggestions, conditional logic, file uploads, payment collection, and webhook integrations.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'frm-features', route: '/forms', selector: '[data-tutorial="forms-features"]', action: 'observe', title: 'Builder Features', callout: 'Pre-built templates, multi-step forms, calculation fields, e-signatures, and automatic data routing to CRM and helpdesk.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'frm-pricing', route: '/forms', selector: '[data-tutorial="forms-pricing"]', action: 'click', title: 'Build a Form', callout: 'Free tier with 5 forms. Pro from $19/mo with unlimited forms and AI suggestions.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     LMS / LEARNING (/lms)
+     ═══════════════════════════════════════════════════════ */
+  'lms': makeSteps('lms', [
+    { id: 'lms-hero', route: '/lms', selector: '[data-tutorial="lms-hero"]', action: 'observe', title: 'AI Learning Management', callout: 'Create, sell, and deliver online courses with AI-powered content generation, adaptive learning paths, and student progress analytics.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'lms-features', route: '/lms', selector: '[data-tutorial="lms-features"]', action: 'observe', title: 'LMS Features', callout: 'Course builder, video hosting, quizzes, certificates, student forums, drip content, and payment processing built in.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'lms-pricing', route: '/lms', selector: '[data-tutorial="lms-pricing"]', action: 'click', title: 'Create Course', callout: 'From $29/mo. 0% transaction fee on all plans (competitors charge 5-10%).', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     APPOINTMENTS / SCHEDULING (/appointments)
+     ═══════════════════════════════════════════════════════ */
+  'appointments': makeSteps('appointments', [
+    { id: 'apt-hero', route: '/appointments', selector: '[data-tutorial="appointments-hero"]', action: 'observe', title: 'AI Scheduling', callout: 'Smart appointment booking with AI time optimization, buffer management, timezone detection, and automatic reminders via email and SMS.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'apt-features', route: '/appointments', selector: '[data-tutorial="appointments-features"]', action: 'observe', title: 'Scheduling Features', callout: 'Round-robin assignment, group bookings, recurring appointments, payment collection at booking, and calendar sync (Google, Outlook, Apple).', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'apt-pricing', route: '/appointments', selector: '[data-tutorial="appointments-pricing"]', action: 'click', title: 'Start Booking', callout: 'Free tier with unlimited bookings. Pro from $15/mo with SMS reminders and payment collection.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     WORKFLOW AUTOMATION (/workflow-automation)
+     ═══════════════════════════════════════════════════════ */
+  'workflow-automation': makeSteps('workflow-automation', [
+    { id: 'wf-hero', route: '/workflow-automation', selector: '[data-tutorial="workflow-hero"]', action: 'observe', title: 'AI Workflow Automation', callout: 'Visual workflow builder with AI-powered triggers, conditions, and actions. Automate any business process without code.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'wf-features', route: '/workflow-automation', selector: '[data-tutorial="workflow-features"]', action: 'observe', title: 'Automation Features', callout: 'Multi-step workflows, conditional branching, webhooks, API integrations, scheduled triggers, and error handling with auto-retry.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'wf-pricing', route: '/workflow-automation', selector: '[data-tutorial="workflow-pricing"]', action: 'click', title: 'Automate Now', callout: 'From $19/mo with unlimited workflows. No per-task pricing like Zapier.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     CONTRACTS (/contracts)
+     ═══════════════════════════════════════════════════════ */
+  'contracts': makeSteps('contracts', [
+    { id: 'con-hero', route: '/contracts', selector: '[data-tutorial="contracts-hero"]', action: 'observe', title: 'AI Contract Management', callout: 'AI-powered contract lifecycle management with template generation, clause extraction, risk analysis, and automated renewal tracking.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'con-features', route: '/contracts', selector: '[data-tutorial="contracts-features"]', action: 'observe', title: 'Contract Features', callout: 'Template library, clause bank, version control, approval workflows, e-signatures, and obligation tracking with deadline alerts.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'con-pricing', route: '/contracts', selector: '[data-tutorial="contracts-pricing"]', action: 'click', title: 'Start Managing', callout: 'From $39/mo. AI clause extraction and risk scoring on all plans.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     VENDOR MANAGER (/vendor-manager)
+     ═══════════════════════════════════════════════════════ */
+  'vendor-manager': makeSteps('vendor-manager', [
+    { id: 'vm-hero', route: '/vendor-manager', selector: '[data-tutorial="vendor-hero"]', action: 'observe', title: 'AI Vendor Management', callout: 'Full vendor lifecycle management with AI risk assessment, PO automation, contract tracking, and spend analytics.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'vm-features', route: '/vendor-manager', selector: '[data-tutorial="vendor-features"]', action: 'observe', title: 'Vendor Features', callout: '29-field vendor profiles, automated PO approval, diversity tracking, SLA monitoring, and proactive renewal alerts.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'vm-pricing', route: '/vendor-manager', selector: '[data-tutorial="vendor-pricing"]', action: 'click', title: 'Manage Vendors', callout: 'From $29/mo. AI risk scoring and PO auto-approval on all plans.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     SIGNATURES (/signatures)
+     ═══════════════════════════════════════════════════════ */
+  'signatures': makeSteps('signatures', [
+    { id: 'sig-hero', route: '/signatures', selector: '[data-tutorial="signatures-hero"]', action: 'observe', title: 'AI eSignatures', callout: 'Legally binding electronic signatures with AI document analysis, smart field placement, and automated signing workflows.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'sig-features', route: '/signatures', selector: '[data-tutorial="signatures-features"]', action: 'observe', title: 'Signature Features', callout: 'Template library, bulk send, signing order, audit trail, mobile signing, and integration with contracts and document management.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'sig-pricing', route: '/signatures', selector: '[data-tutorial="signatures-pricing"]', action: 'click', title: 'Sign Up Free', callout: 'Free tier: 5 documents/month. Pro from $15/mo with unlimited documents.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     PROPOSALS (/proposals)
+     ═══════════════════════════════════════════════════════ */
+  'proposals': makeSteps('proposals', [
+    { id: 'pro-hero', route: '/proposals', selector: '[data-tutorial="proposals-hero"]', action: 'observe', title: 'AI Proposals', callout: 'Create winning proposals in minutes with AI content generation, dynamic pricing tables, e-signatures, and client engagement tracking.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'pro-features', route: '/proposals', selector: '[data-tutorial="proposals-features"]', action: 'observe', title: 'Proposal Features', callout: 'Template library, interactive pricing, video embedding, client comments, analytics (opens, time spent), and one-click acceptance.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'pro-pricing', route: '/proposals', selector: '[data-tutorial="proposals-pricing"]', action: 'click', title: 'Create Proposal', callout: 'From $29/mo. AI content generation and e-signature on all plans.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     SEC INTEL (/sec-intel)
+     ═══════════════════════════════════════════════════════ */
+  'sec-intel': makeSteps('sec-intel', [
+    { id: 'si-hero', route: '/sec-intel', selector: '[data-tutorial="sec-intel-hero"]', action: 'observe', title: 'Security Intelligence', callout: 'Real-time threat intelligence, vulnerability scanning, dark web monitoring, and compliance reporting for your entire infrastructure.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'si-features', route: '/sec-intel', selector: '[data-tutorial="sec-intel-features"]', action: 'observe', title: 'Intel Features', callout: 'CVE tracking, attack surface mapping, credential leak detection, phishing simulation, and automated incident response playbooks.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'si-pricing', route: '/sec-intel', selector: '[data-tutorial="sec-intel-pricing"]', action: 'click', title: 'Secure Now', callout: 'From $99/mo. Continuous scanning and dark web monitoring on all plans.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     SPEAK CLOUD / VOICE (/speak-cloud)
+     ═══════════════════════════════════════════════════════ */
+  'speak-cloud': makeSteps('speak-cloud', [
+    { id: 'sc-hero', route: '/speak-cloud', selector: '[data-tutorial="speak-cloud-hero"]', action: 'observe', title: 'Speak Cloud TTS', callout: 'Multi-provider text-to-speech with 69 cloned voices, emotion detection, and persona switching. ElevenLabs + Edge TTS with quota-aware blending.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'sc-features', route: '/speak-cloud', selector: '[data-tutorial="speak-cloud-features"]', action: 'observe', title: 'Voice Features', callout: 'Cloned voice enforcement, multilingual support, 4-layer emotion intelligence, and automatic provider failover for 99.9% uptime.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'sc-pricing', route: '/speak-cloud', selector: '[data-tutorial="speak-cloud-pricing"]', action: 'click', title: 'Try Voice AI', callout: 'Free tier: 1,000 characters/day. Pro from $29/mo with unlimited characters and cloned voices.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     GRAPH RAG (/graph-rag)
+     ═══════════════════════════════════════════════════════ */
+  'graph-rag': makeSteps('graph-rag', [
+    { id: 'gr-hero', route: '/graph-rag', selector: '[data-tutorial="graph-rag-hero"]', action: 'observe', title: 'Graph RAG Knowledge', callout: '312K+ nodes, 3.3M+ edges spanning 101 domains. Cross-domain knowledge retrieval that finds connections traditional search misses.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'gr-features', route: '/graph-rag', selector: '[data-tutorial="graph-rag-features"]', action: 'observe', title: 'Graph Features', callout: 'Entity resolution, relationship extraction, semantic similarity, cross-domain traversal, and real-time graph updates from doctrine forge.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'gr-pricing', route: '/graph-rag', selector: '[data-tutorial="graph-rag-pricing"]', action: 'click', title: 'Explore Graph', callout: 'Included in SDK Pro tier. API access for custom queries and knowledge traversal.', tooltipPosition: 'top' },
+  ]),
 };
 
 export function getGuidedSteps(tutorialId: string): GuidedStep[] {
