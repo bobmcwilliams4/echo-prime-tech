@@ -829,6 +829,11 @@ export default function HomePage() {
                   { label: 'Drive Intelligence', href: '/drive-intelligence' },
                   { label: 'Revenue Engine', href: '/revenue-engine' },
                   { label: 'Swarm Brain', href: '/swarm-brain' },
+                  { label: 'Speak Cloud', href: '/speak-cloud' },
+                  { label: 'Memory Prime', href: '/memory-prime' },
+                  { label: 'PayPal Integration', href: '/paypal-integration' },
+                  { label: 'Coin Rewards', href: '/coin-rewards' },
+                  { label: 'Model Host', href: '/model-host' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}

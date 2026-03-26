@@ -108,6 +108,11 @@ const EXEMPT_PREFIXES = [
   '/drive-intelligence',  // Echo Drive Intelligence
   '/revenue-engine',     // Echo Revenue Engine
   '/swarm-brain',        // Echo Swarm Brain
+  '/speak-cloud',        // Echo Speak Cloud
+  '/memory-prime',       // Echo Memory Prime
+  '/paypal-integration', // Echo PayPal Integration
+  '/coin-rewards',       // Echo Coin Rewards
+  '/model-host',         // Echo Model Host
 
   // ── Content pages ──
   '/blog',               // Blog articles
