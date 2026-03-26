@@ -621,6 +621,7 @@ export default function HomePage() {
                   { label: 'Engine Catalog', href: '/engines' },
                   { label: 'AI Closer', href: '/closer' },
                   { label: 'Call Center', href: '/call-center' },
+                  { label: 'Project Manager', href: '/project-manager' },
                   { label: 'Title Intelligence', href: '/title-intelligence' },
                   { label: 'Permian Basin AI', href: '/permian' },
                   { label: 'Tax Preparation', href: '/tax-returns' },

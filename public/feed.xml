@@ -5,10 +5,18 @@
     <link>https://echo-ept.com</link>
     <description>Technical blog and changelog from Echo Prime Technologies — AI engineering, intelligence engines, oilfield tech, tax intelligence, and autonomous systems.</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 25 Mar 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 26 Mar 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
 
     <!-- Blog Articles -->
+    <item>
+      <title>AI Project Management in 2026: Why Teams Are Switching from Jira</title>
+      <link>https://echo-ept.com/blog/ai-project-management-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid>https://echo-ept.com/blog/ai-project-management-2026</guid>
+      <category>Product Updates</category>
+      <description>Traditional project management tools were built for human workflows. AI-powered project management automates sprint planning, estimates tasks using historical data, and predicts bottlenecks before they happen.</description>
+    </item>
     <item>
       <title>Parental Controls for Smart TVs: AI-Powered Screen Time Management in 2026</title>
       <link>https://echo-ept.com/blog/parental-controls-smart-tv-screen-time-2026</link>

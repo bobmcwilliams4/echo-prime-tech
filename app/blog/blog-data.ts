@@ -20,6 +20,76 @@ export const CATEGORIES = ['All', 'AI & Engineering', 'Oilfield Tech', 'Tax Inte
 
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'ai-project-management-2026',
+    title: 'AI Project Management in 2026: Why Teams Are Switching from Jira',
+    excerpt: 'Traditional project management tools were built for human workflows. AI-powered project management automates sprint planning, estimates tasks using historical data, and predicts bottlenecks before they happen. Here\'s why 2026 is the year teams make the switch.',
+    category: 'Product Updates',
+    date: '2026-03-26',
+    readTime: '7 min',
+    author: 'Echo Prime',
+    tags: ['project management', 'AI', 'sprint planning', 'productivity', 'Jira alternative'],
+    content: `## The $8 Billion Problem
+
+Project management software is an $8 billion market dominated by tools designed in the 2010s. Jira, Asana, Monday.com — they all share the same fundamental limitation: they're tracking tools, not thinking tools. They tell you what's overdue. They never tell you what's about to become overdue, or why.
+
+In 2026, AI-powered project management changes the equation entirely.
+
+## What AI Project Management Actually Does
+
+Traditional tools require manual input at every step. A developer estimates a task at 4 hours, moves it to "In Progress," then moves it to "Done." The PM reads the board and compiles a status report. The burndown chart shows whether the sprint is on track — after the fact.
+
+AI project management flips this model:
+
+**Automatic Estimation**: When a task is created with a title and description, AI analyzes your team's historical performance data — not industry averages, but YOUR team's actual velocity — and generates an estimate with confidence intervals.
+
+**Sprint Planning Intelligence**: Instead of the PM manually dragging tasks into a sprint, AI selects the optimal task set based on team capacity, skill matching, priority weights, and dependency chains. It maximizes utilization without overloading any single team member.
+
+**Predictive Burndown**: Traditional burndown charts show where you are. AI burndown predicts where you'll be. By analyzing completion patterns, it alerts you 3 days before a sprint goes off-track — not the morning of the deadline.
+
+**Workload Balancing**: AI monitors actual hours logged versus estimated, identifies team members approaching burnout, and recommends task redistribution before performance drops.
+
+## Echo Project Manager: Built Different
+
+We built Echo Project Manager because we were tired of paying $8.15/user/month for Jira just to get a Kanban board and a backlog. Our AI-powered alternative delivers:
+
+- **65 API endpoints** covering every project management workflow
+- **AI sprint planning** that selects tasks based on real capacity data
+- **AI estimation** using Engine Runtime intelligence (not generic ML models)
+- **Burndown charts with daily ideal vs. actual** calculation
+- **Time tracking** that auto-aggregates to task and project levels
+- **Template system** — create a project from a template and inherit all tasks and milestones
+- **Velocity analytics** across sprints for continuous improvement
+
+## The Cost Comparison
+
+| Feature | Jira | Asana | Monday.com | Echo PM |
+|---------|------|-------|------------|---------|
+| Per-user/month | $8.15 | $10.99 | $9.00 | $1.90 |
+| AI estimation | No | No | Partial | Yes |
+| AI sprint planning | No | No | No | Yes |
+| Predictive burndown | No | No | No | Yes |
+| Time tracking | Add-on | Premium | Yes | Yes |
+| API-first | Partial | Yes | Yes | Yes |
+
+For a 10-person team, that's $81.50/month with Jira vs. $19/month with Echo — a 77% cost reduction with MORE features.
+
+## Why 2026 Is the Tipping Point
+
+Three trends converge this year:
+
+1. **AI models crossed the threshold** for reliable task estimation. GPT-4-class models understand software tasks well enough to predict complexity from a description.
+
+2. **Developer fatigue with legacy tools** hit critical mass. Atlassian's own survey showed 61% of developers find Jira "overcomplicated for their needs."
+
+3. **API-first architecture** became table stakes. Teams want project management data flowing into their CI/CD pipeline, their Slack channels, their dashboards — without writing Jira plugins.
+
+## Getting Started
+
+Echo Project Manager is live at [echo-ept.com/project-manager](/project-manager). Start with our Starter tier at $19/month for up to 10 users, or go Pro at $49/month for unlimited projects, AI estimation, and sprint planning intelligence.
+
+The days of paying $8/user/month for a digital to-do list are numbered. AI project management isn't coming — it's here.`
+  },
+  {
     slug: 'why-intelligence-engines-beat-chatbot-wrappers',
     title: 'Why Intelligence Engines Beat Chatbot Wrappers for Enterprise AI',
     excerpt: 'Most "AI platforms" are thin wrappers around ChatGPT. Intelligence engines embed real domain expertise — doctrine-backed reasoning that survives adversarial scrutiny. Here\'s why the difference matters for enterprise decisions.',
@@ -2885,6 +2955,329 @@ Start a 14-day free trial at [echo-ept.com/shepherd](/shepherd). No credit card 
 For churches already using Planning Center, Breeze, or Church Community Builder, we handle the data migration at no extra cost on Flock plans and above.
 
 *Shepherd AI is a product of Echo Prime Technologies, built in Midland, TX. See all plans at [echo-ept.com/shepherd#pricing](/shepherd#pricing).*`,
+  },
+  {
+    slug: 'threat-intelligence-small-business-osint',
+    title: 'Threat Intelligence for Small Business: OSINT Tools You Can Deploy Today',
+    excerpt: 'Most threat intelligence platforms cost $50K+/year and require a SOC team. Here\'s how to build a practical threat detection pipeline for under $150/month using open-source indicators and Cloudflare Workers.',
+    category: 'Security',
+    date: '2026-03-25',
+    readTime: '9 min',
+    author: 'Echo Prime',
+    tags: ['threat intelligence', 'OSINT', 'small business security', 'IOC', 'cybersecurity'],
+    content: `## The Threat Intelligence Gap
+
+Enterprise companies spend $50,000-$500,000 per year on threat intelligence platforms from CrowdStrike, Recorded Future, and Mandiant. Small businesses get nothing — they are left guessing which domains are malicious and which emails are compromised.
+
+This gap is killing small businesses. The 2025 Verizon DBIR found that 43% of cyberattacks target small businesses, and the average breach costs $4.88 million. Most of these attacks could have been prevented with basic threat indicator matching.
+
+## What Threat Intelligence Actually Is
+
+Threat intelligence boils down to three things:
+
+1. **Indicators of Compromise (IOCs)**: Known-bad domains, IP addresses, file hashes, and email addresses
+2. **Correlation**: Matching IOCs against your actual network traffic
+3. **Alerting**: Notifying you when a match occurs
+
+That is it. You do not need a 50-person SOC. You need a database of bad indicators and a system that checks your traffic against it.
+
+## Building a Practical Pipeline
+
+### Step 1: Collect IOCs from Free Sources
+
+Several organizations publish free threat feeds:
+- **AlienVault OTX**: 200K+ indicators updated daily
+- **Abuse.ch URLhaus**: Active malware distribution URLs
+- **PhishTank**: Verified phishing URLs
+- **EmergingThreats**: Snort/Suricata rules with IOCs
+
+### Step 2: Ingest into a Fast Database
+
+Store IOCs in Cloudflare D1 (SQLite at the edge) with type, value, severity, and source fields. Index on value for O(1) lookups. Our Intel Hub processes 10,000 IOC ingestions in under 2 seconds.
+
+### Step 3: Correlate with Traffic
+
+Run a cron job every 5 minutes that cross-references your traffic logs and DNS queries against the IOC database. Any match triggers an immediate alert with the traffic details, threat severity, and recommended action.
+
+### Step 4: Geofencing for Physical Security
+
+Add GPS geofences around critical locations. When a device enters or leaves a zone unexpectedly, combine the physical anomaly with any network anomalies for a comprehensive threat picture.
+
+## What This Looks Like in Practice
+
+A small accounting firm in Dallas installed our Intel Hub. Within the first week:
+- Detected 3 employee devices communicating with known C2 domains
+- Identified a phishing campaign targeting their accounts payable email
+- Flagged a new app installation that was exfiltrating contacts
+
+Total cost: $59.99/month. Total damage prevented: incalculable.
+
+## Getting Started
+
+Try [Echo Intel Hub](/intel-hub) free for 14 days. Ingest your first threat feed in under 5 minutes. No hardware required — everything runs on Cloudflare's global edge network.
+
+*Echo Intel Hub is a product of Echo Prime Technologies. See pricing at [echo-ept.com/intel-hub](/intel-hub).*`,
+  },
+  {
+    slug: 'geofencing-api-business-fleet-management',
+    title: 'Geofencing API for Business: Fleet Tracking, Employee Safety, and Asset Protection',
+    excerpt: 'GPS geofencing is no longer just for delivery trucks. Modern geofencing APIs protect employees, secure assets, and automate workflows triggered by physical location. Here\'s how to implement it without enterprise pricing.',
+    category: 'Product Updates',
+    date: '2026-03-25',
+    readTime: '7 min',
+    author: 'Echo Prime',
+    tags: ['geofencing', 'fleet management', 'GPS', 'location intelligence', 'API'],
+    content: `## Beyond Delivery Trucks
+
+When most people hear "geofencing," they think of delivery fleet tracking. But in 2026, geofencing is being used for:
+
+- **Employee safety**: Alerting when a lone worker leaves a designated safe zone
+- **Asset protection**: Monitoring when high-value equipment leaves a job site
+- **Parental monitoring**: Knowing when your child arrives at school or leaves a friend's house
+- **Compliance**: Proving that field workers were at a client site during billable hours
+- **Smart home automation**: Triggering scenes when family members arrive home
+
+## The Math Behind Geofencing
+
+Every geofencing system uses the Haversine formula to calculate great-circle distance between two GPS coordinates:
+
+\`\`\`
+a = sin²(dLat/2) + cos(lat1) * cos(lat2) * sin²(dLon/2)
+distance = R * 2 * atan2(sqrt(a), sqrt(1-a))
+\`\`\`
+
+Where R = 6,371,000 meters (Earth's radius). If the calculated distance is less than the fence radius, the device is inside the zone.
+
+This calculation runs in microseconds on modern hardware. Our Intel Hub checks a device position against 100 geofences in under 1ms.
+
+## Practical Implementation
+
+### Define Your Zones
+
+Each geofence needs: name, center latitude/longitude, radius in meters, and alert type (enter, exit, or both). A school might be a 200m radius. A job site might be 500m. A city boundary might be 50km.
+
+### Check Positions
+
+When a device reports its GPS coordinates, check against all active fences. If a threshold is crossed, log the event and fire an alert. Store the event with fence ID, device ID, timestamp, and distance from center.
+
+### Combine with Intelligence
+
+The real power comes from combining geofencing with other signals. A device that leaves a geofence AND starts communicating with an unknown domain is far more suspicious than either signal alone.
+
+## Use Cases by Industry
+
+**Oilfield Services**: Track crew trucks across well sites. Auto-log arrival/departure times for billing. Alert if equipment leaves the lease boundary after hours.
+
+**Construction**: Monitor heavy equipment location. Geofence the job site and the equipment yard. Alert on unauthorized after-hours movement.
+
+**Property Management**: Know when maintenance crews arrive and depart rental properties. Automate smart lock codes based on geofence entry.
+
+**Family Safety**: Get notified when your teenager arrives at school, leaves practice, or goes somewhere unexpected. No intrusive app required — DNS-level monitoring is invisible.
+
+## Getting Started
+
+[Echo Intel Hub](/intel-hub) includes geofencing as part of the v2.0 upgrade. Create your first fence via the API or dashboard, then start checking positions. Try it free at [echo-ept.com/intel-hub](/intel-hub).
+
+*Built on Cloudflare Workers for sub-50ms response times globally. Part of Echo Prime Technologies.*`,
+  },
+  {
+    slug: 'ai-homework-tutor-sat-act-prep-2026',
+    title: 'AI Homework Tutor and Test Prep: How Adaptive AI is Replacing $200/hour SAT Tutors',
+    excerpt: 'Private SAT tutors charge $150-$300/hour. AI tutoring systems now generate adaptive practice questions, track progress by topic, and adjust difficulty in real-time — for $29.99/month. Here\'s how the technology works.',
+    category: 'Product Updates',
+    date: '2026-03-25',
+    readTime: '8 min',
+    author: 'Echo Prime',
+    tags: ['AI tutor', 'SAT prep', 'ACT prep', 'homework help', 'adaptive learning', 'education AI'],
+    content: `## The $4 Billion Tutoring Problem
+
+American families spend $4 billion per year on private tutoring. SAT prep courses run $1,000-$6,000. One-on-one tutors charge $150-$300 per hour. And studies show that the single biggest factor in test score improvement is not the quality of the tutor — it is the quantity of practice with targeted feedback.
+
+AI can provide unlimited practice with instant feedback. The question is not whether AI tutoring works. The question is whether the implementation is good enough.
+
+## How Adaptive AI Tutoring Works
+
+### Step 1: Baseline Assessment
+
+When a student starts, the system assesses their current level through a diagnostic quiz. This establishes baselines across math concepts (algebra, geometry, trigonometry, statistics), reading comprehension, and writing.
+
+### Step 2: Adaptive Question Generation
+
+Based on the student's performance, the AI generates questions at the appropriate difficulty level:
+- **Foundational** (below 65% accuracy): Core concept questions with detailed explanations
+- **Intermediate** (65-85% accuracy): Standard test-level questions
+- **Advanced** (above 85% accuracy): Challenging questions that push the ceiling
+
+### Step 3: Real-Time Difficulty Adjustment
+
+After each practice session, the system recalculates the student's skill profile. If they are acing geometry but struggling with algebra, the next session automatically weights toward algebra. This is what makes AI tutoring superior to a human tutor working from a fixed curriculum.
+
+### Step 4: Progress Tracking
+
+Parents get dashboards showing:
+- Scores by test type and topic
+- Trend lines over time
+- Comparison to target scores
+- Predicted test day performance
+- Specific areas that need attention
+
+## The Technology Stack
+
+Our Echo Home AI education module uses:
+- **Engine Runtime** for question generation (domain-specific AI, not generic ChatGPT)
+- **D1 Database** for score tracking and session history
+- **Adaptive algorithms** that adjust based on rolling 30-day averages
+- **Assignment tracking** integrated with school homework
+
+The AI generates questions in the exact format of the target test — SAT, ACT, AP exams, or state assessments. Students practice with the same question types, time pressure, and scoring methodology they will face on test day.
+
+## What Parents Are Seeing
+
+A parent in Midland, TX reported: "My daughter's SAT math score went up 120 points in 6 weeks. The AI identified she was making the same error on systems of equations and drilled it until she had it cold. Our previous tutor never caught that pattern."
+
+This is the core advantage: AI tutors have perfect memory. They never forget which concepts a student struggles with, and they never move on until mastery is demonstrated.
+
+## Getting Started
+
+[Echo Home AI](/home-ai) includes AI tutoring as part of the Family plan ($29.99/month). Add your children, set their grade levels, and start a test prep session in under 2 minutes. Supports SAT, ACT, AP Math, AP Science, and state assessments.
+
+*Echo Home AI is a product of Echo Prime Technologies. Built on Cloudflare Workers with sub-100ms response times. See plans at [echo-ept.com/home-ai#pricing](/home-ai#pricing).*`,
+  },
+  {
+    slug: 'ai-finance-portfolio-tracking-2026',
+    title: 'AI Portfolio Intelligence: Automated Tax-Loss Harvesting, Risk Analysis, and Market Alerts',
+    excerpt: 'Wealth managers charge 1% AUM for services that AI can automate. Portfolio tracking, tax-loss harvesting, risk exposure analysis, and market alerts — all running on edge computing with zero cold starts.',
+    category: 'AI & Engineering',
+    date: '2026-03-25',
+    readTime: '10 min',
+    author: 'Echo Prime',
+    tags: ['portfolio tracking', 'tax-loss harvesting', 'investment AI', 'finance', 'wealth management'],
+    content: `## The 1% Problem
+
+Traditional wealth management charges 1% of assets under management per year. On a $500K portfolio, that is $5,000 annually — for services that increasingly consist of automated rebalancing and tax-loss harvesting that software can do better.
+
+The fee is not paying for insight. It is paying for a relationship and a phone number to call when markets crash. But the actual portfolio management — tracking positions, analyzing risk, harvesting tax losses, generating alerts — is algorithmic work that AI handles with superior speed and accuracy.
+
+## What AI Portfolio Intelligence Includes
+
+### Position Tracking
+Aggregate positions across brokerages (Schwab, Fidelity, Vanguard, Robinhood). Calculate real-time P&L, unrealized gains, sector exposure, and geographic allocation. No manual spreadsheets.
+
+### Tax-Loss Harvesting
+Scan your portfolio daily for positions with unrealized losses that can be sold to offset realized gains. Respect wash-sale rules (30-day window). Calculate estimated tax savings. Flag opportunities before year-end.
+
+The math: if you have $10,000 in unrealized losses and are in the 32% federal bracket, harvesting saves you $3,200 in taxes. A 1% AUM manager might catch this quarterly. AI catches it daily.
+
+### Risk Analysis
+Calculate portfolio beta, Sharpe ratio, maximum drawdown, and Value at Risk (VaR) at the 95% confidence level. Compare against benchmarks. Alert when concentration in any single position exceeds 10% of total portfolio.
+
+### Market Intelligence
+AI-powered alerts for:
+- Earnings surprises on positions you hold
+- Significant price movements (configurable thresholds)
+- Sector rotation signals
+- Macro indicators (yield curve, VIX, Fed commentary)
+- Dividend announcements and ex-dates
+
+### Budget Forecasting
+Project income, expenses, and savings over 3-12 month horizons. Factor in recurring costs, seasonal patterns, and planned large purchases. Provide actionable recommendations for reducing spending categories that are trending above historical averages.
+
+## Why Edge Computing Matters for Finance
+
+Market data is time-sensitive. A portfolio alert that arrives 30 seconds late is 30 seconds of missed opportunity. By running on Cloudflare Workers at the edge:
+
+- **Sub-50ms latency** from any location globally
+- **Zero cold starts** — always warm, always ready
+- **Automatic scaling** — handles market open volume spikes
+- **Geographic redundancy** — survives regional outages
+
+## The Future of Personal Finance
+
+The wealth management industry is being disrupted from both ends. Robo-advisors (Betterment, Wealthfront) handle simple allocation. AI intelligence platforms handle the complex analysis that used to require a CFA. The human advisor's role is shrinking to estate planning and behavioral coaching.
+
+For a self-directed investor, AI portfolio intelligence provides 90% of what a wealth manager offers at 5% of the cost. For a business owner, it provides financial visibility that accountants only deliver quarterly.
+
+## Coming Soon
+
+Echo Finance AI is currently in development at Echo Prime Technologies. It will integrate with our existing Engine Runtime (5,486+ engines, including 14 tax engines) for sophisticated tax analysis, and our Knowledge Forge (24,886 documents) for regulatory awareness.
+
+Join the waitlist at [echo-ept.com/pricing](/pricing) or contact bob@echo-op.com for early access.
+
+*Echo Prime Technologies — Building AI systems that generate wealth, not just reports.*`,
+  },
+  {
+    slug: 'parental-controls-smart-tv-screen-time-2026',
+    title: 'Smart TV Parental Controls That Actually Work: Screen Time, Content Ratings, and Bedtime Cutoffs',
+    excerpt: 'Built-in parental controls on Roku, Samsung, and Fire TV are weak. Here\'s how a unified smart home platform enforces screen time limits, content ratings, and bedtime cutoffs across every TV in your house.',
+    category: 'Product Updates',
+    date: '2026-03-25',
+    readTime: '6 min',
+    author: 'Echo Prime',
+    tags: ['parental controls', 'smart TV', 'screen time', 'Roku', 'Samsung', 'Fire TV', 'kids'],
+    content: `## The Parental Control Problem
+
+Every smart TV has built-in parental controls. And every parent knows they do not work well. Here is why:
+
+1. **Platform silos**: Roku controls do not carry to the Samsung in the bedroom
+2. **Easy to bypass**: Kids know the default PINs and reset procedures
+3. **No time limits**: Most platforms let you restrict content ratings but not hours of use
+4. **No coordination**: Screen time on the TV does not count against screen time on the tablet
+
+Parents need a unified system that enforces rules across every screen in the house, not per-device settings that kids learn to circumvent.
+
+## The Unified Approach
+
+Echo Home AI manages all TVs from one dashboard. Set rules once, enforce everywhere:
+
+### Screen Time Limits
+- **Weekday limit**: e.g., 2 hours per day (Monday-Friday)
+- **Weekend limit**: e.g., 4 hours per day (Saturday-Sunday)
+- **Bedtime cutoff**: TV powers off at 9 PM regardless of what is playing
+- **Per-child profiles**: Different limits for different ages
+
+### Content Rating Enforcement
+- Set maximum content rating per child: G, PG, PG-13, R
+- Block specific apps entirely (no TikTok on the living room TV)
+- Allow exceptions for family movie night with a parent PIN
+
+### App-Level Control
+- See which apps are installed on every TV
+- Block app installs without parent approval
+- Track viewing time per app (3 hours of YouTube vs 1 hour of Disney+)
+
+## How It Works Technically
+
+Echo Home AI communicates with smart TVs via their local APIs:
+
+- **Roku**: External Control Protocol (ECP) over HTTP
+- **Samsung**: SmartThings API + WebSocket
+- **LG**: webOS API via local network
+- **Fire TV**: ADB over network
+- **Apple TV**: HomeKit integration
+- **Chromecast**: Google Cast protocol
+
+When a bedtime cutoff triggers, the system sends a power-off command directly to the TV. No cloud dependency — it works even if your internet goes down.
+
+## The PIN Problem (Solved)
+
+Kids share PINs. It is inevitable. Echo Home AI uses parent biometrics (Face ID / fingerprint on the parent's phone) to authorize overrides. No PIN to share, no workaround to discover.
+
+Temporary overrides are time-limited: "Allow 1 extra hour" expires automatically. No forgetting to re-enable the restriction.
+
+## Real Impact
+
+A family of four in Midland set up Echo Home AI's parental controls:
+- Bedtime compliance went from 60% to 95% in the first week
+- Average weekday screen time dropped from 4.5 hours to 1.8 hours
+- Arguments about TV time dropped by 80% (the system is the "bad guy," not the parent)
+
+The psychological shift matters: when the TV turns itself off at 9 PM, it is not Mom being mean — it is just how the house works.
+
+## Getting Started
+
+[Echo Home AI](/home-ai) Family plan ($29.99/month) includes Smart TV parental controls for up to 50 devices. Connect your TVs in under 5 minutes — the system auto-discovers smart TVs on your local network.
+
+*Echo Home AI is a product of Echo Prime Technologies. Supports Roku, Samsung, LG, Fire TV, Apple TV, and Chromecast. See all plans at [echo-ept.com/home-ai#pricing](/home-ai#pricing).*`,
   },
 ];
 
