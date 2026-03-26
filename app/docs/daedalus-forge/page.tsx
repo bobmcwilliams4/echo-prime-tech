@@ -1,86 +1,119 @@
 'use client'
 
-import ProductDoc from '@/components/ProductDoc'
+import ProductDoc, { ProductDocProps } from '@/components/ProductDoc'
+
+const data: ProductDocProps = {
+  name: 'Daedalus Forge',
+  tagline: 'AI-powered manufacturing intelligence — production planning, quality control, and predictive maintenance.',
+  accent: '#d97706',
+  productUrl: '/daedalus-forge',
+  workerUrl: 'https://daedalus-forge.bmcii1976.workers.dev',
+  version: '1.0.0',
+
+  overview: [
+    'Daedalus Forge is a manufacturing intelligence platform that connects your shop floor to AI-driven decision-making. It ingests data from equipment sensors, MES (Manufacturing Execution Systems), ERP systems, and quality inspection stations to provide real-time visibility into every production line, work order, and machine in your facility. The result is a unified operations command center that replaces spreadsheets, whiteboards, and disconnected monitoring tools with a single, intelligent system.',
+    'The AI engine transforms raw manufacturing data into actionable intelligence. Predictive maintenance models analyze vibration signatures, temperature trends, and cycle time drift to forecast equipment failures days or weeks before they occur — eliminating unplanned downtime that costs manufacturers an average of $260,000 per hour. Quality control models detect defect patterns in real time, correlating material batches, machine settings, and environmental conditions to identify root causes before scrap rates escalate.',
+    'Beyond reactive monitoring, Daedalus Forge optimizes forward-looking decisions. Production scheduling AI balances due dates, machine capacity, changeover times, and material availability to generate optimal job sequences. Supply chain intelligence tracks vendor lead times, price volatility, and quality trends to recommend sourcing decisions. And capacity planning models project bottlenecks weeks out, giving you time to add shifts, outsource operations, or renegotiate delivery dates before commitments are missed.',
+  ],
+
+  gettingStarted: [
+    { step: 1, title: 'Connect Your Data Sources', desc: 'Integrate Daedalus Forge with your existing systems — ERP (SAP, Oracle, NetSuite), MES, SCADA/PLC data historians, quality management systems, and IoT sensor platforms. Pre-built connectors handle the most common systems; a generic REST/MQTT adapter covers custom integrations.' },
+    { step: 2, title: 'Define Your Equipment & Lines', desc: 'Map your facility structure — buildings, production lines, work cells, and individual machines. For each piece of equipment, specify the type, rated capacity, maintenance schedule, and which sensor channels to monitor. The system auto-discovers equipment from connected MES/SCADA data where available.' },
+    { step: 3, title: 'Configure Work Order Ingestion', desc: 'Connect your work order source — ERP, MES, or manual entry. Define product types, routing steps, standard cycle times, and quality specifications. Daedalus Forge ingests open work orders and tracks their progress through each production step in real time.' },
+    { step: 4, title: 'Set Alert Thresholds', desc: 'Configure alert rules for equipment health (vibration, temperature, cycle time deviation), quality metrics (defect rate, SPC control limits), and production targets (OEE, throughput, on-time delivery). Alerts route to specific roles via email, SMS, Slack, or the mobile app.' },
+    { step: 5, title: 'Monitor & Optimize', desc: 'The real-time dashboard shows OEE (Overall Equipment Effectiveness), production throughput, quality yield, and equipment health across your entire facility. Click into any machine, line, or work order for detailed drill-down. Use the AI scheduling engine to optimize job sequences and the predictive maintenance module to plan maintenance windows.' },
+  ],
+
+  features: [
+    { title: 'Production Planning', desc: 'AI scheduling engine generates optimal job sequences considering due dates, machine capacity, setup/changeover times, material availability, and operator skill matrices. Supports finite capacity scheduling with constraint-based optimization. Drag-and-drop Gantt chart for manual overrides with automatic conflict detection.' },
+    { title: 'Quality Control', desc: 'Real-time SPC (Statistical Process Control) monitoring with X-bar, R, p, c, and u charts auto-configured per process. AI correlates defect patterns with machine settings, material lots, environmental conditions, and operator shifts to identify root causes. Automated containment actions quarantine suspect product and notify quality engineers.' },
+    { title: 'Predictive Maintenance', desc: 'Machine learning models analyze sensor data — vibration spectra, temperature profiles, current draw, cycle time trends, and acoustic signatures — to predict failures 2-30 days before they occur. Maintenance work orders are generated automatically with recommended parts, procedures, and estimated downtime.' },
+    { title: 'Supply Chain Optimization', desc: 'Tracks vendor performance across lead time, quality, price, and reliability. AI recommends optimal reorder points, safety stock levels, and sourcing splits based on demand forecasts and vendor risk scores. Alerts when a vendor\'s quality trend deteriorates or lead times extend beyond planning assumptions.' },
+    { title: 'Work Order Management', desc: 'End-to-end work order lifecycle from release through completion. Real-time tracking shows which step each order is on, actual vs. planned cycle times, quantity completed, scrap count, and estimated completion time. Operators log production counts, defects, and downtime reasons from tablets on the shop floor.' },
+    { title: 'Equipment Monitoring', desc: 'Real-time health dashboard for every connected machine showing status (running, idle, down, changeover), current production rate, cumulative output, and sensor readings. Historical trend charts for any parameter. Downtime tracking categorizes every minute of lost production by reason code — mechanical failure, material wait, changeover, quality hold, no operator.' },
+    { title: 'Defect Detection', desc: 'Computer vision models inspect parts using camera feeds at inspection stations. Detects surface defects (scratches, dents, discoloration), dimensional deviations, and assembly errors. Configurable pass/fail thresholds and defect classification. Images of every rejected part are stored with the inspection record for root cause analysis.' },
+    { title: 'Compliance Tracking', desc: 'Manages regulatory compliance documentation for ISO 9001, ISO 13485 (medical devices), AS9100 (aerospace), IATF 16949 (automotive), and FDA 21 CFR Part 11. Automated audit trail captures every production event, quality decision, and calibration record. Generates compliance reports and CAPA (Corrective and Preventive Action) workflows.' },
+    { title: 'Cost Analysis', desc: 'Calculates actual production cost per unit including material, labor, machine time, energy, scrap, and overhead allocation. Compares actual cost to standard cost in real time, flagging variances above configurable thresholds. Drill down into cost drivers — which jobs, machines, or shifts have the highest cost variance and why.' },
+    { title: 'Capacity Planning', desc: 'Forward-looking capacity model projects machine and labor utilization 1-12 weeks out based on the open order book and historical throughput rates. Identifies bottleneck resources, recommends overtime or additional shifts when capacity falls short, and flags delivery commitments at risk of delay.' },
+    { title: 'OEE Dashboard', desc: 'Overall Equipment Effectiveness calculated in real time from availability (uptime vs. planned production time), performance (actual rate vs. rated capacity), and quality (good units vs. total units). OEE broken down by machine, line, shift, product, and time period. Pareto charts show the top loss categories driving OEE below target.' },
+    { title: 'Mobile Shop Floor App', desc: 'Tablet and phone app for operators and supervisors. Start/stop work orders, log production counts, record downtime reasons, capture defect photos, and view machine status — all from the shop floor without walking to a computer terminal. Offline mode caches data during connectivity gaps and syncs automatically when reconnected.' },
+  ],
+
+  apiEndpoints: [
+    { method: 'GET', path: '/api/equipment', desc: 'List all equipment with current status, OEE, sensor readings, and active work orders. Filter by line, status, or equipment type.', auth: true },
+    { method: 'GET', path: '/api/equipment/:id/health', desc: 'Retrieve health score, sensor trends, and predictive maintenance alerts for a specific machine. Includes failure probability timeline and recommended maintenance actions.', auth: true },
+    { method: 'GET', path: '/api/work-orders', desc: 'List work orders with filtering by status (open, in-progress, complete), product, line, and date range. Returns progress, yield, and estimated completion for each order.', auth: true },
+    { method: 'POST', path: '/api/work-orders', desc: 'Create a new work order with product, quantity, due date, routing, and priority. The scheduling engine automatically assigns machines and sequence position.', auth: true },
+    { method: 'POST', path: '/api/schedule/optimize', desc: 'Run the AI scheduling optimizer on all open work orders. Returns the recommended job sequence with start/end times, machine assignments, and on-time delivery confidence scores.', auth: true },
+    { method: 'GET', path: '/api/quality/spc/:processId', desc: 'Retrieve SPC control chart data for a process — measurements, control limits, out-of-control points, and trend analysis. Supports X-bar/R, p-chart, and c-chart types.', auth: true },
+    { method: 'GET', path: '/api/oee', desc: 'Query OEE metrics with grouping by equipment, line, shift, product, or time period. Returns availability, performance, quality components and overall OEE with loss breakdowns.', auth: true },
+    { method: 'GET', path: '/api/capacity', desc: 'Retrieve capacity utilization projections for the next 1-12 weeks. Identifies bottleneck resources and at-risk delivery commitments.', auth: true },
+  ],
+
+  userGuide: [
+    {
+      title: 'Production Scheduling',
+      id: 'production-scheduling',
+      content: [
+        'The production scheduling module is the operational brain of Daedalus Forge. It takes your open work orders — each with a product, quantity, due date, and routing (sequence of operations) — and generates an optimized schedule that respects machine capacity, changeover times, material availability, and operator assignments. The optimizer runs in seconds and produces a Gantt chart showing every job on every machine with start and end times.',
+        'To use the scheduler, ensure your work orders are loaded (from ERP integration or manual entry) and your equipment routing data is current — which machines can run which operations, rated cycle times, and changeover matrices (how long it takes to switch from product A to product B on each machine). The optimizer minimizes total weighted tardiness while respecting capacity constraints, meaning it prioritizes on-time delivery but does not overload any machine.',
+        'After the optimizer runs, review the schedule on the Gantt chart. Drag and drop jobs to make manual adjustments — the system instantly recalculates the impact on all downstream jobs and highlights any new conflicts or late deliveries. Lock specific jobs to fixed time slots if they cannot be moved (e.g., a customer-mandated delivery appointment). The schedule publishes to the shop floor app so operators see their job queue in priority order.',
+      ],
+    },
+    {
+      title: 'Predictive Maintenance',
+      id: 'predictive-maintenance',
+      content: [
+        'Predictive maintenance shifts your strategy from reactive (fix it when it breaks) or calendar-based (maintain every 90 days regardless of condition) to condition-based (maintain when the data says it is needed). Daedalus Forge monitors vibration, temperature, current draw, acoustic emission, and cycle time for every connected machine and uses machine learning to detect patterns that precede failures.',
+        'The health dashboard shows each machine\'s current health score (0-100), trending direction, and any active alerts. Click into a machine to see individual sensor channels with their normal operating bands, current readings, and historical trends. When the model detects an anomaly — a bearing vibration signature shifting toward a failure mode, or a gradual cycle time increase indicating mechanical wear — it generates a maintenance alert with the predicted failure window, recommended action, and required parts.',
+        'Maintenance work orders are created automatically from alerts and appear in the maintenance queue with priority ranking. Scheduling these work orders into planned downtime windows (shift changes, weekends, scheduled changeovers) avoids the catastrophic cost of unplanned failures. The system tracks actual maintenance outcomes — was the prediction correct, what was found, what was replaced — and feeds this back into the model to improve future predictions.',
+      ],
+    },
+    {
+      title: 'Quality Management',
+      id: 'quality-management',
+      content: [
+        'Quality management in Daedalus Forge combines traditional SPC (Statistical Process Control) with AI-driven pattern recognition. For each critical process parameter — a dimension, weight, surface finish, or functional test result — the system auto-configures the appropriate control chart type (X-bar/R for continuous measurements, p-chart for defect rates, c-chart for defect counts) and calculates control limits from your process data.',
+        'Real-time monitoring flags out-of-control conditions the moment they occur — points beyond control limits, runs of 7+ points on one side of the center line, trending patterns, and excessive variation. When a violation is detected, the system correlates it with concurrent variables: which material lot is in use, what machine settings are active, which operator is running the process, and what the environmental conditions are (temperature, humidity). This correlation analysis often identifies the root cause within minutes rather than hours of manual investigation.',
+        'For facilities with camera-based inspection, the computer vision defect detection module classifies parts as pass or fail based on visual criteria you define. Train the model by uploading images of good parts and various defect types — the model learns the visual patterns and inspects at line speed. Every rejected part is logged with the defect classification, image, and associated production context (work order, machine, operator, time) for Pareto analysis and corrective action.',
+      ],
+    },
+    {
+      title: 'Cost Tracking & Analysis',
+      id: 'cost-analysis',
+      content: [
+        'Daedalus Forge calculates actual production cost per unit by aggregating material consumption, direct labor time, machine runtime cost, energy usage, scrap value, and allocated overhead. This actual cost is compared against the standard cost (your target cost from engineering or accounting) in real time, flagging any job, product, or work center where the variance exceeds your configured threshold.',
+        'The cost drill-down shows exactly where money is being spent or lost. Material cost variance might reveal that a supplier price increase has not been reflected in the standard cost, or that scrap rates on a specific machine are consuming more raw material than planned. Labor cost variance could indicate that changeovers are taking longer than estimated, or that rework is consuming unplanned hours. Machine cost variance highlights equipment running slower than rated capacity or consuming more energy than expected.',
+        'Weekly and monthly cost reports aggregate these variances by product, work center, shift, and time period. Trend analysis shows whether cost performance is improving or deteriorating over time. The AI cost optimization module suggests specific actions to reduce cost — alternate material sourcing, process parameter adjustments that reduce scrap, maintenance interventions that restore machine speed, and scheduling changes that reduce changeover frequency.',
+      ],
+    },
+  ],
+
+  aiCapabilities: [
+    { capability: 'Predictive Failure Modeling', desc: 'Machine learning models trained on vibration spectra, temperature profiles, current signatures, and cycle time patterns predict equipment failures 2-30 days before occurrence. Models are equipment-specific — each machine develops its own failure signature library over time. Prediction accuracy improves continuously as maintenance outcome data is fed back into training.' },
+    { capability: 'Production Schedule Optimization', desc: 'Constraint-based optimization engine generates job sequences that minimize weighted tardiness across all machines while respecting capacity limits, changeover matrices, material availability, and operator skill requirements. Solver evaluates thousands of permutations per second and produces near-optimal schedules for facilities with hundreds of active work orders.' },
+    { capability: 'Root Cause Correlation', desc: 'When a quality excursion is detected, the AI automatically correlates the defect pattern with every available variable — material lot, machine settings, environmental conditions, operator, time of day, preceding maintenance events — and ranks the most likely root causes by correlation strength. Reduces investigation time from hours of manual analysis to minutes of AI-guided verification.' },
+    { capability: 'Computer Vision Inspection', desc: 'Convolutional neural network models trained on your product images detect surface defects, dimensional deviations, and assembly errors at line speed. Transfer learning means new defect types can be trained with as few as 50 labeled images. Models run at the edge on inspection station hardware for sub-100ms inference latency.' },
+    { capability: 'Demand-Driven Capacity Planning', desc: 'Forecasts production demand from historical order patterns, sales pipeline data, and seasonal trends. Projects machine and labor utilization 1-12 weeks forward and identifies capacity bottlenecks before they impact delivery. Recommends specific actions — overtime, additional shifts, outsourcing, or customer delivery date renegotiation — with cost impact for each option.' },
+    { capability: 'Anomaly Detection', desc: 'Unsupervised learning models establish normal operating profiles for every sensor channel and production metric. Detects deviations from normal behavior without requiring pre-defined rules — catching novel failure modes and process drifts that rule-based systems miss. Sensitivity is configurable to balance early detection against false alarm rates.' },
+  ],
+
+  troubleshooting: [
+    { issue: 'Sensor data is not appearing on the equipment dashboard', solution: 'Verify the data connector status in Settings > Integrations — a red indicator means the connection is down. For MQTT-based sensors, check that the broker address, port, and topic path are correct. For OPC-UA connections, confirm the server endpoint URL and that the Daedalus Forge IP is whitelisted in the OPC server\'s access control. If data was flowing previously and stopped, check the sensor/PLC for communication faults and verify network connectivity between the sensor gateway and the Daedalus Forge ingestion endpoint.' },
+    { issue: 'Predictive maintenance alerts seem inaccurate (too many false alarms)', solution: 'New installations require a learning period of 2-4 weeks of normal operation to establish baseline patterns. During this period, false positive rates may be higher. Verify that sensor placement is correct — vibration sensors must be mounted rigidly on the bearing housing, not on sheet metal covers. Reduce sensitivity temporarily in Settings > Maintenance > Alert Sensitivity while the model learns. Label each alert as true positive or false positive in the alert log to accelerate model improvement.' },
+    { issue: 'OEE numbers do not match manual calculations', solution: 'Verify that planned production time (the denominator for availability) is configured correctly in the shift schedule — does it include or exclude planned breaks and meals? Check that the rated capacity (ideal cycle time) for each product-machine combination is accurate. If downtime events are not being captured, ensure operators are logging start/stop times in the shop floor app or that automatic status detection from machine signals is calibrated. The most common discrepancy source is disagreement about what counts as "planned downtime" vs. "unplanned downtime."' },
+    { issue: 'Schedule optimizer produces infeasible results', solution: 'An infeasible schedule means the optimizer cannot meet all due dates with available capacity. Check for data issues first: are all machine capacities and operating hours entered correctly? Are changeover times realistic? Are any work orders missing routing information? If the data is correct, the facility genuinely has a capacity shortfall — the optimizer will show which due dates cannot be met and by how much. Use the capacity planning module to evaluate overtime, additional shifts, or outsourcing scenarios to close the gap.' },
+  ],
+
+  faq: [
+    { q: 'What equipment and systems does Daedalus Forge integrate with?', a: 'Pre-built connectors exist for SAP, Oracle, NetSuite, Epicor, and IQMS/DELMIAworks ERP systems; Ignition, Kepware, and Siemens WinCC SCADA platforms; and major IoT sensor platforms including Siemens MindSphere, PTC ThingWorx, and AWS IoT. A generic REST API adapter and MQTT connector handle custom systems. OPC-UA connectivity supports direct PLC communication with Allen-Bradley, Siemens, and Mitsubishi controllers.' },
+    { q: 'How long does it take to deploy Daedalus Forge?', a: 'A typical single-facility deployment takes 2-4 weeks: week 1 for system integration and data connectivity, week 2 for equipment setup and sensor calibration, weeks 3-4 for model training and user onboarding. The predictive maintenance models need 2-4 additional weeks of operating data to achieve full accuracy. Cloud deployment means no on-premise servers to install — only the sensor gateways and shop floor tablets require physical setup.' },
+    { q: 'Can Daedalus Forge handle multiple facilities?', a: 'Yes. Enterprise plans support unlimited facilities with centralized dashboards for cross-plant comparison. Each facility maintains its own equipment, work orders, and scheduling. Corporate-level reports aggregate OEE, quality, cost, and delivery performance across all sites. Role-based access control lets plant managers see their facility while executives see the full portfolio.' },
+    { q: 'What compliance standards does the system support?', a: 'Daedalus Forge supports ISO 9001 (general quality), ISO 13485 (medical devices), AS9100 (aerospace), IATF 16949 (automotive), and FDA 21 CFR Part 11 (electronic records and signatures for regulated industries). The audit trail captures every production event, quality decision, calibration record, and system change with timestamps, user identity, and electronic signatures where required.' },
+    { q: 'How does the computer vision defect detection work?', a: 'Mount cameras at your inspection stations pointed at the parts to inspect. Upload labeled images of good parts and examples of each defect type (minimum 50 images per category). Daedalus Forge trains a convolutional neural network that runs inference at line speed on the inspection station hardware. The model classifies each part as pass or fail with a confidence score and defect category. Accuracy typically exceeds 98% after initial training and improves as more labeled data is accumulated.' },
+  ],
+}
 
 export default function DaedalusForgeDocsPage() {
-  return (
-    <ProductDoc
-      name="Daedalus Forge"
-      tagline="AI-powered manufacturing intelligence — production planning, quality control, predictive maintenance, and supply chain optimization."
-      accent="#d97706"
-      productUrl="/daedalus-forge"
-      workerUrl="https://daedalus-forge.bmcii1976.workers.dev"
-      version="1.0.0"
-      overview={[
-        'Daedalus Forge is an AI manufacturing intelligence platform that transforms production operations with predictive analytics, automated quality control, and intelligent supply chain optimization. Named after the legendary Greek craftsman, it brings AI precision to modern manufacturing.',
-        'The platform monitors production lines in real-time, predicts equipment failures before they happen, optimizes material usage to reduce waste, and generates work orders based on demand forecasts. Integration with IoT sensors, ERP systems, and supplier APIs creates a unified manufacturing dashboard.',
-        'From single-facility workshops to multi-plant enterprises, Daedalus Forge scales to any manufacturing operation. It supports discrete manufacturing, process manufacturing, job shop, and make-to-order production models with industry-specific optimization templates.',
-      ]}
-      gettingStarted={[
-        { step: 1, title: 'Configure Your Facility', desc: 'Set up your manufacturing facility profile: production lines, equipment inventory, shift schedules, and capacity specifications.' },
-        { step: 2, title: 'Connect Data Sources', desc: 'Integrate IoT sensors, PLC systems, ERP software, and supplier APIs. Daedalus supports Modbus, OPC UA, MQTT, and REST API connections.' },
-        { step: 3, title: 'Define Products & BOMs', desc: 'Enter your product catalog with bills of materials, routing steps, quality specs, and standard cycle times. Import from CSV or ERP export.' },
-        { step: 4, title: 'Enable Monitoring', desc: 'Activate real-time production monitoring. Dashboards show OEE, throughput, defect rates, and equipment health across all lines.' },
-        { step: 5, title: 'Schedule Production', desc: 'Use the AI scheduler to generate optimal production plans. Drag-and-drop Gantt charts with automatic constraint resolution and material availability checks.' },
-      ]}
-      features={[
-        { title: 'Production Planning', desc: 'AI-optimized production scheduling considering machine capacity, material availability, labor shifts, due dates, and changeover times. Automatic re-scheduling when disruptions occur.' },
-        { title: 'Quality Control', desc: 'Statistical process control (SPC) charts with automatic out-of-control detection. AI vision for defect inspection. Quality gate management with hold/release workflows.' },
-        { title: 'Predictive Maintenance', desc: 'Machine learning models predict equipment failures 2-4 weeks in advance. Maintenance schedules generated automatically. Reduces unplanned downtime by 60%.' },
-        { title: 'Supply Chain Optimization', desc: 'Dynamic reorder point calculation, lead time forecasting, and multi-supplier sourcing optimization. Safety stock levels adjust automatically based on demand variability.' },
-        { title: 'Work Order Management', desc: 'Create, assign, and track work orders from job creation to completion. Mobile-friendly shop floor interface for operators. Real-time status updates.' },
-        { title: 'Equipment Monitoring', desc: 'Real-time OEE (Overall Equipment Effectiveness) tracking. Availability, performance, and quality metrics per machine. Downtime categorization and Pareto analysis.' },
-        { title: 'Defect Detection', desc: 'AI-powered visual inspection using computer vision. Detect surface defects, dimensional deviations, and assembly errors. 99.2% detection accuracy.' },
-        { title: 'Cost Analysis', desc: 'Activity-based costing for every product and order. Material, labor, overhead, and scrap costs calculated in real-time. Margin analysis by product line.' },
-        { title: 'Compliance Tracking', desc: 'ISO 9001, AS9100, IATF 16949 compliance templates. Audit trail for every production step. Document control with version management and approval workflows.' },
-        { title: 'Capacity Planning', desc: 'Long-range capacity planning with what-if scenario modeling. Identify bottlenecks, plan capital equipment purchases, and simulate production expansion.' },
-      ]}
-      apiEndpoints={[
-        { method: 'POST', path: '/api/work-orders', desc: 'Create a new work order with product, quantity, due date, and priority. Returns order ID and scheduled start time.', auth: true },
-        { method: 'GET', path: '/api/production/status', desc: 'Get real-time production status: active orders, line utilization, defect rates, and throughput.' },
-        { method: 'GET', path: '/api/equipment/:id/health', desc: 'Get equipment health score, maintenance predictions, and OEE metrics for a specific machine.', auth: true },
-        { method: 'POST', path: '/api/quality/inspect', desc: 'Submit an inspection result (pass/fail) with measurements and defect codes. Triggers SPC chart updates.', auth: true },
-        { method: 'GET', path: '/api/inventory/materials', desc: 'Current material inventory levels, reorder alerts, and incoming PO status.', auth: true },
-        { method: 'POST', path: '/api/schedule/optimize', desc: 'Run the AI scheduler to generate an optimized production plan for a date range. Considers all constraints.', auth: true },
-        { method: 'GET', path: '/api/analytics/oee', desc: 'OEE analytics: availability, performance, quality rates by line, shift, or date range.' },
-        { method: 'GET', path: '/health', desc: 'Health check endpoint. Returns service status and connected sensor count.' },
-      ]}
-      userGuide={[
-        { id: 'scheduling', title: 'Production Scheduling', content: [
-          'The AI scheduler considers machine capacity, tool availability, material stock, labor shifts, and customer due dates when generating production plans. It minimizes changeover time and maximizes throughput.',
-          'To schedule production, navigate to Planning > Schedule and select a date range. Click "Optimize" to generate an AI-optimized plan. The Gantt chart shows job assignments by machine with color-coded status.',
-          'When disruptions occur (machine breakdown, rush order, material delay), click "Re-schedule" to generate an updated plan that preserves existing commitments while accommodating the change.',
-        ]},
-        { id: 'quality', title: 'Quality Management', content: [
-          'Quality gates are checkpoints in the production process where inspections must pass before work continues. Configure gates per product in Product Settings > Quality > Gates.',
-          'SPC charts update automatically as inspection data is recorded. Control limits are calculated statistically. When a measurement falls outside limits, the system creates a quality hold and notifies the quality manager.',
-          'For AI visual inspection, mount cameras at inspection stations and configure the defect detection model. The system trains on your specific products — upload 50+ images of good parts and 20+ images of each defect type.',
-        ]},
-        { id: 'maintenance', title: 'Predictive Maintenance', content: [
-          'Predictive maintenance requires sensor data from equipment: vibration, temperature, current draw, pressure, or cycle count. Connect sensors via the IoT gateway and map them to equipment profiles.',
-          'The ML model trains on historical data to establish normal operating patterns. After 2-4 weeks of data collection, the model begins predicting failures. Predictions include estimated time to failure and recommended maintenance action.',
-          'Maintenance work orders are generated automatically when prediction confidence exceeds the threshold (default 80%). Technicians receive mobile notifications with equipment location, predicted failure mode, and required parts.',
-        ]},
-      ]}
-      aiCapabilities={[
-        { capability: 'Production Optimization', desc: 'Constraint-based scheduling algorithm considers 12+ variables simultaneously. Reduces setup time by 30% and increases throughput by 15-25% compared to manual scheduling.' },
-        { capability: 'Failure Prediction', desc: 'Time-series ML models analyze sensor data patterns. Predicts bearing failures, motor degradation, seal leaks, and electrical faults with 85%+ accuracy 2-4 weeks in advance.' },
-        { capability: 'Defect Classification', desc: 'Computer vision classifies defects into 50+ categories with 99.2% accuracy. Supports surface defects, dimensional errors, color variations, and assembly mistakes.' },
-        { capability: 'Demand Forecasting', desc: 'AI forecasts demand using historical orders, seasonal patterns, and market indicators. Forecasts drive material procurement and capacity planning decisions.' },
-        { capability: 'Root Cause Analysis', desc: 'When defect rates spike, AI correlates with machine parameters, material lots, operator shifts, and environmental factors to identify the most likely root cause.' },
-      ]}
-      troubleshooting={[
-        { issue: 'Sensor data not appearing in dashboard', solution: 'Check IoT gateway connectivity. Verify the sensor is mapped to an equipment profile in Settings > Equipment > Sensors. Test the data feed by clicking "Diagnostics" on the sensor row.' },
-        { issue: 'AI scheduler produces infeasible plan', solution: 'The scheduler cannot plan when capacity is insufficient for demand within the date range. Increase available shifts, extend the planning horizon, or prioritize orders to determine which can slip.' },
-        { issue: 'Predictive maintenance not generating alerts', solution: 'The ML model requires 2-4 weeks of sensor data before predictions begin. Check that sensors are transmitting continuously. Models retrain weekly — new equipment may need a full cycle.' },
-      ]}
-      faq={[
-        { q: 'What IoT protocols are supported?', a: 'Modbus TCP/RTU, OPC UA, MQTT, HTTP/REST, and direct database connections (PostgreSQL, MySQL). Custom protocols supported via the gateway SDK on Enterprise plans.' },
-        { q: 'Can it integrate with our existing ERP?', a: 'Yes. Pre-built connectors for SAP, Oracle, Microsoft Dynamics, NetSuite, and Epicor. REST API for custom ERP integration. Bi-directional sync for orders, inventory, and BOMs.' },
-        { q: 'How many machines can it monitor?', a: 'Starter: 10 machines. Professional: 100 machines. Enterprise: unlimited. Each machine can have up to 50 sensors monitored simultaneously.' },
-        { q: 'Is shop floor data stored securely?', a: 'All data encrypted at rest (AES-256) and in transit (TLS 1.3). Data residency options available on Enterprise. SOC 2 Type II certified. No data shared between tenants.' },
-        { q: 'Does it work for job shops with custom orders?', a: 'Yes. The scheduler supports make-to-order, job shop, and engineer-to-order workflows. Each work order can have unique routing, BOM, and quality requirements.' },
-      ]}
-    />
-  )
+  return <ProductDoc {...data} />
 }
