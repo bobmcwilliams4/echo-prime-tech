@@ -2469,6 +2469,34 @@ const GUIDED_STEPS: Record<string, GuidedStep[]> = {
     { id: 'gr-features', route: '/graph-rag', selector: '[data-tutorial="graph-rag-features"]', action: 'observe', title: 'Graph Features', callout: 'Entity resolution, relationship extraction, semantic similarity, cross-domain traversal, and real-time graph updates from doctrine forge.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
     { id: 'gr-pricing', route: '/graph-rag', selector: '[data-tutorial="graph-rag-pricing"]', action: 'click', title: 'Explore Graph', callout: 'Included in SDK Pro tier. API access for custom queries and knowledge traversal.', tooltipPosition: 'top' },
   ]),
+
+  /* ═══ WAVE 3 — 20 more tutorials ═══ */
+  ...Object.fromEntries([
+    ['closer', 'Closer AI', '/closer', 'AI Sales Agent that handles cold calls, objection handling, and follow-ups autonomously.'],
+    ['affiliate', 'Affiliate Program', '/affiliate', 'Earn recurring commissions promoting Echo Prime products. Dashboard with real-time earnings.'],
+    ['agentic-engine', 'Agentic Engine', '/agentic-engine', 'Autonomous AI agents that execute multi-step tasks. Deploy to Cloudflare Workers.'],
+    ['app-forge', 'App Forge', '/app-forge', 'Build and deploy full-stack apps from natural language descriptions. AI-powered code generation.'],
+    ['coin-rewards', 'Echo Coin Rewards', '/coin-rewards', 'Loyalty program with tokenized rewards. Earn coins for engagement, spend on products.'],
+    ['project-management', 'Project Management', '/project-management', 'AI project boards with auto-scheduling, dependency tracking, and resource optimization.'],
+    ['invoicing', 'Invoicing', '/invoicing', 'AI-powered invoicing with auto-categorization, payment tracking, and smart reminders.'],
+    ['hr-management', 'HR Management', '/hr-management', 'AI HR platform with employee onboarding, time-off tracking, and performance reviews.'],
+    ['inventory', 'Inventory Management', '/inventory', 'AI inventory tracking with demand forecasting, reorder automation, and multi-location support.'],
+    ['knowledge-base', 'Knowledge Base', '/knowledge-base', 'Semantic search knowledge base. AI auto-categorizes articles and generates instant answers.'],
+    ['finance-ai', 'Finance AI', '/finance-ai', 'Portfolio tracking, expense analysis, and AI-driven financial insights for personal and business.'],
+    ['compliance', 'Compliance Auditor', '/compliance', 'Automated compliance monitoring. Continuous policy checks across all systems and Workers.'],
+    ['domain-harvester', 'Domain Harvester', '/domain-harvester', 'AI-powered domain discovery and competitive intelligence. WHOIS, DNS, and content analysis.'],
+    ['drive-intelligence', 'Drive Intelligence', '/drive-intelligence', 'AI file system analysis. Identifies duplicates, sensitive data, and organization patterns.'],
+    ['documents', 'Document Manager', '/documents', 'AI document management with semantic search, auto-tagging, and version control.'],
+    ['status-page', 'Status Page', '/status-page', 'Real-time service status dashboard. Automated incident detection and public status communication.'],
+    ['surveillance', 'Surveillance', '/surveillance', 'AI-powered OSINT monitoring. Track mentions, threats, and digital footprints across the web.'],
+    ['web-analytics', 'Web Analytics', '/web-analytics', 'Privacy-first analytics. Real-time visitor tracking, funnel analysis, and AI recommendations.'],
+    ['payroll', 'Payroll', '/payroll', 'AI payroll processing with tax calculations, direct deposit, and compliance automation.'],
+    ['newsletter', 'Newsletter', '/newsletter', 'AI-generated newsletters. Content curation, personalization, and send-time optimization.'],
+  ].map(([id, name, route, desc]) => [id, makeSteps(id, [
+    { id: `${id}-hero`, route, selector: `[data-tutorial="${id}-hero"]`, action: 'observe' as const, title: `Welcome to ${name}`, callout: desc, tooltipPosition: 'bottom' as const },
+    { id: `${id}-features`, route, selector: `[data-tutorial="${id}-features"]`, action: 'observe' as const, title: 'Key Features', callout: `Explore the core capabilities of ${name}. Each feature is AI-powered and production-ready.`, tooltipPosition: 'top' as const },
+    { id: `${id}-pricing`, route, selector: `[data-tutorial="${id}-pricing"]`, action: 'click' as const, title: 'Get Started', callout: `View pricing and start using ${name} today. Free tier available for all products.`, tooltipPosition: 'top' as const },
+  ])])),
 };
 
 export function getGuidedSteps(tutorialId: string): GuidedStep[] {
