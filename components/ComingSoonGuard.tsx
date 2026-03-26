@@ -46,6 +46,8 @@ const EXEMPT_PREFIXES = [
   '/intel-hub',          // Echo Intel Hub
   '/shepherd',           // Echo Shepherd AI
   '/project-manager',    // Echo Project Manager
+  '/finance-ai',         // Echo Finance AI
+  '/crm',                // Echo CRM
   '/surveillance',       // Prometheus Surveillance
   '/dark-web-intel',     // Dark Web Intelligence
   '/rewards',            // Echo Rewards
