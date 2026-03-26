@@ -623,6 +623,7 @@ export default function HomePage() {
                   { label: 'Call Center', href: '/call-center' },
                   { label: 'Project Manager', href: '/project-manager' },
                   { label: 'Echo CRM', href: '/crm' },
+                  { label: 'Helpdesk', href: '/helpdesk' },
                   { label: 'Title Intelligence', href: '/title-intelligence' },
                   { label: 'Permian Basin AI', href: '/permian' },
                   { label: 'Tax Preparation', href: '/tax-returns' },
