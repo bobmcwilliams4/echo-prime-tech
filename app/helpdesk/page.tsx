@@ -143,7 +143,7 @@ export default function HelpdeskPage() {
         <p className="text-center mb-10" style={{ color: 'var(--ept-text-secondary)' }}>No per-agent fees on Starter. No hidden costs. Cancel anytime.</p>
         <div className="grid md:grid-cols-3 gap-6">
           {PRICING.map((p, i) => (
-            <div key={i} className={`p-6 rounded-xl border ${i === 1 ? 'ring-2' : ''}`} style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: i === 1 ? 'var(--ept-accent)' : 'var(--ept-card-border)', ringColor: i === 1 ? 'var(--ept-accent)' : undefined }}>
+            <div key={i} className={`p-6 rounded-xl border ${i === 1 ? 'ring-2 ring-[--ept-accent]' : ''}`} style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: i === 1 ? 'var(--ept-accent)' : 'var(--ept-card-border)' }}>
               <h3 className="font-bold text-xl mb-1" style={{ color: 'var(--ept-text)' }}>{p.name}</h3>
               <div className="mb-4">
                 <span className="text-4xl font-extrabold" style={{ color: 'var(--ept-accent)' }}>{p.price}</span>
