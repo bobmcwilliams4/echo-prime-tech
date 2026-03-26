@@ -94,6 +94,17 @@
   <url><loc>https://echo-ept.com/lms</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/email-marketing</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/surveys</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/knowledge-base</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/workflow-automation</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/social-media</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/documents</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/status-page</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/live-chat</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/link-shortener</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/feedback-board</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/newsletter</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/web-analytics</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/waitlist</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- Products — Finance -->
   <url><loc>https://echo-ept.com/finance-ai</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
@@ -117,8 +128,15 @@
   <!-- Engine Marketplace -->
   <url><loc>https://echo-ept.com/engines/marketplace</loc><lastmod>2026-03-21</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
 
-  <!-- Reviews -->
-  <url><loc>https://echo-ept.com/reviews</loc><lastmod>2026-03-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <!-- Reviews, Proposals & Affiliate -->
+  <url><loc>https://echo-ept.com/reviews</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/proposals</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/affiliate</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/signatures</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/qr-menu</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/podcast</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/payroll</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/calendar</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- Products — Vault -->
   <url><loc>https://echo-ept.com/vault</loc><lastmod>2026-03-07</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
@@ -181,6 +199,20 @@
   <url><loc>https://echo-ept.com/blog/ai-business-tools-vs-legacy-saas-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/blog/building-multi-tenant-saas-cloudflare-workers</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 
+  <!-- Missing blog articles synced 2026-03-25 -->
+  <url><loc>https://echo-ept.com/blog/ai-call-center-replaces-five9-talkdesk</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-call-center-roi-calculator</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-helpdesk-vs-zendesk-2026</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-inventory-management-smb-2026</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/church-management-software-ai-2026</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/digital-tithing-online-giving-church-2026</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/permian-basin-landman-ai-title-search</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New blog articles 2026-03-25 session 44 -->
+  <url><loc>https://echo-ept.com/blog/how-to-build-ai-agent-cloudflare-workers-2026</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/small-business-ai-tools-complete-guide-2026</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-security-audit-checklist-small-business-2026</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
   <!-- Helpdesk -->
   <url><loc>https://echo-ept.com/helpdesk</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
@@ -203,4 +235,77 @@
   <url><loc>https://echo-ept.com/blog/ai-scheduling-assistant-business-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/blog/cloud-invoicing-benefits-freelancers-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/blog/ai-customer-service-vs-zendesk-intercom-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New Blog Articles (2026-03-25 session 45) -->
+  <url><loc>https://echo-ept.com/blog/tax-ai-cpa-firm-automation-2026</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/irc-section-199a-qbi-deduction-strategies-2026</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/permian-basin-well-data-ai-analysis-2026</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/contract-management-ai-small-business-guide-2026</loc><lastmod>2026-03-25</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New Blog Articles (2026-03-26 session 45b) -->
+  <url><loc>https://echo-ept.com/blog/ai-drilling-cost-optimization-permian-basin-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/multi-state-tax-nexus-remote-workforce-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/digital-title-examination-ai-vs-traditional-landman-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/api-security-testing-automated-penetration-guide-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New Blog Articles (2026-03-26 session 45c) -->
+  <url><loc>https://echo-ept.com/blog/ai-voice-cloning-business-use-cases-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/landman-software-comparison-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/small-business-saas-stack-under-200-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New Blog Articles (2026-03-26 session 42) -->
+  <url><loc>https://echo-ept.com/blog/best-ai-church-management-software-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-smart-home-automation-alexa-alternative-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-email-marketing-mailchimp-alternative-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-personal-finance-app-mint-alternative-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-booking-software-calendly-alternative-small-business-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New Blog Articles (2026-03-26 session 45d) -->
+  <url><loc>https://echo-ept.com/blog/irs-audit-defense-ai-documentation-guide-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/oilfield-production-optimization-ai-artificial-lift-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/cryptocurrency-tax-reporting-defi-nft-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/zero-trust-security-small-business-implementation-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ransomware-incident-response-plan-smb-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New Blog Articles (2026-03-26 session 45e) -->
+  <url><loc>https://echo-ept.com/blog/building-multi-agent-ai-systems-production-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/edge-computing-ai-inference-cloudflare-workers-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-document-analysis-contract-review-automation-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New Product Pages (2026-03-26 session 42 wave 4) -->
+  <url><loc>https://echo-ept.com/workflows</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/finance</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New Product Pages (2026-03-26 session 42 wave 4 continued) -->
+  <url><loc>https://echo-ept.com/invoicing</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/appointments</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/hr-management</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/project-management</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New Blog Articles (2026-03-26 session 42 wave 4 — SaaS product articles) -->
+  <url><loc>https://echo-ept.com/blog/ai-hr-management-bamboohr-alternative-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-project-management-jira-alternative-teams-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-invoicing-freelancers-small-business-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-appointment-scheduling-service-business-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- New SaaS Products (2026-03-26 session continued) -->
+  <url><loc>https://echo-ept.com/compliance</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/recruiting</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/timesheet</loc><lastmod>2026-03-26</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+
+  <!-- New Blog Articles (2026-03-26 session 45f) -->
+  <url><loc>https://echo-ept.com/blog/estate-planning-ai-trust-administration-wealth-transfer-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/business-entity-selection-tax-optimization-llc-scorp-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/r-and-d-tax-credit-software-companies-startups-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/api-security-testing-owasp-top-10-automated-scanning-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/cloud-security-posture-management-cspm-multi-cloud-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- New Blog Articles (2026-03-26 session 42 wave 4 — competitor keyword articles) -->
+  <url><loc>https://echo-ept.com/blog/ai-crm-vs-salesforce-small-business-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-document-management-teams-collaboration-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/smart-home-ai-energy-savings-automation-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-church-management-software-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Oilfield Tech deep-dives (2026-03-26 session 45g) -->
+  <url><loc>https://echo-ept.com/blog/well-spacing-optimization-ai-permian-basin-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/drilling-optimization-ai-rop-npt-reduction-2026</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>
