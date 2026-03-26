@@ -2806,6 +2806,86 @@ The Landman Pipeline is live. Start a title search at [echo-ept.com/sentinel](/s
 
 *See all Echo Prime products at [echo-ept.com/pricing](/pricing). Built in Midland, TX — by people who actually run title.*`,
   },
+  {
+    slug: 'digital-tithing-online-giving-church-2026',
+    title: 'Digital Tithing in 2026: Why Your Church Needs an Online Giving Platform',
+    excerpt: 'Cash in the offering plate is declining 15% year over year. Churches that adopt digital giving see 32% higher per-member contributions. Here\'s how to transition without losing the theology of generosity.',
+    category: 'Product Updates',
+    date: '2026-03-25',
+    readTime: '7 min',
+    author: 'Echo Prime',
+    tags: ['church technology', 'online giving', 'digital tithing', 'church management', 'Shepherd AI'],
+    content: `# Digital Tithing in 2026: Why Your Church Needs an Online Giving Platform
+
+The offering plate is not dead — but it's not enough anymore.
+
+In 2026, **73% of adults under 40 carry no cash**. If your church relies on physical offerings as the primary giving method, you're asking people to do something they literally cannot do. The National Association of Church Business Administration reports that churches offering **multiple digital giving channels** see **32% higher per-member annual contributions** compared to cash-only churches.
+
+This isn't about abandoning the theology of generosity. It's about removing friction between the heart's desire to give and the act of giving.
+
+## The Case for Digital Tithing
+
+### 1. Recurring Giving Creates Financial Stability
+
+When a member sets up a $200/month recurring donation, they don't skip giving when they're sick, traveling, or watching online. **Recurring givers contribute 42% more annually** than one-time givers because consistency beats impulse.
+
+With Echo Shepherd AI's Online Giving Portal, members set up weekly, bi-weekly, monthly, quarterly, or annual recurring donations in under 60 seconds. The system calculates the next processing date automatically and handles fund allocation — so a member can give $150/month to general and $50/month to missions without two separate setups.
+
+### 2. Giving Campaigns with Real-Time Progress
+
+Building fund stuck at 60%? Missions trip need $8,000 by April? Create a **giving campaign** with a goal amount, description, and deadline. Members see real-time progress — the percentage bar fills as donations come in. Psychological research shows that **progress indicators increase completion rates by 27%**.
+
+Shepherd AI tracks raised amounts automatically. Every campaign donation gets properly recorded in the member's giving history and shows up on their year-end tax statement.
+
+### 3. Text-to-Give: The Lowest Friction Channel
+
+During the offering, the pastor says: "Text GIVE 50 to our church number." The member texts, the system matches their phone to their member record, and the donation is logged — fund, amount, tax-deductible status, all handled.
+
+Text-to-give captures **impulse generosity** that cash and even apps miss. When the sermon lands and hearts are stirred, the path from conviction to action should be two thumb taps, not "download our app, create an account, add your card, then..."
+
+### 4. Year-End Tax Statements in One Click
+
+Every January, church admins spend hours creating giving statements for tax season. Shepherd AI generates them automatically — one API call per member produces a complete statement with total amount, tax-deductible amount, and fund-by-fund breakdown. Generate for one member or the entire congregation at once.
+
+## Beyond Giving: The Full Shepherd AI v2.0
+
+The Online Giving Portal is one of four new modules in Shepherd AI v2.0:
+
+**Curriculum & Study Guides** — AI-generated multi-week Bible study curricula. Give the AI a scripture passage and your denomination, and it builds a complete study guide with discussion questions, application challenges, and prayer focuses. Assign curricula to small groups and track lesson-by-lesson progress.
+
+**Communications Hub** — Draft and schedule church announcements with targeted delivery. Manage prayer requests with answered/unanswered tracking. Send to specific groups or the whole congregation. Consolidate your church's communication in one place instead of scattered across GroupMe, email, and bulletin boards.
+
+**Media Library & Devotionals** — Store sermon recordings (video, audio, or podcast), link them to their sermon entries in the system, and generate a podcast-style RSS feed automatically. The AI devotional generator creates daily devotionals based on scripture passages, tailored to your denomination's theological voice.
+
+## 14 Modules. 80+ Endpoints. 21 Denominations.
+
+Shepherd AI v2.0 now includes:
+
+- AI Sermon Builder with cross-references and illustration suggestions
+- Scripture Engine with commentary and reading plans
+- Congregation CRM with family connections
+- Online Giving Portal with recurring donations, campaigns, and text-to-give
+- Worship Planning with CCLI tracking
+- Volunteer Management with gap detection
+- Small Groups with curriculum and progress tracking
+- Church Calendar with RSVPs and capacity management
+- Pastoral Care with encrypted notes
+- Church Analytics with growth trends
+- Communications Hub with announcements and prayer requests
+- Media Library with sermon recordings and podcast feed
+- AI Devotional Generator
+- Denomination-aware theology across all features (21+ traditions)
+
+Every feature is built on Cloudflare's global edge network — sub-100ms response times, zero cold starts, SOC 2 compliant infrastructure. Your church data never trains AI models.
+
+## Getting Started
+
+Start a 14-day free trial at [echo-ept.com/shepherd](/shepherd). No credit card required. Set up your church profile in under 5 minutes — denomination, campus info, and you're live.
+
+For churches already using Planning Center, Breeze, or Church Community Builder, we handle the data migration at no extra cost on Flock plans and above.
+
+*Shepherd AI is a product of Echo Prime Technologies, built in Midland, TX. See all plans at [echo-ept.com/shepherd#pricing](/shepherd#pricing).*`,
+  },
 ];
 
 export function formatDate(dateStr: string): string {
