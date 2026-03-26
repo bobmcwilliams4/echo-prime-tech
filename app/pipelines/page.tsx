@@ -1,4 +1,6 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import FaqSchema from '../../components/FaqSchema';
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
@@ -28,6 +30,15 @@ import {
 } from '../../lib/pipeline-api';
 
 const SERVICE_ID = 'data-pipelines';
+
+const FAQS = [
+  { q: 'What types of data sources can your pipelines extract from?', a: 'We support 50+ source types including county clerk databases, public filings, government records, REST APIs, websites, market data feeds, SEC filings, and custom endpoints. Our autonomous extraction handles login-protected sites, CAPTCHA-gated portals, and paginated results.' },
+  { q: 'How does the pipeline handle data quality and errors?', a: 'Every pipeline includes automated data quality gates: schema validation, completeness checks, deduplication, and anomaly detection. Failed records are quarantined for review while healthy data flows through. Error rates, latency, and throughput are tracked in real-time.' },
+  { q: 'Can I build custom pipelines without writing code?', a: 'Yes. The Pipeline Builder provides a no-code interface where you select a source type, configure connection parameters, set a sync schedule, and choose transformations. For advanced users, custom transformation scripts and webhook integrations are also supported.' },
+  { q: 'What delivery formats are supported?', a: 'Extracted data can be delivered via REST API, webhooks, CSV/JSON file export, database replication (PostgreSQL, MySQL), or direct R2/S3 bucket delivery. Real-time streaming and batch modes are both available depending on your plan.' },
+  { q: 'How is my data secured?', a: 'All data is encrypted at rest and in transit. API keys are managed through our secure vault system. We maintain audit logging on every pipeline operation. Enterprise plans include SOC2-ready compliance features and dedicated infrastructure isolation.' },
+  { q: 'What happens if a data source goes down or changes its structure?', a: 'Our pipelines include automatic retry logic with exponential backoff, change detection for site structure modifications, and instant alert notifications when a source becomes unreachable. We monitor all active sources 24/7 and can adapt extractors within hours of detected changes.' },
+];
 
 // ── Tab types ────────────────────────────────────────────────
 type MainTab = 'overview' | 'builder';
@@ -180,6 +191,8 @@ function PipelineBuilderApp() {
   if (view === 'dashboard') {
     return (
       <div className="space-y-6">
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Data Pipelines', href: '/pipelines' }]} />
+      <FaqSchema faqs={FAQS} />
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold" style={{ color: 'var(--ept-text)' }}>Your Pipelines</h2>
@@ -1074,6 +1087,19 @@ function PipelinesPageContent() {
           <PipelineBuilderApp />
         </section>
       )}
+      {/* FAQ */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Intelligence Engine Integration */}
       <section className="max-w-4xl mx-auto px-6 py-12">
         <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>

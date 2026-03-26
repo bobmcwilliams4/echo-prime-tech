@@ -7,6 +7,7 @@ import { useAuth } from '../lib/auth-context';
 import { useTheme } from '../lib/theme-context';
 import { SmokeDivider } from '../components/ParticleBackground';
 import ReadAloudButton from '../components/ReadAloudButton';
+import { Menu, X } from 'lucide-react';
 
 interface LiveStats {
   engines: string;
@@ -270,6 +271,7 @@ export default function HomePage() {
   const { isDark, toggle } = useTheme();
   const { user } = useAuth();
   const live = useLiveStats();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const capSection = useInView();
   const diffSection = useInView();
   const indSection = useInView();
@@ -313,6 +315,71 @@ export default function HomePage() {
                 Get Started
               </Link>
             )}
+            <button
+              onClick={() => setMobileMenuOpen(prev => !prev)}
+              className="md:hidden w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
+              style={{ backgroundColor: 'var(--ept-surface)', color: 'var(--ept-text-secondary)' }}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+        </div>
+
+        {/* ─── Mobile Menu ─── */}
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-t ${mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
+          style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: mobileMenuOpen ? 'var(--ept-border)' : 'transparent' }}
+        >
+          <div className="px-6 py-4 flex flex-col gap-1">
+            {[
+              { label: 'Engines', href: '/engines' },
+              { label: 'Permian', href: '/permian' },
+              { label: 'Store', href: '/ecommerce' },
+              { label: 'Services', href: '/services' },
+              { label: 'Pricing', href: '/pricing' },
+              { label: 'Case Studies', href: '/case-studies' },
+              { label: 'Blog', href: '/blog' },
+            ].map(item => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm font-medium py-2.5 px-3 rounded-lg transition-colors hover:opacity-80"
+                style={{ color: 'var(--ept-text-secondary)' }}
+              >
+                {item.label}
+              </Link>
+            ))}
+            <Link
+              href="/sentinel"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-sm font-semibold py-2.5 px-3 rounded-lg transition-colors"
+              style={{ color: 'var(--ept-accent)' }}
+            >
+              Sentinel AI
+            </Link>
+            <div className="mt-2 pt-3" style={{ borderTop: '1px solid var(--ept-border)' }}>
+              {user ? (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full px-5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:opacity-90"
+                  style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full px-5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:opacity-90"
+                  style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
+                >
+                  Get Started
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </nav>
@@ -405,6 +472,33 @@ export default function HomePage() {
                 <span className="text-xs font-semibold uppercase tracking-wider transition-colors group-hover:opacity-80" style={{ color: 'var(--ept-accent)' }}>Get Started &rarr;</span>
               </Link>
             ))}
+          </div>
+          <div className="mt-12 mb-8">
+            <h3 className="text-xl font-bold text-center mb-6" style={{ color: 'var(--ept-text)' }}>Business Suite</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {[
+                { label: 'CRM', price: '$29', href: '/crm' },
+                { label: 'Helpdesk', price: '$29', href: '/helpdesk' },
+                { label: 'Contracts', price: '$19', href: '/contracts' },
+                { label: 'Appointments', price: '$19', href: '/appointments' },
+                { label: 'Invoicing', price: '$15', href: '/invoicing' },
+                { label: 'HR', price: '$25', href: '/hr-management' },
+                { label: 'Inventory', price: '$19', href: '/inventory' },
+                { label: 'Forms', price: 'Free', href: '/forms' },
+                { label: 'LMS', price: '$19', href: '/lms' },
+                { label: 'Email', price: '$9', href: '/email-sender' },
+                { label: 'Live Chat', price: '$19', href: '/live-chat' },
+                { label: 'Workflows', price: 'Free', href: '/workflows' },
+                { label: 'Projects', price: 'Free', href: '/project-management' },
+                { label: 'Documents', price: '$12', href: '/documents' },
+                { label: 'Finance', price: 'Free', href: '/finance' },
+              ].map((p) => (
+                <Link key={p.href} href={p.href} className="p-3 rounded-xl border text-center transition-all hover:scale-[1.03] card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                  <div className="text-sm font-bold" style={{ color: 'var(--ept-text)' }}>{p.label}</div>
+                  <div className="text-xs font-mono mt-1" style={{ color: 'var(--ept-accent)' }}>{p.price}/mo</div>
+                </Link>
+              ))}
+            </div>
           </div>
           <div className="mt-8 text-center">
             <Link href="/pricing" className="text-sm font-semibold transition-colors hover:opacity-80" style={{ color: 'var(--ept-accent)' }}>View all pricing &amp; plans &rarr;</Link>
@@ -563,6 +657,38 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ─── Latest from the Blog ─── */}
+      <section className="py-20 px-6" ref={useInView(0.1).ref}>
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Latest from the Blog</h2>
+              <p className="mt-2 text-sm" style={{ color: 'var(--ept-text-secondary)' }}>Technical deep-dives on AI engineering, oilfield tech, tax intelligence, and security</p>
+            </div>
+            <Link href="/blog" className="text-sm font-semibold hidden md:block" style={{ color: 'var(--ept-accent)' }}>View all 90 articles &rarr;</Link>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              { title: 'IRS Audit Defense: How AI Documentation Saves $50K+', href: '/blog/irs-audit-defense-ai-documentation-guide-2026', category: 'Tax Intelligence', time: '14 min' },
+              { title: 'AI Artificial Lift Optimization: Cut LOE by 30%', href: '/blog/oilfield-production-optimization-ai-artificial-lift-2026', category: 'Oilfield Tech', time: '13 min' },
+              { title: 'Zero Trust Security for Small Business: $0-$500/Month', href: '/blog/zero-trust-security-small-business-implementation-2026', category: 'Security', time: '14 min' },
+            ].map(post => (
+              <Link key={post.href} href={post.href} className="p-5 rounded-xl border transition-all hover:scale-[1.01] block" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: isDark ? '#14b8a615' : '#0d737715', color: 'var(--ept-accent)' }}>{post.category}</span>
+                  <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{post.time}</span>
+                </div>
+                <h3 className="text-sm font-bold leading-snug mb-2" style={{ color: 'var(--ept-text)' }}>{post.title}</h3>
+                <span className="text-xs font-medium" style={{ color: 'var(--ept-accent)' }}>Read article &rarr;</span>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-6 text-center md:hidden">
+            <Link href="/blog" className="text-sm font-semibold" style={{ color: 'var(--ept-accent)' }}>View all 90 articles &rarr;</Link>
+          </div>
+        </div>
+      </section>
+
       {/* ─── CTA ─── */}
       <section id="contact" className="py-32 px-6 mesh-bg relative" ref={ctaSection.ref}>
         <div className="absolute inset-0 dot-grid opacity-20" />
@@ -621,17 +747,31 @@ export default function HomePage() {
                   { label: 'Engine Catalog', href: '/engines' },
                   { label: 'AI Closer', href: '/closer' },
                   { label: 'Call Center', href: '/call-center' },
-                  { label: 'Project Manager', href: '/project-manager' },
+                  { label: 'Project Management', href: '/project-management' },
                   { label: 'Echo CRM', href: '/crm' },
                   { label: 'Helpdesk', href: '/helpdesk' },
                   { label: 'Inventory', href: '/inventory' },
-                  { label: 'Invoice', href: '/invoice' },
-                  { label: 'Booking', href: '/booking' },
-                  { label: 'Email', href: '/email-sender' },
+                  { label: 'Invoicing', href: '/invoicing' },
+                  { label: 'Appointments', href: '/appointments' },
+                  { label: 'Email Sender', href: '/email-sender' },
                   { label: 'Analytics', href: '/analytics' },
+                  { label: 'Finance AI', href: '/finance' },
                   { label: 'Forms', href: '/forms' },
-                  { label: 'HR Management', href: '/hr' },
+                  { label: 'HR Management', href: '/hr-management' },
                   { label: 'Contracts', href: '/contracts' },
+                  { label: 'LMS', href: '/lms' },
+                  { label: 'Email Marketing', href: '/email-marketing' },
+                  { label: 'Surveys', href: '/surveys' },
+                  { label: 'Knowledge Base', href: '/knowledge-base' },
+                  { label: 'Workflows', href: '/workflows' },
+                  { label: 'Social Media', href: '/social-media' },
+                  { label: 'Documents', href: '/documents' },
+                  { label: 'Status Page', href: '/status-page' },
+                  { label: 'Live Chat', href: '/live-chat' },
+                  { label: 'Link Shortener', href: '/link-shortener' },
+                  { label: 'Feedback Board', href: '/feedback-board' },
+                  { label: 'Newsletter', href: '/newsletter' },
+                  { label: 'Web Analytics', href: '/web-analytics' },
                   { label: 'Title Intelligence', href: '/title-intelligence' },
                   { label: 'Permian Basin AI', href: '/permian' },
                   { label: 'Tax Preparation', href: '/tax-returns' },
@@ -642,7 +782,6 @@ export default function HomePage() {
                   { label: 'Immortality Vault', href: '/immortality-vault' },
                   { label: 'SDK Gateway', href: '/sdk' },
                   { label: 'Bot Factory', href: '/bots' },
-                  { label: 'Business Manager', href: '/business-manager' },
                   { label: 'REVENG Scanner', href: '/scanner' },
                   { label: 'Price Alerts', href: '/price-alerts' },
                   { label: 'Reddit Intel', href: '/reddit' },
@@ -657,8 +796,21 @@ export default function HomePage() {
                   { label: 'Hephaestion Forge', href: '/hephaestion-forge' },
                   { label: 'Website Builder', href: '/websites' },
                   { label: 'Surveillance', href: '/surveillance' },
-                  { label: 'Intel Hub', href: '/intel-hub' },
                   { label: 'Store', href: '/ecommerce' },
+                  { label: 'Proposals', href: '/proposals' },
+                  { label: 'Affiliate', href: '/affiliate' },
+                  { label: 'Signatures', href: '/signatures' },
+                  { label: 'QR Menu', href: '/qr-menu' },
+                  { label: 'Podcast', href: '/podcast' },
+                  { label: 'Payroll', href: '/payroll' },
+                  { label: 'Calendar', href: '/calendar' },
+                  { label: 'Compliance', href: '/compliance' },
+                  { label: 'Recruiting', href: '/recruiting' },
+                  { label: 'Timesheet', href: '/timesheet' },
+                  { label: 'Feature Flags', href: '/feature-flags' },
+                  { label: 'Expense Management', href: '/expense-management' },
+                  { label: 'OKR', href: '/okr' },
+                  { label: 'Subscription', href: '/subscription' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}

@@ -1,4 +1,5 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -6,6 +7,7 @@ import { useState } from 'react';
 import { useTheme } from '../../lib/theme-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import FaqSchema from '../../components/FaqSchema';
 
 /* ── Scraper Categories ── */
 
@@ -84,6 +86,15 @@ const SCRAPER_CATEGORIES: ScraperCategory[] = [
   },
 ];
 
+const FAQS = [
+  { q: 'What types of data can your scrapers extract?', a: 'Our scrapers handle structured and unstructured data from virtually any web source — HTML pages, JavaScript-rendered SPAs, REST/GraphQL APIs, PDFs, spreadsheets, and more. We extract text, tables, images, metadata, and nested data structures, then normalize everything into clean JSON, CSV, or database records.' },
+  { q: 'Can you scrape JavaScript-heavy websites and single-page apps?', a: 'Yes. Our scraping stack includes headless browser rendering powered by Cloudflare Browser Rendering and Playwright. This means we fully execute JavaScript, wait for dynamic content to load, handle infinite scroll, and interact with page elements — just like a real user would.' },
+  { q: 'How do you handle rate limiting and anti-bot protections?', a: 'Every scraper includes intelligent rate limiting with configurable delays, automatic retry with exponential backoff, rotating proxy support, and browser fingerprint randomization. We respect robots.txt by default and design scrapers to be polite and resilient, avoiding bans while maintaining high throughput.' },
+  { q: 'What export formats and integrations are supported?', a: 'Scraped data can be exported as JSON, CSV, Parquet, or streamed directly into your database. We support real-time webhooks, REST API access, D1/R2 cloud storage, and direct integrations with tools like Google Sheets, Airtable, PostgreSQL, and custom data pipelines.' },
+  { q: 'Is web scraping legal? How do you ensure compliance?', a: 'Web scraping of publicly available data is generally legal, but compliance depends on the source and jurisdiction. We build scrapers that respect robots.txt, honor Terms of Service where applicable, avoid scraping personal data without consent, and comply with CFAA, GDPR, and CCPA guidelines. We always recommend consulting legal counsel for sensitive use cases.' },
+  { q: 'Can scrapers run on a schedule or be triggered automatically?', a: 'Absolutely. All scrapers deploy on Cloudflare Workers with built-in cron triggers for scheduled runs — hourly, daily, weekly, or custom intervals. You can also trigger scrapes on-demand via API call or webhook, and chain multiple scrapers together in automated data pipelines.' },
+];
+
 const PRICING_TIERS = [
   { tier: 'Starter', price: 399, interval: 'one-time', features: ['1 scraper, 1 source', 'Basic scheduling (cron)', 'CSV/JSON export', 'Cloudflare Workers hosting', '30 days support'], popular: false },
   { tier: 'Professional', price: 1299, interval: 'one-time', features: ['1 scraper, multi-source', 'Anti-detection suite', 'D1 database + R2 storage', 'Real-time webhooks', 'Analytics dashboard', '90 days support'], popular: true },
@@ -97,6 +108,8 @@ export default function ScrapersPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Scrapers', href: '/scrapers' }]} />
+      <FaqSchema faqs={FAQS} />
       <ProductTutorialButton tutorialId="scrapers" productName="Custom Scrapers" />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
@@ -293,6 +306,19 @@ export default function ScrapersPage() {
           placeholder="Ask about web scraping, data extraction..."
           exampleQueries={['How to bypass Cloudflare protection ethically', 'Best headless browser for scraping', 'Handling dynamic JavaScript content']}
         />
+      </section>
+
+      {/* FAQ */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );

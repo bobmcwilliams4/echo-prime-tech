@@ -9,6 +9,8 @@ import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import { startAsyncInvestigation, getJobProgress, type AsyncJobProgress, type PipelineResult } from '../../lib/landman-api';
 import TitleChainReport from '../../components/TitleChainReport';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 // ════════════════════════════════════════════════════════════════
 // ECHO PRIME TECHNOLOGIES — Title Intelligence Product Page
@@ -135,6 +137,33 @@ const WORKFLOW_STEPS = [
   { step: 4, title: 'Gap Analysis', desc: 'AI identifies breaks: missing probates, unrecorded transfers, overconveyances, and orphan instruments. Each gap gets a severity score and curative recommendation.' },
   { step: 5, title: 'Live Portal Search', desc: 'For unfilled gaps, the system scrapes live county portals in real-time — GovOS, Tyler Technologies, TexasFile — searching by name, date, and instrument type.' },
   { step: 6, title: 'Report Generation', desc: 'Gold-standard HTML and DOCX reports with ownership tables, family trees, timeline visualization, instrument index, confidence scores, and legal theory analysis.' },
+];
+
+const FAQS = [
+  {
+    q: 'How does AI chain of title analysis work?',
+    a: 'Our system ingests raw courthouse records — deeds, leases, probates, liens — and uses a knowledge graph to link grantor-grantee relationships from sovereignty to present. AI classifies 59 instrument types, resolves name variations, tracks mineral/surface splits, and calculates fractional interests using exact rational arithmetic. The result is a gap-free chain with confidence scores on every link.',
+  },
+  {
+    q: 'Which Texas counties are covered?',
+    a: 'We currently cover 98 Texas counties through direct connections to GovOS, Tyler Technologies, TexasFile, and Odyssey courthouse portals. Coverage is strongest in the Permian Basin (Reeves, Loving, Ward, Winkler, Pecos, Crane, Upton, Midland, Ector, Andrews) and extends across all major oil and gas producing regions. New counties are added regularly.',
+  },
+  {
+    q: 'What is included in a run sheet report?',
+    a: 'Each run sheet includes a complete ownership table with current NMA/NRI calculations, a chronological instrument index with book/page references, a family tree for probate tracts, timeline visualization, gap analysis with curative recommendations, and legal theory notes. Reports are delivered in both interactive HTML and downloadable DOCX formats.',
+  },
+  {
+    q: 'How does gap detection work?',
+    a: 'The AI compares every link in the chain against expected conveyance patterns. It flags missing probates, unrecorded transfers, overconveyances (where granted interests exceed 8/8ths), orphan instruments with no chain connection, and recording gaps longer than statutory thresholds. Each gap receives a severity score — critical, moderate, or minor — along with a specific curative recommendation.',
+  },
+  {
+    q: 'What is the typical turnaround time?',
+    a: 'A standard single-tract title search completes in 2 to 8 hours depending on chain complexity and county portal response times. Simple chains with clean conveyance history finish in under 3 hours. Multi-generation probate tracts with heirship issues may take up to 8 hours. Batch jobs of 100+ titles are processed in parallel with results delivered within 24 to 48 hours.',
+  },
+  {
+    q: 'Can I integrate Title Intelligence into my existing landman workflow?',
+    a: 'Yes. The Professional and Enterprise plans include full API access so you can trigger title searches programmatically from your existing project management or GIS tools. The API accepts legal descriptions, county/section/block identifiers, or party names and returns structured JSON with the complete chain, ownership tables, and gap analysis. We also support webhook callbacks for async pipeline completion.',
+  },
 ];
 
 interface DeedRecord {
@@ -286,6 +315,8 @@ export default function TitleIntelligencePage() {
 
   return (
     <div data-tutorial="title-hero" className="min-h-screen transition-colors duration-500" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Industry Solutions',href:'/services'},{name:'Title Intelligence',href:'/title-intelligence'}]} />
       {/* ─── Nav ─── */}
       <nav className="fixed top-0 w-full z-50 backdrop-blur-2xl border-b transition-colors duration-500" style={{ backgroundColor: 'var(--ept-nav-bg)', borderColor: 'var(--ept-border)' }}>
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -813,6 +844,19 @@ export default function TitleIntelligencePage() {
           exampleQueries={['How to calculate net mineral acres', 'Texas intestate succession for mineral rights', 'What is a division order?']}
         />
       </section>
+        {/* ─── FAQ ─── */}
+        <section className="py-16 px-6 max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+          <div className="space-y-6">
+            {FAQS.map(faq => (
+              <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+                <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <footer className="max-w-5xl mx-auto px-6 mt-20 pt-8 border-t text-center" style={{ borderColor: 'var(--ept-border)' }}>
           <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
             © {new Date().getFullYear()} Echo Prime Technologies. All rights reserved. Title Intelligence is for informational purposes and does not constitute a legal opinion.

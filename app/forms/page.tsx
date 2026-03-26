@@ -1,4 +1,6 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -34,11 +36,22 @@ const COMPARISON = [
   { feature: 'API Access', typeform: '$59+/mo', google: 'Free', echo: 'All plans' },
 ];
 
+const FAQS = [
+  { q: 'Can I build forms without coding?', a: 'Yes. Echo Forms has a visual builder with drag-and-drop field types: text, number, email, phone, dropdown, checkbox, radio, file upload, date picker, and rich text. Conditional logic lets you show/hide fields based on previous answers.' },
+  { q: 'How do I collect payments with forms?', a: 'Add a payment field connected to Stripe or PayPal. Customers pay when they submit the form. Works for event registrations, service bookings, donations, or any form that requires payment.' },
+  { q: 'Can forms trigger automations?', a: 'Yes. Every submission can trigger webhooks, email notifications, CRM record creation, Slack messages, or any API call. Use our built-in automation rules or connect via Zapier-compatible webhooks.' },
+  { q: 'Is there conditional logic?', a: 'Full conditional logic with AND/OR rules. Show or hide fields, skip to specific sections, or branch into different paths based on any combination of field values. No coding required.' },
+  { q: 'How secure are form submissions?', a: 'All data is encrypted in transit (TLS 1.3) and at rest (Cloudflare D1 encryption). GDPR-compliant data handling with configurable retention policies. CAPTCHA protection against spam submissions.' },
+  { q: 'Can I embed forms on my website?', a: 'Yes. Every form gets an embed code (iframe or JavaScript snippet) that works on any website. Forms inherit your site\'s styling via CSS customization. Or use the API to build fully custom form UIs.' },
+];
+
 export default function FormsPage() {
   const { isDark } = useTheme();
 
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/products' }, { name: 'Forms', href: '/forms' }]} />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/" className="flex items-center gap-3">
@@ -65,7 +78,7 @@ export default function FormsPage() {
           all for a fraction of what Typeform charges.
         </p>
         <div className="flex items-center justify-center gap-4 flex-wrap">
-          <Link href="/signup" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free</Link>
+          <Link href="/checkout?service=forms&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free</Link>
           <Link href="/pricing" className="px-8 py-3 rounded-xl border font-semibold text-lg" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>View Pricing</Link>
         </div>
       </section>
@@ -143,7 +156,20 @@ export default function FormsPage() {
               <ul className="space-y-2 mb-6">
                 {p.features.map((f) => <li key={f} className="text-sm flex items-start gap-2" style={{ color: 'var(--ept-text-secondary)' }}><span style={{ color: 'var(--ept-accent)' }}>&#10003;</span>{f}</li>)}
               </ul>
-              <Link href="/signup" className="block text-center px-4 py-2 rounded-lg font-semibold text-sm" style={{ backgroundColor: p.popular ? 'var(--ept-accent)' : 'var(--ept-surface)', color: p.popular ? '#fff' : 'var(--ept-text)' }}>Get Started</Link>
+              <Link href={`/checkout?service=forms&tier=${p.name.toLowerCase()}`} className="block text-center px-4 py-2 rounded-lg font-semibold text-sm" style={{ backgroundColor: p.popular ? 'var(--ept-accent)' : 'var(--ept-surface)', color: p.popular ? '#fff' : 'var(--ept-text)' }}>Get Started</Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQs */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
             </div>
           ))}
         </div>
@@ -156,7 +182,7 @@ export default function FormsPage() {
           Get AI-powered form building, response analysis, quiz scoring, and real-time analytics
           at a fraction of the cost. Deploy in minutes on Cloudflare&apos;s global edge network.
         </p>
-        <Link href="/signup" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Building Forms Free</Link>
+        <Link href="/checkout?service=forms&tier=starter" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Building Forms Free</Link>
       </section>
     </div>
   );

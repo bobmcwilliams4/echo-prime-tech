@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../../../lib/auth-context';
 import { useTheme } from '../../../lib/theme-context';
+import FaqSchema from '../../../components/FaqSchema';
 import { SDK_TIERS } from '../../../lib/sdk-api';
+import BreadcrumbSchema from '../../../components/BreadcrumbSchema';
 
 const ANNUAL_DISCOUNT = 0.20;
 
@@ -81,6 +83,8 @@ export default function SDKPricingPage() {
 
   return (
     <div style={{ color: 'var(--ept-text)' }}>
+      <FaqSchema faqs={FAQ} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'SDK', href: '/sdk' }, { name: 'Pricing', href: '/sdk/pricing' }]} />
       {/* Header */}
       <section style={{ maxWidth: 800, margin: '0 auto', padding: '64px 24px 32px', textAlign: 'center' }}>
         <h1 style={{ fontSize: 40, fontWeight: 800, marginBottom: 12 }}>SDK Pricing</h1>

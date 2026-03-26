@@ -1,8 +1,10 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import FaqSchema from '../../components/FaqSchema';
 
 const NAV_ITEMS = [
   { label: 'Engines', href: '/engines' },
@@ -105,6 +107,8 @@ export default function HephaestionForgePage() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Hephaestion Forge', href: '/hephaestion-forge' }]} />
+      <FaqSchema faqs={FAQS} />
 
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between sticky top-0 z-50"
@@ -124,7 +128,7 @@ export default function HephaestionForgePage() {
         <div className="flex items-center gap-3">
           <Link href="/login" className="px-4 py-2 rounded-lg text-sm font-semibold"
             style={{ color: 'var(--ept-text-secondary)' }}>Sign In</Link>
-          <Link href="/signup" className="px-4 py-2 rounded-lg text-sm font-semibold"
+          <Link href="/checkout?service=hephaestion-forge&tier=starter" className="px-4 py-2 rounded-lg text-sm font-semibold"
             style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started</Link>
         </div>
       </nav>
@@ -145,7 +149,7 @@ export default function HephaestionForgePage() {
           through a 13-stage AI pipeline with 6 quality gates.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/signup" className="px-8 py-3 rounded-xl font-semibold text-white text-center"
+          <Link href="/checkout?service=hephaestion-forge&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-white text-center"
             style={{ backgroundColor: 'var(--ept-accent)' }}>
             Start Building Free
           </Link>
@@ -264,7 +268,7 @@ export default function HephaestionForgePage() {
                   </li>
                 ))}
               </ul>
-              <Link href={plan.tier === 'Custom' ? '/support' : '/signup'}
+              <Link href={plan.tier === 'Custom' ? '/support' : `/checkout?service=hephaestion-forge&tier=${plan.tier.toLowerCase()}`}
                 className="w-full py-2.5 rounded-lg font-semibold text-center text-sm block"
                 style={{
                   backgroundColor: plan.popular ? 'var(--ept-accent)' : 'var(--ept-surface)',
@@ -317,7 +321,7 @@ export default function HephaestionForgePage() {
           Join teams using Hephaestion Forge to go from idea to deployed application in hours, not weeks.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/signup" className="px-8 py-3 rounded-xl font-semibold text-white"
+          <Link href="/checkout?service=hephaestion-forge&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-white"
             style={{ backgroundColor: 'var(--ept-accent)' }}>
             Start Building Free
           </Link>

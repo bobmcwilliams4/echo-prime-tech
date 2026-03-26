@@ -1,4 +1,6 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -54,6 +56,8 @@ export default function EmailSenderPage() {
 
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/products' }, { name: 'Email Sender', href: '/email-sender' }]} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/" className="flex items-center gap-3">
           <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={32} height={32} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} />
@@ -74,8 +78,8 @@ export default function EmailSenderPage() {
           Reliable delivery at a fraction of the cost.
         </p>
         <div className="flex gap-4 justify-center">
-          <Link href="/signup" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
-          <Link href="/pricing" className="px-8 py-3 rounded-xl font-semibold text-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>See Pricing</Link>
+          <Link href="/checkout?service=email-sender&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
+          <Link href="#pricing" className="px-8 py-3 rounded-xl font-semibold text-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>See Pricing</Link>
         </div>
       </section>
 
@@ -135,7 +139,7 @@ export default function EmailSenderPage() {
       </section>
 
       {/* Pricing */}
-      <section className="max-w-5xl mx-auto px-6 pb-20">
+      <section id="pricing" className="max-w-5xl mx-auto px-6 pb-20">
         <h2 className="text-3xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Simple Pricing</h2>
         <p className="text-center mb-10" style={{ color: 'var(--ept-text-secondary)' }}>Pay for what you send. No hidden fees.</p>
         <div className="grid md:grid-cols-3 gap-6">
@@ -153,7 +157,7 @@ export default function EmailSenderPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/signup" className="block text-center px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: i === 1 ? 'var(--ept-accent)' : 'var(--ept-surface)', color: i === 1 ? '#fff' : 'var(--ept-text)' }}>
+              <Link href={`/checkout?service=email-sender&tier=${p.name.toLowerCase()}`} className="block text-center px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: i === 1 ? 'var(--ept-accent)' : 'var(--ept-surface)', color: i === 1 ? '#fff' : 'var(--ept-text)' }}>
                 {i === 0 ? 'Start Free' : 'Get Started'}
               </Link>
             </div>
@@ -179,7 +183,7 @@ export default function EmailSenderPage() {
         <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
           <h2 className="text-3xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Send Smarter?</h2>
           <p className="mb-6" style={{ color: 'var(--ept-text-secondary)' }}>100 free emails/day for 30 days. No credit card required.</p>
-          <Link href="/signup" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
+          <Link href="/checkout?service=email-sender&tier=starter" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
         </div>
       </section>
 

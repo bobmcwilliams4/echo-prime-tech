@@ -1,4 +1,6 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -154,6 +156,15 @@ const PRICING = [
 /* ================================================================
    PAGE COMPONENT
    ================================================================ */
+const FAQS = [
+  { q: 'How fast do alerts fire after a price condition is met?', a: 'Alerts fire within 2 seconds of the condition being met. Our distributed monitoring infrastructure polls 50+ exchanges and data feeds every second, so you never miss a critical move.' },
+  { q: 'What assets can I monitor?', a: 'Over 10,000 assets including cryptocurrencies (BTC, ETH, altcoins), stocks, commodities, and forex pairs. We aggregate data from Binance, Coinbase, Kraken, NYSE, NASDAQ, CME, and dozens more sources.' },
+  { q: 'What notification channels are supported?', a: 'Alerts are delivered via Telegram, Discord, Slack, SMS (Twilio), email, and custom webhooks. You can configure different channels for different alert priorities and set mute schedules for non-urgent notifications.' },
+  { q: 'How does the AI trend analysis work?', a: 'Workers AI models analyze momentum, market sentiment, on-chain metrics, order book depth, whale wallet movements, and social signals to generate actionable trend scores. Predictive confidence intervals are updated every 15 minutes with backtested accuracy.' },
+  { q: 'Can I connect my exchange accounts for portfolio tracking?', a: 'Yes. Connect multiple exchange accounts via read-only API keys for unified portfolio monitoring. We support real-time P&L, cost basis tracking (FIFO/LIFO/HIFO), tax lot identification, and automatic detection of deposits, withdrawals, and staking rewards.' },
+  { q: 'Is the free plan really free forever?', a: 'Yes. The free tier includes 3 active alerts, daily price summaries, email notifications, and 7-day historical data with no time limit. Upgrade to Pro anytime for unlimited alerts, real-time notifications, and AI analysis.' },
+];
+
 export default function PriceAlertsPage() {
   const { user } = useAuth();
   const { isDark } = useTheme();
@@ -174,6 +185,8 @@ export default function PriceAlertsPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/products' }, { name: 'Price Alerts', href: '/price-alerts' }]} />
       {/* --- Nav --- */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">
@@ -362,6 +375,19 @@ export default function PriceAlertsPage() {
               <p className="text-sm mb-3" style={{ color: 'var(--ept-text-muted)' }}>{svc.desc}</p>
               <span className="text-xs font-semibold" style={{ color: 'var(--ept-accent)' }}>{svc.price} &rarr;</span>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* --- FAQ --- */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
           ))}
         </div>
       </section>

@@ -9,6 +9,8 @@ import { QRCodeSVG } from 'qrcode.react'
 import { createPaymentLink } from '../../lib/paypal-api'
 import ProductTutorialButton from '../../components/product-tutorial-button'
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 /* ─── Payment Link Generator ─────────────────────────────────────────────── */
 
@@ -46,6 +48,7 @@ function PaymentLinkGenerator() {
 
   return (
     <div className="p-8 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Payments', href: '/payments' }]} />
       <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>
         Payment Link Generator
       </h3>
@@ -222,6 +225,17 @@ function QuickPayLinks() {
   )
 }
 
+/* ─── FAQs ───────────────────────────────────────────────────────────────── */
+
+const FAQS = [
+  { q: 'Which payment processors do you support?', a: 'Echo Payments integrates with Stripe, PayPal, Square, and direct ACH/wire transfers. Add multiple processors per account and route payments based on amount, currency, or customer location.' },
+  { q: 'How does subscription billing work?', a: 'Create subscription plans with any billing cycle (weekly, monthly, annual, custom). Automatic invoice generation, failed payment retry logic, grace periods, and proration on plan changes. Dunning management recovers 15-25% of failed payments.' },
+  { q: 'What currencies are supported?', a: 'Over 135 currencies. Multi-currency invoicing with automatic exchange rate conversion. Customers pay in their local currency while you receive settlement in USD, EUR, or GBP.' },
+  { q: 'Is it PCI compliant?', a: 'Yes. Echo Payments never touches raw card numbers. All payment processing goes through PCI-DSS Level 1 certified processors (Stripe, PayPal). We store only tokenized references. Your PCI scope stays minimal.' },
+  { q: 'Can I create custom checkout pages?', a: 'Yes. Embeddable payment forms with your branding, hosted checkout pages, and payment link generation. All work on mobile. No coding required for basic checkout — full API available for custom integrations.' },
+  { q: 'What reporting is available?', a: 'Real-time revenue dashboards with MRR, ARR, churn rate, ARPU, and LTV. Transaction search with filters. Exportable to CSV. Automated daily/weekly revenue summary emails.' },
+];
+
 /* ─── Main Page ──────────────────────────────────────────────────────────── */
 
 export default function PaymentsPage() {
@@ -362,6 +376,7 @@ export default function PaymentsPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <FaqSchema faqs={FAQS} />
       <ProductTutorialButton tutorialId="payments" productName="Payment Processing" />
       {/* Navigation */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
@@ -385,7 +400,7 @@ export default function PaymentsPage() {
               Dashboard
             </Link>
           ) : (
-            <Link href="/signup" className="px-6 py-3 rounded-xl font-semibold text-sm" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+            <Link href="/checkout?service=payments&tier=starter" className="px-6 py-3 rounded-xl font-semibold text-sm" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
               Get Started
             </Link>
           )}
@@ -619,6 +634,20 @@ export default function PaymentsPage() {
           exampleQueries={['PCI DSS compliance requirements', 'Stripe vs PayPal fee comparison', 'How to handle payment disputes']}
         />
       </section>
+
+      {/* FAQs */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <footer className="border-t px-6 py-12 text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p style={{ color: 'var(--ept-text-muted)' }}>
           © 2026 Echo Prime Technologies. All rights reserved.

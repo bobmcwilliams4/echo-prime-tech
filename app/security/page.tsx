@@ -10,8 +10,19 @@ import ReadAloudButton from '../../components/ReadAloudButton';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import SubscriptionGate from '../../components/SubscriptionGate';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 const SERVICE_ID = 'cyber-defense';
+
+const FAQS = [
+  { q: 'What types of security assessments do you offer?', a: 'Network penetration testing, web application testing, API security testing, social engineering, wireless security, cloud configuration review, source code review, and red team exercises. Each engagement includes a detailed report with remediation priorities.' },
+  { q: 'Do you work with small businesses?', a: 'Yes. Our starter security audit is designed for businesses with 5-50 employees who need professional-grade security without enterprise budgets. We assess your attack surface, identify critical vulnerabilities, and provide a prioritized remediation plan.' },
+  { q: 'What certifications do your testers hold?', a: 'Our team holds OSCP, OSCE, GPEN, GWAPT, CEH, and CISSP certifications. All testing follows OWASP, NIST, and PTES methodologies. We stay current with the latest CVEs and attack techniques.' },
+  { q: 'How long does a typical engagement take?', a: 'A basic web application test takes 1-2 weeks. A full network penetration test takes 2-4 weeks. Red team exercises run 4-8 weeks. Timelines depend on scope and complexity. We provide a detailed statement of work before starting.' },
+  { q: 'Do you offer ongoing monitoring?', a: 'Yes. After the initial assessment, we offer continuous monitoring packages that include vulnerability scanning, threat intelligence feeds, dark web monitoring for your credentials, and quarterly re-testing of critical assets.' },
+  { q: 'Will testing disrupt our operations?', a: 'We design tests to minimize disruption. Non-destructive techniques are used by default. Denial-of-service testing is only performed in isolated environments with your approval. Testing windows can be scheduled during off-hours.' },
+];
 
 /* ═══════════════════════════════════════════════════════════════
    FEATURE CARDS — 16 deep defensive capabilities
@@ -216,6 +227,8 @@ function SecurityPageContent() {
 
   return (
     <div data-tutorial="security-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Products',href:'/services'},{name:'Cybersecurity',href:'/security'}]} />
       {/* ─── Nav ─── */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority /></Link>
@@ -488,6 +501,38 @@ function SecurityPageContent() {
           ))}
         </div>
       </section>
+
+      {/* ─── FAQ ─── */}
+      <section className="max-w-3xl mx-auto px-6 pb-16">
+        <h2 className="text-2xl font-bold text-center mb-8" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-4">
+          {FAQS.map((faq, i) => (
+            <details key={i} className="group rounded-xl border overflow-hidden" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <summary className="cursor-pointer select-none px-6 py-4 font-semibold flex items-center justify-between" style={{ color: 'var(--ept-text)' }}>
+                {faq.q}
+                <span className="ml-2 transition-transform group-open:rotate-45 text-lg" style={{ color: 'var(--ept-accent)' }}>+</span>
+              </summary>
+              <div className="px-6 pb-4 text-sm leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>{faq.a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Related Articles ─── */}
+      <div className="mt-16 max-w-4xl mx-auto px-6">
+        <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Related Articles</h3>
+        <div className="grid md:grid-cols-2 gap-3">
+          {[
+            { title: 'Zero Trust Security for Small Business', href: '/blog/zero-trust-security-small-business-implementation-2026' },
+            { title: 'Ransomware Incident Response Plan', href: '/blog/ransomware-incident-response-plan-smb-2026' },
+            { title: 'API Security Testing: OWASP Top 10', href: '/blog/api-security-testing-owasp-top-10-automated-scanning-2026' },
+          ].map(a => (
+            <a key={a.href} href={a.href} className="p-4 rounded-lg border text-sm font-medium hover:opacity-80 transition-opacity" style={{ borderColor: 'var(--ept-card-border)', color: 'var(--ept-accent)' }}>
+              {a.title} &rarr;
+            </a>
+          ))}
+        </div>
+      </div>
 
       {/* ─── CTA ─── */}
       <section className="max-w-3xl mx-auto px-6 pb-20 text-center">

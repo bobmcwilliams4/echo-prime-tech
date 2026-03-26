@@ -8,6 +8,17 @@ import Link from 'next/link'
 import ProductTutorialButton from '../../components/product-tutorial-button'
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import { getBotHealth, getRedditStats, type BotHealth, type RedditStats } from '../../lib/bot-status-api'
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+
+const FAQS = [
+  { q: 'How is this different from just reading Reddit manually?', a: 'Echo Reddit Intelligence monitors thousands of posts and comments 24/7 across all your target subreddits simultaneously. Our AI scores sentiment, detects emerging trends, and sends real-time alerts — impossible to replicate manually at any scale.' },
+  { q: 'Can I track competitor mentions on Reddit?', a: 'Yes. Set up keyword alerts for competitor brand names, product names, or any terms. You get instant notifications when they are mentioned, with sentiment scoring so you know if the conversation is positive or negative.' },
+  { q: 'How does the crypto and stock signal detection work?', a: 'We monitor r/wallstreetbets, r/cryptocurrency, r/stocks, and 50+ financial subreddits for volume spikes, sentiment shifts, and pump signals. Our AI correlates Reddit activity with price data to flag potential moves before they hit mainstream.' },
+  { q: 'Is the data available via API?', a: 'Yes. Professional and Enterprise plans include full REST API access with JSON responses, webhook integration for real-time event delivery, and CSV/JSON bulk export for historical data analysis.' },
+  { q: 'How far back does historical data go?', a: 'Starter plans retain 7 days of data. Professional plans retain 90 days. Enterprise plans offer unlimited historical archives with custom retention policies.' },
+  { q: 'Is there a free trial?', a: 'Yes. All plans include a 14-day free trial with no credit card required. Start monitoring subreddits immediately and upgrade only if you see value.' },
+];
 
 export default function RedditPage() {
   const { isDark } = useTheme()
@@ -152,6 +163,8 @@ export default function RedditPage() {
 
   return (
     <div data-tutorial="reddit-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Reddit Bot', href: '/reddit' }]} />
+      <FaqSchema faqs={FAQS} />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/" className="flex items-center gap-3">
@@ -173,7 +186,7 @@ export default function RedditPage() {
           ) : (
             <>
               <Link href="/login" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Login</Link>
-              <Link href="/signup" className="px-4 py-2 rounded-lg font-semibold text-sm" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+              <Link href="/checkout?service=reddit&tier=starter" className="px-4 py-2 rounded-lg font-semibold text-sm" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
                 Sign Up
               </Link>
             </>
@@ -380,6 +393,18 @@ export default function RedditPage() {
           placeholder="Ask about Reddit marketing, sentiment analysis..."
           exampleQueries={['Reddit API rate limits and best practices', 'How to analyze subreddit sentiment', 'Content marketing strategies for Reddit']}
         />
+      </section>
+
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   )

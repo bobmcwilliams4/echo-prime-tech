@@ -23,6 +23,7 @@ import {
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import SubscriptionGate from '../../components/SubscriptionGate';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 // ===============================================================
 // TYPES
@@ -483,6 +484,7 @@ function TaxReturnPageContent() {
 
   return (
     <div data-tutorial="tax-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Products',href:'/services'},{name:'Tax Intelligence',href:'/tax-returns'}]} />
       {/* NAV */}
       <nav className="sticky top-0 z-50 border-b px-6 py-3 flex items-center justify-between backdrop-blur-xl" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-nav-bg)' }}>
         <div className="flex items-center gap-6">
@@ -1990,6 +1992,42 @@ function TaxReturnPageContent() {
             <h3 className="text-base font-bold mt-2 mb-2" style={{ color: 'var(--ept-text)' }}>AI Compliance Automation for Enterprise</h3>
             <p className="text-xs" style={{ color: 'var(--ept-text-secondary)' }}>Automating regulatory compliance with doctrine-backed AI intelligence.</p>
           </Link>
+        </div>
+      </section>
+
+      {/* ── Related Articles ── */}
+      <div className="mt-4 max-w-4xl mx-auto px-6">
+        <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Related Articles</h3>
+        <div className="grid md:grid-cols-2 gap-3">
+          {[
+            { title: 'IRS Audit Defense with AI', href: '/blog/irs-audit-defense-ai-documentation-guide-2026' },
+            { title: 'LLC vs S-Corp vs C-Corp', href: '/blog/business-entity-selection-tax-optimization-llc-scorp-2026' },
+            { title: 'R&D Tax Credit for Software Companies', href: '/blog/r-and-d-tax-credit-software-companies-startups-2026' },
+          ].map(a => (
+            <a key={a.href} href={a.href} className="p-4 rounded-lg border text-sm font-medium hover:opacity-80 transition-opacity" style={{ borderColor: 'var(--ept-card-border)', color: 'var(--ept-accent)' }}>
+              {a.title} &rarr;
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* FAQ */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {[
+            { q: 'How does AI tax preparation actually work?', a: 'You upload your tax documents (W-2s, 1099s, receipts) and our system extracts all data automatically using OCR and AI classification. 14 specialized Tax Intelligence Engines then analyze your situation against the full Internal Revenue Code, identifying every applicable deduction, credit, and optimization strategy before generating your complete return.' },
+            { q: 'Is my tax data secure?', a: 'All tax documents and personal data are encrypted with AES-256-GCM at rest and in transit. We follow IRS Publication 4557 security standards for tax preparers. Your data is never used for AI training, never shared with third parties, and you can request full deletion at any time.' },
+            { q: 'What types of tax returns do you support?', a: 'We handle individual returns (1040), self-employment (Schedule C/SE), rental income (Schedule E), investment income (Schedule D), and multi-state filings. Support for partnership (1065) and S-Corp (1120-S) returns is available on Business and Enterprise plans.' },
+            { q: 'How much can the AI save me compared to doing taxes myself?', a: 'Our 14 TX Engines scan the entire IRC code for deductions and credits most people miss. On average, AI-optimized returns identify 15-30% more deductions than self-prepared returns. The what-if scenario tool lets you compare filing strategies side by side so you can see exactly how much each optimization saves.' },
+            { q: 'Who reviews my return before filing?', a: 'Every return goes through a multi-stage review: AI validation checks for mathematical accuracy and completeness, the audit risk engine flags potential issues, and a licensed tax preparer performs final review. You receive a detailed return health score and can ask questions before authorizing submission.' },
+            { q: 'What if I get audited?', a: 'Every answer and recommendation our engines produce includes full IRC authority citations and confidence scoring. If the IRS questions any position on your return, we provide complete documentation of the legal basis for each line item. Business and Enterprise plans include audit defense support with doctrine-backed response preparation.' },
+          ].map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
         </div>
       </section>
 

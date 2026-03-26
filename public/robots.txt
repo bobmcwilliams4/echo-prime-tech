@@ -41,10 +41,6 @@ Allow: /
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /vault
-Disallow: /closer/calls
-Disallow: /closer/leads
-Disallow: /closer/analytics
-Disallow: /closer/settings
 Disallow: /checkout
 Disallow: /login
 Disallow: /signup
@@ -53,5 +49,17 @@ Disallow: /coming-soon
 Disallow: /settings
 Disallow: /command-center
 Disallow: /commander
+Disallow: /closer/calls
+Disallow: /closer/leads
+Disallow: /closer/analytics
+Disallow: /closer/settings
+Disallow: /closer/scripts
+Disallow: /closer/email
+Disallow: /closer/campaigns
+Disallow: /closer/appointments
+Disallow: /office-ai/dashboard
+Disallow: /office-ai/settings
+Disallow: /sdk/signup
+Disallow: /immortality-vault/app
 
 Sitemap: https://echo-ept.com/sitemap.xml

@@ -1,4 +1,6 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import FaqSchema from '../../components/FaqSchema';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -44,6 +46,8 @@ export default function SupportPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Support', href: '/support' }]} />
+      <FaqSchema faqs={FAQ} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority /></Link>
         <Link href="/pricing" className="text-sm font-semibold px-5 py-2 rounded-xl transition-all hover:opacity-90" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>View Pricing</Link>

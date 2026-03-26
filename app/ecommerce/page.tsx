@@ -1,4 +1,5 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
@@ -8,6 +9,7 @@ import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import FaqSchema from '../../components/FaqSchema';
 
 // ═══════════════════════════════════════════════════════════════
 // SERVICE CATALOG — Mirrors ept-api SERVICES with ecommerce metadata
@@ -352,6 +354,7 @@ function ProductCard({ service, onBuy, onViewDetails }: { service: EcomService; 
       className="rounded-2xl border overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col"
       style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}
     >
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'E-Commerce', href: '/ecommerce' }]} />
       {/* Badge */}
       {service.badge && (
         <div className="px-3 py-1 text-xs font-bold text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>
@@ -463,6 +466,15 @@ function ProductCard({ service, onBuy, onViewDetails }: { service: EcomService; 
   );
 }
 
+const FAQS = [
+  { q: 'Can I migrate from Shopify?', a: 'Yes. Export your Shopify products as CSV and use our bulk import endpoint. Products, variants, images, and categories transfer in minutes. Customer data and order history can be imported via API.' },
+  { q: 'How does AI product description generation work?', a: 'Provide a product name and basic details, and AI generates SEO-optimized descriptions, bullet points, and meta tags. Customize tone (professional, casual, luxury) and length. Generate descriptions in 20+ languages.' },
+  { q: 'What payment methods are supported?', a: 'Stripe, PayPal, and direct bank transfer out of the box. Support for Apple Pay, Google Pay, and Buy Now Pay Later via Stripe integration. Multi-currency with automatic conversion.' },
+  { q: 'Is there inventory management?', a: 'Yes. Real-time stock tracking, low-stock alerts, variant-level inventory (size, color, etc.), and backorder support. Integrates with Echo Inventory for multi-warehouse management.' },
+  { q: 'Can I sell digital products?', a: 'Yes. Upload digital files (PDFs, software, courses) with secure download links that expire after a configurable number of downloads or time period. License key generation available.' },
+  { q: 'How does the storefront work?', a: 'API-first headless commerce — use our embeddable widgets for a no-code storefront, or build a fully custom frontend with our REST API. SEO-optimized product pages with schema markup included.' },
+];
+
 // ═══════════════════════════════════════════════════════════════
 // MAIN PAGE
 // ═══════════════════════════════════════════════════════════════
@@ -547,6 +559,7 @@ export default function EcommercePage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <FaqSchema faqs={FAQS} />
       {/* Nav Bar */}
       <nav className="border-b px-6 py-4 flex items-center justify-between sticky top-0 z-50" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <div className="flex items-center gap-4">
@@ -725,6 +738,20 @@ export default function EcommercePage() {
           exampleQueries={['Best practices for subscription billing', 'How to reduce cart abandonment', 'Payment processor fee comparison']}
         />
       </section>
+
+      {/* FAQs */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <footer className="px-6 py-8 border-t text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>
           &copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved. |{' '}

@@ -1,4 +1,6 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import FaqSchema from '../../components/FaqSchema';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -9,6 +11,15 @@ import { useTheme } from '../../lib/theme-context';
 import { getServices, Service } from '../../lib/ept-api';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+
+const FAQS = [
+  { q: 'How do I activate a service after signing up?', a: 'Simply select the services you want from the grid above and click Continue to Checkout. Once payment is confirmed, your service is live immediately — no setup delay, no manual provisioning.' },
+  { q: 'Can I add or remove services later?', a: 'Yes. You can change your active services anytime from your dashboard. Adding a service routes you through checkout; removing one takes effect at the end of your current billing cycle.' },
+  { q: 'Do services integrate with each other?', a: 'Absolutely. Our services are built on a unified platform. Data flows between Intelligence Engines, Title Intelligence, AI Closer, Sentinel, and every other product automatically. The more services you activate, the smarter your stack becomes.' },
+  { q: 'Is there a discount for bundling multiple services?', a: 'Yes. Contact us for custom enterprise bundle pricing when you need 3 or more services. Bundle discounts can save 15-30% compared to individual subscriptions.' },
+  { q: 'What kind of support do I get?', a: 'All plans include email support with 24-hour response times. Growth and Enterprise tiers include priority support with 2-hour response. Enterprise clients get a dedicated account manager.' },
+  { q: 'Can I try a service before committing?', a: 'Many services offer free tiers or 14-day trials. Sentinel AI, Price Alerts, and the Gamer Companion all have free plans so you can experience the platform before upgrading.' },
+];
 
 export default function ServicesPage() {
   const router = useRouter();
@@ -55,6 +66,8 @@ export default function ServicesPage() {
 
   if (loading || !user) return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Services', href: '/services' }]} />
+      <FaqSchema faqs={FAQS} />
       <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'var(--ept-accent)', borderTopColor: 'transparent' }} />
     </div>
   );
@@ -127,6 +140,18 @@ export default function ServicesPage() {
           placeholder="Ask about consulting, project management..."
           exampleQueries={['How to scope a software consulting engagement', 'Best practices for SOW writing', 'Project estimation techniques']}
         />
+      </section>
+
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );

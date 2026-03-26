@@ -23,6 +23,23 @@ export default function NotFound() {
           </svg>
           Back to Home
         </Link>
+        <div className="mt-10 pt-8" style={{ borderTop: '1px solid var(--ept-border)' }}>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'var(--ept-text-muted)' }}>Popular Pages</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {[
+              { label: 'Engines', href: '/engines' },
+              { label: 'Pricing', href: '/pricing' },
+              { label: 'Blog', href: '/blog' },
+              { label: 'SDK', href: '/sdk' },
+              { label: 'Sentinel AI', href: '/sentinel' },
+              { label: 'Security', href: '/security' },
+            ].map(l => (
+              <Link key={l.href} href={l.href} className="text-xs px-3 py-1.5 rounded-full border transition-opacity hover:opacity-80" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-accent)' }}>
+                {l.label}
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

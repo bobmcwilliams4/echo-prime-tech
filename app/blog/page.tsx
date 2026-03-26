@@ -1,4 +1,5 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
@@ -30,6 +31,7 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Blog', href: '/blog' }]} />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">

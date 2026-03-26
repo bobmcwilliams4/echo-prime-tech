@@ -1,4 +1,6 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -52,6 +54,8 @@ export default function HelpdeskPage() {
 
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/products' }, { name: 'Helpdesk', href: '/helpdesk' }]} />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/" className="flex items-center gap-3">
@@ -75,7 +79,7 @@ export default function HelpdeskPage() {
           Replace Zendesk at a fraction of the cost.
         </p>
         <div className="flex gap-4 justify-center">
-          <Link href="/signup" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
+          <Link href="/checkout?service=helpdesk&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
           <Link href="/pricing" className="px-8 py-3 rounded-xl font-semibold text-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>See Pricing</Link>
         </div>
       </section>
@@ -156,7 +160,7 @@ export default function HelpdeskPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/signup" className="block text-center px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: i === 1 ? 'var(--ept-accent)' : 'var(--ept-surface)', color: i === 1 ? '#fff' : 'var(--ept-text)' }}>
+              <Link href={`/checkout?service=helpdesk&tier=${p.name.toLowerCase()}`} className="block text-center px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: i === 1 ? 'var(--ept-accent)' : 'var(--ept-surface)', color: i === 1 ? '#fff' : 'var(--ept-text)' }}>
                 {i === 0 ? 'Start Free' : 'Get Started'}
               </Link>
             </div>
@@ -185,7 +189,7 @@ export default function HelpdeskPage() {
         <div className="p-10 rounded-2xl" style={{ backgroundColor: 'var(--ept-card-bg)', border: `1px solid var(--ept-card-border)` }}>
           <h2 className="text-2xl md:text-3xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Transform Your Support?</h2>
           <p className="mb-6" style={{ color: 'var(--ept-text-secondary)' }}>Join hundreds of businesses using Echo Helpdesk to deliver faster, smarter customer support.</p>
-          <Link href="/signup" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
+          <Link href="/checkout?service=helpdesk&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
         </div>
       </section>
     </div>

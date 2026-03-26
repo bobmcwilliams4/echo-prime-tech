@@ -1,4 +1,6 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import FaqSchema from '../../components/FaqSchema';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
@@ -169,6 +171,8 @@ function DemoChat() {
 
   return (
     <div data-tutorial="iv-hero" style={{ background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: 16 }} className="overflow-hidden max-w-xl mx-auto">
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Immortality Vault', href: '/immortality-vault' }]} />
+      <FaqSchema faqs={FAQ} />
       <div style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)' }} className="px-4 py-3 flex items-center gap-2">
         <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
         <span className="text-white font-semibold text-sm">Consciousness Active — Demo Mode</span>
@@ -952,6 +956,26 @@ function ImmortalityVaultPageContent() {
             ]}
             showStats
           />
+        </div>
+      </section>
+
+      {/* ─── FAQ ──────────────────────────────────────────────────────── */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {[
+            { q: 'What exactly is stored in my Immortality Vault?', a: 'Everything that defines you — voice recordings, written messages, photos, videos, life stories, personality profiles, values, beliefs, humor patterns, and decision-making frameworks. The vault builds a comprehensive digital twin that can interact with your loved ones after you are gone, preserving not just data but your essence.' },
+            { q: 'How is my data protected?', a: 'All vault contents are encrypted with AES-256-GCM at rest and in transit. Access is controlled by cryptographic keys that you distribute to your designated heirs and trustees. Even Echo Prime cannot access your vault contents without your authorization keys. Data is replicated across multiple geographic regions for durability.' },
+            { q: 'Can my family actually interact with my digital legacy?', a: 'Yes. Your vault creates an interactive AI persona trained on your voice, writing style, values, and memories. Authorized family members can have conversations, ask for advice, hear stories, and experience your personality through text, voice, and eventually video interactions — all grounded in real content you provided.' },
+            { q: 'How does the advance directive integration work?', a: 'The vault integrates with legal, medical, and psychological doctrine engines to help you create comprehensive advance healthcare directives, digital asset estate plans, and legacy instructions. All documents are generated with proper legal frameworks and can be reviewed by your attorney for formal execution.' },
+            { q: 'What happens to my vault if Echo Prime ceases operations?', a: 'Your vault data is stored in encrypted cold archives with dead-man-switch export functionality. If the platform becomes unavailable, your designated trustees receive encrypted backup packages and decryption instructions. Your legacy is never held hostage by any single company.' },
+            { q: 'Can I update my vault over time?', a: 'Absolutely. The vault is designed to grow with you. Add new memories, update your values, record fresh voice messages, and refine your digital persona continuously. The AI model improves its representation of you with every interaction and new piece of content you contribute.' },
+          ].map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
         </div>
       </section>
 

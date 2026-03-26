@@ -1,4 +1,5 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
@@ -262,6 +263,7 @@ export default function ShepherdPage() {
 
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <FaqSchema faqs={FAQ} />
 
       {/* ── Nav Bar ── */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>

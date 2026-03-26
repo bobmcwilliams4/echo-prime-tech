@@ -1,9 +1,11 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import FaqSchema from '../../components/FaqSchema';
 
 /* ==============================================================================
    DAEDALUS FORGE — AI Manufacturing Intelligence
@@ -83,6 +85,8 @@ export default function DaedalusForgePage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Daedalus Forge', href: '/daedalus-forge' }]} />
+      <FaqSchema faqs={FAQS} />
 
       {/* ── Nav ── */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>

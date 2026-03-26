@@ -8,6 +8,8 @@ import { useAuth } from '../../lib/auth-context'
 import ProductTutorialButton from '../../components/product-tutorial-button'
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import { getBotHealth, getXBotStats, type BotHealth, type XBotStats } from '../../lib/bot-status-api'
+import FaqSchema from '../../components/FaqSchema'
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 export default function XBotPage() {
   const { isDark } = useTheme()
@@ -146,6 +148,33 @@ export default function XBotPage() {
     }
   ]
 
+  const FAQS = [
+    {
+      q: 'Is Echo X Bot compliant with X/Twitter API terms of service?',
+      a: 'Yes. Echo X Bot uses the official X API v2 with OAuth 2.0 authentication. All posting, engagement, and analytics features operate within X platform rate limits and usage policies. We monitor API policy changes and update our systems accordingly.'
+    },
+    {
+      q: 'How does the AI content generation work?',
+      a: 'Our 14 AI personalities are trained on industry-specific language patterns and brand voice profiles. You configure your niche, tone, and content categories, then the AI generates original posts, threads, and replies tailored to your audience. Every piece of content can be reviewed before publishing or set to autopilot.'
+    },
+    {
+      q: 'Can I customize my posting schedule?',
+      a: 'Absolutely. You can set specific posting times, frequency caps, and timezone-aware schedules. Our smart scheduling engine also analyzes your audience engagement patterns to recommend optimal posting windows for maximum reach and impressions.'
+    },
+    {
+      q: 'How does engagement automation differ from spam?',
+      a: 'Echo X Bot uses contextual AI to craft genuine, relevant replies to mentions, comments, and trending conversations in your niche. Responses are unique, on-brand, and indistinguishable from human interaction. We enforce rate limits and sentiment analysis to ensure every interaction adds value.'
+    },
+    {
+      q: 'What analytics and tracking are available?',
+      a: 'The analytics dashboard tracks impressions, engagement rate, follower growth, link clicks, profile visits, and post performance over time. You get daily and weekly reports, A/B testing insights on content types, and ROI metrics tied to your posting strategy.'
+    },
+    {
+      q: 'Can I manage multiple X accounts from one dashboard?',
+      a: 'Yes. The Professional plan supports up to 3 accounts and Enterprise supports unlimited accounts. Each account gets its own AI personality configuration, posting schedule, and analytics view. Perfect for agencies, brands with multiple handles, or creators managing personal and business accounts.'
+    }
+  ]
+
   const steps = [
     {
       number: '01',
@@ -171,6 +200,8 @@ export default function XBotPage() {
 
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'X Bot', href: '/x-bot' }]} />
+      <FaqSchema faqs={FAQS} />
       {/* Navigation */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/" className="flex items-center gap-3">
@@ -416,6 +447,20 @@ export default function XBotPage() {
           exampleQueries={['X API v2 rate limits and best practices', 'How to grow engagement on X organically', 'Content scheduling strategies']}
         />
       </section>
+
+      {/* FAQ */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <footer className="border-t px-6 py-8 text-center" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
         <p>&copy; 2026 Echo Prime Technologies. All rights reserved.</p>
       </footer>

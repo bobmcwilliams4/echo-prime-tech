@@ -1,4 +1,6 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -90,6 +92,8 @@ export default function FinanceAIPage() {
 
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/products' }, { name: 'Finance AI', href: '/finance-ai' }]} />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/" className="flex items-center gap-3">
@@ -117,7 +121,7 @@ export default function FinanceAIPage() {
           Portfolio tracking, budget management, spending anomaly detection, tax-loss harvesting, net worth dashboards, and financial health scoring — powered by intelligence engines, not spreadsheets.
         </p>
         <div className="flex gap-4 justify-center animate-fade-up-delay-2">
-          <Link href="/signup" className="px-8 py-4 rounded-xl font-bold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
+          <Link href="/checkout?service=finance-ai&tier=starter" className="px-8 py-4 rounded-xl font-bold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
           <Link href="/sdk/docs" className="px-8 py-4 rounded-xl font-bold text-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}>API Docs</Link>
         </div>
 
@@ -201,7 +205,7 @@ export default function FinanceAIPage() {
                   </li>
                 ))}
               </ul>
-              <button className="w-full py-3 rounded-xl font-semibold" style={{ backgroundColor: p.popular ? 'var(--ept-accent)' : 'transparent', color: p.popular ? '#fff' : 'var(--ept-text)', border: p.popular ? 'none' : '1px solid var(--ept-border)' }}>{p.cta}</button>
+              <Link href={`/checkout?service=finance-ai&tier=${p.name.toLowerCase()}`} className="block text-center w-full py-3 rounded-xl font-semibold" style={{ backgroundColor: p.popular ? 'var(--ept-accent)' : 'transparent', color: p.popular ? '#fff' : 'var(--ept-text)', border: p.popular ? 'none' : '1px solid var(--ept-border)' }}>{p.cta}</Link>
             </div>
           ))}
         </div>
@@ -228,7 +232,7 @@ export default function FinanceAIPage() {
         <h2 className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Take Control of Your Financial Future</h2>
         <p className="text-lg mb-8" style={{ color: 'var(--ept-text-secondary)' }}>55 endpoints. 13 modules. AI that works for your money, not against it.</p>
         <div className="flex gap-4 justify-center">
-          <Link href="/signup" className="px-8 py-4 rounded-xl font-bold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started Free</Link>
+          <Link href="/checkout?service=finance-ai&tier=starter" className="px-8 py-4 rounded-xl font-bold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started Free</Link>
           <Link href="/pricing" className="px-8 py-4 rounded-xl font-bold text-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}>View Pricing</Link>
         </div>
       </section>

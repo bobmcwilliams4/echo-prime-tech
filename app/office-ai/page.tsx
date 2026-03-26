@@ -1,4 +1,5 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import { useRef, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
@@ -8,6 +9,7 @@ import { useAuth } from '../../lib/auth-context';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import FaqSchema from '../../components/FaqSchema';
 
 /* ==============================================================================
    ECHO OFFICE AI — AI-Powered Office Management Platform
@@ -553,6 +555,7 @@ function ConversationSimulator() {
 
   return (
     <div className="rounded-2xl border overflow-hidden" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Office AI', href: '/office-ai' }]} />
       {/* Tab Bar */}
       <div className="flex overflow-x-auto border-b" style={{ borderColor: 'var(--ept-border)' }}>
         {Object.entries(DEMO_CONVERSATIONS).map(([key, val]) => (
@@ -1075,6 +1078,15 @@ const COMPARE_DATA = [
    INDUSTRIES
    ============================================================================== */
 
+const FAQS = [
+  { q: 'What is included with Echo Office AI?', a: 'Every plan includes AI phone answering, voicemail transcription, call notes, invoicing, online bookings, customer management, expense tracking, and an analytics dashboard. Higher tiers add outbound AI calls, sentiment analysis, fleet management, inventory, payroll, and more.' },
+  { q: 'How many employees or users can I add?', a: 'Starter supports up to 5 users, Professional supports up to 25 users across 3 businesses, and Enterprise offers unlimited users and unlimited businesses. All users get full mobile and desktop access.' },
+  { q: 'Does it integrate with QuickBooks or Xero?', a: 'Yes. Echo Office AI syncs invoices, expenses, and payments with QuickBooks Online and Xero in real time. Transactions flow automatically so you never have to double-enter data. Setup takes under 5 minutes.' },
+  { q: 'Can I use Echo Office AI on my phone?', a: 'Absolutely. The platform is fully responsive and works on any mobile browser — iPhone, Android, or tablet. Your team can clock in, view schedules, send invoices, and manage customers from anywhere in the field.' },
+  { q: 'How do I migrate data from my existing tools?', a: 'We provide CSV import for customers, invoices, and inventory. You can also connect directly to QuickBooks, Xero, Google Contacts, and most CRM platforms. For Enterprise customers, our team handles the full migration for you at no extra cost.' },
+  { q: 'How does pricing compare to hiring staff or using competitors?', a: 'A single office admin costs $2,000–$4,000/month. Competitor platforms like Jobber or HouseCall Pro charge similar rates but lack AI phone answering and voice intelligence. Echo Office AI starts at $49/mo and replaces multiple tools with one platform — most businesses save 70–90% on administrative overhead.' },
+];
+
 const INDUSTRIES = [
   'Cleaning Services', 'Property Management', 'Real Estate', 'Legal Offices', 'Medical Practices',
   'Dental Offices', 'Salons & Spas', 'HVAC Companies', 'Plumbing', 'Landscaping',
@@ -1245,6 +1257,7 @@ export default function OfficeAIPage() {
 
   return (
     <div className="min-h-screen transition-colors duration-600" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <FaqSchema faqs={FAQS} />
       {/* --- Nav --- */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">
@@ -1848,6 +1861,19 @@ export default function OfficeAIPage() {
           <div className="mt-6">
             <a href="mailto:bob@echo-op.com?subject=Echo%20Office%20AI%20Enterprise" className="text-sm underline" style={{ color: 'var(--ept-accent)' }}>Enterprise inquiries</a>
           </div>
+        </div>
+      </section>
+
+      {/* --- FAQ --- */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
         </div>
       </section>
 

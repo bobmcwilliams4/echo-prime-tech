@@ -1,4 +1,5 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -8,6 +9,7 @@ import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import FaqSchema from '../../components/FaqSchema';
 import {
   vaultCredentials,
   vaultCredential,
@@ -23,6 +25,33 @@ import {
 } from '../../lib/ept-api';
 
 type Tab = 'credentials' | 'keychain' | 'backups' | 'stats' | 'audit';
+
+const FAQS = [
+  {
+    q: 'What encryption standards does the Vault use?',
+    a: 'All credentials are encrypted at rest using AES-256-GCM with Argon2id key derivation. Encryption keys are never stored alongside ciphertext, and every read/write operation is authenticated to prevent tampering or replay attacks.',
+  },
+  {
+    q: 'How does automatic credential rotation work?',
+    a: 'The Vault monitors credential age and can trigger automatic rotation policies per service. When a rotation window is reached, the system generates a new high-entropy secret, updates the upstream provider via API, and archives the previous credential — all without manual intervention.',
+  },
+  {
+    q: 'Can I control who on my team accesses specific credentials?',
+    a: 'Yes. Role-based access controls (RBAC) let you assign granular permissions per credential or folder. Team members can be scoped to read-only, rotate-only, or full-access tiers, and every permission change is logged in the audit trail.',
+  },
+  {
+    q: 'What does the audit log capture?',
+    a: 'Every vault operation — credential reads, reveals, searches, rotations, permission changes, and failed access attempts — is recorded with a timestamp, actor identity, IP address, and action type. Logs are immutable and retained for compliance review.',
+  },
+  {
+    q: 'How should I manage API keys for multiple environments?',
+    a: 'Use the Keychain tab to organize API keys by environment tag (production, staging, development). Each key is stored with its masked value and character length for quick identification, and can be injected into CI/CD pipelines via the Vault CLI or REST API.',
+  },
+  {
+    q: 'Does the Vault integrate with CI/CD pipelines?',
+    a: 'Absolutely. The Vault exposes a secure REST API that CI/CD runners (GitHub Actions, GitLab CI, Cloudflare Workers) can call at build time to fetch secrets. Tokens are short-lived and scoped to the requesting pipeline, so secrets never persist in build logs or artifacts.',
+  },
+];
 
 // Auth check uses role from API (server-enforced), not client-side email list
 const SESSION_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
@@ -91,6 +120,7 @@ export default function VaultPage() {
   if (loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0f' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Vault', href: '/vault' }]} />
         <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: '#00ff88', borderTopColor: 'transparent' }} />
       </div>
     );
@@ -137,6 +167,7 @@ export default function VaultPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#0a0a0f', color: '#e0e0e0' }}>
+      <FaqSchema faqs={FAQS} />
       <ProductTutorialButton tutorialId="vault" productName="Digital Vault" />
       {/* Top bar */}
       <nav data-tutorial="dvault-hero" className="border-b px-6 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a2e', backgroundColor: '#0d0d14' }}>
@@ -172,6 +203,19 @@ export default function VaultPage() {
         {tab === 'stats' && <StatsTab masterPassword={masterPassword} />}
         {tab === 'audit' && <AuditTab masterPassword={masterPassword} />}
       </div>
+
+      {/* FAQ */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

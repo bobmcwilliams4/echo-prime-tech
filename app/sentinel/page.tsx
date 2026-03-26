@@ -18,6 +18,7 @@ import {
 import MarkdownBlock from '../../components/MarkdownBlock';
 import TitleChainReport from '../../components/TitleChainReport';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import {
   startAsyncInvestigation,
   getJobProgress,
@@ -1258,6 +1259,7 @@ export default function SentinelPage() {
 
   return (
     <div className="min-h-screen flex flex-col relative" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Products',href:'/services'},{name:'Sentinel AI',href:'/sentinel'}]} />
       <ProductTutorialButton tutorialId="engines" productName="Sentinel AI" />
       {/* ── Chat viewport (contains 3D scene, header, messages, input) ── */}
       <div className="relative flex flex-col overflow-hidden" style={{ height: '100vh', minHeight: '100vh', backgroundColor: '#050508' }}>
@@ -2161,6 +2163,26 @@ export default function SentinelPage() {
           </p>
         </div>
         )}
+
+        {/* FAQ */}
+        <section className="py-16 px-6 max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+          <div className="space-y-6">
+            {[
+              { q: 'What makes Sentinel AI different from ChatGPT or other chatbots?', a: 'Sentinel is not a chatbot — it is a professional intelligence interface backed by 5,486+ domain-specific engines and 601K+ pre-compiled doctrines. Every response includes authority citations (IRC codes, case law, NIST frameworks, medical literature) with confidence stratification. Sentinel delivers court-defensible answers, not conversational guesses.' },
+              { q: 'What domains can Sentinel query?', a: 'Sentinel covers 940+ knowledge domains including tax law, legal analysis, cybersecurity, medical intelligence, oilfield engineering, financial modeling, forensics, accounting, insurance, and dozens of specialized fields. You can query a single domain or let the system auto-route across multiple relevant engines.' },
+              { q: 'How does the title chain investigation feature work?', a: 'Sentinel detects natural language requests for title chain research and automatically triggers our Landman Pipeline — an async investigation system covering 80+ Texas counties and 259K+ records. Results are delivered in a professional 5-tab report: Summary, Run Sheet, Ownership Chain, Gap Analysis, and Full Report.' },
+              { q: 'Can I choose which AI model processes my query?', a: 'Yes. Sentinel supports multiple fine-tuned models including Claude Opus 4.6, GPT-4.1, Grok, and specialized adapters trained on domain-specific content. You can select a specific model or use auto-routing, which matches your query to the best-performing model for that domain.' },
+              { q: 'Is voice interaction available?', a: 'Pro and higher plans include voice-enabled Sentinel with real-time speech-to-text input and text-to-speech responses powered by ElevenLabs. You can have natural spoken conversations with Sentinel while it queries intelligence engines and delivers expert-level answers out loud.' },
+              { q: 'What are the query limits on each plan?', a: 'Free tier includes 50 queries per day. Pro plans offer unlimited queries with priority model access and voice. Business plans add API access, team seats, and SLA guarantees. Sovereign plans include custom engine development and white-label deployment.' },
+            ].map(faq => (
+              <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+                <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* Cross-sell */}
         <div className="max-w-4xl mx-auto">

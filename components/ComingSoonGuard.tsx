@@ -60,11 +60,36 @@ const EXEMPT_PREFIXES = [
   '/analytics',          // Echo Analytics
   '/email-marketing',    // Echo Email Marketing
   '/surveys',            // Echo Surveys
+  '/knowledge-base',     // Echo Knowledge Base
   '/surveillance',       // Prometheus Surveillance
   '/dark-web-intel',     // Dark Web Intelligence
   '/rewards',            // Echo Rewards
   '/permian',            // Permian Basin
   '/reviews',            // Reviews
+  '/workflow-automation', // Workflow Automation
+  '/social-media',       // Social Media Manager
+  '/documents',          // Document Manager
+  '/status-page',        // Status Page
+  '/live-chat',          // Live Chat
+  '/link-shortener',     // Link Shortener
+  '/feedback-board',     // Feedback Board
+  '/newsletter',         // Echo Newsletter
+  '/web-analytics',      // Echo Web Analytics
+  '/waitlist',           // Echo Waitlist
+  '/proposals',          // Echo Proposals
+  '/affiliate',          // Echo Affiliate
+  '/signatures',         // Echo Signatures
+  '/qr-menu',            // Echo QR Menu
+  '/podcast',            // Echo Podcast
+  '/payroll',            // Echo Payroll
+  '/calendar',           // Echo Calendar
+  '/compliance',         // Echo Compliance
+  '/recruiting',         // Echo Recruiting
+  '/timesheet',          // Echo Timesheet
+  '/feature-flags',      // Echo Feature Flags
+  '/expense-management', // Echo Expense Management
+  '/okr',                // Echo OKR
+  '/subscription',       // Echo Subscription
 
   // ── Content pages ──
   '/blog',               // Blog articles

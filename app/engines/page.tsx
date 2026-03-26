@@ -16,6 +16,7 @@ import {
   type EngineCategory,
 } from '../../lib/engine-cloud-api';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 // ── Domain metadata: full names, descriptions, capabilities, pricing tier ──
 
@@ -200,6 +201,7 @@ export default function EnginesPage() {
 
   return (
     <div data-tutorial="engines-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Products',href:'/services'},{name:'AI Engines',href:'/engines'}]} />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">
@@ -533,7 +535,7 @@ export default function EnginesPage() {
                         {registering ? 'Registering...' : 'Activate Free'}
                       </button>
                     ) : (
-                      <Link href="/signup" className="block text-center py-2.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: '#6366f120', color: '#818cf8', border: '1px solid #6366f140' }}>
+                      <Link href={`/checkout?service=engines&tier=${tier.name.toLowerCase()}`} className="block text-center py-2.5 rounded-lg text-sm font-semibold" style={{ backgroundColor: '#6366f120', color: '#818cf8', border: '1px solid #6366f140' }}>
                         Get Started
                       </Link>
                     )
@@ -584,7 +586,7 @@ export default function EnginesPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href="/signup" className="block text-center py-2.5 rounded-lg text-sm font-semibold" style={{
+                  <Link href={`/checkout?service=engines&tier=${tier.name.toLowerCase()}`} className="block text-center py-2.5 rounded-lg text-sm font-semibold" style={{
                     backgroundColor: tier.popular ? '#6366f1' : 'transparent',
                     color: tier.popular ? '#fff' : '#818cf8',
                     border: tier.popular ? 'none' : '1px solid #6366f1',
@@ -624,6 +626,41 @@ export default function EnginesPage() {
                 <h3 className="text-sm font-bold mb-1" style={{ color: 'var(--ept-text)' }}>{svc.title}</h3>
                 <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{svc.desc}</p>
               </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <section className="py-16 px-6 max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+          <div className="space-y-6">
+            {[
+              { q: 'What is an Intelligence Engine?', a: 'An Intelligence Engine is a domain-specific AI model backed by curated doctrines — verified source material from IRC codes, case law, NIST frameworks, medical literature, and more. Unlike generic chatbots, each engine delivers court-defensible, citation-backed answers within its area of expertise.' },
+              { q: 'How many engines and domains are available?', a: 'We currently operate 5,486+ engines across 940+ knowledge domains including tax, legal, cybersecurity, medical, oilfield engineering, finance, forensics, and dozens more. New engines are compiled and deployed weekly as our doctrine library grows.' },
+              { q: 'Can I query multiple domains in a single request?', a: 'Yes. Our cross-domain query system automatically routes your question to the most relevant engines and can synthesize answers from multiple domains. For example, a tax-legal question will pull doctrines from both TX and LG engines simultaneously.' },
+              { q: 'How is pricing structured?', a: 'Pricing is per-query and varies by domain tier (Supreme, Critical, Engineering, Standard) and your subscription plan. Professional plans start at $199/month with included query credits. Enterprise and Sovereign plans offer volume discounts of up to 60% per query.' },
+              { q: 'Are engine responses legally defensible?', a: 'Every response includes full authority citations — IRC sections, case law references, regulatory standards, or peer-reviewed sources. Responses carry confidence stratification (Defensible, Aggressive, Disclosure, High Risk) so you know exactly how to use the output in professional settings.' },
+              { q: 'Can I build custom engines for my organization?', a: 'Absolutely. Sovereign plan customers can commission custom engine development with proprietary doctrine sets. We handle ingestion, validation, and deployment. Custom engines are isolated to your account and can be white-labeled for client-facing use.' },
+            ].map(faq => (
+              <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+                <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Related Articles */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Related Articles</h3>
+          <div className="grid md:grid-cols-2 gap-3">
+            {[
+              { title: 'Edge Computing for AI Inference', href: '/blog/edge-computing-ai-inference-cloudflare-workers-2026' },
+              { title: 'Building Multi-Agent AI Systems', href: '/blog/building-multi-agent-ai-systems-production-2026' },
+            ].map(a => (
+              <a key={a.href} href={a.href} className="p-4 rounded-lg border text-sm font-medium hover:opacity-80 transition-opacity" style={{ borderColor: 'var(--ept-card-border)', color: 'var(--ept-accent)' }}>
+                {a.title} &rarr;
+              </a>
             ))}
           </div>
         </div>

@@ -1,4 +1,6 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -25,11 +27,22 @@ const PRICING = [
   { name: 'Enterprise', price: '$199', period: '/mo', features: ['Unlimited warehouses', 'Unlimited products', 'AI forecasting', 'Lot & expiry tracking', 'Serial number tracking', 'Custom fields', 'Webhooks', 'Priority support', 'Multi-currency'] },
 ];
 
+const FAQS = [
+  { q: 'How does AI demand forecasting work?', a: 'Echo Inventory analyzes your historical sales data, seasonal patterns, and current stock levels to predict future demand. It recommends reorder points and quantities so you never overstock or run out.' },
+  { q: 'Can I manage multiple warehouses?', a: 'Yes. Each warehouse has its own inventory counts, bin locations, and staff. Transfer stock between locations with full tracking. Reports can be filtered by location or viewed globally.' },
+  { q: 'How does barcode/SKU scanning work?', a: 'Generate and print barcodes for any product. Scan with any USB or Bluetooth barcode reader to instantly pull up product details, adjust quantities, or process receiving. Works with existing barcode hardware.' },
+  { q: 'What happens when stock runs low?', a: 'Configurable low-stock alerts trigger when inventory drops below your set threshold. Notifications go via email, webhook, or in-app alert. AI can auto-generate purchase orders for critical items.' },
+  { q: 'Can I track inventory across sales channels?', a: 'Yes. Connect Shopify, WooCommerce, Amazon, or any platform via API. Sales on any channel automatically decrement inventory. Overselling protection prevents selling items you don\'t have.' },
+  { q: 'Is there a free plan?', a: 'The Starter plan includes up to 500 SKUs and 1 warehouse for free. Growth supports 5,000 SKUs across 3 warehouses. Enterprise is unlimited with advanced analytics and custom integrations.' },
+];
+
 export default function InventoryPage() {
   const { isDark } = useTheme();
 
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/products' }, { name: 'Inventory', href: '/inventory' }]} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/" className="flex items-center gap-3">
           <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={32} height={32} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} />
@@ -49,7 +62,7 @@ export default function InventoryPage() {
           Know what you have, where it is, and when to reorder.
         </p>
         <div className="flex gap-4 justify-center">
-          <Link href="/signup" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
+          <Link href="/checkout?service=inventory&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
           <Link href="/pricing" className="px-8 py-3 rounded-xl font-semibold text-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>See Pricing</Link>
         </div>
       </section>
@@ -95,9 +108,22 @@ export default function InventoryPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/signup" className="block text-center px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: i === 1 ? 'var(--ept-accent)' : 'var(--ept-surface)', color: i === 1 ? '#fff' : 'var(--ept-text)' }}>
+              <Link href={`/checkout?service=inventory&tier=${p.name.toLowerCase()}`} className="block text-center px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: i === 1 ? 'var(--ept-accent)' : 'var(--ept-surface)', color: i === 1 ? '#fff' : 'var(--ept-text)' }}>
                 {i === 0 ? 'Start Free' : 'Get Started'}
               </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQs */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
             </div>
           ))}
         </div>
@@ -107,7 +133,7 @@ export default function InventoryPage() {
         <div className="p-10 rounded-2xl" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
           <h2 className="text-2xl md:text-3xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Stop Guessing. Start Knowing.</h2>
           <p className="mb-6" style={{ color: 'var(--ept-text-secondary)' }}>Real-time stock levels, AI-powered forecasting, and automatic reorder alerts — all in one platform.</p>
-          <Link href="/signup" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
+          <Link href="/checkout?service=inventory&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
         </div>
       </section>
     </div>

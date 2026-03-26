@@ -1,4 +1,5 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -7,6 +8,7 @@ import { useTheme } from '../../lib/theme-context';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import SubscriptionGate from '../../components/SubscriptionGate';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 /* ==============================================================================
    ECHO INTEL HUB — Digital Intelligence & Monitoring Platform
@@ -125,6 +127,8 @@ function IntelHubContent() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/engines' }, { name: 'Intelligence Hub', href: '/intel-hub' }]} />
       <ProductTutorialButton tutorialId="settings" productName="Intel Hub" />
 
       {/* ── Nav ── */}

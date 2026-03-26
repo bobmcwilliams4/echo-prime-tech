@@ -9,6 +9,17 @@ import { useRouter } from 'next/navigation'
 import ProductTutorialButton from '../../components/product-tutorial-button'
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import { getBotHealth, getLinkedInStats, type BotHealth, type LinkedInStats } from '../../lib/bot-status-api'
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+
+const FAQS = [
+  { q: 'How does the AI generate LinkedIn content?', a: 'Our AI analyzes your industry, target audience, and personal brand to create original thought leadership posts. It draws from 10 professional categories and adapts to your writing style over time, ensuring every post sounds authentically you.' },
+  { q: 'Will LinkedIn flag my account for automation?', a: 'We operate within LinkedIn\'s acceptable use guidelines. All connection requests and posts go through an approval queue, and we use intelligent rate limiting to keep activity within safe thresholds. Your account stays protected.' },
+  { q: 'Can I review posts before they go live?', a: 'Absolutely. Every piece of content enters your approval queue first. You can edit, reschedule, or reject any post before it publishes. Enterprise plans also support team review and compliance workflows.' },
+  { q: 'How does lead generation work?', a: 'The system identifies decision-makers in your target industries by analyzing profile data, company information, and engagement patterns. Leads are enriched with contact details and exported directly to your CRM (HubSpot, Salesforce, or custom).' },
+  { q: 'What kind of results can I expect?', a: 'Most users see a 3-5x increase in profile views and connection requests within the first month. Content engagement typically doubles, and lead generation campaigns average a 3x higher acceptance rate than manual outreach.' },
+  { q: 'Is there a free trial?', a: 'Yes. All plans include a 14-day free trial with full feature access. No credit card required to start. You can downgrade or cancel anytime during the trial period.' },
+];
 
 export default function LinkedInPage() {
   const { isDark } = useTheme()
@@ -188,6 +199,8 @@ export default function LinkedInPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'LinkedIn Bot', href: '/linkedin' }]} />
+      <FaqSchema faqs={FAQS} />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">
@@ -391,7 +404,19 @@ export default function LinkedInPage() {
         </button>
       </section>
 
-      {/* Footer */}
+      {/* FAQ */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Intelligence Engine Integration */}
       <section className="max-w-4xl mx-auto px-6 py-12">
         <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--ept-text)' }}>

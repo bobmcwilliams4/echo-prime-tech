@@ -9,6 +9,8 @@ import { closerFetch, getDashboardStats } from '../../lib/closer-api';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import SubscriptionGate from '../../components/SubscriptionGate';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 /* ══════════════════════════════════════════════════════════════════════
    CONVAI WIDGET — ElevenLabs Voice AI Demo
@@ -133,6 +135,8 @@ function CloserLandingPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Products',href:'/services'},{name:'AI Closer',href:'/closer'}]} />
       <ProductTutorialButton tutorialId="settings" productName="Closer AI" />
       {/* Nav */}
       <nav
@@ -213,7 +217,7 @@ function CloserLandingPage() {
               Try Live Demo
             </button>
             <Link
-              href="/signup"
+              href="/checkout?service=closer&tier=starter"
               className="flex items-center gap-2 px-8 py-4 rounded-xl border font-semibold text-lg transition-all hover:opacity-80"
               style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}
             >
@@ -484,7 +488,7 @@ function CloserLandingPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/signup"
+                  href={`/checkout?service=closer&tier=${plan.name.toLowerCase()}`}
                   className="block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all"
                   style={{
                     backgroundColor: plan.popular ? 'var(--ept-accent)' : 'transparent',
@@ -516,6 +520,47 @@ function CloserLandingPage() {
               >
                 {ind}
               </span>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="mb-16" id="faq">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-3" style={{ color: 'var(--ept-text)' }}>
+              Frequently Asked <span className="gradient-text">Questions</span>
+            </h2>
+            <p style={{ color: 'var(--ept-text-secondary)' }}>
+              Everything you need to know about Echo Closer AI.
+            </p>
+          </div>
+          <div className="max-w-3xl mx-auto space-y-4">
+            {FAQS.map((faq, i) => (
+              <details
+                key={i}
+                className="group rounded-xl border overflow-hidden"
+                style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}
+              >
+                <summary
+                  className="flex items-center justify-between cursor-pointer px-6 py-4 font-semibold text-sm select-none"
+                  style={{ color: 'var(--ept-text)' }}
+                >
+                  {faq.q}
+                  <svg
+                    className="w-5 h-5 flex-shrink-0 transition-transform group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    style={{ color: 'var(--ept-text-muted)' }}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <div className="px-6 pb-4 text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
+                  {faq.a}
+                </div>
+              </details>
             ))}
           </div>
         </section>
@@ -873,6 +918,15 @@ function CloserPageContent() {
 
   return <CloserDashboard />;
 }
+
+const FAQS = [
+  { q: 'How does the AI voice work?', a: 'Echo Closer uses a real-time STT → LLM → TTS pipeline. The AI listens via speech-to-text, processes the response through a language model with your sales script and product knowledge, and speaks back with natural text-to-speech. Full conversations in under 2 seconds latency.' },
+  { q: 'Can I customize the sales scripts?', a: 'Yes. Build multi-step sales scripts with a state-machine editor. Define stages (intro, qualification, pitch, objection handling, close), transition rules, and AI behavior per stage. The AI follows your script while adapting naturally to the conversation.' },
+  { q: 'What CRM features are included?', a: 'Full lead pipeline with stages, notes, call recordings, sentiment analysis, and automatic follow-up scheduling. Import leads via CSV, API, or webhook. Lead scoring based on conversation engagement and buying signals.' },
+  { q: 'Can the AI handle objections?', a: 'Yes. Train the AI with your objection-handling playbook. It recognizes common objections (price, timing, competitor, authority) and responds with your proven rebuttals. Escalates to a human agent when confidence is low.' },
+  { q: 'Is it white-label ready?', a: 'Yes. Full multi-tenant SaaS architecture. Custom branding, custom domain, API access, and per-tenant configuration. Resell under your own brand with custom pricing.' },
+  { q: 'What does it cost?', a: 'Starter at $99/mo (100 calls), Growth at $299/mo (500 calls, CRM, analytics), and Enterprise at $799/mo (unlimited calls, white-label, API, dedicated support). Per-minute pricing available for high-volume users.' },
+];
 
 export default function CloserPage() {
   return <SubscriptionGate serviceId="ai-closer"><CloserPageContent /></SubscriptionGate>;

@@ -13,6 +13,7 @@ import {
 } from '../../lib/ebay-api';
 import SubscriptionGate from '../../components/SubscriptionGate';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 /* ═══════════════════════════════════════════════════════════════
    CGC GRADING DATA
@@ -1916,6 +1917,7 @@ function GradingPageContent() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/pricing' }, { name: 'AI Grading', href: '/grading' }]} />
       {/* NAV */}
       <nav className="sticky top-0 z-50 border-b px-6 py-3 flex items-center justify-between backdrop-blur-xl" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-nav-bg)' }}>
         <div className="flex items-center gap-6">
@@ -3530,7 +3532,7 @@ function GradingLanding() {
           Upload a photo. Get an instant AI-powered grade from 5 vision models. List on eBay in one click. No shipping, no 3-month wait, no $50+ fees per item.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mb-12">
-          <Link href="/signup" className="px-8 py-3.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90" style={{ background: TEAL.gradient }}>
+          <Link href="/checkout?service=grading&tier=starter" className="px-8 py-3.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90" style={{ background: TEAL.gradient }}>
             Start Grading Free
           </Link>
           <Link href="#pricing" className="px-8 py-3.5 rounded-xl font-semibold text-sm transition-all" style={{ border: '1px solid var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
@@ -3634,9 +3636,29 @@ function GradingLanding() {
         <p className="text-sm mb-8 max-w-lg mx-auto" style={{ color: 'var(--ept-text-muted)' }}>
           Join collectors, dealers, and shops who use AI grading to price accurately and sell faster.
         </p>
-        <Link href="/signup" className="inline-block px-10 py-3.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90" style={{ background: TEAL.gradient }}>
+        <Link href="/checkout?service=grading&tier=starter" className="inline-block px-10 py-3.5 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90" style={{ background: TEAL.gradient }}>
           Create Free Account
         </Link>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {[
+            { q: 'How accurate is AI grading compared to CGC or PSA?', a: 'Our ensemble of 5 vision models (Claude Opus 4.6, GPT-4o, Gemini 2.5 Pro, Grok 4, and Qwen 2.5 VL) achieves consensus grades that consistently fall within 0.5 points of professional grading service results. The Trinity AI debate system further refines accuracy by having three expert AI personalities cross-examine each assessment.' },
+            { q: 'What types of collectibles can I grade?', a: 'We support 19 collectible categories including comics, baseball cards, football cards, basketball cards, hockey cards, Pokemon cards, Yu-Gi-Oh, Magic: The Gathering, coins, stamps, vinyl records, video games, action figures, and more. Each category uses specialized grading scales (CGC, PSA, NGC, Beckett) appropriate to the item type.' },
+            { q: 'How does the eBay integration work?', a: 'After grading, you can list items on eBay with one click. Our AI generates optimized titles, detailed condition descriptions, and suggested pricing based on real-time market comps from GoCollect, Heritage Auctions, and live eBay sales. Bulk listing lets you move entire collections to market in minutes.' },
+            { q: 'Do I need professional photography equipment?', a: 'No. Our AI models are trained to work with smartphone photos. For best results, use good lighting and capture both front and back of the item. The AI compensates for common photo issues like slight angles, shadows, and varying resolutions.' },
+            { q: 'Can I track my collection value over time?', a: 'Yes. The Collector and Dealer plans include portfolio tracking that monitors market values across your entire collection. You get price alerts, ROI calculations, and trend analysis so you always know what your collection is worth and when to sell.' },
+            { q: 'Is there an API for shop owners and dealers?', a: 'The Dealer plan includes full API access for integrating AI grading into your own website, point-of-sale system, or inventory management tools. Process hundreds of items programmatically with bulk grading endpoints and receive structured JSON responses.' },
+          ].map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Footer */}

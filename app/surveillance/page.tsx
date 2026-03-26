@@ -1,10 +1,12 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
+import FaqSchema from '../../components/FaqSchema';
 
 /* ==============================================================================
    ECHO PROMETHEUS SURVEILLANCE — AI-Powered Intelligence & Monitoring
@@ -110,6 +112,8 @@ export default function SurveillancePage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Surveillance', href: '/surveillance' }]} />
+      <FaqSchema faqs={FAQS} />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">

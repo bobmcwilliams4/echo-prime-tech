@@ -1,0 +1,11 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Echo Live Chat — AI-Powered Website Chat Widget | Echo Prime Technology',
+  description: 'Embeddable live chat widget with AI-powered responses, visitor tracking, team inbox, and canned responses. Intercom & Drift alternative starting at $19/month.',
+  keywords: ['live chat', 'website chat widget', 'customer messaging', 'Intercom alternative', 'Drift alternative', 'AI chat support'],
+};
+
+export default function LiveChatLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

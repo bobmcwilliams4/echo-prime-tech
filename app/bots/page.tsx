@@ -1,4 +1,5 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -6,6 +7,7 @@ import { useState } from 'react';
 import { useTheme } from '../../lib/theme-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import FaqSchema from '../../components/FaqSchema';
 
 /* ── Bot Categories ── */
 
@@ -98,6 +100,15 @@ const BOT_CATEGORIES: BotCategory[] = [
   },
 ];
 
+const FAQS = [
+  { q: 'What platforms do your bots support?', a: 'We build bots for Discord, Slack, Telegram, X (Twitter), LinkedIn, Reddit, WhatsApp, Facebook Messenger, Instagram, and more. If a platform has an API, we can build a bot for it.' },
+  { q: 'Can I customize my bot\'s personality and behavior?', a: 'Every bot is fully customizable. Choose from 14 pre-built AI personalities or define your own tone, vocabulary, and response style. You control the voice, the rules, and the boundaries.' },
+  { q: 'How do autonomous posting schedules work?', a: 'Bots run on Cloudflare Workers with cron triggers, posting on schedules you define — hourly, daily, or based on custom logic like trending topics or engagement windows. All schedules are adjustable in real time.' },
+  { q: 'Does the bot handle content moderation?', a: 'Yes. Every bot includes configurable moderation filters for spam, profanity, off-topic content, and custom blacklists. Escalation rules route flagged content to a human reviewer when needed.' },
+  { q: 'What analytics and reporting do I get?', a: 'Each bot comes with an analytics dashboard tracking engagement rates, response times, audience growth, sentiment trends, and conversion metrics. Reports export to CSV or integrate directly with your CRM.' },
+  { q: 'Can one bot manage multiple platforms at once?', a: 'Absolutely. Our Professional and Enterprise tiers support multi-platform bots that post, respond, and sync across all connected channels from a single control panel with unified analytics.' },
+];
+
 const PRICING_TIERS = [
   { tier: 'Starter', price: 499, interval: 'one-time', features: ['1 bot, 1 platform', 'Basic AI personality', 'Cloudflare Workers hosting', 'D1 database + KV cache', '30 days support'], popular: false },
   { tier: 'Professional', price: 1499, interval: 'one-time', features: ['1 bot, multi-platform', 'Advanced AI + 14 personalities', 'Cron scheduling', 'Analytics dashboard', 'CRM integration', '90 days support'], popular: true },
@@ -111,6 +122,8 @@ export default function BotsPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'AI Bots', href: '/bots' }]} />
+      <FaqSchema faqs={FAQS} />
       <ProductTutorialButton tutorialId="bots" productName="Custom Bots" />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
@@ -294,6 +307,19 @@ export default function BotsPage() {
           </Link>
         </div>
       </div>
+
+      {/* FAQ */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Intelligence Engine Integration */}
       <section className="max-w-4xl mx-auto px-6 py-12">

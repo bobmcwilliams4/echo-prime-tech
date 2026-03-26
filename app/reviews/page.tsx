@@ -1,298 +1,161 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
-import { getPublicReviews, submitPublicReview, type Review } from '../../lib/business-api';
+
+const FEATURES = [
+  { icon: 'R', title: 'Review Collection', desc: 'Send automated review requests via email with branded landing pages. Customers leave reviews in one click — no login required' },
+  { icon: 'S', title: 'AI Sentiment Analysis', desc: 'Every review is automatically analyzed for sentiment and scored. See positive/neutral/negative trends over time' },
+  { icon: 'C', title: 'Campaign Management', desc: 'Create review request campaigns with custom timing, automatic reminders, and follow-up sequences' },
+  { icon: 'W', title: 'Embeddable Widgets', desc: 'Showcase your best reviews anywhere with 5 widget styles: carousel, grid, list, badge, and floating' },
+  { icon: 'A', title: 'AI Response Suggestions', desc: 'Get professional response suggestions for every review — thank positive reviewers and address negative feedback' },
+  { icon: 'L', title: 'Multi-Location', desc: 'Track reviews and ratings separately for each business location with per-location analytics' },
+  { icon: 'T', title: 'Competitor Tracking', desc: 'Monitor competitor ratings and review volume. Benchmark your reputation against the competition' },
+  { icon: 'I', title: 'AI Insights', desc: 'Get automatic analysis of review trends: top strengths, areas for improvement, and actionable recommendations' },
+  { icon: 'E', title: 'Review Request Emails', desc: 'Automated email campaigns with configurable delay, reminders, and expiration. Maximize response rates' },
+  { icon: 'D', title: 'Analytics Dashboard', desc: 'Track review volume, average ratings, response rates, sentiment breakdown, and conversion over time' },
+  { icon: 'X', title: 'Data Export', desc: 'Export all reviews as CSV or JSON. Your data is always portable — no lock-in' },
+  { icon: 'V', title: 'Verified Reviews', desc: 'Reviews collected through request links are marked as verified — building trust with potential customers' },
+];
+
+const COMPARE = [
+  ['Feature', 'Echo Reviews', 'Trustpilot', 'Podium'],
+  ['Review collection emails', 'All plans', 'Paid plans', 'All plans'],
+  ['AI sentiment analysis', 'All plans', 'Enterprise', 'No'],
+  ['AI response suggestions', 'All plans', 'Enterprise', 'Paid add-on'],
+  ['Embeddable widgets (5 types)', 'All plans', '1 type free', '1 type'],
+  ['Multi-location', 'All plans', 'Paid plans', 'All plans'],
+  ['Competitor tracking', 'All plans', 'Paid plans', 'No'],
+  ['Review request campaigns', 'All plans', 'Paid plans', 'All plans'],
+  ['Automatic reminders', 'All plans', 'Paid plans', 'All plans'],
+  ['Custom branding', 'All plans', 'Enterprise', 'Paid plans'],
+  ['AI trend insights', 'All plans', 'Enterprise', 'No'],
+  ['API access', 'All plans', 'Enterprise', 'Enterprise'],
+  ['Data export', 'All plans', 'Paid plans', 'Enterprise'],
+  ['Revenue share / per-invite fees', '$0', '$0', '$0.10-0.25/invite'],
+  ['Starting price', '$14/mo', '$259/mo', 'Contact sales'],
+];
+
+const TIERS = [
+  { name: 'Starter', price: '$14', per: '/mo', features: ['1 location', '500 review requests/mo', 'AI sentiment analysis', 'AI response suggestions', 'Embeddable widgets', 'Review campaigns', 'Auto reminders', 'Analytics dashboard'] },
+  { name: 'Growth', price: '$39', per: '/mo', features: ['5 locations', '5,000 review requests/mo', 'Competitor tracking', 'AI trend insights', 'Custom branding', 'API access', 'Data export', 'Priority support'], popular: true },
+  { name: 'Scale', price: '$99', per: '/mo', features: ['Unlimited locations', 'Unlimited requests', 'White-label widgets', 'Custom domains', 'Webhook integrations', 'Bulk import', 'Dedicated support', 'SLA guarantee'] },
+];
+
+const FAQS = [
+  { q: 'How quickly can I start collecting reviews?', a: 'You can send your first review request within 5 minutes of signing up. Just import your customer list or connect your CRM, and Echo Reviews handles the rest — automated emails, branded landing pages, and one-click review submission.' },
+  { q: 'Do customers need to create an account to leave a review?', a: 'No. Customers click the link in the email and leave their review directly — no login, no signup, no friction. This dramatically increases your response rate compared to platforms that require accounts.' },
+  { q: 'How does AI sentiment analysis work?', a: 'Every review is automatically scored for positive, neutral, or negative sentiment using our proprietary AI. You get trend charts over time, automatic flagging of negative reviews, and AI-generated response suggestions for every review.' },
+  { q: 'Can I embed reviews on my existing website?', a: 'Yes. One line of JavaScript gives you 5 widget styles: carousel, grid, list, badge, and floating. Each widget auto-filters by rating, supports light/dark/auto themes, and works on any website or CMS.' },
+  { q: 'How does Echo Reviews compare to Trustpilot or Podium?', a: 'Echo Reviews includes AI sentiment analysis, AI response suggestions, competitor tracking, and 5 widget types on all plans — features that competitors lock behind enterprise tiers. Our Starter plan at $14/mo delivers more than most competitors at $250+/mo.' },
+  { q: 'Can I track reviews across multiple business locations?', a: 'Yes, all plans support multi-location tracking. Each location gets its own analytics, ratings, and review volume tracking. The Growth and Scale plans include advanced per-location reporting and benchmarking.' },
+];
 
 export default function ReviewsPage() {
   const { isDark } = useTheme();
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  // Form state
-  const [showForm, setShowForm] = useState(false);
-  const [name, setName] = useState('');
-  const [rating, setRating] = useState(5);
-  const [hoverRating, setHoverRating] = useState(0);
-  const [text, setText] = useState('');
-  const [serviceType, setServiceType] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [submitError, setSubmitError] = useState('');
-
-  useEffect(() => {
-    loadReviews();
-  }, []);
-
-  async function loadReviews() {
-    try {
-      setLoading(true);
-      const data = await getPublicReviews();
-      setReviews(data.reviews || []);
-    } catch {
-      setError('Unable to load reviews right now.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!name.trim() || !text.trim()) return;
-    try {
-      setSubmitting(true);
-      setSubmitError('');
-      await submitPublicReview({
-        reviewer_name: name.trim(),
-        rating,
-        text: text.trim(),
-        service_type: serviceType.trim() || undefined,
-      });
-      setSubmitted(true);
-      setName('');
-      setRating(5);
-      setText('');
-      setServiceType('');
-    } catch (err: unknown) {
-      setSubmitError(err instanceof Error ? err.message : 'Failed to submit review');
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  const avgRating = reviews.length > 0
-    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-    : 0;
-
-  const ratingCounts = [5, 4, 3, 2, 1].map(star => ({
-    star,
-    count: reviews.filter(r => r.rating === star).length,
-    pct: reviews.length > 0 ? (reviews.filter(r => r.rating === star).length / reviews.length) * 100 : 0,
-  }));
-
   return (
-    <div style={{ backgroundColor: 'var(--ept-bg)', minHeight: '100vh' }}>
-      {/* Nav */}
+    <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/pricing' }, { name: 'Reviews', href: '/reviews' }]} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
-        <Link href="/" className="flex items-center gap-3">
-          <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime Technologies" width={140} height={36} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} />
-        </Link>
+        <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={140} height={36} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} /></Link>
         <div className="flex items-center gap-4">
           <Link href="/pricing" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Pricing</Link>
-          <Link href="/login" className="px-4 py-2 rounded-lg text-sm font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Sign In</Link>
+          <Link href="/checkout?service=reviews&tier=starter" className="px-4 py-2 rounded-lg text-sm font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started</Link>
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-4 py-12">
-        {/* Hero */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>
-            Customer Reviews
-          </h1>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
-            See what our customers are saying about Echo Prime Technologies. Real feedback from real clients.
-          </p>
+      <section className="max-w-5xl mx-auto px-6 py-20 text-center">
+        <h1 className="text-4xl md:text-6xl font-extrabold mb-6 animate-fade-up">Echo <span className="gradient-text">Reviews</span></h1>
+        <p className="text-xl md:text-2xl mb-8 animate-fade-up-delay-1" style={{ color: 'var(--ept-text-secondary)' }}>Turn happy customers into your best marketing.</p>
+        <div className="flex justify-center gap-4 animate-fade-up-delay-2">
+          <Link href="/checkout?service=reviews&tier=starter" className="px-8 py-4 rounded-xl font-bold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Collecting Reviews</Link>
+          <Link href="#features" className="px-8 py-4 rounded-xl font-bold text-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>See Features</Link>
         </div>
+      </section>
 
-        {/* Summary Stats */}
-        {reviews.length > 0 && (
-          <div className="p-6 rounded-xl border mb-10 flex flex-col md:flex-row items-center gap-8" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-            {/* Average */}
-            <div className="text-center md:border-r md:pr-8" style={{ borderColor: 'var(--ept-border)' }}>
-              <div className="text-5xl font-extrabold" style={{ color: 'var(--ept-accent)' }}>{avgRating.toFixed(1)}</div>
-              <div className="flex gap-0.5 justify-center mt-1">
-                {[1, 2, 3, 4, 5].map(s => (
-                  <span key={s} style={{ color: s <= Math.round(avgRating) ? '#eab308' : 'var(--ept-text-muted)', fontSize: '1.25rem' }}>&#9733;</span>
-                ))}
-              </div>
-              <div className="text-sm mt-1" style={{ color: 'var(--ept-text-muted)' }}>{reviews.length} review{reviews.length !== 1 ? 's' : ''}</div>
+      <section className="max-w-4xl mx-auto px-6 mb-16">
+        <div className="p-8 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-accent)', borderWidth: 2 }}>
+          <h3 className="text-2xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>90% of Customers Read Reviews Before Buying</h3>
+          <p style={{ color: 'var(--ept-text-secondary)' }}>Most businesses leave reviews to chance. Echo Reviews automates the entire process — send review requests after every transaction, analyze sentiment with AI, generate professional responses, and showcase your best reviews with embeddable widgets. More reviews = more trust = more revenue.</p>
+        </div>
+      </section>
+
+      <section className="max-w-3xl mx-auto px-6 mb-16">
+        <div className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-card-border)' }}>
+          <h3 className="text-lg font-bold mb-3" style={{ color: 'var(--ept-text)' }}>Embed Your Reviews Anywhere</h3>
+          <div className="p-4 rounded-lg font-mono text-sm overflow-x-auto" style={{ backgroundColor: 'var(--ept-card-bg)', color: 'var(--ept-accent)' }}>
+            {'<script src="https://echo-reviews.bmcii1976.workers.dev/widget.js?id=YOUR_WIDGET_ID"></script>'}
+          </div>
+          <p className="text-sm mt-3" style={{ color: 'var(--ept-text-muted)' }}>One line of code. 5 widget styles (carousel, grid, list, badge, floating). Auto-filters by rating. Light/dark/auto theme. Works on any website.</p>
+        </div>
+      </section>
+
+      <section id="features" className="max-w-6xl mx-auto px-6 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Everything for Reputation Management</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {FEATURES.map((f) => (
+            <div key={f.title} className="p-6 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold mb-3" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>{f.icon}</div>
+              <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{f.title}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{f.desc}</p>
             </div>
-            {/* Breakdown */}
-            <div className="flex-1 w-full space-y-1.5">
-              {ratingCounts.map(({ star, count, pct }) => (
-                <div key={star} className="flex items-center gap-3 text-sm">
-                  <span className="w-6 text-right font-medium" style={{ color: 'var(--ept-text-secondary)' }}>{star}</span>
-                  <span style={{ color: '#eab308', fontSize: '0.75rem' }}>&#9733;</span>
-                  <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--ept-surface)' }}>
-                    <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: '#eab308' }} />
-                  </div>
-                  <span className="w-8 text-right" style={{ color: 'var(--ept-text-muted)' }}>{count}</span>
-                </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>How We Compare</h2>
+        <div className="overflow-x-auto rounded-xl border" style={{ borderColor: 'var(--ept-card-border)' }}>
+          <table className="w-full text-sm">
+            <thead><tr style={{ backgroundColor: 'var(--ept-surface)' }}>
+              {COMPARE[0].map((h, i) => <th key={i} className="px-4 py-3 text-left font-bold" style={{ color: 'var(--ept-text)' }}>{h}</th>)}
+            </tr></thead>
+            <tbody>
+              {COMPARE.slice(1).map((row, ri) => (
+                <tr key={ri} style={{ borderTop: '1px solid var(--ept-border)' }}>
+                  {row.map((cell, ci) => (
+                    <td key={ci} className="px-4 py-3" style={{ color: ci === 1 && (cell.startsWith('All') || cell.startsWith('$14') || cell === '$0') ? 'var(--ept-accent)' : 'var(--ept-text-secondary)', fontWeight: ci === 1 ? 600 : 400 }}>{cell}</td>
+                  ))}
+                </tr>
               ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Simple Pricing</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {TIERS.map((t) => (
+            <div key={t.name} className="p-6 rounded-xl border relative" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: t.popular ? 'var(--ept-accent)' : 'var(--ept-card-border)', borderWidth: t.popular ? 2 : 1 }}>
+              {t.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Most Popular</div>}
+              <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{t.name}</h3>
+              <div className="mb-4"><span className="text-4xl font-extrabold" style={{ color: 'var(--ept-text)' }}>{t.price}</span><span style={{ color: 'var(--ept-text-muted)' }}>{t.per}</span></div>
+              <ul className="space-y-2 mb-6">{t.features.map((f) => <li key={f} className="text-sm flex items-center gap-2" style={{ color: 'var(--ept-text-secondary)' }}><span style={{ color: 'var(--ept-accent)' }}>&#10003;</span>{f}</li>)}</ul>
+              <Link href={`/checkout?service=reviews&tier=${t.name.toLowerCase()}`} className="block text-center px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: t.popular ? 'var(--ept-accent)' : 'transparent', color: t.popular ? '#fff' : 'var(--ept-accent)', border: t.popular ? 'none' : '1px solid var(--ept-border)' }}>Get Started</Link>
             </div>
-          </div>
-        )}
-
-        {/* Write a Review CTA */}
-        <div className="text-center mb-10">
-          <button
-            onClick={() => { setShowForm(true); setSubmitted(false); }}
-            className="px-6 py-3 rounded-xl font-semibold text-lg"
-            style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}
-          >
-            Write a Review
-          </button>
+          ))}
         </div>
+      </section>
 
-        {/* Review Submission Form */}
-        {showForm && (
-          <div className="p-6 rounded-xl border mb-10" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-            {submitted ? (
-              <div className="text-center py-8">
-                <div className="text-4xl mb-3" style={{ color: '#22c55e' }}>&#10003;</div>
-                <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>Thank you for your review!</h3>
-                <p style={{ color: 'var(--ept-text-secondary)' }}>Your review has been submitted and will appear after approval.</p>
-                <button onClick={() => setShowForm(false)} className="mt-4 px-4 py-2 rounded-lg text-sm border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>Close</button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit}>
-                <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--ept-text)' }}>Leave a Review</h3>
-
-                {submitError && (
-                  <div className="p-3 rounded-lg mb-4 border text-sm" style={{ backgroundColor: 'rgba(239,68,68,0.1)', borderColor: 'rgba(239,68,68,0.3)', color: '#ef4444' }}>
-                    {submitError}
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Your Name *</label>
-                    <input
-                      value={name}
-                      onChange={e => setName(e.target.value)}
-                      required
-                      maxLength={100}
-                      placeholder="John Smith"
-                      className="w-full px-3 py-2 rounded-lg border text-sm"
-                      style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Service Received</label>
-                    <input
-                      value={serviceType}
-                      onChange={e => setServiceType(e.target.value)}
-                      maxLength={100}
-                      placeholder="e.g. AI Engine Integration, Tax Prep"
-                      className="w-full px-3 py-2 rounded-lg border text-sm"
-                      style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
-                    />
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-xs font-medium mb-2" style={{ color: 'var(--ept-text-muted)' }}>Rating *</label>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map(star => (
-                      <button
-                        key={star}
-                        type="button"
-                        onMouseEnter={() => setHoverRating(star)}
-                        onMouseLeave={() => setHoverRating(0)}
-                        onClick={() => setRating(star)}
-                        style={{
-                          color: star <= (hoverRating || rating) ? '#eab308' : 'var(--ept-text-muted)',
-                          fontSize: '2rem',
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          padding: '0 2px',
-                          lineHeight: 1,
-                        }}
-                      >
-                        &#9733;
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--ept-text-muted)' }}>Your Review *</label>
-                  <textarea
-                    value={text}
-                    onChange={e => setText(e.target.value)}
-                    required
-                    maxLength={2000}
-                    rows={4}
-                    placeholder="Tell us about your experience..."
-                    className="w-full px-3 py-2 rounded-lg border text-sm"
-                    style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}
-                  />
-                  <div className="text-xs mt-1 text-right" style={{ color: 'var(--ept-text-muted)' }}>{text.length}/2000</div>
-                </div>
-
-                <div className="flex gap-3 justify-end">
-                  <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 rounded-lg text-sm border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>Cancel</button>
-                  <button type="submit" disabled={submitting || !name.trim() || !text.trim()} className="px-6 py-2 rounded-lg text-sm font-semibold disabled:opacity-50" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
-                    {submitting ? 'Submitting...' : 'Submit Review'}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        )}
-
-        {/* Reviews List */}
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'var(--ept-accent)', borderTopColor: 'transparent' }} />
-          </div>
-        ) : error ? (
-          <div className="text-center py-16" style={{ color: 'var(--ept-text-muted)' }}>{error}</div>
-        ) : reviews.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-lg mb-2" style={{ color: 'var(--ept-text-secondary)' }}>No reviews yet.</p>
-            <p style={{ color: 'var(--ept-text-muted)' }}>Be the first to share your experience!</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {reviews.map(review => (
-              <div key={review.id} className="p-5 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
-                  <div>
-                    <div className="flex items-center gap-3">
-                      <span className="font-semibold" style={{ color: 'var(--ept-text)' }}>{review.reviewer_name}</span>
-                      {review.featured && (
-                        <span className="px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(234,179,8,0.15)', color: '#eab308' }}>
-                          Featured
-                        </span>
-                      )}
-                    </div>
-                    {review.service_type && (
-                      <div className="text-xs mt-0.5" style={{ color: 'var(--ept-text-muted)' }}>{review.service_type}</div>
-                    )}
-                  </div>
-                  <div className="flex gap-0.5 shrink-0">
-                    {[1, 2, 3, 4, 5].map(s => (
-                      <span key={s} style={{ color: s <= review.rating ? '#eab308' : 'var(--ept-text-muted)', fontSize: '0.875rem' }}>&#9733;</span>
-                    ))}
-                  </div>
-                </div>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>{review.text}</p>
-                {review.date && (
-                  <div className="text-xs mt-3" style={{ color: 'var(--ept-text-muted)' }}>
-                    {new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <footer className="border-t px-6 py-8 mt-16" style={{ borderColor: 'var(--ept-border)' }}>
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>&copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved.</div>
-          <div className="flex gap-4 text-sm">
-            <Link href="/about" style={{ color: 'var(--ept-text-secondary)' }}>About</Link>
-            <Link href="/legal/privacy" style={{ color: 'var(--ept-text-secondary)' }}>Privacy</Link>
-            <Link href="/legal/terms" style={{ color: 'var(--ept-text-secondary)' }}>Terms</Link>
-          </div>
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
         </div>
+      </section>
+
+      <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
+        <p>&copy; 2026 Echo Prime Technology. All rights reserved.</p>
       </footer>
     </div>
   );

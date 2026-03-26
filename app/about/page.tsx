@@ -1,8 +1,10 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
+import FaqSchema from '../../components/FaqSchema';
 
 const NAV_ITEMS = [
   { label: 'Home', href: '/' },
@@ -51,6 +53,15 @@ const VALUES = [
   },
 ];
 
+const ABOUT_FAQS = [
+  { q: 'What is Echo Prime Technologies?', a: 'Echo Prime Technologies is an AI infrastructure company based in Midland, Texas. We build domain-specific intelligence engines, autonomous sales agents, and enterprise AI tools that embed real expertise from subject matter professionals — not generic chatbot wrappers.' },
+  { q: 'How many AI engines does Echo Prime offer?', a: 'Over 5,486 specialized engines across 940+ domains, backed by 601,000+ doctrine blocks. Each engine contains verified, authoritative knowledge in fields like oilfield operations, tax law, cybersecurity, legal analysis, and engineering.' },
+  { q: 'Is Echo Prime funded by venture capital?', a: 'No. Echo Prime is 100% bootstrapped and independently owned. We have zero VC funding, zero corporate overhead, and zero investor influence. Every dollar of revenue goes directly into building better technology. We answer to customers, not investors.' },
+  { q: 'Where is Echo Prime based?', a: 'Midland, Texas — the heart of the Permian Basin. Our founder has 30 years of oilfield experience, and that heritage of reliability and no-nonsense engineering is built into everything we do.' },
+  { q: 'What industries does Echo Prime serve?', a: 'Our engines cover oil and gas, legal, tax preparation, cybersecurity, engineering, medical, financial services, real estate, manufacturing, and dozens more. Our largest customer segments are oilfield operators, independent landmen, tax professionals, and SMBs replacing multiple SaaS tools.' },
+  { q: 'How is Echo Prime different from ChatGPT or other AI tools?', a: 'Generic AI tools give generic answers. Our engines embed real domain expertise through 601K+ verified doctrine blocks with authoritative citations. When you ask our Tax Intelligence engine about IRC §199A, it responds with the actual code section, Treasury Regulations, and relevant case law — not a summary it made up.' },
+];
+
 const TIMELINE = [
   { year: '2024', event: 'Founded by Bobby Don McWilliams II after 30 years in the oilfield industry' },
   { year: '2025', event: 'First intelligence engines deployed — Tax, Legal, and Landman domains' },
@@ -89,6 +100,8 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'About', href: '/about' }]} />
+      <FaqSchema faqs={ABOUT_FAQS} />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/" className="flex items-center gap-3">
@@ -230,6 +243,33 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Technology Stack */}
+      <section className="px-6 py-16 border-t" style={{ borderColor: 'var(--ept-border)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Our Technology Stack</h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
+              Enterprise-grade infrastructure running on the global edge — zero servers to manage, zero cold starts, infinite scale.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { title: 'Edge Computing', desc: 'All services run on Cloudflare Workers — 300+ data centers, sub-50ms response times globally. No traditional servers, no scaling concerns.' },
+              { title: 'Knowledge Architecture', desc: '601K+ doctrine blocks organized into domain-specific engines. Each engine embeds real expertise from subject matter professionals.' },
+              { title: 'Multi-Model AI', desc: 'Claude, GPT-4, Gemini, DeepSeek, and local models. Each query routes to the optimal model for the task based on domain and complexity.' },
+              { title: 'Real-Time Data', desc: 'Distributed databases (D1), key-value stores (KV), object storage (R2), and vector search — all at the edge, all sub-millisecond.' },
+              { title: 'Security First', desc: 'Zero-trust architecture, encrypted at rest and in transit, SOC 2 controls, and AI-powered threat detection across all services.' },
+              { title: 'Open Standards', desc: 'REST APIs, webhooks, OAuth 2.0, MCP protocol support. Integrate with your existing tools or build custom workflows with our SDK.' },
+            ].map(tech => (
+              <div key={tech.title} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{tech.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>{tech.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="px-6 py-20 border-t" style={{ borderColor: 'var(--ept-border)' }}>
         <div className="max-w-3xl mx-auto text-center">
@@ -245,6 +285,19 @@ export default function AboutPage() {
               View Pricing
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {ABOUT_FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
         </div>
       </section>
 

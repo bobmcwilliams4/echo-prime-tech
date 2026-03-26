@@ -1,4 +1,6 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -34,11 +36,22 @@ const COMPARISON = [
   { feature: 'API Access', docusign: '$50+/mo', pandadoc: 'Enterprise', echo: 'All plans' },
 ];
 
+const FAQS = [
+  { q: 'Are e-signatures legally binding?', a: 'Yes. Echo Contracts e-signatures comply with the ESIGN Act and UETA. Every signature captures the signer\'s IP address, user agent, and exact timestamp. The signed document is sealed with a unique token for verification.' },
+  { q: 'How does AI risk analysis work?', a: 'Our Engine Runtime evaluates contract terms, total value, counterparty history, and clause coverage. It identifies missing protective clauses, flags unfavorable terms, and provides a risk score with specific recommendations — like a virtual contract attorney reviewing every draft.' },
+  { q: 'Can I import existing contracts?', a: 'Yes. Upload PDF or DOCX files to create contract records with metadata. The system tracks expiry dates, renewal terms, and linked contacts. For new contracts, start from templates with variable placeholders.' },
+  { q: 'How does version control work?', a: 'Every edit creates a new version with a change summary. You can compare any two versions side-by-side, see exactly what changed, and roll back to any previous version. The complete revision history is permanent and auditable.' },
+  { q: 'What happens when a contract expires?', a: 'Echo Contracts sends renewal reminders based on your configured notice period (e.g., 60 days before expiry). Auto-renew contracts roll forward automatically. Expired contracts move to "expired" status but remain fully accessible in your archive.' },
+  { q: 'Is there a limit on signers per contract?', a: 'No. Add as many signing parties as needed. Each signer receives a unique token-based link — no account required. The system tracks signing order if sequential approval is configured.' },
+];
+
 export default function ContractsPage() {
   const { isDark } = useTheme();
 
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/products' }, { name: 'Contracts', href: '/contracts' }]} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/" className="flex items-center gap-3">
           <Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={32} height={32} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} />
@@ -62,7 +75,7 @@ export default function ContractsPage() {
           e-signatures, version control, and renewal automation. Replace DocuSign + PandaDoc at 1/3 the cost.
         </p>
         <div className="flex items-center justify-center gap-4 flex-wrap">
-          <Link href="/signup" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free</Link>
+          <Link href="/checkout?service=contracts&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free</Link>
           <Link href="/pricing" className="px-8 py-3 rounded-xl border font-semibold text-lg" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>View Pricing</Link>
         </div>
       </section>
@@ -131,7 +144,20 @@ export default function ContractsPage() {
               <ul className="space-y-2 mb-6">
                 {p.features.map((f) => <li key={f} className="text-sm flex items-start gap-2" style={{ color: 'var(--ept-text-secondary)' }}><span style={{ color: 'var(--ept-accent)' }}>&#10003;</span>{f}</li>)}
               </ul>
-              <Link href="/signup" className="block text-center px-4 py-2 rounded-lg font-semibold text-sm" style={{ backgroundColor: p.popular ? 'var(--ept-accent)' : 'var(--ept-surface)', color: p.popular ? '#fff' : 'var(--ept-text)' }}>Get Started</Link>
+              <Link href={`/checkout?service=contracts&tier=${p.name.toLowerCase()}`} className="block text-center px-4 py-2 rounded-lg font-semibold text-sm" style={{ backgroundColor: p.popular ? 'var(--ept-accent)' : 'var(--ept-surface)', color: p.popular ? '#fff' : 'var(--ept-text)' }}>Get Started</Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQs */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
             </div>
           ))}
         </div>
@@ -143,7 +169,7 @@ export default function ContractsPage() {
           Get unlimited e-signatures, AI risk analysis, clause libraries, version control,
           and full contract lifecycle management for less than one DocuSign seat.
         </p>
-        <Link href="/signup" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Managing Contracts</Link>
+        <Link href="/checkout?service=contracts&tier=starter" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Managing Contracts</Link>
       </section>
     </div>
   );

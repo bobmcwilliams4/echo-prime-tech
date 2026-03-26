@@ -1,4 +1,5 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -105,6 +106,7 @@ export default function WebsiteBuilderPage() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <FaqSchema faqs={FAQS} />
 
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between sticky top-0 z-50"
@@ -124,7 +126,7 @@ export default function WebsiteBuilderPage() {
         <div className="flex items-center gap-3">
           <Link href="/login" className="px-4 py-2 rounded-lg text-sm font-semibold"
             style={{ color: 'var(--ept-text-secondary)' }}>Sign In</Link>
-          <Link href="/signup" className="px-4 py-2 rounded-lg text-sm font-semibold"
+          <Link href="/checkout?service=websites&tier=starter" className="px-4 py-2 rounded-lg text-sm font-semibold"
             style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started</Link>
         </div>
       </nav>
@@ -145,7 +147,7 @@ export default function WebsiteBuilderPage() {
           production-ready, deployed website — in minutes.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/signup" className="px-8 py-3 rounded-xl font-semibold text-white text-center"
+          <Link href="/checkout?service=websites&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-white text-center"
             style={{ backgroundColor: 'var(--ept-accent)' }}>
             Build Your Site Free
           </Link>
@@ -274,7 +276,7 @@ export default function WebsiteBuilderPage() {
                   </li>
                 ))}
               </ul>
-              <Link href={plan.tier === 'Agency' ? '/support' : '/signup'}
+              <Link href={plan.tier === 'Agency' ? '/support' : `/checkout?service=websites&tier=${plan.tier.toLowerCase()}`}
                 className="w-full py-2.5 rounded-lg font-semibold text-center text-sm block"
                 style={{
                   backgroundColor: plan.popular ? 'var(--ept-accent)' : 'var(--ept-surface)',
@@ -327,7 +329,7 @@ export default function WebsiteBuilderPage() {
           Stop dragging blocks. Stop hiring devs for simple sites. Describe what you want and go live today.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/signup" className="px-8 py-3 rounded-xl font-semibold text-white"
+          <Link href="/checkout?service=websites&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-white"
             style={{ backgroundColor: 'var(--ept-accent)' }}>
             Build Your Site Free
           </Link>

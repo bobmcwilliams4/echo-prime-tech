@@ -1,8 +1,10 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import FaqSchema from '../../components/FaqSchema';
 
 interface ChangelogEntry {
   date: string;
@@ -15,6 +17,58 @@ interface ChangelogEntry {
 }
 
 const CHANGELOG: ChangelogEntry[] = [
+  {
+    date: '2026-03-26',
+    version: 'v2026.19',
+    title: '90 Blog Articles + 73 FaqSchema Pages + 40 BreadcrumbSchema Pages + 256 Static Pages',
+    type: 'launch',
+    description: 'Continued SEO and content expansion. 90 blog articles across 5 balanced categories, JSON-LD FaqSchema on all 73 FAQ pages for Google rich snippets, BreadcrumbSchema navigation on 40 key pages, 200 sitemap URLs, and 99 RSS items.',
+    highlights: [
+      '90 blog articles: Tax Intelligence (10), Security (11), Oilfield Tech (11), AI & Engineering (20), Product Updates (36)',
+      '73 pages with FaqSchema JSON-LD for Google FAQ rich results',
+      '40 pages with BreadcrumbSchema JSON-LD for breadcrumb rich results',
+      '256 static pages (up from 252)',
+      '200 sitemap URLs, 99 RSS feed items',
+      'New tax articles: Estate Planning, Entity Selection (LLC/S-Corp/C-Corp), R&D Tax Credits',
+      'New security articles: API Security Testing (OWASP Top 10), Cloud Security Posture Management (CSPM)',
+    ],
+    link: '/blog',
+  },
+  {
+    date: '2026-03-26',
+    version: 'v2026.18',
+    title: '76 Blog Articles + 70+ FAQ Pages + FAQ Rich Snippets + Organization Schema',
+    type: 'launch',
+    description: 'Massive SEO and content expansion: 76 blog articles across 5 categories (up from 20), 70+ product pages with FAQ sections, FAQ JSON-LD structured data for Google rich snippets, enhanced Organization schema with contact information, and 37 SoftwareApplication JSON-LD entries.',
+    highlights: [
+      '76 blog articles: Tax Intelligence (7), Security (9), Oilfield Tech (11), AI & Engineering (17), Product Updates (32)',
+      '70+ product pages with FAQ sections (6 Q&As each)',
+      'FaqSchema component for Google FAQ rich snippets on all FAQ pages',
+      'Enhanced Organization schema: address, phone, email, social links',
+      '37 SoftwareApplication JSON-LD entries for product pages',
+      '88 product page-level metadata layouts for SEO',
+      'Full sitemap.xml with 170+ URLs',
+      'RSS feed with 30+ articles',
+      'About page: Technology Stack section + FAQ',
+      'Category data quality fixes (removed orphan categories)',
+    ],
+    link: '/blog',
+  },
+  {
+    date: '2026-03-26',
+    version: 'v2026.17',
+    title: '50+ New Product Pages + Complete Product Suite',
+    type: 'launch',
+    description: 'Expanded from 40 pages to 90+ with complete product coverage. New product pages for HR, Inventory, Finance AI, Project Manager, LMS, Surveys, Status Page, Knowledge Base, Helpdesk, Social Media, Email Marketing, Booking, Contracts, Forms, Link Shortener, Gamer Companion, Home AI, Intel Hub, and more.',
+    highlights: [
+      '50+ new product pages with consistent design language',
+      'SEO metadata layouts for all product pages',
+      'Cross-linked navigation between related products',
+      'Coming Soon Guard for unreleased features',
+      'Product Tutorial system with guided overlays',
+    ],
+    link: '/services',
+  },
   {
     date: '2026-03-23',
     version: 'v2026.14',
@@ -233,6 +287,7 @@ export default function ChangelogPage() {
 
   return (
     <div style={{ color: 'var(--ept-text)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Changelog', href: '/changelog' }]} />
       {/* Nav */}
       <nav
         className="border-b px-6 py-4 flex items-center justify-between"

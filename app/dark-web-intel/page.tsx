@@ -1,8 +1,10 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import FaqSchema from '../../components/FaqSchema';
 
 const NAV_ITEMS = [
   { label: 'Engines', href: '/engines' },
@@ -116,6 +118,8 @@ export default function DarkWebIntelPage() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Dark Web Intel', href: '/dark-web-intel' }]} />
+      <FaqSchema faqs={FAQS} />
 
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between sticky top-0 z-50"
@@ -138,7 +142,7 @@ export default function DarkWebIntelPage() {
             </Link>
           ))}
         </div>
-        <Link href="/signup"
+        <Link href="/checkout?service=dark-web-intel&tier=starter"
           className="px-4 py-2 rounded-xl text-sm font-semibold"
           style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
           Get Started
@@ -159,7 +163,7 @@ export default function DarkWebIntelPage() {
           AI-powered dark web monitoring, breach detection, and brand protection. 3,816 tracked threats. 4,752 IOCs. 16 scraper sources. Real-time alerts.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/signup"
+          <Link href="/checkout?service=dark-web-intel&tier=starter"
             className="px-8 py-4 rounded-xl font-semibold text-lg"
             style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
             Start Free Trial
@@ -277,7 +281,7 @@ export default function DarkWebIntelPage() {
                   </li>
                 ))}
               </ul>
-              <Link href={tier.name === 'Enterprise' ? '/support' : '/signup'}
+              <Link href={tier.name === 'Enterprise' ? '/support' : `/checkout?service=dark-web-intel&tier=${tier.name.toLowerCase()}`}
                 className="block text-center px-4 py-3 rounded-xl font-semibold text-sm"
                 style={{
                   backgroundColor: tier.popular ? 'var(--ept-accent)' : 'transparent',
@@ -328,7 +332,7 @@ export default function DarkWebIntelPage() {
           The question is whether you know about it. Start your free 14-day trial — no credit card required.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/signup"
+          <Link href="/checkout?service=dark-web-intel&tier=starter"
             className="px-8 py-4 rounded-xl font-semibold text-lg"
             style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
             Start Free Trial

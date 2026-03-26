@@ -1,21 +1,21 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Customer Reviews — What People Say About Echo Prime Technologies',
-  description: 'Read reviews from businesses using Echo Prime AI engines, Closer AI sales agent, Sentinel intelligence, and more. Real feedback from real users.',
+  title: 'Echo Reviews — AI Review Management & Reputation Platform | Echo Prime Technology',
+  description: 'Collect, manage, and showcase customer reviews with AI. Sentiment analysis, review request campaigns, embeddable widgets, competitor tracking, and reputation analytics. Starting at $14/mo.',
   openGraph: {
-    title: 'Customer Reviews — Echo Prime Technologies',
-    description: 'Real reviews from businesses using AI engines, sales agents, and intelligence tools.',
+    title: 'Echo Reviews — AI Review Management & Reputation Platform',
+    description: 'Turn happy customers into your best marketing. AI-powered review collection, sentiment analysis, and reputation management.',
     url: 'https://echo-ept.com/reviews',
   },
   twitter: {
     card: 'summary',
-    title: 'Customer Reviews — Echo Prime Technologies',
-    description: 'Real reviews from businesses using AI engines, sales agents, and intelligence tools.',
+    title: 'Echo Reviews — AI Review Management & Reputation Platform',
+    description: 'Turn happy customers into your best marketing. AI-powered review collection, sentiment analysis, and reputation management.',
   },
   alternates: { canonical: '/reviews' },
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+export default function ReviewsLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

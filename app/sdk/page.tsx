@@ -5,6 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    Echo Prime SDK — Developer Sales + Signup Page
@@ -206,6 +208,16 @@ const FEATURES = [
   },
 ];
 
+/* ─── FAQs ─── */
+const FAQS = [
+  { q: 'How do I get started with the Echo Prime SDK?', a: 'Sign up for a free API key on this page — no credit card required. Install the CLI with npm or pip, initialize with your key, and start querying intelligence engines immediately. The entire process takes under 60 seconds.' },
+  { q: 'How do I manage and rotate my API key?', a: 'Your API key is displayed once at signup — store it securely. If your key is compromised or you need a new one, use the "Regenerate API Key" option on the signup form with your registered email. Regeneration instantly revokes the previous key.' },
+  { q: 'What are the rate limits for each tier?', a: 'Free: 5 requests/min (500/day). Starter: 30 requests/min (2,000/day). Pro: 120 requests/min (10,000/day). Enterprise: custom limits up to 100,000 requests/day. Rate limit headers are included in every response so you can track usage in real time.' },
+  { q: 'Which programming languages are supported?', a: 'We provide first-class SDKs for TypeScript/JavaScript (npm) and Python (pip). Any language that can make HTTP requests works with our REST API — cURL, Go, Rust, Java, C#, Ruby, and more. OpenAPI specs are available for code generation.' },
+  { q: 'What can I do on the free tier?', a: 'The free tier includes 500 requests per day, access to 10 engine domains, full knowledge search, and community support. It is ideal for prototyping and personal projects. Upgrade to Starter or Pro when you need more domains, higher throughput, or premium features like Bot Factory and webhooks.' },
+  { q: 'Does the SDK support webhooks and async callbacks?', a: 'Yes. Pro and Enterprise tiers include webhook support. Register a callback URL through the API and receive real-time notifications for long-running engine queries, doctrine generation completions, and scraper pipeline results — no polling required.' },
+];
+
 /* ═══════════════════════════════════════════════════════════════════════════════ */
 
 export default function SDKPage() {
@@ -331,6 +343,8 @@ export default function SDKPage() {
 
   return (
     <div style={{ color: textPrimary, minHeight: '100vh' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Developers',href:'/sdk'},{name:'SDK Gateway',href:'/sdk'}]} />
       {/* ═══════════════ NAVIGATION ═══════════════ */}
       <nav
         className="fixed top-0 w-full z-50 backdrop-blur-2xl border-b transition-colors duration-500"
@@ -906,6 +920,34 @@ export default function SDKPage() {
           </pre>
         </div>
       </section>
+
+      {/* ═══════════════ FAQ ═══════════════ */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════ Related Articles ═══════════════ */}
+      <div className="mt-16 max-w-4xl mx-auto px-6">
+        <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Related Articles</h3>
+        <div className="grid md:grid-cols-2 gap-3">
+          {[
+            { title: 'Edge Computing for AI Inference on Cloudflare Workers', href: '/blog/edge-computing-ai-inference-cloudflare-workers-2026' },
+            { title: 'AI Document Analysis and Contract Review', href: '/blog/ai-document-analysis-contract-review-automation-2026' },
+          ].map(a => (
+            <a key={a.href} href={a.href} className="p-4 rounded-lg border text-sm font-medium hover:opacity-80 transition-opacity" style={{ borderColor: 'var(--ept-card-border)', color: 'var(--ept-accent)' }}>
+              {a.title} &rarr;
+            </a>
+          ))}
+        </div>
+      </div>
 
       {/* ═══════════════ FOOTER CTA ═══════════════ */}
       <section className="max-w-3xl mx-auto px-6 pb-32 text-center">

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 // ════════════════════════════════════════════════════════════════
 // ECHO PRIME TECHNOLOGIES — Permian Basin Oilfield AI
@@ -120,6 +122,33 @@ const TIERS = [
   },
 ];
 
+const FAQS = [
+  {
+    q: 'What Permian Basin well data do you cover?',
+    a: 'We index production data, completion reports, and well records across all major Permian sub-basins — Delaware, Midland, Central Basin Platform, and Northwest Shelf. Coverage spans 98 Texas counties with the highest density in core counties like Midland, Ector, Reeves, Ward, Pecos, and Martin.',
+  },
+  {
+    q: 'How does your production decline analysis work?',
+    a: 'Our engines apply Arps hyperbolic, harmonic, and exponential decline models to historical RRC production data. You get EUR estimates, b-factor calculations, and type curve comparisons — all backed by real field data, not generic assumptions. Results include confidence intervals and sensitivity analysis.',
+  },
+  {
+    q: 'Can I use Echo Prime for lease evaluation and acquisition due diligence?',
+    a: 'Yes. Our Lease & Contract Analysis engines read and interpret OGLs, JOAs, PSAs, farmouts, and division orders. They flag problematic clauses, Pugh clause implications, overconveyance risks, and depth severance issues. Combined with title intelligence, you get a full diligence package in hours.',
+  },
+  {
+    q: 'How does county records integration work?',
+    a: 'We maintain a continuously updated index of grantor-grantee records across 98 Texas counties, with 259,000+ deed records classified into 59 instrument types. Our AI resolves name variations, links probate records, and detects chain-of-title gaps automatically — no manual courthouse visits required.',
+  },
+  {
+    q: 'Do you offer API access for operators and engineering teams?',
+    a: 'Absolutely. Our Producer tier and above includes full REST API access to all oilfield engines — production analytics, title intelligence, lease analysis, and regulatory compliance. API keys authenticate through our SDK Gateway with sub-50ms response times from Cloudflare edge.',
+  },
+  {
+    q: 'How frequently is your well and production data updated?',
+    a: 'RRC production data is ingested as soon as new filings are published, typically within 24-48 hours of availability. County deed records are refreshed on a rolling basis with priority given to high-activity Permian Basin counties. Regulatory alerts and compliance deadlines update in real time.',
+  },
+];
+
 const STATS = [
   { value: '5,486+', label: 'AI Engines' },
   { value: '259K+', label: 'Deed Records' },
@@ -152,6 +181,8 @@ export default function PermianBasinPage() {
 
   return (
     <div className="min-h-screen transition-colors duration-500" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Industry Solutions',href:'/services'},{name:'Permian Basin AI',href:'/permian'}]} />
       {/* ─── Nav ─── */}
       <nav className="fixed top-0 w-full z-50 backdrop-blur-2xl border-b transition-colors duration-500" style={{ backgroundColor: 'var(--ept-nav-bg)', borderColor: 'var(--ept-border)' }}>
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -426,6 +457,34 @@ export default function PermianBasinPage() {
             ))}
           </div>
         </section>
+
+        {/* ─── FAQ ─── */}
+        <section className="py-16 px-6 max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+          <div className="space-y-6">
+            {FAQS.map(faq => (
+              <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+                <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ─── Related Articles ─── */}
+        <div className="mt-16 max-w-4xl mx-auto px-6">
+          <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Related Articles</h3>
+          <div className="grid md:grid-cols-2 gap-3">
+            {[
+              { title: 'AI Artificial Lift Optimization', href: '/blog/oilfield-production-optimization-ai-artificial-lift-2026' },
+              { title: 'How Independent O&G Operators Use AI', href: '/blog/ai-for-independent-oil-gas-operators' },
+            ].map(a => (
+              <a key={a.href} href={a.href} className="p-4 rounded-lg border text-sm font-medium hover:opacity-80 transition-opacity" style={{ borderColor: 'var(--ept-card-border)', color: 'var(--ept-accent)' }}>
+                {a.title} &rarr;
+              </a>
+            ))}
+          </div>
+        </div>
 
         {/* ─── CTA ─── */}
         <section className="max-w-3xl mx-auto px-6 text-center">

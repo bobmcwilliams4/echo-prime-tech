@@ -1,8 +1,10 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import FaqSchema from '../../components/FaqSchema';
 
 const NAV_ITEMS = [
   { label: 'Engines', href: '/engines' },
@@ -71,6 +73,8 @@ export default function RewardsPage() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Rewards', href: '/rewards' }]} />
+      <FaqSchema faqs={FAQS} />
 
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between sticky top-0 z-50"
@@ -93,7 +97,7 @@ export default function RewardsPage() {
             </Link>
           ))}
         </div>
-        <Link href="/signup"
+        <Link href="/checkout?service=rewards&tier=starter"
           className="px-4 py-2 rounded-xl text-sm font-semibold"
           style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
           Start Earning
@@ -114,7 +118,7 @@ export default function RewardsPage() {
           Echo Coin is the loyalty and rewards token of the Echo Prime ecosystem. Earn coins by using products, stake for APY up to 15%, and unlock membership perks as you climb from Bronze to Sovereign.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <Link href="/signup"
+          <Link href="/checkout?service=rewards&tier=starter"
             className="px-8 py-4 rounded-xl font-semibold text-lg"
             style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
             Start Earning Free
@@ -216,7 +220,7 @@ export default function RewardsPage() {
               <div className="font-bold mb-1" style={{ color: 'var(--ept-text)' }}>{s.period}</div>
               <div className="text-xs font-semibold mb-3" style={{ color: 'var(--ept-accent)' }}>{s.label}</div>
               <div className="text-sm flex-1 mb-4" style={{ color: 'var(--ept-text-secondary)' }}>{s.desc}</div>
-              <Link href="/signup"
+              <Link href="/checkout?service=rewards&tier=starter"
                 className="block text-center px-4 py-2 rounded-lg text-sm font-semibold border"
                 style={{ borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)' }}>
                 Stake Now
@@ -267,7 +271,7 @@ export default function RewardsPage() {
           Start earning coins for every query, every engine run, every interaction. Free to join — no credit card.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/signup"
+          <Link href="/checkout?service=rewards&tier=starter"
             className="px-8 py-4 rounded-xl font-semibold text-lg"
             style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
             Start Earning Free

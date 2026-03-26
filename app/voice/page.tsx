@@ -6,6 +6,8 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useTheme } from '../../lib/theme-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 // ─── Constants ───
 const TTS_API = 'https://tts.echo-op.com';
@@ -14,6 +16,15 @@ const ECHO_API_KEY = process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-f
 const MAX_CLONE_SIZE = 50 * 1024 * 1024;
 const MAX_TEXT_LENGTH = 50_000;
 const ENGINE_VERSION = '3.0.0';
+
+const FAQS = [
+  { q: 'How does voice cloning work?', a: 'Upload a clean audio sample of the target voice (minimum 30 seconds, ideally 2-5 minutes). Our engine analyzes pitch, cadence, timbre, and speech patterns to create a high-fidelity digital voice model. Cloned voices can then generate speech from any text input with natural prosody.' },
+  { q: 'What languages are supported?', a: 'Our TTS engine supports 29 languages including English, Spanish, French, German, Japanese, Mandarin, Portuguese, Arabic, Hindi, Korean, and more. ElevenLabs multilingual v2 powers cross-lingual synthesis, allowing a single cloned voice to speak multiple languages naturally.' },
+  { q: 'What is the typical text-to-speech latency?', a: 'First-byte latency averages 180-350ms via our ElevenLabs v3 primary pipeline. Cached requests return in under 50ms. Our three-tier fallback chain (ElevenLabs Cloud, Echo Speak Edge, Local GPU) ensures consistent sub-500ms delivery even under load.' },
+  { q: 'Can I train a custom voice model?', a: 'Yes. Professional voice cloning accepts audio samples via the Voice Cloning tab. For enterprise clients, we offer fine-tuned voice models trained on larger datasets (1-10 hours of audio) with custom emotion ranges, speaking styles, and domain-specific pronunciation.' },
+  { q: 'How do I integrate the Voice API into my application?', a: 'Our REST API accepts POST requests with text, voice ID, and optional parameters (speed, stability, similarity, format). Authentication uses an API key header. SDKs are available for JavaScript, Python, and cURL. See the API tab in Voice Studio for full documentation and code examples.' },
+  { q: 'How is voice usage priced?', a: 'Voice credits are included with Echo Prime subscriptions. The free tier includes 10,000 characters per month. Professional plans start at $29/month with 500,000 characters, and Enterprise plans offer unlimited generation. Voice cloning and custom model training are available on Professional and above.' },
+];
 
 /**
  * TTS generation with ElevenLabs ConvoAI v3 as primary, Echo Speak as fallback.
@@ -2655,6 +2666,8 @@ export default function VoicePage() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Products',href:'/services'},{name:'Voice AI',href:'/voice'}]} />
       {/* Top nav */}
       <nav className="h-12 border-b flex items-center justify-between px-4 shrink-0 z-50" style={{ backgroundColor: 'var(--ept-bg-alt)', borderColor: 'var(--ept-border)' }}>
         <div className="flex items-center gap-4">
@@ -2761,6 +2774,19 @@ export default function VoicePage() {
           exampleQueries={['Comparison of TTS engines: ElevenLabs vs Azure vs Google', 'How to reduce TTS latency', 'Voice cloning ethical considerations']}
         />
       </section>
+      {/* ─── FAQ ─── */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {FAQS.map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <footer className="py-8 text-center border-t" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
           &copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved.

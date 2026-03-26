@@ -1,10 +1,12 @@
 'use client';
+import FaqSchema from '../../components/FaqSchema';
 
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 /* ==============================================================================
    ECHO HOME AI — Whole-Home Intelligence & Automation
@@ -92,6 +94,8 @@ export default function HomeAIPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/engines' }, { name: 'Smart Home AI', href: '/home-ai' }]} />
       {/* ── Nav ── */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">

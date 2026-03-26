@@ -1,4 +1,5 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
@@ -7,6 +8,7 @@ import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import FaqSchema from '../../components/FaqSchema';
 import {
   searchGenealogyRecords,
   searchDeedRecords,
@@ -57,6 +59,15 @@ const GENEALOGY_SOURCES = [
   { id: 'chronicling_america', name: 'Chronicling America', icon: '📰', desc: 'Library of Congress newspapers' },
   { id: 'usgenweb', name: 'USGenWeb', icon: '🗂️', desc: 'Volunteer county archives' },
   { id: 'courthouse', name: 'County Courthouses', icon: '🏛️', desc: 'Direct clerk portal access' },
+];
+
+const FAQS = [
+  { q: 'How many counties are covered?', a: 'Currently 33 Texas counties with 224,000+ deed records. We add new counties regularly. Coverage includes major oil & gas producing counties in the Permian Basin (Ector, Midland, Reeves, Loving, Ward, Crane, Upton, Reagan) plus surrounding areas.' },
+  { q: 'What document types are available?', a: 'Deeds (warranty, mineral, quitclaim, special warranty), oil & gas leases, assignments, releases, right-of-way easements, surface use agreements, pooling orders, division orders, and more. 32+ instrument types indexed.' },
+  { q: 'How current is the data?', a: 'Records are updated monthly from county clerk sources. Our ShadowGlass scraper runs automated harvesting cycles. Latest records are typically within 30 days of filing.' },
+  { q: 'Can I trace a chain of title?', a: 'Yes. Use Sentinel AI with natural language: "Show me the chain of title for Section 12, Block 33, T-2-S, Ector County." The system traces ownership through all conveyances and identifies gaps. Results include run sheets and ownership diagrams.' },
+  { q: 'Is there an API for bulk access?', a: 'Yes. Full REST API for searching, filtering, and downloading records. Bulk export via CSV or JSON. Rate limits depend on your plan. Perfect for title companies, land departments, and mineral buyers who need programmatic access.' },
+  { q: 'How does pricing work?', a: 'Free tier includes 10 searches/day. Professional ($99/mo) includes unlimited searches and API access. Enterprise ($299/mo) adds bulk export, dedicated support, and priority scraping for your counties of interest.' },
 ];
 
 interface SearchState {
@@ -258,6 +269,8 @@ export default function CountyRecordsPage() {
 
   return (
     <div data-tutorial="county-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'County Records', href: '/county-records' }]} />
+      <FaqSchema faqs={FAQS} />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <div className="flex items-center gap-6">
@@ -750,6 +763,33 @@ export default function CountyRecordsPage() {
             </div>
           </div>
         )}
+      </section>
+
+      {/* FAQ */}
+      <section className="px-6 py-16 max-w-4xl mx-auto">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-center mb-10" style={{ color: 'var(--ept-text)' }}>
+          Frequently Asked Questions
+        </h2>
+        <div className="space-y-4">
+          {FAQS.map((faq, i) => (
+            <details
+              key={i}
+              className="group rounded-xl border overflow-hidden"
+              style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}
+            >
+              <summary
+                className="flex items-center justify-between cursor-pointer px-6 py-4 text-sm font-semibold select-none"
+                style={{ color: 'var(--ept-text)' }}
+              >
+                {faq.q}
+                <span className="ml-4 shrink-0 transition-transform group-open:rotate-45 text-lg" style={{ color: 'var(--ept-accent)' }}>+</span>
+              </summary>
+              <div className="px-6 pb-5 text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
+                {faq.a}
+              </div>
+            </details>
+          ))}
+        </div>
       </section>
 
       {/* CTA */}

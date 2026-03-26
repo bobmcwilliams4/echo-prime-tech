@@ -1,4 +1,5 @@
 'use client';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
@@ -150,6 +151,7 @@ function KnowledgeExplorerApp() {
   if (view === 'dashboard') {
     return (
       <div className="space-y-8">
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Knowledge', href: '/knowledge' }]} />
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {loadingStats ? (
@@ -653,6 +655,26 @@ function KnowledgePageContent() {
           <KnowledgeExplorerApp />
         </section>
       )}
+
+      {/* FAQ */}
+      <section className="py-16 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <div className="space-y-6">
+          {[
+            { q: 'How is Knowledge Forge different from a regular search engine?', a: 'Knowledge Forge uses proprietary knowledge graphs and 5,486+ Intelligence Engines to understand relationships between concepts across 940+ domains. Instead of returning keyword matches, it delivers synthesized, citation-backed answers with full provenance chains — you know exactly where every fact comes from.' },
+            { q: 'What types of documents can I ingest?', a: 'The platform supports PDFs, Word documents, spreadsheets, plain text, HTML, Markdown, and structured data formats like JSON and CSV. Documents are automatically chunked, embedded, and indexed into domain-specific knowledge graphs. Bulk ingestion APIs handle thousands of documents in parallel.' },
+            { q: 'Can my team collaborate on a shared knowledge base?', a: 'Yes. Business and Enterprise plans support multi-user access with role-based permissions. Your team can ingest documents, tag knowledge, and query the system collaboratively. All access is logged in a full audit trail for compliance and governance.' },
+            { q: 'How do you ensure the accuracy of knowledge retrieval?', a: 'Every response is grounded in verified source documents with deterministic audit trails. Our engines use doctrine-backed retrieval — not hallucination-prone generation — meaning every claim is traceable to a specific document, section, and version. Confidence scoring tells you how reliable each answer is.' },
+            { q: 'Can I query across multiple domains simultaneously?', a: 'Absolutely. The cross-domain intelligence search routes your query to all relevant engines at once. A question about tax implications of a medical practice, for example, will pull doctrine from Tax, Legal, Medical, and Business engines simultaneously and synthesize a unified answer.' },
+            { q: 'Is there an API for integrating Knowledge Forge into our applications?', a: 'Yes. All plans include REST API access for programmatic search, ingestion, and knowledge retrieval. The SDK provides client libraries for JavaScript/TypeScript, Python, and cURL. Enterprise customers get dedicated rate limits, custom endpoints, and service-level agreements.' },
+          ].map(faq => (
+            <div key={faq.q} className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <h3 className="font-semibold mb-2" style={{ color: 'var(--ept-text)' }}>{faq.q}</h3>
+              <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <footer className="border-t py-8 text-center" style={{ borderColor: 'var(--ept-border)' }}>
         <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
