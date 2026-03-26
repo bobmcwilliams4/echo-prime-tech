@@ -2153,6 +2153,152 @@ const GUIDED_STEPS: Record<string, GuidedStep[]> = {
       tooltipPosition: 'top',
     },
   ]),
+
+  /* ═══════════════════════════════════════════════════════
+     ECHO CALL CENTER (/call-center)
+     ═══════════════════════════════════════════════════════ */
+  'call-center': makeSteps('call-center', [
+    { id: 'cc-hero', route: '/call-center', selector: '[data-tutorial="cc-hero"]', action: 'observe', title: 'Echo Call Center', callout: 'AI-powered call center with queue routing, supervisor dashboards, gamification, and workflow automation. 230+ REST endpoints and 65 database tables.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'cc-features', route: '/call-center', selector: '[data-tutorial="cc-features"]', action: 'observe', title: 'Feature Highlights', callout: 'Explore queue routing (5 strategies), VIP contacts, callbacks, voicemails, scripts engine, CRM webhooks, SLA alerts, TCPA compliance, and more.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'cc-pricing', route: '/call-center', selector: '[data-tutorial="cc-pricing"]', action: 'click', title: 'View Pricing', callout: 'Check out the pricing tiers — Starter, Professional, and Enterprise. Each includes a free trial.', tooltipPosition: 'bottom' },
+    { id: 'cc-comparison', route: '/call-center', selector: '[data-tutorial="cc-comparison"]', action: 'observe', title: 'How We Compare', callout: 'See how Echo Call Center stacks up against Five9, Talkdesk, and Aircall across 13 features.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'top' },
+    { id: 'cc-faq', route: '/call-center', selector: '[data-tutorial="cc-faq"]', action: 'click', title: 'FAQ', callout: 'Common questions about setup, integrations, and capabilities. Click any question to expand.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     ECHO HOME AI (/home-ai)
+     ═══════════════════════════════════════════════════════ */
+  'home-ai': makeSteps('home-ai', [
+    { id: 'home-hero', route: '/home-ai', selector: '[data-tutorial="home-hero"]', action: 'observe', title: 'Echo Home AI', callout: 'Whole-home intelligence — control 40+ smart device brands, tutor kids, manage bills, dispatch robots, and optimize energy from one AI dashboard.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'home-devices', route: '/home-ai', selector: '[data-tutorial="home-devices"]', action: 'observe', title: 'Device Control', callout: 'Add and manage smart lights, thermostats, locks, cameras, robot vacuums, mowers, and more — all unified.', autoAdvance: true, autoAdvanceDelay: 4000, tooltipPosition: 'bottom' },
+    { id: 'home-education', route: '/home-ai', selector: '[data-tutorial="home-education"]', action: 'observe', title: 'Education Module', callout: 'Assign homework, generate AI test prep, track scores, and monitor student progress — built-in tutoring.', autoAdvance: true, autoAdvanceDelay: 4000, tooltipPosition: 'bottom' },
+    { id: 'home-security', route: '/home-ai', selector: '[data-tutorial="home-security"]', action: 'observe', title: 'Security Systems', callout: 'Arm/disarm your home, control locks, view cameras, and review activity logs — all from one interface.', autoAdvance: true, autoAdvanceDelay: 4000, tooltipPosition: 'bottom' },
+    { id: 'home-pricing', route: '/home-ai', selector: '[data-tutorial="home-pricing"]', action: 'click', title: 'View Plans', callout: 'Choose a plan and start automating your home. Free trial available on all tiers.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     ECHO SHEPHERD AI (/shepherd)
+     ═══════════════════════════════════════════════════════ */
+  'shepherd': makeSteps('shepherd', [
+    { id: 'shepherd-hero', route: '/shepherd', selector: '[data-tutorial="shepherd-hero"]', action: 'observe', title: 'Echo Shepherd AI', callout: 'Church management powered by AI — member care, sermon planning, giving, curriculum, and communications for any denomination.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'shepherd-giving', route: '/shepherd', selector: '[data-tutorial="shepherd-giving"]', action: 'observe', title: 'Online Giving', callout: 'Recurring donations, campaigns, text-to-give, and automated tax statements — making generosity frictionless.', autoAdvance: true, autoAdvanceDelay: 4000, tooltipPosition: 'bottom' },
+    { id: 'shepherd-curriculum', route: '/shepherd', selector: '[data-tutorial="shepherd-curriculum"]', action: 'observe', title: 'Curriculum & Study', callout: 'AI-generated Bible studies, group assignments, and progress tracking — discipleship made easy.', autoAdvance: true, autoAdvanceDelay: 4000, tooltipPosition: 'bottom' },
+    { id: 'shepherd-comms', route: '/shepherd', selector: '[data-tutorial="shepherd-comms"]', action: 'observe', title: 'Communications', callout: 'Send announcements, manage prayer requests, and celebrate answered prayers — keep your congregation connected.', autoAdvance: true, autoAdvanceDelay: 4000, tooltipPosition: 'bottom' },
+    { id: 'shepherd-pricing', route: '/shepherd', selector: '[data-tutorial="shepherd-pricing"]', action: 'click', title: 'Get Started', callout: 'Plans start at $29/mo for small churches. 21 denomination configs included.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     ECHO INTEL HUB (/intel-hub)
+     ═══════════════════════════════════════════════════════ */
+  'intel-hub': makeSteps('intel-hub', [
+    { id: 'intel-hero', route: '/intel-hub', selector: '[data-tutorial="intel-hero"]', action: 'observe', title: 'Echo Intel Hub', callout: 'Digital intelligence platform — threat intel, geofencing, breach monitoring, and automated risk reports.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'intel-threats', route: '/intel-hub', selector: '[data-tutorial="intel-threats"]', action: 'observe', title: 'Threat Intelligence', callout: 'Ingest IOCs, check indicators, and correlate threats across your infrastructure in real-time.', autoAdvance: true, autoAdvanceDelay: 4000, tooltipPosition: 'bottom' },
+    { id: 'intel-geo', route: '/intel-hub', selector: '[data-tutorial="intel-geo"]', action: 'observe', title: 'Geofencing', callout: 'Define GPS zones, track entry/exit events, and set up location-based alerts with haversine distance.', autoAdvance: true, autoAdvanceDelay: 4000, tooltipPosition: 'bottom' },
+    { id: 'intel-breach', route: '/intel-hub', selector: '[data-tutorial="intel-breach"]', action: 'observe', title: 'Breach Monitoring', callout: 'Monitor emails and domains for data breaches. Get reports with risk scoring and remediation steps.', autoAdvance: true, autoAdvanceDelay: 4000, tooltipPosition: 'bottom' },
+    { id: 'intel-pricing', route: '/intel-hub', selector: '[data-tutorial="intel-pricing"]', action: 'click', title: 'Choose Plan', callout: 'Personal, Business, and Enterprise tiers. All include a kill switch and anomaly detection.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     A/B TESTING (/ab-testing)
+     ═══════════════════════════════════════════════════════ */
+  'ab-testing': makeSteps('ab-testing', [
+    { id: 'ab-hero', route: '/ab-testing', selector: '[data-tutorial="ab-hero"]', action: 'observe', title: 'Echo A/B Testing', callout: 'Bayesian A/B testing with AI optimization. Get results 3-5x faster than traditional tools with revenue tracking.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'ab-features', route: '/ab-testing', selector: '[data-tutorial="ab-features"]', action: 'observe', title: 'Testing Features', callout: 'Split tests, multivariate tests, feature flags, visual editor, and server-side testing via REST API.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'ab-comparison', route: '/ab-testing', selector: '[data-tutorial="ab-comparison"]', action: 'observe', title: 'How We Compare', callout: 'Compare against Optimizely, VWO, and Google Optimize across 12 dimensions.', autoAdvance: true, autoAdvanceDelay: 4000, tooltipPosition: 'top' },
+    { id: 'ab-pricing', route: '/ab-testing', selector: '[data-tutorial="ab-pricing"]', action: 'click', title: 'Start Testing', callout: 'From $29/mo for 5 experiments. Growth plan includes AI suggestions and multivariate tests.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     INCIDENT MANAGER (/incident-manager)
+     ═══════════════════════════════════════════════════════ */
+  'incident-manager': makeSteps('incident-manager', [
+    { id: 'im-hero', route: '/incident-manager', selector: '[data-tutorial="im-hero"]', action: 'observe', title: 'Echo Incident Manager', callout: 'From alert to post-mortem in one platform. AI escalation, timeline tracking, and blameless post-mortems.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'im-features', route: '/incident-manager', selector: '[data-tutorial="im-features"]', action: 'observe', title: 'Incident Features', callout: 'Full lifecycle management — P1-P4 severity, auto-escalation, timeline tracking, and metrics dashboards.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'im-comparison', route: '/incident-manager', selector: '[data-tutorial="im-comparison"]', action: 'observe', title: 'vs PagerDuty & OpsGenie', callout: 'See how Echo stacks up on escalation, post-mortems, metrics, and pricing.', autoAdvance: true, autoAdvanceDelay: 4000, tooltipPosition: 'top' },
+    { id: 'im-pricing', route: '/incident-manager', selector: '[data-tutorial="im-pricing"]', action: 'click', title: 'Start Free Trial', callout: 'Plans from $19/mo. Professional includes AI escalation rules and MTTR/MTTD metrics.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     GAMER COMPANION (/gamer-companion)
+     ═══════════════════════════════════════════════════════ */
+  'gamer-companion': makeSteps('gamer-companion', [
+    { id: 'gc-hero', route: '/gamer-companion', selector: '[data-tutorial="gc-hero"]', action: 'observe', title: 'GGI Apex Predator', callout: 'AI-powered gaming companion — real-time overlays, build optimization, match analysis, and coaching across 50+ games.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'gc-features', route: '/gamer-companion', selector: '[data-tutorial="gc-features"]', action: 'observe', title: 'Core Features', callout: 'Aim training, team comms analysis, meta tracking, replay review, and streaming integration.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'gc-pricing', route: '/gamer-companion', selector: '[data-tutorial="gc-pricing"]', action: 'click', title: 'Choose Your Tier', callout: 'Free tier available. Pro unlocks AI coaching, match analysis, and real-time overlays.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     WHATSAPP BOT (/whatsapp-bot)
+     ═══════════════════════════════════════════════════════ */
+  'whatsapp-bot': makeSteps('whatsapp-bot', [
+    { id: 'wa-hero', route: '/whatsapp-bot', selector: '[data-tutorial="wa-hero"]', action: 'observe', title: 'Echo WhatsApp Bot', callout: '14 AI personalities, 2,600+ knowledge engines, lead capture, broadcasts, and product catalogs — all on WhatsApp.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'wa-features', route: '/whatsapp-bot', selector: '[data-tutorial="wa-features"]', action: 'observe', title: 'Bot Features', callout: 'Domain-aware routing, Shared Brain memory, Knowledge Forge access, and HMAC webhook security.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'wa-comparison', route: '/whatsapp-bot', selector: '[data-tutorial="wa-comparison"]', action: 'observe', title: 'vs WATI & ManyChat', callout: 'Compare AI capabilities, knowledge engines, memory, and performance.', autoAdvance: true, autoAdvanceDelay: 4000, tooltipPosition: 'top' },
+    { id: 'wa-pricing', route: '/whatsapp-bot', selector: '[data-tutorial="wa-pricing"]', action: 'click', title: 'Get Started', callout: 'From $49/mo with 1,000 messages. Professional includes all 14 personalities and product catalogs.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     TELEGRAM BOT (/telegram-bot)
+     ═══════════════════════════════════════════════════════ */
+  'telegram-bot': makeSteps('telegram-bot', [
+    { id: 'tg-hero', route: '/telegram-bot', selector: '[data-tutorial="tg-hero"]', action: 'observe', title: 'Echo Telegram Bot', callout: '32 AI personalities, 18 slash commands, voice transcription, crypto feeds, and community moderation.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'tg-features', route: '/telegram-bot', selector: '[data-tutorial="tg-features"]', action: 'observe', title: 'Bot Capabilities', callout: 'Voice STT pipeline, inline keyboards, autonomous posting, and domain-aware routing across 20+ expert domains.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'tg-pricing', route: '/telegram-bot', selector: '[data-tutorial="tg-pricing"]', action: 'click', title: 'Start Building', callout: 'From $29/mo. Professional includes all 32 personalities, crypto integration, and Knowledge Forge access.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     CRM (/crm) — NOT A PRODUCT PAGE YET, PLACEHOLDER
+     ═══════════════════════════════════════════════════════ */
+  'crm': makeSteps('crm', [
+    { id: 'crm-hero', route: '/crm', selector: '[data-tutorial="crm-hero"]', action: 'observe', title: 'Echo CRM', callout: 'AI-powered customer relationship management — contacts, deals, pipelines, and automated follow-ups.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'crm-features', route: '/crm', selector: '[data-tutorial="crm-features"]', action: 'observe', title: 'CRM Features', callout: 'Deal tracking, contact enrichment, email sequences, pipeline visualization, and AI-powered insights.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'crm-pricing', route: '/crm', selector: '[data-tutorial="crm-pricing"]', action: 'click', title: 'Get Started', callout: 'Plans from $19/mo. All tiers include unlimited contacts and AI-powered lead scoring.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     BOOKING (/booking)
+     ═══════════════════════════════════════════════════════ */
+  'booking': makeSteps('booking', [
+    { id: 'book-hero', route: '/booking', selector: '[data-tutorial="book-hero"]', action: 'observe', title: 'Echo Booking', callout: 'Intelligent appointment scheduling — automated confirmations, reminders, buffer times, and calendar sync.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'book-features', route: '/booking', selector: '[data-tutorial="book-features"]', action: 'observe', title: 'Scheduling Features', callout: 'Multi-staff calendars, service types, buffer times, automated reminders, and custom booking pages.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'book-pricing', route: '/booking', selector: '[data-tutorial="book-pricing"]', action: 'click', title: 'Start Booking', callout: 'Free tier for solo practitioners. Business tier adds staff management and API access.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     INVOICE (/invoice)
+     ═══════════════════════════════════════════════════════ */
+  'invoice': makeSteps('invoice', [
+    { id: 'inv-hero', route: '/invoice', selector: '[data-tutorial="inv-hero"]', action: 'observe', title: 'Echo Invoice', callout: 'AI-powered invoicing — generate, send, track, and collect payments with automated reminders and late fees.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'inv-features', route: '/invoice', selector: '[data-tutorial="inv-features"]', action: 'observe', title: 'Invoicing Features', callout: 'Templates, recurring invoices, payment tracking, overdue alerts, tax calculation, and export to accounting.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'inv-pricing', route: '/invoice', selector: '[data-tutorial="inv-pricing"]', action: 'click', title: 'Try Free', callout: 'Free tier includes 10 invoices/month. Professional adds automation and payment processing.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     DOCUMENT MANAGER (/document-manager)
+     ═══════════════════════════════════════════════════════ */
+  'document-manager': makeSteps('document-manager', [
+    { id: 'doc-hero', route: '/document-manager', selector: '[data-tutorial="doc-hero"]', action: 'observe', title: 'Echo Document Manager', callout: 'AI-powered document management — version control, OCR extraction, e-signatures, and smart search.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'doc-features', route: '/document-manager', selector: '[data-tutorial="doc-features"]', action: 'observe', title: 'Document Features', callout: 'Full-text search, version history, access controls, audit trails, and automated classification.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'doc-pricing', route: '/document-manager', selector: '[data-tutorial="doc-pricing"]', action: 'click', title: 'Get Started', callout: 'From $19/mo with 5GB storage. Professional adds OCR, e-signatures, and AI classification.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     EXPENSE TRACKER (/expense)
+     ═══════════════════════════════════════════════════════ */
+  'expense': makeSteps('expense', [
+    { id: 'exp-hero', route: '/expense', selector: '[data-tutorial="exp-hero"]', action: 'observe', title: 'Echo Expense Tracker', callout: 'AI-powered expense management — receipt scanning, mileage tracking, policy enforcement, and approval workflows.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'exp-features', route: '/expense', selector: '[data-tutorial="exp-features"]', action: 'observe', title: 'Expense Features', callout: 'OCR receipt scanning, category detection, per diem calculations, and multi-currency support.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'exp-pricing', route: '/expense', selector: '[data-tutorial="exp-pricing"]', action: 'click', title: 'Start Free Trial', callout: 'Plans from $9/mo per user. Unlimited receipt scanning on all tiers.', tooltipPosition: 'top' },
+  ]),
+
+  /* ═══════════════════════════════════════════════════════
+     CUSTOMER SUCCESS (/customer-success)
+     ═══════════════════════════════════════════════════════ */
+  'customer-success': makeSteps('customer-success', [
+    { id: 'cs-hero', route: '/customer-success', selector: '[data-tutorial="cs-hero"]', action: 'observe', title: 'Echo Customer Success', callout: 'AI-powered customer health scoring, churn prediction, expansion revenue tracking, and automated outreach.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'cs-features', route: '/customer-success', selector: '[data-tutorial="cs-features"]', action: 'observe', title: 'Success Features', callout: 'Health scores, usage analytics, NPS tracking, playbook automation, and renewal management.', autoAdvance: true, autoAdvanceDelay: 5000, tooltipPosition: 'bottom' },
+    { id: 'cs-pricing', route: '/customer-success', selector: '[data-tutorial="cs-pricing"]', action: 'click', title: 'Get Started', callout: 'From $49/mo. All plans include AI health scoring and churn prediction.', tooltipPosition: 'top' },
+  ]),
 };
 
 export function getGuidedSteps(tutorialId: string): GuidedStep[] {
