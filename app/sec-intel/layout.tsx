@@ -6,7 +6,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'SEC EDGAR Intelligence | Echo Prime Technologies',
     description: 'AI-powered SEC filing analysis with watchlists, alerts, and automated intelligence.',
+    url: 'https://echo-ept.com/sec-intel',
   },
+  alternates: { canonical: '/sec-intel' },
 };
 
 export default function SecIntelLayout({ children }: { children: React.ReactNode }) {

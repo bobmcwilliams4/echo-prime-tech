@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'AI Price Alerts | Echo Prime Technologies',
     description: 'Real-time AI price alerts for crypto and stocks with custom thresholds and multi-channel notifications.',
+    url: 'https://echo-ept.com/price-alerts',
   },
 };
 

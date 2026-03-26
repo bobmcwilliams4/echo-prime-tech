@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Reddit AI Monitor | Echo Prime Technologies',
     description: 'AI-powered Reddit monitoring with keyword tracking, sentiment analysis, and trend detection.',
+    url: 'https://echo-ept.com/reddit',
   },
 };
 

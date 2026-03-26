@@ -6,7 +6,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'X/Twitter AI Bot | Echo Prime Technologies',
     description: 'Autonomous X/Twitter bot with AI content generation, 14 personalities, and Grok images.',
+    url: 'https://echo-ept.com/x-bot',
   },
+  alternates: { canonical: '/x-bot' },
 };
 
 export default function XBotLayout({ children }: { children: React.ReactNode }) {
