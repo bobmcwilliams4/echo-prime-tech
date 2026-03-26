@@ -56,6 +56,7 @@ export default function StatusPagePage() {
   const { isDark } = useTheme();
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Status Page — Uptime Monitoring & Public Status Pages</h1><p>Beautiful public status pages with real-time uptime monitoring. Features include HTTP, TCP, and DNS endpoint monitoring with configurable intervals from 30 seconds, branded public status pages with custom domain support, incident management with real-time timeline updates, scheduled maintenance windows with subscriber alerts, email, SMS, and webhook notifications, 90-day uptime history with response time graphs, component grouping for API, website, and database services, REST API for programmatic management, uptime badge embeds, P95 and P99 response time tracking, and free SSL certificates. Pricing from $9/mo compared to $29/mo for StatusPage.io.</p></div></noscript>
       <FaqSchema faqs={FAQS} />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/pricing' }, { name: 'Status Page', href: '/status-page' }]} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>

@@ -922,6 +922,7 @@ function PipelinesPageContent() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Data Pipelines — Automated Data Integration</h1><p>Build automated data pipelines with visual configuration. Connect REST APIs, databases, file systems, webhooks, and cloud storage as data sources. Apply transformations including JSON extraction, CSV parsing, deduplication, filtering, AI enrichment, and schema validation. Schedule pipelines on cron intervals or trigger on demand. Monitor pipeline health with execution history, success rates, and record counts. Features include multi-source ingestion, configurable transformations, scheduled execution, real-time monitoring, and export to any destination.</p></div></noscript>
       <ProductTutorialButton tutorialId="pipelines" productName="Data Pipelines" />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>

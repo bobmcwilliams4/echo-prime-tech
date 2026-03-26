@@ -73,6 +73,7 @@ export default function CustomerSuccessPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: dark ? '#0a0a0a' : '#ffffff', color: dark ? '#e5e5e5' : '#1a1a1a' }}>
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Customer Success — AI-Powered Customer Health & Retention</h1><p>AI health scoring, automated playbooks, onboarding tracking, and churn prediction for SaaS customer success teams. Features include real-time composite health scores from 5 signal categories with configurable weights, automated retention playbooks triggered by health drops or contract expiry, template-based onboarding with step tracking and auto-completion, expansion opportunity tracking with upsell confidence scoring, automatic risk alerts with severity levels, AI-powered churn prediction with retention recommendations, NPS and CSAT survey collection, touchpoint logging with sentiment analysis, CSM assignment with workload visibility, net revenue retention analytics with daily snapshots, and CSV/JSON export. Pricing from $39/mo compared to $2,500/mo for Gainsight.</p></div></noscript>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Customer Success', href: '/customer-success' }]} />
       <FaqSchema />
 

@@ -70,6 +70,7 @@ export default function DataRoomPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: dark ? '#0a0a0a' : '#ffffff', color: dark ? '#e5e5e5' : '#1a1a1a' }}>
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Data Room — AI-Powered Virtual Data Room for Due Diligence</h1><p>Secure virtual data room for M&A transactions, fundraising, and due diligence. Features include granular per-user per-document permissions for view, download, print, and upload access. Digital NDA tracking with full legal records. Complete audit trail logging every document view, download, and login. AI-powered due diligence analysis for document completeness and risk identification. Structured Q&A module with AI-suggested answers. Secure expiring access links with email verification. Nested folder hierarchy with version control. Dynamic watermarking with viewer name and timestamp. Engagement analytics tracking who viewed what and for how long. Flat monthly pricing from $49/mo compared to $15K+ per deal for Intralinks.</p></div></noscript>
       <FaqSchema />
 
       <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>

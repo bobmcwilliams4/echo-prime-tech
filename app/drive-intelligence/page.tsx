@@ -49,6 +49,7 @@ export default function DriveIntelligencePage() {
     <>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Drive Intelligence', href: '/drive-intelligence' }]} />
       <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Drive Intelligence — AI File System Analysis</h1><p>Turn chaotic file systems into organized intelligence. AI-powered file classification, content-aware duplicate detection, sensitive data discovery for PII, PHI, and credentials, storage optimization recommendations, smart folder organization, file relationship mapping, version history tracking across locations, multi-source scanning for local drives, NAS, and cloud storage, compliance reports for GDPR, HIPAA, SOC2, and PCI-DSS, and full-text search across all file contents. Pricing from $19/mo for Starter to $199/mo for Enterprise with unlimited scan capacity.</p></div></noscript>
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 16, background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Echo Drive Intelligence</h1>

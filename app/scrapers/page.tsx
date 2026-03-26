@@ -108,6 +108,7 @@ export default function ScrapersPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Custom Scraper Factory — Echo Prime Technologies</h1><p>Industrial-grade data extraction. Web scrapers, API harvesters, document processors, and intelligence pipelines built to your spec, deployed on Cloudflare Workers. Categories include web scrapers for e-commerce, real estate, and job boards; government and legal scrapers for county deeds, SEC filings, and court documents; social media intelligence for Twitter, Reddit, and reviews; and data harvester pipelines for APIs, documents, and knowledge ingestion. Pricing starts at $399 one-time for a starter scraper build.</p></div></noscript>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Scrapers', href: '/scrapers' }]} />
       <FaqSchema faqs={FAQS} />
       <ProductTutorialButton tutorialId="scrapers" productName="Custom Scrapers" />

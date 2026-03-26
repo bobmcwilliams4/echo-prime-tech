@@ -66,6 +66,7 @@ export default function IncidentManagerPage() {
     <>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Incident Manager', href: '/incident-manager' }]} />
       <FaqSchema faqs={faqs} />
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Incident Manager — AI-Powered Incident Response Platform</h1><p>Complete incident response lifecycle management with AI-powered escalation. Features include full incident state machine from creation through investigation, escalation, resolution, and closure. Configurable multi-tier AI escalation rules with automatic SLA breach promotion. Chronological timeline tracking for every incident action. Structured blameless post-mortem reports with root cause analysis and action items. P1-P4 severity classification with per-level SLA targets. Real-time MTTR and MTTD metrics dashboard. Webhook ingestion from Datadog, Grafana, Prometheus, and Sentry. Multi-channel alerts via email, Slack, and webhooks. Pricing from $19/mo compared to $25/user/mo for PagerDuty.</p></div></noscript>
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
 
         {/* Hero */}

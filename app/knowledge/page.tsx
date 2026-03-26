@@ -472,6 +472,7 @@ function KnowledgePageContent() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Knowledge Forge — AI Knowledge Management</h1><p>Search, explore, and query over 5,000 knowledge documents across 18 categories. AI-powered semantic search finds relevant information instantly. Features include full-text search with natural language queries, categorized knowledge browser, document ingestion pipeline, and integration with 2,600+ intelligence engines. The Knowledge Forge powers contextual answers across tax law, cybersecurity, oilfield operations, business management, and more.</p></div></noscript>
       <ProductTutorialButton tutorialId="knowledge" productName="Knowledge Forge" />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>

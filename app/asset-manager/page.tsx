@@ -66,6 +66,7 @@ export default function AssetManagerPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: dark ? '#0a0a0a' : '#ffffff', color: dark ? '#e5e5e5' : '#1a1a1a' }}>
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Asset Manager — AI-Powered Asset Lifecycle Management</h1><p>Track every asset with automatic depreciation, maintenance scheduling, and AI condition assessments. Features include comprehensive asset registry with custom fields, tags, serial numbers, and photos. Automatic straight-line and declining-balance depreciation with daily cron updates. Preventive maintenance scheduling with cost tracking. AI condition assessment analyzing age, maintenance history, and manufacturer data. Location tracking across buildings, floors, rooms, and GPS coordinates. Insurance policy management with expiry alerts. Portfolio analytics dashboard with total value and depreciation breakdowns. Check in/out tracking with condition logging. Market valuation history and replacement cost tracking. Structured disposal workflow. AI tax forecast for depreciation impact. Pricing from $29/mo compared to $1,500/yr for Asset Panda.</p></div></noscript>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Asset Manager', href: '/asset-manager' }]} />
       <FaqSchema />
       <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>

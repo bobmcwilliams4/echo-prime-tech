@@ -216,6 +216,7 @@ function ScannerPageContent() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Security Scanner — AI-Powered Vulnerability Assessment</h1><p>12 security analyzers scan your infrastructure in under 30 seconds across 200+ checkpoints. Features include port scanning and service enumeration, SSL and TLS configuration analysis, HTTP security header validation, DNS record auditing, subdomain discovery and enumeration, web application vulnerability scanning, API security testing, cloud misconfiguration detection, credential exposure checking, and continuous monitoring with scheduled scans. Results are categorized by severity level with actionable remediation guidance.</p></div></noscript>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Scanner', href: '/scanner' }]} />
       <FaqSchema faqs={FAQS} />
       <ProductTutorialButton tutorialId="scanner" productName="Security Scanner" />

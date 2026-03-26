@@ -559,6 +559,7 @@ export default function EcommercePage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Prime Store — AI Intelligence Products & Services</h1><p>Purchase AI intelligence engines, security tools, data pipelines, and professional services from Echo Prime Technologies. Browse products by category including AI Engines, Security, Data Pipelines, and Professional Services. Each product includes detailed feature lists, pricing tiers, and instant checkout. Products range from Sentinel AI intelligence engines and penetration testing services to data pipeline automation and custom scraper development. All products deploy on Cloudflare Workers for global edge performance.</p></div></noscript>
       <FaqSchema faqs={FAQS} />
       {/* Nav Bar */}
       <nav className="border-b px-6 py-4 flex items-center justify-between sticky top-0 z-50" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>

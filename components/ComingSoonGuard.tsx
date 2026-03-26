@@ -136,11 +136,12 @@ const EXEMPT_PREFIXES = [
   '/epocgs',             // AI Collectibles Grading (alt route)
   '/business-manager',   // Business Manager
 
+  '/crypto-trading',     // AI Crypto Trading (full product page)
+  '/scrapers',           // Custom Scraper Factory (full product page)
+  '/pipelines',          // Data Pipelines (full product page)
+
   // ── BLOCKED (redirect to /coming-soon): ──
   // '/sec-intel'        — duplicate of /security, UI shell
-  // '/crypto-trading'   — no execution engine, regulatory risk
-  // '/scrapers'         — internal tool, looks shady
-  // '/pipelines'        — internal infra, not customer product
   // '/orchestration'    — internal infra, 190 lines
   // '/sandbox'          — CTF training, not a product
 ];

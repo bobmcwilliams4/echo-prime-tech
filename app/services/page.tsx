@@ -74,6 +74,7 @@ export default function ServicesPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Professional Services — Echo Prime Technologies</h1><p>Enterprise AI services: autonomous intelligence engines, voice synthesis, website development, collectibles grading, cybersecurity, penetration testing, and more. Select the services you want to activate and manage your subscriptions from the dashboard. Bundle multiple services for 15-30% savings. All plans include email support with 24-hour response times.</p></div></noscript>
       <ProductTutorialButton tutorialId="services" productName="Professional Services" />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority /></Link>

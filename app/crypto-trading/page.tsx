@@ -186,6 +186,7 @@ export default function CryptoTradingPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>AI-Powered Crypto Trading — Fully Automated | Echo Prime Technologies</h1><p>Automated trading strategies across 200+ pairs on 5 major exchanges with sub-50ms execution. Features include automated grid trading, DCA bots, momentum scalping, and mean-reversion strategies. AI signal engine analyzes technical indicators, order book depth, funding rates, and on-chain metrics. Portfolio-level risk management with stop-loss, trailing stops, drawdown caps, and circuit breakers. Multi-exchange execution on Binance, Coinbase Pro, Kraken, KuCoin, and Bybit. Tax-compliant Form 8949 reports with FIFO, LIFO, and specific identification methods. Free tier for portfolio tracking; Pro plan at $49/mo for automated AI trading.</p></div></noscript>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Crypto Trading', href: '/crypto-trading' }]} />
       <FaqSchema faqs={FAQS} />
       {/* --- Nav --- */}

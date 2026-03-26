@@ -227,6 +227,7 @@ function SecurityPageContent() {
 
   return (
     <div data-tutorial="security-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Cybersecurity Intelligence — AI Threat Detection | Echo Prime Technologies</h1><p>Enterprise-grade cybersecurity with AI-powered penetration testing, dark web monitoring, credential auditing, and threat intelligence. Features include network penetration testing, web application security, API security assessment, social engineering testing, wireless security auditing, cloud configuration review, source code analysis, red team exercises, dark web credential monitoring, OSINT intelligence gathering, and compliance reporting for NIST, SOC2, PCI-DSS, and HIPAA frameworks. Our team holds OSCP, OSCE, GPEN, GWAPT, CEH, and CISSP certifications.</p></div></noscript>
       <FaqSchema faqs={FAQS} />
       <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Products',href:'/services'},{name:'Cybersecurity',href:'/security'}]} />
       {/* ─── Nav ─── */}

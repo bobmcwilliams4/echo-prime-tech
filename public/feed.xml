@@ -8,7 +8,31 @@
     <lastBuildDate>Thu, 26 Mar 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
 
-    <!-- 115 Articles (5 new: scheduling, compliance, recruiting, newsletter, feedback) -->
+    <!-- 118 Articles (3 new: expense management, contract management, payroll) -->
+    <item>
+      <title>AI Expense Management Software in 2026: Echo Expense vs Expensify vs SAP Concur</title>
+      <link>https://echo-ept.com/blog/ai-expense-management-vs-expensify-sap-concur-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-expense-management-vs-expensify-sap-concur-2026</guid>
+      <category>Product Updates</category>
+      <description>Expensify charges $5/user/month minimum. SAP Concur starts at $8/report. AI expense management with receipt OCR, policy enforcement, and real-time spend analytics delivers more for less.</description>
+    </item>
+    <item>
+      <title>AI Contract Management Platform in 2026: Echo Contracts vs DocuSign CLM vs Ironclad</title>
+      <link>https://echo-ept.com/blog/ai-contract-management-vs-docusign-clm-ironclad-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-contract-management-vs-docusign-clm-ironclad-2026</guid>
+      <category>Product Updates</category>
+      <description>DocuSign CLM costs $40,000+/year. Ironclad starts at $50,000. AI contract management with risk scoring, clause extraction, and automated workflows delivers enterprise CLM at SMB pricing.</description>
+    </item>
+    <item>
+      <title>AI Payroll Software for Small Business in 2026: Echo Payroll vs Gusto vs ADP</title>
+      <link>https://echo-ept.com/blog/ai-payroll-software-small-business-vs-gusto-adp-2026</link>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-payroll-software-small-business-vs-gusto-adp-2026</guid>
+      <category>Product Updates</category>
+      <description>Gusto charges $40/mo + $6/employee. ADP starts at $79/mo + $4/employee. AI payroll with tax filing, compliance monitoring, and predictive cost modeling cuts costs by 70%.</description>
+    </item>
     <item>
       <title>AI Scheduling Software for Small Business: Stop Losing $15K/Year to No-Shows</title>
       <link>https://echo-ept.com/blog/ai-scheduling-software-small-business-2026</link>
