@@ -625,6 +625,7 @@ export default function HomePage() {
                   { label: 'Echo CRM', href: '/crm' },
                   { label: 'Helpdesk', href: '/helpdesk' },
                   { label: 'Inventory', href: '/inventory' },
+                  { label: 'Invoice', href: '/invoice' },
                   { label: 'Title Intelligence', href: '/title-intelligence' },
                   { label: 'Permian Basin AI', href: '/permian' },
                   { label: 'Tax Preparation', href: '/tax-returns' },

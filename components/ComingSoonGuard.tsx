@@ -50,6 +50,7 @@ const EXEMPT_PREFIXES = [
   '/crm',                // Echo CRM
   '/helpdesk',           // Echo Helpdesk
   '/inventory',          // Echo Inventory
+  '/invoice',            // Echo Invoice
   '/surveillance',       // Prometheus Surveillance
   '/dark-web-intel',     // Dark Web Intelligence
   '/rewards',            // Echo Rewards
