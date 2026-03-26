@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import BreadcrumbSchema from '@/components/BreadcrumbSchema';
 
 /* ══════════════════════════════════════════════════════════════
    DATA
@@ -473,6 +474,7 @@ export default function CallCenterPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Call Center', href: '/call-center' }]} />
       {/* Nav */}
       <nav
         className="border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40"

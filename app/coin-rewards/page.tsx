@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
   { question: 'How does the token economy work?', answer: 'Users earn Echo Coins for actions you define — purchases, referrals, reviews, engagement, milestones. Coins are redeemable for discounts, exclusive content, upgrades, or custom rewards. The exchange rate and reward catalog are fully customizable.' },
@@ -46,6 +47,7 @@ export default function CoinRewardsPage() {
 
   return (
     <>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Echo Coin Rewards', href: '/coin-rewards' }]} />
       <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>

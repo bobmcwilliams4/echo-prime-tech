@@ -1,6 +1,7 @@
 'use client'
 
 import { useTheme } from '../../lib/theme-context'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 function FaqSchema() {
   const faq = {
@@ -72,6 +73,7 @@ export default function CustomerSuccessPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: dark ? '#0a0a0a' : '#ffffff', color: dark ? '#e5e5e5' : '#1a1a1a' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Customer Success', href: '/customer-success' }]} />
       <FaqSchema />
 
       {/* Hero */}

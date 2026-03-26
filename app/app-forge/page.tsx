@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
   { q: 'What types of apps can it generate?', a: 'Six archetypes: Electron desktop apps, Next.js web apps, React Native mobile, CLI tools, Chrome extensions, and MCP servers. Each archetype has specialized templates and build pipelines.' },
@@ -46,6 +47,7 @@ export default function AppForgePage() {
 
   return (
     <>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'App Forge', href: '/app-forge' }]} />
       <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>

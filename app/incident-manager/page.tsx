@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
   {
@@ -63,6 +64,7 @@ export default function IncidentManagerPage() {
 
   return (
     <>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Incident Manager', href: '/incident-manager' }]} />
       <FaqSchema faqs={faqs} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
 

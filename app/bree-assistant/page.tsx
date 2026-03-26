@@ -1,5 +1,6 @@
 'use client';
 import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '@/components/BreadcrumbSchema';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -32,6 +33,7 @@ export default function BreeAssistantPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Bree Assistant', href: '/bree-assistant' }]} />
       <FaqSchema faqs={FAQS} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">

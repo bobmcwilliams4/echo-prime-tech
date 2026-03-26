@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
   { question: 'What voices are available?', answer: '69 cloned voices across multiple languages using ElevenLabs multilingual_v2 model. Each voice has distinct personality traits — from authoritative CEO to warm customer service. Custom voice cloning available on Professional plans.' },
@@ -47,6 +48,7 @@ export default function SpeakCloudPage() {
 
   return (
     <>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Speak Cloud', href: '/speak-cloud' }]} />
       <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>

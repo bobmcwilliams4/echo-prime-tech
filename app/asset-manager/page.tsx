@@ -1,6 +1,7 @@
 'use client'
 
 import { useTheme } from '../../lib/theme-context'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 function FaqSchema() {
   const faq = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [
@@ -65,6 +66,7 @@ export default function AssetManagerPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: dark ? '#0a0a0a' : '#ffffff', color: dark ? '#e5e5e5' : '#1a1a1a' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Asset Manager', href: '/asset-manager' }]} />
       <FaqSchema />
       <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
         <div style={{ display: 'inline-block', background: dark ? '#1a2a1a' : '#ecfdf5', color: dark ? '#f59e0b' : '#d97706', padding: '6px 16px', borderRadius: 20, fontSize: 14, fontWeight: 600, marginBottom: 20 }}>AI-Powered Asset Management</div>

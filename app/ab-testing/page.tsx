@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
   {
@@ -62,6 +63,7 @@ export default function AbTestingPage() {
 
   return (
     <>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'A/B Testing', href: '/ab-testing' }]} />
       <FaqSchema faqs={faqs} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
 

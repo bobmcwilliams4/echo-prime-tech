@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import BreadcrumbSchema from '@/components/BreadcrumbSchema';
 
 const FEATURES = [
   { icon: 'M', title: 'Multi-Tier Commissions', desc: 'Percentage, flat rate, tiered, or recurring commissions. Sub-affiliate earnings with automatic parent credit. Custom rates per affiliate.' },
@@ -48,6 +49,7 @@ export default function AffiliatePage() {
   const { isDark } = useTheme();
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Affiliate Program', href: '/affiliate' }]} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={140} height={36} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} /></Link>
         <div className="flex items-center gap-4">

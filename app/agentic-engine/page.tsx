@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
   { q: 'What is an autonomous AI agent?', a: 'An AI agent that can plan, execute, and iterate without human intervention. Give it a goal, and it breaks it into tasks, selects tools, executes steps, evaluates results, and adjusts its approach — running 24/7 on Cloudflare Workers.' },
@@ -46,6 +47,7 @@ export default function AgenticEnginePage() {
 
   return (
     <>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Agentic Engine', href: '/agentic-engine' }]} />
       <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>

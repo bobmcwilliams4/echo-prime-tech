@@ -1,5 +1,6 @@
 'use client';
 import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '@/components/BreadcrumbSchema';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -21,6 +22,7 @@ export default function BusinessManagerRedirect() {
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Business Manager', href: '/business-manager' }]} />
       <FaqSchema faqs={FAQS} />
       <p className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>Redirecting to Echo Office AI...</p>
 

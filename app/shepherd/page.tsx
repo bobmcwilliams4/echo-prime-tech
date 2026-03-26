@@ -1,5 +1,6 @@
 'use client';
 import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '@/components/BreadcrumbSchema';
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
@@ -263,6 +264,7 @@ export default function ShepherdPage() {
 
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Shepherd AI', href: '/shepherd' }]} />
       <FaqSchema faqs={FAQ} />
 
       {/* ── Nav Bar ── */}

@@ -5,14 +5,18 @@ import type { GuidedStep } from './guided-tutorial-context';
    Maps each tutorial to a sequence of interactive steps
    targeting real UI elements via data-tutorial selectors.
 
-   PRODUCT TUTORIALS (34 products):
+   PRODUCT TUTORIALS (52 products):
    - Engines, Closer (6 sub-tutorials), Grading, Tax Returns,
      Title Intelligence, Security, Pentesting, SDK, Knowledge,
      Pipelines, Bots, Scrapers, Immortality Vault, Dark Web Intel,
      Crypto Trading, Price Alerts, Reddit, Voice, EchoCAD,
      Daedalus Forge, Hephaestion Forge, Office AI, Bree Assistant,
      X Bot, LinkedIn, Payments, Scanner, E-Commerce, Websites,
-     Orchestration, County Records, Vault, Sandbox, Services
+     Orchestration, County Records, Vault, Sandbox, Services,
+     Call Center, Home AI, Shepherd AI, Intel Hub, A/B Testing,
+     Incident Manager, Gamer Companion, WhatsApp Bot, Telegram Bot,
+     CRM, Booking, Invoice, Inventory, Payroll, Document Manager,
+     Expense Tracker, Customer Success, Data Room
 ───────────────────────────────────────────────────────── */
 
 function makeSteps(

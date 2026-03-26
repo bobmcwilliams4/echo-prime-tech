@@ -1,5 +1,6 @@
 'use client';
 import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '@/components/BreadcrumbSchema';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -56,6 +57,7 @@ export default function AppointmentsPage() {
   const { isDark } = useTheme();
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Appointments', href: '/appointments' }]} />
       <FaqSchema faqs={FAQS} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={140} height={36} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} /></Link>
