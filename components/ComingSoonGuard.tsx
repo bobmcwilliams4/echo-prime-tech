@@ -118,6 +118,9 @@ const EXEMPT_PREFIXES = [
   '/mega-gateway',       // Echo MEGA Gateway
   '/phoenix-cloud',      // Echo Phoenix Cloud
 
+  // ── Documentation pages ──
+  '/docs',               // Documentation Hub + all sub-routes
+
   // ── Content pages ──
   '/blog',               // Blog articles
   '/changelog',          // Changelog
