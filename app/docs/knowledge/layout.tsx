@@ -1,15 +1,6 @@
 import type { Metadata } from 'next'
-
 export const metadata: Metadata = {
-  title: 'Knowledge Forge Documentation — User Manual & API Reference | Echo Prime Tech',
-  description: 'Complete documentation for Echo Knowledge Forge — document ingestion, vector embeddings, semantic search, RAG pipeline integration, and multi-source knowledge base management.',
-  openGraph: {
-    title: 'Knowledge Forge Documentation — User Manual & API Reference | Echo Prime Tech',
-    description: 'Complete documentation for Echo Knowledge Forge — document ingestion, vector embeddings, semantic search, and RAG pipeline integration.',
-    url: 'https://echo-ept.com/docs/knowledge',
-  },
+  title: 'Echo Knowledge Systems Documentation — Knowledge Forge User Manual | Echo Prime Tech',
+  description: 'Complete documentation for Echo Knowledge Systems: Knowledge Forge, document ingestion, semantic search, chunking, embeddings, and knowledge graph integration.',
 }
-
-export default function KnowledgeDocsLayout({ children }: { children: React.ReactNode }) {
-  return children
-}
+export default function Layout({ children }: { children: React.ReactNode }) { return children }

@@ -32,7 +32,7 @@ const categories: DocCategory[] = [
       { name: 'Quick Start Guide', href: '/sdk/quickstart', badge: 'Popular' },
       { name: 'Pricing & Plans', href: '/pricing' },
       { name: 'Free Tier Guide', href: '/free' },
-      { name: 'API Authentication', href: '/sdk' },
+      { name: 'API Authentication', href: '/docs/sdk', badge: 'Docs' },
     ],
   },
   {
@@ -40,8 +40,8 @@ const categories: DocCategory[] = [
     icon: '🧠',
     desc: 'Engine-backed intelligence products.',
     items: [
-      { name: 'Sentinel AI', href: '/docs/sentinel', badge: 'Flagship' },
-      { name: 'Intelligence Engines', href: '/engines' },
+      { name: 'Sentinel AI', href: '/docs/sentinel', badge: 'Docs' },
+      { name: 'Intelligence Engines', href: '/docs/engines', badge: 'Docs' },
       { name: 'Knowledge Forge', href: '/knowledge' },
       { name: 'Graph RAG', href: '/graph-rag' },
       { name: 'Doctrine System', href: '/engines/marketplace' },
@@ -55,11 +55,12 @@ const categories: DocCategory[] = [
     items: [
       { name: 'CRM', href: '/docs/crm', badge: 'Docs' },
       { name: 'Invoicing', href: '/docs/invoice', badge: 'Docs' },
+      { name: 'Office AI', href: '/docs/office-ai', badge: 'Docs' },
+      { name: 'Booking', href: '/docs/booking', badge: 'Docs' },
+      { name: 'Expense Tracking', href: '/docs/expense', badge: 'Docs' },
       { name: 'HR Management', href: '/hr' },
       { name: 'Project Management', href: '/project-manager' },
-      { name: 'Appointments', href: '/booking' },
       { name: 'Payroll', href: '/payroll' },
-      { name: 'Expense Tracking', href: '/expense-management' },
       { name: 'Inventory', href: '/inventory' },
       { name: 'Contracts', href: '/contracts' },
       { name: 'Proposals', href: '/proposals' },
@@ -71,11 +72,11 @@ const categories: DocCategory[] = [
     desc: 'Grow revenue with AI-powered tools.',
     items: [
       { name: 'Closer AI Sales', href: '/docs/closer', badge: 'Docs' },
+      { name: 'A/B Testing', href: '/docs/ab-testing', badge: 'Docs' },
       { name: 'Email Marketing', href: '/email-marketing' },
       { name: 'Social Media', href: '/social-media' },
       { name: 'Live Chat', href: '/live-chat' },
       { name: 'Surveys', href: '/surveys' },
-      { name: 'A/B Testing', href: '/ab-testing' },
       { name: 'Forms', href: '/forms' },
       { name: 'LMS / Courses', href: '/lms' },
     ],
@@ -85,13 +86,12 @@ const categories: DocCategory[] = [
     icon: '💬',
     desc: 'Bots, voice, and messaging.',
     items: [
-      { name: 'Bot Fleet', href: '/bots' },
-      { name: 'Discord Bot', href: '/bots' },
-      { name: 'LinkedIn Bot', href: '/linkedin' },
-      { name: 'Telegram Bot', href: '/telegram-bot' },
-      { name: 'WhatsApp Bot', href: '/whatsapp-bot' },
-      { name: 'X/Twitter Bot', href: '/x-bot' },
+      { name: 'Bot Fleet', href: '/docs/bots', badge: 'Docs' },
       { name: 'Voice AI / TTS', href: '/docs/voice', badge: 'Docs' },
+      { name: 'Telegram Bot', href: '/docs/telegram-bot', badge: 'Docs' },
+      { name: 'WhatsApp Bot', href: '/docs/whatsapp-bot', badge: 'Docs' },
+      { name: 'LinkedIn Bot', href: '/linkedin' },
+      { name: 'X/Twitter Bot', href: '/x-bot' },
       { name: 'Speak Cloud', href: '/speak-cloud' },
     ],
   },
@@ -100,10 +100,9 @@ const categories: DocCategory[] = [
     icon: '🔒',
     desc: 'Cybersecurity and intelligence.',
     items: [
-      { name: 'Security Suite', href: '/security' },
+      { name: 'Security Suite', href: '/docs/security', badge: 'Docs' },
+      { name: 'Dark Web Intel', href: '/docs/dark-web-intel', badge: 'Docs' },
       { name: 'Pentesting', href: '/pentesting' },
-      { name: 'Dark Web Intel', href: '/dark-web-intel' },
-      { name: 'SEC Intelligence', href: '/sec-intel' },
       { name: 'Surveillance', href: '/surveillance' },
       { name: 'Scanner', href: '/scanner' },
       { name: 'Vault', href: '/vault' },
@@ -115,11 +114,11 @@ const categories: DocCategory[] = [
     desc: 'Oil & gas, tax, legal, and more.',
     items: [
       { name: 'Permian Basin Intel', href: '/permian', badge: 'Flagship' },
+      { name: 'Tax Returns', href: '/docs/tax-returns', badge: 'Docs' },
+      { name: 'County Records', href: '/docs/county-records', badge: 'Docs' },
+      { name: 'EchoCAD', href: '/docs/echocad', badge: 'Docs' },
       { name: 'Title Intelligence', href: '/title-intelligence' },
-      { name: 'County Records', href: '/county-records' },
-      { name: 'Tax Returns', href: '/tax-returns' },
       { name: 'Grading / Collectibles', href: '/grading' },
-      { name: 'EchoCAD', href: '/echocad' },
     ],
   },
   {
@@ -127,13 +126,11 @@ const categories: DocCategory[] = [
     icon: '⚡',
     desc: 'APIs, SDKs, and integrations.',
     items: [
-      { name: 'SDK Documentation', href: '/sdk', badge: 'Dev' },
+      { name: 'SDK Gateway', href: '/docs/sdk', badge: 'Docs' },
+      { name: 'Hephaestion Forge', href: '/docs/hephaestion-forge', badge: 'Docs' },
+      { name: 'Daedalus Forge', href: '/docs/daedalus-forge', badge: 'Docs' },
       { name: 'SDK Quickstart', href: '/sdk/quickstart' },
-      { name: 'API Reference', href: '/sdk' },
-      { name: 'Webhooks', href: '/sdk' },
       { name: 'App Forge', href: '/app-forge' },
-      { name: 'Hephaestion Forge', href: '/hephaestion-forge' },
-      { name: 'Daedalus Forge', href: '/daedalus-forge' },
       { name: 'Prompt Forge', href: '/prompt-forge' },
     ],
   },
@@ -144,10 +141,10 @@ const categories: DocCategory[] = [
     items: [
       { name: 'Helpdesk', href: '/docs/helpdesk', badge: 'Docs' },
       { name: 'Call Center', href: '/docs/call-center', badge: 'Docs' },
+      { name: 'Incident Manager', href: '/docs/incident-manager', badge: 'Docs' },
+      { name: 'Document Manager', href: '/docs/document-manager', badge: 'Docs' },
       { name: 'Workflow Automation', href: '/workflow-automation' },
-      { name: 'Incident Manager', href: '/incident-manager' },
       { name: 'Vendor Manager', href: '/vendor-manager' },
-      { name: 'Orchestration', href: '/orchestration' },
     ],
   },
   {
@@ -155,12 +152,13 @@ const categories: DocCategory[] = [
     icon: '✨',
     desc: 'Unique AI-powered solutions.',
     items: [
-      { name: 'Immortality Vault', href: '/immortality-vault' },
+      { name: 'Immortality Vault', href: '/docs/immortality-vault', badge: 'Docs' },
       { name: 'Home AI', href: '/docs/home-ai', badge: 'Docs' },
       { name: 'Shepherd AI (Church)', href: '/docs/shepherd', badge: 'Docs' },
+      { name: 'Gamer Companion', href: '/docs/gamer-companion', badge: 'Docs' },
+      { name: 'Coin Rewards', href: '/docs/coin-rewards', badge: 'Docs' },
+      { name: 'Price Alerts', href: '/docs/price-alerts', badge: 'Docs' },
       { name: 'Bree Assistant', href: '/bree-assistant' },
-      { name: 'Gamer Companion', href: '/gamer-companion' },
-      { name: 'Echo Coin Rewards', href: '/coin-rewards' },
     ],
   },
 ]
@@ -223,7 +221,7 @@ export default function DocsPage() {
           <div className="flex justify-center gap-8 mt-8 flex-wrap">
             {[
               { value: '130+', label: 'Product Pages' },
-              { value: '75', label: 'Interactive Tutorials' },
+              { value: '33', label: 'Full User Manuals' },
               { value: '106', label: 'Blog Articles' },
               { value: '10', label: 'Doc Categories' },
             ].map(s => (
@@ -297,12 +295,12 @@ export default function DocsPage() {
           <h2 className="text-2xl font-bold text-center mb-8" style={{ color: 'var(--ept-text)' }}>User Manuals</h2>
           <div className="grid md:grid-cols-3 gap-4">
             {[
-              { title: 'Platform Guide', desc: 'Complete guide to the Echo Prime platform. Account setup, navigation, settings.', href: '/about', icon: '📘' },
-              { title: 'Sentinel AI Manual', desc: 'How to use engine-backed intelligence queries with confidence scoring.', href: '/sentinel', icon: '🛡️' },
-              { title: 'Closer AI Manual', desc: 'Sales pipeline, lead management, AI calls, scripts, and analytics.', href: '/closer', icon: '📞' },
-              { title: 'SDK Developer Guide', desc: 'API authentication, endpoints, rate limits, webhooks, and code samples.', href: '/sdk', icon: '🔧' },
-              { title: 'Bot Fleet Manual', desc: 'Configure bots for Discord, LinkedIn, Telegram, X, Reddit, and more.', href: '/bots', icon: '🤖' },
-              { title: 'Permian Basin Guide', desc: 'County records, title search, mineral rights, and production analytics.', href: '/permian', icon: '🛢️' },
+              { title: 'Sentinel AI Manual', desc: '5,486 engines, confidence stratification, cross-domain intelligence.', href: '/docs/sentinel', icon: '🛡️' },
+              { title: 'Closer AI Manual', desc: '35+ persuasion techniques, AI sales calls, pipeline analytics.', href: '/docs/closer', icon: '📞' },
+              { title: 'SDK Developer Guide', desc: 'API authentication, endpoints, rate limits, webhooks, and code samples.', href: '/docs/sdk', icon: '🔧' },
+              { title: 'Voice AI Manual', desc: '69 cloned voices, emotion engine, multi-provider TTS, streaming.', href: '/docs/voice', icon: '🎤' },
+              { title: 'Bot Fleet Manual', desc: '9-platform bot fleet: Discord, LinkedIn, Telegram, X, Reddit, and more.', href: '/docs/bots', icon: '🤖' },
+              { title: 'Security Suite', desc: 'Vulnerability scanning, pentesting, dark web monitoring, OSINT.', href: '/docs/security', icon: '🔒' },
             ].map(manual => (
               <Link key={manual.title} href={manual.href} className="p-5 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
                 <span className="text-3xl">{manual.icon}</span>
@@ -326,7 +324,7 @@ export default function DocsPage() {
 
         {/* Footer */}
         <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
-          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 130+ products. 75 tutorials. 611K+ doctrines.</p>
+          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 130+ products. 33 user manuals. 611K+ doctrines.</p>
           <div className="flex justify-center gap-6 mt-3">
             <Link href="/" style={{ color: 'var(--ept-accent)' }}>Home</Link>
             <Link href="/blog" style={{ color: 'var(--ept-accent)' }}>Blog</Link>
