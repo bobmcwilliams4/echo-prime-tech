@@ -139,6 +139,7 @@ const EXEMPT_PREFIXES = [
   '/crypto-trading',     // AI Crypto Trading (full product page)
   '/scrapers',           // Custom Scraper Factory (full product page)
   '/pipelines',          // Data Pipelines (full product page)
+  '/runway',             // Echo Runway (AI Fashion Platform)
 
   // ── BLOCKED (redirect to /coming-soon): ──
   // '/sec-intel'        — duplicate of /security, UI shell
