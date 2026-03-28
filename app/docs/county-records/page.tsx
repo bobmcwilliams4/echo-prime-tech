@@ -1,10 +1,18 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 export default function CountyRecordsDocPage() {
   return (
-    <ProductDoc
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: 'Echo County Records', href: '/docs/county-records' },
+      ]} />
+      <ProductDoc
       name="Echo County Records"
       tagline="AI-powered oil & gas deed record search and analysis — 259K+ records across 80+ Texas counties."
       accent="#92400e"
@@ -91,5 +99,6 @@ export default function CountyRecordsDocPage() {
         { q: 'Is there an API for integrating with my title software?', a: 'Yes. Professional and Enterprise plans include full REST API access. The API supports all search, chain building, and export functions available in the web interface. API documentation with code examples is available in the API Reference tab.' },
       ]}
     />
+    </>
   )
 }

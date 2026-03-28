@@ -1,6 +1,8 @@
 'use client'
 
 import ProductDoc, { ProductDocProps } from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const data: ProductDocProps = {
   name: 'Echo Expense Management',
@@ -89,5 +91,15 @@ const data: ProductDocProps = {
 }
 
 export default function ExpenseManagementDocsPage() {
-  return <ProductDoc {...data} />
+  return (
+    <>
+      <FaqSchema faqs={data.faq} name={data.name} />
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: data.name, href: '/docs/expense-management' },
+      ]} />
+      <ProductDoc {...data} />
+    </>
+  )
 }

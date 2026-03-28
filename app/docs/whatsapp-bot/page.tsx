@@ -1,10 +1,18 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 export default function WhatsAppBotDocPage() {
   return (
-    <ProductDoc
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: 'Echo WhatsApp Bot', href: '/docs/whatsapp-bot' },
+      ]} />
+      <ProductDoc
       name="Echo WhatsApp Bot"
       tagline="AI-powered WhatsApp Business automation — message templates, interactive flows, catalog integration, payments, and CRM sync."
       accent="#25d366"
@@ -91,5 +99,6 @@ export default function WhatsAppBotDocPage() {
         { q: 'How does the AI know about my business to answer questions?', a: 'Upload your business knowledge base (FAQ document, product specs, policies, pricing) through the /api/knowledge endpoint. The AI retrieves relevant sections when answering customer questions. It never fabricates information — if the answer is not in your knowledge base, it responds with a polite redirect to human support. Knowledge updates take effect immediately.' },
       ]}
     />
+    </>
   )
 }

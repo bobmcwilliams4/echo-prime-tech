@@ -1,10 +1,18 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 export default function VoiceDocPage() {
   return (
-    <ProductDoc
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: 'Echo Voice AI', href: '/docs/voice' },
+      ]} />
+      <ProductDoc
       name="Echo Voice AI"
       tagline="69 cloned voices, 4-layer emotion engine, multi-provider TTS, speech-to-text, and AI voice studio."
       accent="#8b5cf6"
@@ -97,5 +105,6 @@ export default function VoiceDocPage() {
         { q: 'Can the same voice speak multiple languages?', a: 'Yes. The multilingual_v2 model supports 29 languages. A cloned English voice can speak Spanish, French, German, etc. with the same voice characteristics but native pronunciation.' },
       ]}
     />
+    </>
   )
 }

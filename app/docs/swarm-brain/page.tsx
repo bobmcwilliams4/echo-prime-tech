@@ -1,6 +1,8 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const data = {
   name: 'Swarm Brain',
@@ -92,5 +94,15 @@ const data = {
 }
 
 export default function SwarmBrainDocPage() {
-  return <ProductDoc {...data} />
+  return (
+    <>
+      <FaqSchema faqs={data.faq} name={data.name} />
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: data.name, href: '/docs/swarm-brain' },
+      ]} />
+      <ProductDoc {...data} />
+    </>
+  )
 }

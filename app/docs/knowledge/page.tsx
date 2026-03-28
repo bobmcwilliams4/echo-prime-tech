@@ -1,10 +1,18 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 export default function KnowledgeDocsPage() {
   return (
-    <ProductDoc
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: 'Echo Knowledge Systems', href: '/docs/knowledge' },
+      ]} />
+      <ProductDoc
       name="Echo Knowledge Systems"
       tagline="AI-powered knowledge management — document ingestion, semantic search, auto-categorization, and enterprise knowledge graph."
       accent="#0d9488"
@@ -91,5 +99,6 @@ export default function KnowledgeDocsPage() {
         { q: 'Does ingesting a document make it public?', a: 'No. Documents are private by default. Only users with API keys scoped to the relevant category can access them. Public categories can be created for shared knowledge, but this is opt-in.' },
       ]}
     />
+    </>
   )
 }

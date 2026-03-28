@@ -1,10 +1,18 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 export default function DarkWebIntelDocPage() {
   return (
-    <ProductDoc
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: 'Dark Web Intelligence', href: '/docs/dark-web-intel' },
+      ]} />
+      <ProductDoc
       name="Dark Web Intelligence"
       tagline="AI-powered dark web monitoring and threat detection — know about breaches and threats before they become crises."
       accent="#991b1b"
@@ -91,5 +99,6 @@ export default function DarkWebIntelDocPage() {
         { q: 'Does the platform store the actual stolen passwords?', a: 'No. The platform stores password hashes and metadata (hash type, length, complexity indicators) but never stores plaintext passwords. This allows credential matching and validity estimation without creating an additional exposure risk. All finding data is encrypted at rest.' },
       ]}
     />
+    </>
   )
 }

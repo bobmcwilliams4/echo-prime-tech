@@ -1,10 +1,18 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 export default function PriceAlertsDocPage() {
   return (
-    <ProductDoc
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: 'Echo Price Alerts', href: '/docs/price-alerts' },
+      ]} />
+      <ProductDoc
       name="Echo Price Alerts"
       tagline="AI-powered price monitoring — track commodities, crypto, stocks, competitors, and custom data sources with real-time multi-channel alerts."
       accent="#ea580c"
@@ -91,5 +99,6 @@ export default function PriceAlertsDocPage() {
         { q: 'How far back does historical data go?', a: 'Crypto: full history from CoinGecko (varies by token, most major tokens have 5+ years). Equities: 20 years of daily data, 2 years of hourly data, 30 days of minute-level data. Commodities: 10 years of daily data. Custom scraped prices: from the date you added the asset. All data is stored in D1 and never purged.' },
       ]}
     />
+    </>
   )
 }

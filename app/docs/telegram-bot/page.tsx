@@ -1,10 +1,18 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 export default function TelegramBotDocPage() {
   return (
-    <ProductDoc
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: 'Echo Telegram Bot', href: '/docs/telegram-bot' },
+      ]} />
+      <ProductDoc
       name="Echo Telegram Bot"
       tagline="AI-powered Telegram automation — webhook processing, inline queries, group management, payments, and conversational AI."
       accent="#0088cc"
@@ -91,5 +99,6 @@ export default function TelegramBotDocPage() {
         { q: 'Can I connect the bot to external services?', a: 'Yes. Command handlers support HTTP callouts to any external API. Built-in integrations exist for Echo CRM, payment gateways, Google Sheets, and webhook relay. Custom integrations are configured via the /api/integrations endpoint with URL, auth headers, and payload templates.' },
       ]}
     />
+    </>
   )
 }

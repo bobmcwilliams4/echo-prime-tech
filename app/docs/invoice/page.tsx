@@ -1,10 +1,18 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 export default function InvoiceDocPage() {
   return (
-    <ProductDoc
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: 'Echo Invoice', href: '/docs/invoice' },
+      ]} />
+      <ProductDoc
       name="Echo Invoice"
       tagline="AI-powered invoicing — create, send, track, and automate billing with intelligent payment reminders."
       accent="#10b981"
@@ -99,5 +107,6 @@ export default function InvoiceDocPage() {
         { q: 'How do I migrate from QuickBooks or FreshBooks?', a: 'Use the CSV import tool to migrate clients, products, and invoice history. We provide import templates and a migration guide. Enterprise plan includes assisted migration.' },
       ]}
     />
+    </>
   )
 }

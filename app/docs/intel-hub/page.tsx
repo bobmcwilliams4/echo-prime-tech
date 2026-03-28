@@ -1,10 +1,18 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 export default function IntelHubDocPage() {
   return (
-    <ProductDoc
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: 'Echo Intel Hub', href: '/docs/intel-hub' },
+      ]} />
+      <ProductDoc
       name="Echo Intel Hub"
       tagline="Unified intelligence dashboard — aggregate, correlate, and act on data from every Echo source in real time."
       accent="#1e40af"
@@ -91,5 +99,6 @@ export default function IntelHubDocPage() {
         { q: 'Does Intel Hub store the raw source data?', a: 'Intel Hub stores normalized copies of all ingested data to enable cross-source search and correlation. Raw source data is retained based on your plan (90 days for Starter, 1 year for Professional, unlimited for Enterprise). You can configure per-source retention policies.' },
       ]}
     />
+    </>
   )
 }

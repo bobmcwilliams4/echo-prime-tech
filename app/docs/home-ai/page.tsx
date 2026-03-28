@@ -1,10 +1,18 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 export default function HomeAiDocPage() {
   return (
-    <ProductDoc
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: 'Echo Home AI', href: '/docs/home-ai' },
+      ]} />
+      <ProductDoc
       name="Echo Home AI"
       tagline="AI-powered smart home hub — automation, energy management, family scheduling, bills, tutoring, and more."
       accent="#f59e0b"
@@ -98,5 +106,6 @@ export default function HomeAiDocPage() {
         { q: 'Can I use Home AI without smart devices?', a: 'Yes. Many features work without smart devices: bill tracking, family calendar, meal planning, tutoring, pet care, fitness, and garden management. Smart devices add automation capabilities.' },
       ]}
     />
+    </>
   )
 }

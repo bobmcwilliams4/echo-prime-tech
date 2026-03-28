@@ -1,10 +1,18 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 export default function CoinRewardsDocPage() {
   return (
-    <ProductDoc
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: 'Echo Coin Rewards', href: '/docs/coin-rewards' },
+      ]} />
+      <ProductDoc
       name="Echo Coin Rewards"
       tagline="Gamified loyalty and rewards platform — earn points, unlock tiers, collect badges, refer friends, and redeem real rewards."
       accent="#f59e0b"
@@ -91,5 +99,6 @@ export default function CoinRewardsDocPage() {
         { q: 'Can my business create a custom rewards program using the API?', a: 'Yes. The API lets you mint coins for custom events, create branded reward catalogs, run challenges, and query user data. You define your own earn rules, reward items, and tier structure. White-label options remove Echo branding entirely. Contact sales for enterprise pricing and dedicated support.' },
       ]}
     />
+    </>
   )
 }

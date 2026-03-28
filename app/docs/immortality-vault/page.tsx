@@ -1,10 +1,18 @@
 'use client'
 
 import ProductDoc from '@/components/ProductDoc'
+import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 export default function ImmortalityVaultDocPage() {
   return (
-    <ProductDoc
+    <>
+      <BreadcrumbSchema items={[
+        { name: 'Home', href: '/' },
+        { name: 'Docs', href: '/docs' },
+        { name: 'Immortality Vault', href: '/docs/immortality-vault' },
+      ]} />
+      <ProductDoc
       name="Immortality Vault"
       tagline="AI-powered digital legacy and consciousness preservation — ensure your story, voice, and wisdom live forever."
       accent="#8b5cf6"
@@ -91,5 +99,6 @@ export default function ImmortalityVaultDocPage() {
         { q: 'Can I delete specific content from my vault permanently?', a: 'Yes. Navigate to the content item and select Permanent Delete. This removes the content from all backups and replicas within 72 hours. Deleted content cannot be recovered. For interview responses, you can retract specific answers without deleting the entire session.' },
       ]}
     />
+    </>
   )
 }
