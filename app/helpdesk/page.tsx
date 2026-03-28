@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { title: 'Smart Ticket Routing', desc: 'AI auto-assigns tickets based on agent skills, workload, and availability. Round-robin, least-loaded, and skill-based assignment.' },
@@ -185,12 +186,10 @@ export default function HelpdeskPage() {
       </section>
 
       {/* CTA */}
-      <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
-        <div className="p-10 rounded-2xl" style={{ backgroundColor: 'var(--ept-card-bg)', border: `1px solid var(--ept-card-border)` }}>
-          <h2 className="text-2xl md:text-3xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Transform Your Support?</h2>
-          <p className="mb-6" style={{ color: 'var(--ept-text-secondary)' }}>Join hundreds of businesses using Echo Helpdesk to deliver faster, smarter customer support.</p>
-          <Link href="/checkout?service=helpdesk&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
-        </div>
+      <section className="max-w-xl mx-auto px-6 pb-20">
+        <h2 className="text-2xl md:text-3xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Transform Your Support?</h2>
+        <p className="mb-6 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Join hundreds of businesses using Echo Helpdesk to deliver faster, smarter customer support.</p>
+        <TrialCTA serviceId="echo-helpdesk" tier="starter" productName="Echo Helpdesk" />
       </section>
     </div>
   );

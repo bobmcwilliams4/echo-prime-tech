@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '@/lib/theme-context';
 import { useAuth } from '@/lib/auth-context';
+import TrialCTA from '@/components/TrialCTA';
 
 /*  ═══════════════════════════════════════════════════════════════════
     Echo CRM — AI-Powered Customer Relationship Management
@@ -174,10 +175,10 @@ export default function CRMPage() {
       </section>
 
       {/* CTA */}
-      <section className="text-center py-20 px-6">
-        <h2 className="text-3xl font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Close More Deals?</h2>
-        <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>Join the teams switching from HubSpot and Salesforce to Echo CRM — faster, smarter, and 77% cheaper.</p>
-        <Link href="/checkout?service=crm&tier=team" className="px-8 py-4 rounded-xl font-semibold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
+      <section className="py-20 px-6 max-w-xl mx-auto">
+        <h2 className="text-3xl font-bold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Close More Deals?</h2>
+        <p className="text-lg mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Join the teams switching from HubSpot and Salesforce to Echo CRM — faster, smarter, and 77% cheaper.</p>
+        <TrialCTA serviceId="echo-crm" tier="team" productName="Echo CRM" />
       </section>
     </main>
   );

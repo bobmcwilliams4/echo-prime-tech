@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { title: 'Kanban Boards', desc: 'Drag-and-drop boards with customizable columns, WIP limits, and swimlanes. Visualize every stage of your workflow at a glance.' },
@@ -140,10 +141,10 @@ export default function ProjectManagerPage() {
       </section>
 
       {/* CTA Footer */}
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-extrabold mb-4">Ready to Ship Faster?</h2>
-        <p className="text-lg mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Start managing projects in minutes. No credit card required.</p>
-        <Link href="/checkout?service=pm&tier=starter" className="px-10 py-4 rounded-xl font-bold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started Free</Link>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl md:text-3xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Ship Faster?</h2>
+        <p className="mb-6 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Start managing projects in minutes. No credit card required.</p>
+        <TrialCTA serviceId="echo-pm" tier="starter" productName="Echo Project Manager" />
       </section>
 
       <footer className="text-center py-10 text-sm" style={{ color: 'var(--ept-text-muted)' }}>

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 const FAQS = [
   { q: 'How does online booking work?', a: 'Share your booking link or embed the widget on your site. Clients choose a service, pick an available time slot, and confirm in under 60 seconds. Real-time availability prevents double-bookings automatically.' },
@@ -119,10 +120,10 @@ export default function BookingPage() {
       </section>
 
       {/* CTA Footer */}
-      <section className="max-w-3xl mx-auto px-6 py-16 text-center">
-        <h2 className="text-3xl font-extrabold mb-4">Ready to Fill Your Calendar?</h2>
-        <p className="text-lg mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Start accepting bookings in under 5 minutes. No credit card required for the free tier.</p>
-        <Link href="/checkout?service=booking&tier=pro" className="px-8 py-4 rounded-xl font-bold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
+      <section className="max-w-xl mx-auto px-6 py-16">
+        <h2 className="text-2xl md:text-3xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Fill Your Calendar?</h2>
+        <p className="mb-6 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Start accepting bookings in under 5 minutes. No credit card required.</p>
+        <TrialCTA serviceId="echo-booking" tier="pro" productName="Echo Booking" />
       </section>
 
       <footer className="text-center py-10 text-sm" style={{ color: 'var(--ept-text-muted)' }}>

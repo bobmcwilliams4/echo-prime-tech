@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: '📄', title: 'Invoice Creation', desc: 'Generate professional branded invoices with line items, taxes, discounts, and notes. Export print-ready PDFs in seconds.' },
@@ -124,10 +125,10 @@ export default function InvoicePage() {
       </section>
 
       {/* CTA */}
-      <section className="px-6 py-20 text-center">
-        <h2 className="text-3xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Streamline Your Invoicing?</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Join thousands of businesses that get paid faster with Echo Invoicing.</p>
-        <Link href="/checkout?service=invoicing&tier=pro" className="px-8 py-4 rounded-xl font-bold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl md:text-3xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Streamline Your Invoicing?</h2>
+        <p className="mb-6 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Join thousands of businesses that get paid faster with Echo Invoicing.</p>
+        <TrialCTA serviceId="echo-invoicing" tier="pro" productName="Echo Invoicing" />
       </section>
 
       {/* Footer */}
