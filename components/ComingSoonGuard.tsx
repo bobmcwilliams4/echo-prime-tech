@@ -122,6 +122,13 @@ const EXEMPT_PREFIXES = [
   '/document-delivery',  // Echo Document Delivery
   '/autonomous-builder', // Echo Autonomous Builder
   '/diagnostics',        // Echo Diagnostics Agent
+  '/appointments',       // Echo Appointments
+  '/document-manager',   // Echo Document Manager
+  '/invoicing',          // Echo Invoicing
+  '/project-management', // Echo Project Management
+  '/hr-management',      // Echo HR Management
+  '/expense',            // Echo Expense
+  '/sec-intel',          // Security Intelligence
 
   // ── Documentation pages ──
   '/docs',               // Documentation Hub + all sub-routes
@@ -147,8 +154,7 @@ const EXEMPT_PREFIXES = [
   '/runway',             // Echo Runway (AI Fashion Platform)
 
   // ── BLOCKED (redirect to /coming-soon): ──
-  // '/sec-intel'        — duplicate of /security, UI shell
-  // '/orchestration'    — internal infra, 190 lines
+  // '/orchestration'    — internal infra, redirect to /engines
   // '/sandbox'          — CTF training, not a product
 ];
 
