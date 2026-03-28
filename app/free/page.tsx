@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    Free Tier — Conversion Landing Page
@@ -120,6 +121,7 @@ export default function FreePage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Free Tier', href: '/free' }]} />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">

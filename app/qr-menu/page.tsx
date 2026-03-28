@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 const FEATURES = [
   { icon: 'Q', title: 'QR Code Generator', desc: 'Generate unique QR codes for each table, counter, or location. Bulk create up to 100 codes at once. Custom styling with your brand colors.' },
@@ -47,6 +48,7 @@ export default function QrMenuPage() {
   const { isDark } = useTheme();
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'QR Menu', href: '/qr-menu' }]} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={140} height={36} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} /></Link>
         <div className="flex items-center gap-4">
