@@ -8,6 +8,7 @@ import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { getServices, subscribe, Service } from '../../lib/ept-api';
 import { createInvoice } from '../../lib/paypal-api';
+import { createCheckoutSession } from '../../lib/stripe-api';
 import PayPalCheckoutButtons from '../../components/PayPalCheckoutButtons';
 
 // ── Tax rates by US state (simplified — major states) ──
@@ -306,6 +307,37 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
     }
   };
 
+  // Stripe Checkout — redirect to Stripe-hosted payment page
+  const [stripeLoading, setStripeLoading] = useState(false);
+  const handleStripeCheckout = async () => {
+    const validationError = validateBilling();
+    if (validationError) { setError(validationError); return; }
+    if (!invoice || !selectedService || !selectedTier) return;
+
+    setError('');
+    setStripeLoading(true);
+    try {
+      const result = await createCheckoutSession({
+        plan_name: `${selectedService.name} — ${selectedTier.tier} Plan`,
+        price_cents: Math.round(invoice.total * 100),
+        interval: selectedTier.interval === 'year' ? 'year' : 'month',
+        customer_email: billing.email,
+        customer_name: billing.companyName || billing.contactName,
+        service_id: initialServiceId,
+        tier: initialTier,
+      });
+      if (result.ok && result.url) {
+        window.location.href = result.url;
+      } else {
+        setError(result.error || 'Failed to create checkout session');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Stripe checkout failed');
+    } finally {
+      setStripeLoading(false);
+    }
+  };
+
   const handlePayPalSuccess = async (details: { order_id: string; capture_id?: string; payer?: string; status: string }) => {
     // Activate subscription in DB after successful PayPal payment
     try { await subscribe([initialServiceId]); } catch {}
@@ -363,7 +395,7 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
               <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
                 {isB2BInvoice
                   ? 'A PayPal invoice will be sent to your email. Net-30 payment terms.'
-                  : 'Pay securely with PayPal, Venmo, credit/debit card, or Pay Later.'}
+                  : 'Pay securely with credit/debit card via Stripe, or with PayPal, Venmo, or Pay Later.'}
               </p>
             </div>
 
@@ -464,9 +496,33 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
                 </div>
               )}
 
-              {/* B2C: PayPal Smart Buttons | B2B: Send Invoice button */}
+              {/* B2C: Stripe + PayPal | B2B: Send Invoice button */}
               {!isB2BInvoice && invoice ? (
-                <div className="mt-6">
+                <div className="mt-6 space-y-3">
+                  {/* Primary: Credit/Debit Card via Stripe */}
+                  <button
+                    onClick={handleStripeCheckout}
+                    disabled={stripeLoading}
+                    className="w-full py-3 rounded-lg font-bold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    style={{ backgroundColor: 'var(--ept-accent)', color: '#fff', cursor: stripeLoading ? 'wait' : 'pointer' }}
+                  >
+                    {stripeLoading ? (
+                      <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                      </svg>
+                    )}
+                    {stripeLoading ? 'Redirecting to Stripe...' : `Pay with Card — $${invoice.total.toLocaleString()}`}
+                  </button>
+
+                  <div className="flex items-center gap-3 text-[10px]" style={{ color: 'var(--ept-text-muted)' }}>
+                    <div className="flex-1 h-px" style={{ backgroundColor: 'var(--ept-border)' }} />
+                    <span>or pay with</span>
+                    <div className="flex-1 h-px" style={{ backgroundColor: 'var(--ept-border)' }} />
+                  </div>
+
+                  {/* Secondary: PayPal */}
                   <PayPalCheckoutButtons
                     amount={invoice.total}
                     currency="USD"
@@ -490,7 +546,7 @@ function CheckoutContent({ initialServiceId, initialTier }: { initialServiceId: 
               )}
 
               <p className="text-[10px] mt-3 text-center" style={{ color: 'var(--ept-text-muted)' }}>
-                {isB2BInvoice ? 'A PayPal invoice will be sent to your email. Pay within 30 days.' : 'Secure payment via PayPal. Pay with your PayPal balance, Venmo, credit/debit card, or Pay Later.'}
+                {isB2BInvoice ? 'A PayPal invoice will be sent to your email. Pay within 30 days.' : 'Secure checkout powered by Stripe. Also accepts PayPal, Venmo, or Pay Later.'}
               </p>
 
               <div className="mt-4 pt-4 text-[10px] space-y-1" style={{ borderTop: '1px solid var(--ept-border)', color: 'var(--ept-text-muted)' }}>

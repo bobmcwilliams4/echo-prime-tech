@@ -18,6 +18,7 @@ function SuccessContent() {
   const invoiceId = params.get('invoice_id');
   const orderId = params.get('order_id');
   const captureId = params.get('capture_id');
+  const sessionId = params.get('session_id');
   const amount = params.get('amount');
   const status = params.get('status');
 
@@ -48,6 +49,8 @@ function SuccessContent() {
         <p className="text-sm mb-2" style={{ color: 'var(--ept-text-secondary)' }}>
           {method === 'invoice'
             ? 'A detailed invoice has been sent to your email via PayPal. Payment is due within 30 days.'
+            : method === 'stripe'
+            ? 'Your card payment has been processed by Stripe. Your subscription is now active.'
             : 'Your PayPal payment has been processed. Your subscription is now active.'}
         </p>
 
@@ -66,6 +69,12 @@ function SuccessContent() {
         {orderId && (
           <p className="text-xs font-mono mb-1" style={{ color: 'var(--ept-text-muted)' }}>
             Order: {orderId}{captureId ? ` | Capture: ${captureId}` : ''}{status ? ` | Status: ${status}` : ''}
+          </p>
+        )}
+
+        {sessionId && (
+          <p className="text-xs font-mono mb-1" style={{ color: 'var(--ept-text-muted)' }}>
+            Stripe Session: {sessionId.slice(0, 20)}...
           </p>
         )}
 
