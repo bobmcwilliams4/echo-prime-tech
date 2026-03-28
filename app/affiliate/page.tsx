@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '@/components/BreadcrumbSchema';
 import FaqSchema from '@/components/FaqSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: 'M', title: 'Multi-Tier Commissions', desc: 'Percentage, flat rate, tiered, or recurring commissions. Sub-affiliate earnings with automatic parent credit. Custom rates per affiliate.' },

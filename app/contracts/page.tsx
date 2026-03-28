@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { title: 'Contract Templates', desc: 'Create reusable templates with variable placeholders. NDA, MSA, SOW, employment, vendor — start from proven language instead of blank pages.' },
@@ -163,13 +164,13 @@ export default function ContractsPage() {
         </div>
       </section>
 
-      <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Stop Paying Per Signature</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Stop Paying Per Signature</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>
           Get unlimited e-signatures, AI risk analysis, clause libraries, version control,
           and full contract lifecycle management for less than one DocuSign seat.
         </p>
-        <Link href="/checkout?service=contracts&tier=starter" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Managing Contracts</Link>
+        <TrialCTA serviceId="echo-contracts" tier="starter" productName="Echo Contracts" />
       </section>
     </div>
   );

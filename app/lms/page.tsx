@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: '🎓', title: 'Course Builder', desc: 'Drag-and-drop course creation with modules, lessons, and multimedia content' },
@@ -139,6 +140,13 @@ export default function LMSPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Start Teaching Online Today</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Build AI-powered courses in minutes, not months. Free trial, no credit card required.</p>
+        <TrialCTA serviceId="echo-lms" tier="starter" productName="Echo LMS" />
       </section>
 
       {/* Footer */}

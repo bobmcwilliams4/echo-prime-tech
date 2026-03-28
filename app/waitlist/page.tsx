@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import FaqSchema from '../../components/FaqSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 const FAQS = [
   { q: 'How does the referral system work?', a: 'Every person who signs up gets a unique referral link. When someone joins through that link, the referrer moves up in line. The more referrals, the higher the position. This creates a viral growth loop where signups drive more signups.' },
@@ -153,6 +154,12 @@ export default function WaitlistPage() {
             </details>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Launch with Momentum?</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Turn every signup into a referral engine. Build your waitlist today.</p>
+        <TrialCTA serviceId="echo-waitlist" tier="starter" productName="Echo Waitlist" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

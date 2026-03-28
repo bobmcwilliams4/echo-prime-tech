@@ -4,6 +4,7 @@ import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: '📋', title: 'Job Postings', desc: 'Create rich job listings with salary ranges, skills, benefits, and customizable application questions.' },
@@ -177,14 +178,12 @@ export default function RecruitingPage() {
       </section>
 
       {/* CTA */}
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Hiring?</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold mb-4 text-center">Ready to Transform Your Hiring?</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>
           Join teams saving thousands by hiring smarter with AI-powered recruiting.
         </p>
-        <Link href="/checkout?service=recruiting&tier=growth" className="px-8 py-4 rounded-xl font-semibold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
-          Start Your Free Trial
-        </Link>
+        <TrialCTA serviceId="echo-recruiting" tier="starter" productName="Echo Recruiting" />
       </section>
     </div>
   );

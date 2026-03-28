@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: '📊', title: 'NPS Surveys', desc: 'One-click Net Promoter Score surveys with promoter/passive/detractor breakdown' },
@@ -134,6 +135,13 @@ export default function SurveysPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Start Collecting Better Feedback</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>AI-powered surveys with NPS, CSAT, and custom templates. Free trial, no credit card required.</p>
+        <TrialCTA serviceId="echo-surveys" tier="starter" productName="Echo Surveys" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

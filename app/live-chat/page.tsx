@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: 'W', title: 'Embeddable Widget', desc: 'One-line script tag adds a beautiful chat widget to any website — fully customizable colors, position, and greeting' },
@@ -145,6 +146,12 @@ export default function LiveChatPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Talk to Your Visitors?</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Start engaging website visitors with AI-powered live chat in minutes.</p>
+        <TrialCTA serviceId="echo-live-chat" tier="starter" productName="Echo Live Chat" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

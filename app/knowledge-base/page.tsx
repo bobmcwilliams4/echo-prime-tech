@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: '📚', title: 'Article Management', desc: 'Create, edit, and organize articles with categories, tags, and ordering' },
@@ -134,6 +135,13 @@ export default function KnowledgeBasePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Help Customers Help Themselves</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>AI-powered knowledge base with article generation, full-text search, and reader feedback. Free trial, no credit card required.</p>
+        <TrialCTA serviceId="echo-knowledge-base" tier="starter" productName="Echo Knowledge Base" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

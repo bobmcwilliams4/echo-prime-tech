@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '@/components/BreadcrumbSchema';
 import FaqSchema from '@/components/FaqSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: 'S', title: 'Draw-to-Sign', desc: 'Signers draw their signature on an HTML5 Canvas right in the browser. Touch-optimized for mobile. Legally binding with IP and timestamp audit.' },
@@ -164,6 +165,12 @@ export default function SignaturesPage() {
             </details>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Get Documents Signed?</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Legally binding e-signatures with audit trails, auto-reminders, and branded pages.</p>
+        <TrialCTA serviceId="echo-signatures" tier="starter" productName="Echo Signatures" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

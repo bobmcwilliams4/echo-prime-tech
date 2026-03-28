@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { title: 'Drag-and-Drop Builder', desc: 'Create forms with text, number, email, select, multi-select, checkbox, date, file upload, rating, and more. JSON-based field definitions for maximum flexibility.' },
@@ -176,13 +177,13 @@ export default function FormsPage() {
       </section>
 
       {/* CTA */}
-      <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Stop Paying Typeform Prices for Basic Forms</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Stop Paying Typeform Prices for Basic Forms</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>
           Get AI-powered form building, response analysis, quiz scoring, and real-time analytics
           at a fraction of the cost. Deploy in minutes on Cloudflare&apos;s global edge network.
         </p>
-        <Link href="/checkout?service=forms&tier=starter" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Building Forms Free</Link>
+        <TrialCTA serviceId="echo-forms" tier="starter" productName="Echo Forms" />
       </section>
     </div>
   );

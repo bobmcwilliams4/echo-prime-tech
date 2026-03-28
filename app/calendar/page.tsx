@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
@@ -165,10 +166,10 @@ export default function CalendarPage() {
         </div>
       </section>
 
-      <section className="px-6 py-20 text-center">
-        <h2 className="text-3xl font-extrabold mb-4">Ready to Automate Your Scheduling?</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Stop emailing about availability. Let Echo Calendar handle it.</p>
-        <Link href="/checkout?service=calendar&tier=pro" className="px-8 py-4 rounded-xl font-bold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-extrabold mb-4 text-center">Ready to Automate Your Scheduling?</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Stop emailing about availability. Let Echo Calendar handle it.</p>
+        <TrialCTA serviceId="echo-calendar" tier="starter" productName="Echo Calendar" />
       </section>
 
       <footer className="border-t px-6 py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

@@ -4,6 +4,7 @@ import FaqSchema from '../../components/FaqSchema';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 const FEATURES = [
@@ -184,10 +185,10 @@ export default function PayrollPage() {
       </section>
 
       {/* CTA */}
-      <section className="px-6 py-20 text-center">
-        <h2 className="text-3xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Simplify Payroll?</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Join businesses that save hours every pay period with Echo Payroll.</p>
-        <Link href="/checkout?service=payroll&tier=business" className="px-8 py-4 rounded-xl font-bold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Simplify Payroll?</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Join businesses that save hours every pay period with Echo Payroll.</p>
+        <TrialCTA serviceId="echo-payroll" tier="starter" productName="Echo Payroll" />
       </section>
 
       {/* Footer */}

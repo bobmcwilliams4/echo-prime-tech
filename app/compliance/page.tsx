@@ -4,6 +4,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: '🛡️', title: 'Framework Templates', desc: 'SOC2, HIPAA, GDPR, ISO 27001 with pre-built controls — one click to adopt any framework.' },
@@ -179,14 +180,12 @@ export default function CompliancePage() {
       </section>
 
       {/* CTA */}
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Automate Compliance?</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold mb-4 text-center">Ready to Automate Compliance?</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>
           Join companies saving thousands by managing compliance with AI instead of spreadsheets.
         </p>
-        <Link href="/checkout?service=compliance&tier=business" className="px-8 py-4 rounded-xl font-semibold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
-          Start Your Free Trial
-        </Link>
+        <TrialCTA serviceId="echo-compliance" tier="starter" productName="Echo Compliance" />
       </section>
     </div>
   );

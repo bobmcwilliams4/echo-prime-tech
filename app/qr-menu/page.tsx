@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import FaqSchema from '../../components/FaqSchema';
 
@@ -164,6 +165,12 @@ export default function QrMenuPage() {
             </details>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Go Digital?</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Replace paper menus with a beautiful, scannable QR experience your customers will love.</p>
+        <TrialCTA serviceId="echo-qr-menu" tier="starter" productName="Echo QR Menu" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

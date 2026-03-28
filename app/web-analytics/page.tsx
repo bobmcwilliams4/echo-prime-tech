@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: 'P', title: 'Privacy-First', desc: 'No cookies, no fingerprinting, no consent banners. Fully GDPR, CCPA, and PECR compliant out of the box' },
@@ -151,6 +152,12 @@ export default function WebAnalyticsPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Ready to See Your Real Traffic?</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Privacy-first analytics with no cookies, no consent banners, and no bloat.</p>
+        <TrialCTA serviceId="echo-web-analytics" tier="starter" productName="Echo Web Analytics" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

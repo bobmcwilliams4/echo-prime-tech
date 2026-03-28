@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: '\u{1F465}', title: 'Employee Management', desc: 'Centralized profiles with contact info, department, role, salary history, and documents. Search, filter, and manage your entire workforce from one screen.' },
@@ -151,15 +152,10 @@ export default function HRPage() {
       </section>
 
       {/* CTA Footer */}
-      <section className="max-w-4xl mx-auto px-6 py-16 text-center">
-        <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-          <h2 className="text-3xl font-extrabold mb-4">Ready to Modernize Your HR?</h2>
-          <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Start a free trial today. No credit card required. Set up in under 10 minutes.</p>
-          <div className="flex justify-center gap-4 flex-wrap">
-            <Link href="/checkout?service=hr&tier=starter" className="px-8 py-4 rounded-xl font-bold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
-            <Link href="/support" className="px-8 py-4 rounded-xl font-bold text-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>Talk to Sales</Link>
-          </div>
-        </div>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Modernize Your HR?</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Start a free trial today. No credit card required. Set up in under 10 minutes.</p>
+        <TrialCTA serviceId="echo-hr" tier="starter" productName="Echo HR" />
       </section>
 
       <footer className="text-center py-10 text-sm" style={{ color: 'var(--ept-text-muted)' }}>

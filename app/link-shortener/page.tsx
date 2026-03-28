@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: 'S', title: 'Custom Short URLs', desc: 'Create branded short links with custom slugs — or let us auto-generate clean 6-character codes' },
@@ -144,6 +145,12 @@ export default function LinkShortenerPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Shorten Your First Link?</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Track every click with branded short URLs and real-time analytics.</p>
+        <TrialCTA serviceId="echo-link-shortener" tier="starter" productName="Echo Link Shortener" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

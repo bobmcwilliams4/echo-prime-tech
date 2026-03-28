@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: 'R', title: 'Review Collection', desc: 'Send automated review requests via email with branded landing pages. Customers leave reviews in one click — no login required' },
@@ -158,6 +159,12 @@ export default function ReviewsPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Collect More Reviews?</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Automate review requests, analyze sentiment with AI, and showcase your reputation.</p>
+        <TrialCTA serviceId="echo-reviews" tier="starter" productName="Echo Reviews" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

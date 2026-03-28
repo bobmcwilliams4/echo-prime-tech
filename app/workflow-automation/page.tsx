@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: 'W', title: 'Multi-Step Workflows', desc: 'Chain unlimited steps with HTTP calls, transforms, conditions, delays, and AI' },
@@ -162,6 +163,13 @@ export default function WorkflowAutomationPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Automate Your Business Today</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Connect everything. Automate anything. AI-powered workflows with 18 native Echo integrations. Free trial, no credit card required.</p>
+        <TrialCTA serviceId="echo-workflow-automation" tier="starter" productName="Echo Workflow Automation" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

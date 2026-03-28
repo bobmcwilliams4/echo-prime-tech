@@ -4,6 +4,7 @@ import FaqSchema from '../../components/FaqSchema';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: '📁', title: 'Folder Hierarchy', desc: 'Organize documents in nested folders with drag-and-drop. Unlimited depth, custom icons, and starred folders for quick access.' },
@@ -140,10 +141,10 @@ export default function DocumentManagerPage() {
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Take Control of Your Documents?</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Join teams creating, collaborating, and finding documents faster with AI-powered document management.</p>
-        <Link href="/checkout?service=document-manager&tier=growth" className="px-8 py-4 rounded-xl font-semibold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Take Control of Your Documents?</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Join teams creating, collaborating, and finding documents faster with AI-powered document management.</p>
+        <TrialCTA serviceId="echo-document-manager" tier="starter" productName="Echo Document Manager" />
       </section>
     </div>
   );

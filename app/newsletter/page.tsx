@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import FaqSchema from '../../components/FaqSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 const FAQS = [
   { q: 'How many subscribers can I have?', a: 'Starter supports 1,000 subscribers, Growth supports 10,000, and Scale supports 100,000. All plans include unlimited lists and segments.' },
@@ -156,6 +157,12 @@ export default function NewsletterPage() {
             </details>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Own Your Audience?</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Start publishing newsletters with zero platform tax. Your words, your revenue.</p>
+        <TrialCTA serviceId="echo-newsletter" tier="starter" productName="Echo Newsletter" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

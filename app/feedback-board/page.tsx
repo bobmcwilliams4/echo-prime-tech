@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: 'F', title: 'Feature Requests', desc: 'Let users submit ideas with categories — feature, bug, improvement, question — and vote on what matters most' },
@@ -142,6 +143,12 @@ export default function FeedbackBoardPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Hear from Your Users?</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Centralize feature requests, let users vote, and build what matters.</p>
+        <TrialCTA serviceId="echo-feedback-board" tier="starter" productName="Echo Feedback Board" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

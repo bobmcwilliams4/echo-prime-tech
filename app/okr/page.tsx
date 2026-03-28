@@ -3,6 +3,7 @@
 import FaqSchema from '../../components/FaqSchema';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 const FEATURES = [

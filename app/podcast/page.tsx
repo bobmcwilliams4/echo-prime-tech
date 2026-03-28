@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: '🎙️', title: 'Unlimited Hosting', desc: 'Upload unlimited episodes to our global CDN. No bandwidth caps, no storage limits.' },
@@ -183,10 +184,10 @@ export default function PodcastPage() {
       </section>
 
       {/* CTA */}
-      <section className="px-6 py-20 text-center">
-        <h2 className="text-3xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Launch Your Podcast?</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Join thousands of creators who trust Echo Podcast for reliable, AI-powered hosting.</p>
-        <Link href="/checkout?service=podcast&tier=creator" className="px-8 py-4 rounded-xl font-bold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Launch Your Podcast?</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Join thousands of creators who trust Echo Podcast for reliable, AI-powered hosting.</p>
+        <TrialCTA serviceId="echo-podcast" tier="starter" productName="Echo Podcast" />
       </section>
 
       {/* Footer */}

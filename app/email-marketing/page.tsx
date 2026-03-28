@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { title: 'AI Campaign Builder', desc: 'Generate high-converting email campaigns with AI. Input your goal and audience — get subject line, body copy, and CTA in seconds.' },
@@ -175,12 +176,10 @@ export default function EmailMarketingPage() {
       </section>
 
       {/* CTA */}
-      <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
-        <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-          <h2 className="text-3xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Grow Your List?</h2>
-          <p className="mb-6" style={{ color: 'var(--ept-text-secondary)' }}>14-day free trial on the Growth plan. No credit card required.</p>
-          <Link href="/checkout?service=email-marketing&tier=starter" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
-        </div>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Grow Your List?</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>14-day free trial on the Growth plan. No credit card required.</p>
+        <TrialCTA serviceId="echo-email-marketing" tier="starter" productName="Echo Email Marketing" />
       </section>
 
       {/* Footer */}
