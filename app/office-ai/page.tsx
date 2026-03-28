@@ -67,8 +67,8 @@ export default function OfficeAiPage() {
 
   return (
     <>
-      <FaqSchema faqs={FAQS.map(f => ({ question: f.q, answer: f.a }))} />
-      <BreadcrumbSchema items={[{ name: 'Home', url: 'https://echo-ept.com' }, { name: 'Office AI', url: 'https://echo-ept.com/office-ai' }]} />
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Office AI', href: '/office-ai' }]} />
 
       {/* ── Nav ── */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>

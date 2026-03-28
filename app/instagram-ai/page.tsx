@@ -5,10 +5,10 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'How does Instagram automation work?', answer: 'Connect your Instagram Business account via OAuth. Schedule posts, stories, and reels with AI-optimized timing. AI generates captions, suggests hashtags, and analyzes engagement patterns to maximize reach.' },
-  { question: 'Is this safe for my account?', answer: 'Yes. We use only official Instagram Graph API endpoints — no scraping, no bot actions, no risk of shadowbanning. Your account stays safe because we never violate Instagram Terms of Service.' },
-  { question: 'Can AI generate content for me?', answer: 'AI generates captions based on your image/video content and brand voice. Suggests trending hashtags specific to your niche. Creates content calendars based on your audience peak times and historical performance.' },
-  { question: 'What analytics are available?', answer: 'Follower growth, engagement rate, reach, impressions, story views, reel performance, best posting times, hashtag effectiveness, competitor benchmarking, and audience demographics — all in real-time dashboards.' },
+  { q: 'How does Instagram automation work?', a: 'Connect your Instagram Business account via OAuth. Schedule posts, stories, and reels with AI-optimized timing. AI generates captions, suggests hashtags, and analyzes engagement patterns to maximize reach.' },
+  { q: 'Is this safe for my account?', a: 'Yes. We use only official Instagram Graph API endpoints — no scraping, no bot actions, no risk of shadowbanning. Your account stays safe because we never violate Instagram Terms of Service.' },
+  { q: 'Can AI generate content for me?', a: 'AI generates captions based on your image/video content and brand voice. Suggests trending hashtags specific to your niche. Creates content calendars based on your audience peak times and historical performance.' },
+  { q: 'What analytics are available?', a: 'Follower growth, engagement rate, reach, impressions, story views, reel performance, best posting times, hashtag effectiveness, competitor benchmarking, and audience demographics — all in real-time dashboards.' },
 ]
 
 const features = [
@@ -47,7 +47,7 @@ export default function InstagramAiPage() {
 
   return (
     <>
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Instagram AI', href: '/instagram-ai' }]} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
@@ -93,7 +93,7 @@ export default function InstagramAiPage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

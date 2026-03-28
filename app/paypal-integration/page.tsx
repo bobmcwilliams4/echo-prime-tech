@@ -5,10 +5,10 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'How does PayPal integration work?', answer: 'Connect your PayPal business account in minutes. Our API wraps PayPal REST APIs with AI enrichment — automatic categorization, fraud scoring, reconciliation, and analytics. Accept one-time payments, subscriptions, and invoices through a unified interface.' },
-  { question: 'What AI features are included?', answer: 'AI fraud detection scores every transaction (0-100 risk score). Auto-categorization tags payments by type. Smart reconciliation matches PayPal transactions to your invoices automatically. Churn prediction identifies at-risk subscribers.' },
-  { question: 'Can it handle subscriptions?', answer: 'Yes. Create subscription plans with flexible billing cycles, trial periods, and upgrade/downgrade paths. AI monitors subscriber health and triggers retention workflows when churn risk rises.' },
-  { question: 'Does it work with other payment processors?', answer: 'PayPal is the primary integration. Stripe support is available via our separate Payments product. Both feed into the same analytics dashboard for unified financial intelligence.' },
+  { q: 'How does PayPal integration work?', a: 'Connect your PayPal business account in minutes. Our API wraps PayPal REST APIs with AI enrichment — automatic categorization, fraud scoring, reconciliation, and analytics. Accept one-time payments, subscriptions, and invoices through a unified interface.' },
+  { q: 'What AI features are included?', a: 'AI fraud detection scores every transaction (0-100 risk score). Auto-categorization tags payments by type. Smart reconciliation matches PayPal transactions to your invoices automatically. Churn prediction identifies at-risk subscribers.' },
+  { q: 'Can it handle subscriptions?', a: 'Yes. Create subscription plans with flexible billing cycles, trial periods, and upgrade/downgrade paths. AI monitors subscriber health and triggers retention workflows when churn risk rises.' },
+  { q: 'Does it work with other payment processors?', a: 'PayPal is the primary integration. Stripe support is available via our separate Payments product. Both feed into the same analytics dashboard for unified financial intelligence.' },
 ]
 
 const features = [
@@ -47,7 +47,7 @@ export default function PayPalIntegrationPage() {
 
   return (
     <>
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'PayPal Integration', href: '/paypal-integration' }]} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
@@ -93,7 +93,7 @@ export default function PayPalIntegrationPage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

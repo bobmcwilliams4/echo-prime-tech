@@ -5,10 +5,10 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'What is persistent AI memory?', answer: 'AI models forget everything between sessions. Memory Prime solves this by storing conversations, facts, decisions, and context in a 9-pillar architecture. Your AI agents remember everything — across sessions, across models, across your entire organization.' },
-  { question: 'How does cross-agent memory work?', answer: 'Memory Prime provides a shared memory layer. When Agent A learns a customer preference, Agent B can access it instantly. No manual context passing. Works across Claude, GPT-4, Gemini, and any LLM.' },
-  { question: 'What are the 9 memory pillars?', answer: 'Episodic (conversation history), Semantic (facts & knowledge), Procedural (how-to instructions), Working (current session context), Long-term (permanent records), Emotional (sentiment patterns), Social (relationship graphs), Spatial (location context), and Temporal (time-based patterns).' },
-  { question: 'How does it integrate with my LLM?', answer: 'Simple API: store memories after interactions, retrieve relevant context before generating responses. SDK handles injection automatically. Works as middleware between your app and any LLM provider.' },
+  { q: 'What is persistent AI memory?', a: 'AI models forget everything between sessions. Memory Prime solves this by storing conversations, facts, decisions, and context in a 9-pillar architecture. Your AI agents remember everything — across sessions, across models, across your entire organization.' },
+  { q: 'How does cross-agent memory work?', a: 'Memory Prime provides a shared memory layer. When Agent A learns a customer preference, Agent B can access it instantly. No manual context passing. Works across Claude, GPT-4, Gemini, and any LLM.' },
+  { q: 'What are the 9 memory pillars?', a: 'Episodic (conversation history), Semantic (facts & knowledge), Procedural (how-to instructions), Working (current session context), Long-term (permanent records), Emotional (sentiment patterns), Social (relationship graphs), Spatial (location context), and Temporal (time-based patterns).' },
+  { q: 'How does it integrate with my LLM?', a: 'Simple API: store memories after interactions, retrieve relevant context before generating responses. SDK handles injection automatically. Works as middleware between your app and any LLM provider.' },
 ]
 
 const features = [
@@ -47,7 +47,7 @@ export default function MemoryPrimePage() {
 
   return (
     <>
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Memory Prime', href: '/memory-prime' }]} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
@@ -93,7 +93,7 @@ export default function MemoryPrimePage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

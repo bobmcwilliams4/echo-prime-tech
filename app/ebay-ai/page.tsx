@@ -5,10 +5,10 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'How does AI listing optimization work?', answer: 'AI analyzes top-performing listings in your category and generates optimized titles (80-char SEO), descriptions, item specifics, and pricing. It studies what sells and adapts your listings to match winning patterns.' },
-  { question: 'What is dynamic repricing?', answer: 'AI monitors competitor prices and adjusts yours in real-time to win the Buy Box while maximizing profit. Set floor prices and margin targets — the AI handles everything else. Repricing runs 24/7.' },
-  { question: 'Can it manage inventory across channels?', answer: 'Yes. Sync inventory between eBay, your Shopify store, Amazon, and local warehouse. When an item sells on one channel, stock updates everywhere automatically to prevent overselling.' },
-  { question: 'How does competitor analysis work?', answer: 'AI tracks competitor listings: pricing changes, sold quantities, listing strategies, and sell-through rates. Get alerts when competitors undercut you and automated response strategies.' },
+  { q: 'How does AI listing optimization work?', a: 'AI analyzes top-performing listings in your category and generates optimized titles (80-char SEO), descriptions, item specifics, and pricing. It studies what sells and adapts your listings to match winning patterns.' },
+  { q: 'What is dynamic repricing?', a: 'AI monitors competitor prices and adjusts yours in real-time to win the Buy Box while maximizing profit. Set floor prices and margin targets — the AI handles everything else. Repricing runs 24/7.' },
+  { q: 'Can it manage inventory across channels?', a: 'Yes. Sync inventory between eBay, your Shopify store, Amazon, and local warehouse. When an item sells on one channel, stock updates everywhere automatically to prevent overselling.' },
+  { q: 'How does competitor analysis work?', a: 'AI tracks competitor listings: pricing changes, sold quantities, listing strategies, and sell-through rates. Get alerts when competitors undercut you and automated response strategies.' },
 ]
 
 const features = [
@@ -47,7 +47,7 @@ export default function EbayAiPage() {
 
   return (
     <>
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'eBay AI', href: '/ebay-ai' }]} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
@@ -93,7 +93,7 @@ export default function EbayAiPage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

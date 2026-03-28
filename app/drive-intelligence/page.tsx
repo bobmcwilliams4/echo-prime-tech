@@ -5,10 +5,10 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'How does AI file analysis work?', answer: 'Our AI scans file content, metadata, and structure to classify documents, detect duplicates, identify sensitive data, and suggest organization schemes. It understands context — grouping related files even when names are inconsistent.' },
-  { question: 'Will it modify my files?', answer: 'Never without your approval. Drive Intelligence operates in read-only mode by default. It analyzes and recommends — you approve actions before any files are moved, renamed, or deleted.' },
-  { question: 'Can it scan network drives and cloud storage?', answer: 'Yes. Scan local drives, NAS, network shares, and cloud storage (Google Drive, OneDrive, Dropbox, S3, R2). Unified view across all storage locations.' },
-  { question: 'How does compliance scanning work?', answer: 'AI identifies PII, PHI, financial data, and other sensitive information across your file systems. Generate compliance reports for GDPR, HIPAA, SOC2, and PCI-DSS. Flag files that need encryption or access restriction.' },
+  { q: 'How does AI file analysis work?', a: 'Our AI scans file content, metadata, and structure to classify documents, detect duplicates, identify sensitive data, and suggest organization schemes. It understands context — grouping related files even when names are inconsistent.' },
+  { q: 'Will it modify my files?', a: 'Never without your approval. Drive Intelligence operates in read-only mode by default. It analyzes and recommends — you approve actions before any files are moved, renamed, or deleted.' },
+  { q: 'Can it scan network drives and cloud storage?', a: 'Yes. Scan local drives, NAS, network shares, and cloud storage (Google Drive, OneDrive, Dropbox, S3, R2). Unified view across all storage locations.' },
+  { q: 'How does compliance scanning work?', a: 'AI identifies PII, PHI, financial data, and other sensitive information across your file systems. Generate compliance reports for GDPR, HIPAA, SOC2, and PCI-DSS. Flag files that need encryption or access restriction.' },
 ]
 
 const features = [
@@ -48,7 +48,7 @@ export default function DriveIntelligencePage() {
   return (
     <>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Drive Intelligence', href: '/drive-intelligence' }]} />
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Drive Intelligence — AI File System Analysis</h1><p>Turn chaotic file systems into organized intelligence. AI-powered file classification, content-aware duplicate detection, sensitive data discovery for PII, PHI, and credentials, storage optimization recommendations, smart folder organization, file relationship mapping, version history tracking across locations, multi-source scanning for local drives, NAS, and cloud storage, compliance reports for GDPR, HIPAA, SOC2, and PCI-DSS, and full-text search across all file contents. Pricing from $19/mo for Starter to $199/mo for Enterprise with unlimited scan capacity.</p></div></noscript>
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
@@ -94,7 +94,7 @@ export default function DriveIntelligencePage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

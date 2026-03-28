@@ -5,10 +5,10 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'How does self-healing work?', answer: 'Phoenix monitors your services continuously. When it detects an error — failed health check, spike in error rates, memory leak — it automatically triggers a repair workflow. Simple fixes (restart, scale, rollback) happen instantly. Complex issues get AI-assisted root cause analysis and suggested fixes.' },
-  { question: 'What services can Phoenix monitor?', answer: 'Any HTTP service, Cloudflare Worker, Docker container, database, or custom health endpoint. Supports Sentry, Datadog, PagerDuty, and custom monitoring integrations. If it has a health check URL, Phoenix can monitor it.' },
-  { question: 'How does AI root cause analysis work?', answer: 'When an error occurs, Phoenix correlates it with recent deployments, config changes, traffic patterns, and dependent service status. AI analyzes error logs, stack traces, and metrics to identify the most likely root cause — then suggests or executes the fix.' },
-  { question: 'Can it rollback bad deployments?', answer: 'Yes. Phoenix detects deployment regressions within minutes by monitoring error rates and latency after each deploy. Automatic rollback to the last known good version with one-click approval or fully automatic mode.' },
+  { q: 'How does self-healing work?', a: 'Phoenix monitors your services continuously. When it detects an error — failed health check, spike in error rates, memory leak — it automatically triggers a repair workflow. Simple fixes (restart, scale, rollback) happen instantly. Complex issues get AI-assisted root cause analysis and suggested fixes.' },
+  { q: 'What services can Phoenix monitor?', a: 'Any HTTP service, Cloudflare Worker, Docker container, database, or custom health endpoint. Supports Sentry, Datadog, PagerDuty, and custom monitoring integrations. If it has a health check URL, Phoenix can monitor it.' },
+  { q: 'How does AI root cause analysis work?', a: 'When an error occurs, Phoenix correlates it with recent deployments, config changes, traffic patterns, and dependent service status. AI analyzes error logs, stack traces, and metrics to identify the most likely root cause — then suggests or executes the fix.' },
+  { q: 'Can it rollback bad deployments?', a: 'Yes. Phoenix detects deployment regressions within minutes by monitoring error rates and latency after each deploy. Automatic rollback to the last known good version with one-click approval or fully automatic mode.' },
 ]
 
 const features = [
@@ -47,7 +47,7 @@ export default function PhoenixCloudPage() {
 
   return (
     <>
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Phoenix Cloud', href: '/phoenix-cloud' }]} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
@@ -93,7 +93,7 @@ export default function PhoenixCloudPage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

@@ -5,11 +5,11 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'What is multi-agent AI orchestration?', answer: 'Instead of one AI handling everything, Swarm Brain coordinates fleets of specialized agents working in parallel. A research agent gathers data, an analysis agent processes it, a writing agent drafts output — all simultaneously, with intelligent task delegation.' },
-  { question: 'How does competitive execution work?', answer: 'Multiple agents tackle the same task independently, then a judge agent evaluates all outputs and selects the best. This eliminates single-model bias and consistently produces higher quality results.' },
-  { question: 'Can I define custom agent types?', answer: 'Yes. Define agents with custom system prompts, tool access, knowledge domains, and behavior policies. Deploy agents as Cloudflare Workers that run 24/7 autonomously.' },
-  { question: 'How does cross-agent memory work?', answer: 'Shared Brain provides a unified memory layer across all agents. Decisions, findings, and context flow between agents automatically. No manual context passing — the swarm shares one brain.' },
-  { question: 'What models can agents use?', answer: 'Any model: Claude, GPT-4, Gemini, Llama, Groq, and local models via BRAVO inference. Each agent can use a different model optimized for its task. Auto-routing selects the best model per query.' },
+  { q: 'What is multi-agent AI orchestration?', a: 'Instead of one AI handling everything, Swarm Brain coordinates fleets of specialized agents working in parallel. A research agent gathers data, an analysis agent processes it, a writing agent drafts output — all simultaneously, with intelligent task delegation.' },
+  { q: 'How does competitive execution work?', a: 'Multiple agents tackle the same task independently, then a judge agent evaluates all outputs and selects the best. This eliminates single-model bias and consistently produces higher quality results.' },
+  { q: 'Can I define custom agent types?', a: 'Yes. Define agents with custom system prompts, tool access, knowledge domains, and behavior policies. Deploy agents as Cloudflare Workers that run 24/7 autonomously.' },
+  { q: 'How does cross-agent memory work?', a: 'Shared Brain provides a unified memory layer across all agents. Decisions, findings, and context flow between agents automatically. No manual context passing — the swarm shares one brain.' },
+  { q: 'What models can agents use?', a: 'Any model: Claude, GPT-4, Gemini, Llama, Groq, and local models via BRAVO inference. Each agent can use a different model optimized for its task. Auto-routing selects the best model per query.' },
 ]
 
 const features = [
@@ -48,7 +48,7 @@ export default function SwarmBrainPage() {
 
   return (
     <>
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Swarm Brain', href: '/swarm-brain' }]} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
@@ -94,7 +94,7 @@ export default function SwarmBrainPage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

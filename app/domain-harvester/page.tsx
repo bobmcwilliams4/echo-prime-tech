@@ -5,10 +5,10 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'What does domain monitoring include?', answer: 'Real-time WHOIS change detection, DNS record monitoring, SSL certificate tracking, nameserver changes, registrar transfers, and expiration alerts. Every change is logged with before/after diffs.' },
-  { question: 'How does brand protection work?', answer: 'AI scans new domain registrations for typosquatting, homoglyph attacks, and brand impersonation. Get alerted within hours when someone registers a domain similar to yours — before they can use it for phishing.' },
-  { question: 'Can it find expiring domains?', answer: 'Yes. Track domains in your niche as they approach expiration. Set alerts for premium domains, competitor domains, or keyword-rich domains entering the drop cycle. Integrates with registrar APIs for instant acquisition.' },
-  { question: 'How many domains can I monitor?', answer: 'Starter plan tracks 100 domains, Professional handles 1,000, and Enterprise is unlimited. Bulk import via CSV or API. Add entire competitor portfolios with one click.' },
+  { q: 'What does domain monitoring include?', a: 'Real-time WHOIS change detection, DNS record monitoring, SSL certificate tracking, nameserver changes, registrar transfers, and expiration alerts. Every change is logged with before/after diffs.' },
+  { q: 'How does brand protection work?', a: 'AI scans new domain registrations for typosquatting, homoglyph attacks, and brand impersonation. Get alerted within hours when someone registers a domain similar to yours — before they can use it for phishing.' },
+  { q: 'Can it find expiring domains?', a: 'Yes. Track domains in your niche as they approach expiration. Set alerts for premium domains, competitor domains, or keyword-rich domains entering the drop cycle. Integrates with registrar APIs for instant acquisition.' },
+  { q: 'How many domains can I monitor?', a: 'Starter plan tracks 100 domains, Professional handles 1,000, and Enterprise is unlimited. Bulk import via CSV or API. Add entire competitor portfolios with one click.' },
 ]
 
 const features = [
@@ -48,7 +48,7 @@ export default function DomainHarvesterPage() {
   return (
     <>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Domain Harvester', href: '/domain-harvester' }]} />
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Domain Harvester — AI-Powered Domain Intelligence</h1><p>AI-powered domain intelligence platform for monitoring WHOIS changes, detecting brand impersonation, tracking DNS records, and discovering expiring premium domains. Features include real-time WHOIS monitoring across all TLDs, AI typosquatting and homoglyph detection for brand protection, DNS record monitoring for A, AAAA, CNAME, MX, TXT, and NS records, expiring domain alerts with keyword filters, SSL certificate monitoring and CT log tracking, competitor domain portfolio intelligence, bulk domain import via CSV and API, historical WHOIS data, subdomain discovery and enumeration, registrar API integration with GoDaddy, Namecheap, and Cloudflare, webhook alerts to Slack, Discord, and email, and AI-powered domain valuation. Pricing from $29/mo.</p></div></noscript>
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
@@ -94,7 +94,7 @@ export default function DomainHarvesterPage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

@@ -5,10 +5,10 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'What models can I deploy?', answer: 'Any ONNX, PyTorch, TensorFlow, or GGUF model. Pre-optimized support for Llama, Mistral, Qwen, Whisper, Stable Diffusion, and popular open-source models. Upload your fine-tuned models or choose from our model marketplace.' },
-  { question: 'How does auto-scaling work?', answer: 'GPU instances scale from 0 to N based on request queue depth. Scale-to-zero means you pay nothing when idle. Burst scaling handles traffic spikes in under 30 seconds. Configure min/max instances and concurrency per model.' },
-  { question: 'Can I do A/B testing between models?', answer: 'Yes. Route traffic between model versions with configurable percentages. Compare latency, accuracy, and user feedback side-by-side. Automatically promote the winning model after statistical significance is reached.' },
-  { question: 'What about LoRA adapters?', answer: 'First-class LoRA support. Upload base model once, then hot-swap LoRA adapters per request. Run 10+ specialized models on one GPU. Perfect for multi-tenant or multi-domain deployments.' },
+  { q: 'What models can I deploy?', a: 'Any ONNX, PyTorch, TensorFlow, or GGUF model. Pre-optimized support for Llama, Mistral, Qwen, Whisper, Stable Diffusion, and popular open-source models. Upload your fine-tuned models or choose from our model marketplace.' },
+  { q: 'How does auto-scaling work?', a: 'GPU instances scale from 0 to N based on request queue depth. Scale-to-zero means you pay nothing when idle. Burst scaling handles traffic spikes in under 30 seconds. Configure min/max instances and concurrency per model.' },
+  { q: 'Can I do A/B testing between models?', a: 'Yes. Route traffic between model versions with configurable percentages. Compare latency, accuracy, and user feedback side-by-side. Automatically promote the winning model after statistical significance is reached.' },
+  { q: 'What about LoRA adapters?', a: 'First-class LoRA support. Upload base model once, then hot-swap LoRA adapters per request. Run 10+ specialized models on one GPU. Perfect for multi-tenant or multi-domain deployments.' },
 ]
 
 const features = [
@@ -47,7 +47,7 @@ export default function ModelHostPage() {
 
   return (
     <>
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Model Host', href: '/model-host' }]} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
@@ -93,7 +93,7 @@ export default function ModelHostPage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

@@ -5,10 +5,10 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'What is MEGA Gateway?', answer: 'A unified API that aggregates 37,475+ tools from 1,873 MCP (Model Context Protocol) servers into one endpoint. Instead of integrating with dozens of APIs separately, call MEGA Gateway once and access everything — web search, file operations, database queries, browser automation, and more.' },
-  { question: 'How does intelligent routing work?', answer: 'When you call a tool, MEGA Gateway selects the optimal server based on availability, latency, and capability. If a server is down, it automatically falls back to alternatives. Load balancing across servers ensures high availability.' },
-  { question: 'Can I add my own MCP servers?', answer: 'Yes. Register custom MCP servers with the gateway. Your tools become searchable and executable alongside the 37K+ built-in tools. Perfect for extending the gateway with proprietary business tools.' },
-  { question: 'How do credentials work?', answer: 'MEGA Gateway integrates with Echo Vault for secure credential management. API keys, OAuth tokens, and secrets are stored encrypted and injected at execution time. Never expose credentials in your code.' },
+  { q: 'What is MEGA Gateway?', a: 'A unified API that aggregates 37,475+ tools from 1,873 MCP (Model Context Protocol) servers into one endpoint. Instead of integrating with dozens of APIs separately, call MEGA Gateway once and access everything — web search, file operations, database queries, browser automation, and more.' },
+  { q: 'How does intelligent routing work?', a: 'When you call a tool, MEGA Gateway selects the optimal server based on availability, latency, and capability. If a server is down, it automatically falls back to alternatives. Load balancing across servers ensures high availability.' },
+  { q: 'Can I add my own MCP servers?', a: 'Yes. Register custom MCP servers with the gateway. Your tools become searchable and executable alongside the 37K+ built-in tools. Perfect for extending the gateway with proprietary business tools.' },
+  { q: 'How do credentials work?', a: 'MEGA Gateway integrates with Echo Vault for secure credential management. API keys, OAuth tokens, and secrets are stored encrypted and injected at execution time. Never expose credentials in your code.' },
 ]
 
 const features = [
@@ -47,7 +47,7 @@ export default function MegaGatewayPage() {
 
   return (
     <>
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'MEGA Gateway', href: '/mega-gateway' }]} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
@@ -93,7 +93,7 @@ export default function MegaGatewayPage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

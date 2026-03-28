@@ -66,8 +66,8 @@ export default function ImmortalityVaultPage() {
 
   return (
     <>
-      <FaqSchema faqs={FAQS.map(f => ({ question: f.q, answer: f.a }))} />
-      <BreadcrumbSchema items={[{ name: 'Home', url: 'https://echo-ept.com' }, { name: 'Immortality Vault', url: 'https://echo-ept.com/immortality-vault' }]} />
+      <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Immortality Vault', href: '/immortality-vault' }]} />
 
       {/* ── Nav ── */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>

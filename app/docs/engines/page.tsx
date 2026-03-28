@@ -94,7 +94,7 @@ const data = {
     { q: 'How does cross-domain routing work?', a: 'When a query spans multiple domains, the engine router identifies all relevant domain clusters, dispatches parallel sub-queries, collects doctrine blocks from each, ranks them together by relevance and authority, and synthesizes a unified response with citations from every contributing engine.' },
     { q: 'What confidence level should I use for client deliverables?', a: 'Use DEFENSIBLE for client-facing deliverables, formal opinions, and audit responses. AGGRESSIVE is appropriate for internal strategy and research. DISCLOSURE and HIGH_RISK are useful for understanding the full range of positions but require appropriate risk disclaimers.' },
   ],
-} as const
+}
 
 export default function EngineDocPage() {
   return <ProductDoc {...data} />

@@ -5,11 +5,11 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'What voices are available?', answer: '69 cloned voices across multiple languages using ElevenLabs multilingual_v2 model. Each voice has distinct personality traits — from authoritative CEO to warm customer service. Custom voice cloning available on Professional plans.' },
-  { question: 'How does multi-provider routing work?', answer: 'Speak Cloud automatically routes between ElevenLabs (highest quality), Edge TTS (lowest cost), and local GPU inference (zero cost on BRAVO). Quota-aware blending ensures you never hit rate limits while optimizing for quality and cost.' },
-  { question: 'Can I use emotion-aware voice synthesis?', answer: 'Yes. The 4-layer emotion engine analyzes text sentiment, context, and conversation history to adjust voice parameters — pace, pitch, emphasis, and emotion. A support response sounds empathetic; a sales pitch sounds confident.' },
-  { question: 'What about latency?', answer: 'Edge TTS delivers sub-200ms first-byte. ElevenLabs streams in 300-500ms. Local GPU inference on dedicated hardware achieves 100-150ms. All providers stream audio chunks for instant playback.' },
-  { question: 'Is there speech-to-text too?', answer: 'Yes. Whisper-based STT is available for transcription and voice commands. Combined with TTS, you get full duplex voice AI — listen, understand, and speak back in real-time.' },
+  { q: 'What voices are available?', a: '69 cloned voices across multiple languages using ElevenLabs multilingual_v2 model. Each voice has distinct personality traits — from authoritative CEO to warm customer service. Custom voice cloning available on Professional plans.' },
+  { q: 'How does multi-provider routing work?', a: 'Speak Cloud automatically routes between ElevenLabs (highest quality), Edge TTS (lowest cost), and local GPU inference (zero cost on BRAVO). Quota-aware blending ensures you never hit rate limits while optimizing for quality and cost.' },
+  { q: 'Can I use emotion-aware voice synthesis?', a: 'Yes. The 4-layer emotion engine analyzes text sentiment, context, and conversation history to adjust voice parameters — pace, pitch, emphasis, and emotion. A support response sounds empathetic; a sales pitch sounds confident.' },
+  { q: 'What about latency?', a: 'Edge TTS delivers sub-200ms first-byte. ElevenLabs streams in 300-500ms. Local GPU inference on dedicated hardware achieves 100-150ms. All providers stream audio chunks for instant playback.' },
+  { q: 'Is there speech-to-text too?', a: 'Yes. Whisper-based STT is available for transcription and voice commands. Combined with TTS, you get full duplex voice AI — listen, understand, and speak back in real-time.' },
 ]
 
 const features = [
@@ -49,7 +49,7 @@ export default function SpeakCloudPage() {
   return (
     <>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Speak Cloud', href: '/speak-cloud' }]} />
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 16, background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Echo Speak Cloud</h1>
@@ -94,7 +94,7 @@ export default function SpeakCloudPage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

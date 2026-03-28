@@ -173,7 +173,7 @@ export default function RunwayPage() {
               style={{
                 backgroundColor: 'var(--ept-card-bg)',
                 borderColor: p.popular ? 'var(--ept-accent)' : 'var(--ept-card-border)',
-                ringColor: 'var(--ept-accent)',
+                ['--tw-ring-color' as string]: 'var(--ept-accent)',
               }}
             >
               {p.popular && (

@@ -5,10 +5,10 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'How does the token economy work?', answer: 'Users earn Echo Coins for actions you define — purchases, referrals, reviews, engagement, milestones. Coins are redeemable for discounts, exclusive content, upgrades, or custom rewards. The exchange rate and reward catalog are fully customizable.' },
-  { question: 'What makes the AI personalization special?', answer: 'AI analyzes each user behavior pattern to serve the right reward at the right time. A frequent buyer gets loyalty bonuses. An inactive user gets re-engagement offers. A social sharer gets referral multipliers. Every user gets a unique incentive strategy.' },
-  { question: 'Can I integrate with my existing platform?', answer: 'Yes. JavaScript SDK for web apps, REST API for backends, webhook events for any system. Pre-built integrations for Shopify, WooCommerce, and Stripe. Embed reward widgets or build custom UIs.' },
-  { question: 'How does referral tracking work?', answer: 'Unique referral codes per user with multi-level tracking. Referrers earn coins when their invites sign up, make first purchase, or hit milestones. AI optimizes referral incentives based on network effects and conversion data.' },
+  { q: 'How does the token economy work?', a: 'Users earn Echo Coins for actions you define — purchases, referrals, reviews, engagement, milestones. Coins are redeemable for discounts, exclusive content, upgrades, or custom rewards. The exchange rate and reward catalog are fully customizable.' },
+  { q: 'What makes the AI personalization special?', a: 'AI analyzes each user behavior pattern to serve the right reward at the right time. A frequent buyer gets loyalty bonuses. An inactive user gets re-engagement offers. A social sharer gets referral multipliers. Every user gets a unique incentive strategy.' },
+  { q: 'Can I integrate with my existing platform?', a: 'Yes. JavaScript SDK for web apps, REST API for backends, webhook events for any system. Pre-built integrations for Shopify, WooCommerce, and Stripe. Embed reward widgets or build custom UIs.' },
+  { q: 'How does referral tracking work?', a: 'Unique referral codes per user with multi-level tracking. Referrers earn coins when their invites sign up, make first purchase, or hit milestones. AI optimizes referral incentives based on network effects and conversion data.' },
 ]
 
 const features = [
@@ -48,7 +48,7 @@ export default function CoinRewardsPage() {
   return (
     <>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Echo Coin Rewards', href: '/coin-rewards' }]} />
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 16, background: 'linear-gradient(135deg, #eab308, #f97316)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Echo Coin Rewards</h1>
@@ -93,7 +93,7 @@ export default function CoinRewardsPage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

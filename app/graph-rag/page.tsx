@@ -5,10 +5,10 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'What is GraphRAG?', answer: 'Graph-based Retrieval Augmented Generation combines knowledge graphs with vector search. Instead of just finding similar text chunks, GraphRAG traverses entity relationships to find contextually connected information across domains — delivering answers with full citation chains.' },
-  { question: 'How big is the knowledge graph?', answer: '312K+ nodes, 3.3M+ edges, spanning 101 domain clusters with 1.37M cross-domain connections. Built from 5,400+ engines and 529K+ doctrines. The graph grows continuously as new knowledge is ingested.' },
-  { question: 'How is this different from vector search?', answer: 'Vector search finds similar text. GraphRAG finds related concepts across domains. A tax question about depreciation can traverse to oilfield equipment specs, lease terms, and IRS rulings — connections that vector similarity alone would miss.' },
-  { question: 'Can I bring my own data?', answer: 'Yes. Upload documents via the Knowledge Forge API and they are automatically chunked, embedded, entity-extracted, and woven into the graph. Your private data gets the same cross-domain discovery as the base knowledge.' },
+  { q: 'What is GraphRAG?', a: 'Graph-based Retrieval Augmented Generation combines knowledge graphs with vector search. Instead of just finding similar text chunks, GraphRAG traverses entity relationships to find contextually connected information across domains — delivering answers with full citation chains.' },
+  { q: 'How big is the knowledge graph?', a: '312K+ nodes, 3.3M+ edges, spanning 101 domain clusters with 1.37M cross-domain connections. Built from 5,400+ engines and 529K+ doctrines. The graph grows continuously as new knowledge is ingested.' },
+  { q: 'How is this different from vector search?', a: 'Vector search finds similar text. GraphRAG finds related concepts across domains. A tax question about depreciation can traverse to oilfield equipment specs, lease terms, and IRS rulings — connections that vector similarity alone would miss.' },
+  { q: 'Can I bring my own data?', a: 'Yes. Upload documents via the Knowledge Forge API and they are automatically chunked, embedded, entity-extracted, and woven into the graph. Your private data gets the same cross-domain discovery as the base knowledge.' },
 ]
 
 const features = [
@@ -48,7 +48,7 @@ export default function GraphRagPage() {
   return (
     <>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Graph RAG', href: '/graph-rag' }]} />
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 16, background: 'linear-gradient(135deg, #a855f7, #06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Echo Graph RAG</h1>
@@ -93,7 +93,7 @@ export default function GraphRagPage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>

@@ -94,7 +94,7 @@ const data = {
     { q: 'What happens when I hit the rate limit?', a: 'You receive an HTTP 429 response with a Retry-After header indicating seconds until your next allowed request. The official SDKs handle this automatically with exponential backoff and configurable retry counts.' },
     { q: 'Does the gateway support WebSocket or streaming?', a: 'The TTS endpoint supports chunked transfer encoding for audio streaming. Full WebSocket support for real-time engine queries and chat is on the roadmap for v2.1.' },
   ],
-} as const
+}
 
 export default function SDKGatewayDocPage() {
   return <ProductDoc {...data} />

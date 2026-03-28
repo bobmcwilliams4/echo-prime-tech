@@ -5,10 +5,10 @@ import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
-  { question: 'How does AI pricing optimization work?', answer: 'Machine learning analyzes customer behavior, competitor pricing, demand patterns, and elasticity curves to recommend optimal prices for every product/service. Prices update dynamically based on real-time signals.' },
-  { question: 'What data does churn prediction use?', answer: 'Usage frequency, support tickets, payment patterns, feature adoption, login recency, NPS scores, and engagement metrics. The model identifies at-risk customers 30-60 days before they churn.' },
-  { question: 'Can it integrate with my billing system?', answer: 'Yes. Direct integrations with Stripe, PayPal, Chargebee, and Paddle. Webhook-based integration for any billing system. Import historical revenue data via CSV or API.' },
-  { question: 'How accurate are revenue forecasts?', answer: 'Typically within 5-10% accuracy for 90-day forecasts, improving with more historical data. The model accounts for seasonality, growth trends, churn rates, and expansion revenue.' },
+  { q: 'How does AI pricing optimization work?', a: 'Machine learning analyzes customer behavior, competitor pricing, demand patterns, and elasticity curves to recommend optimal prices for every product/service. Prices update dynamically based on real-time signals.' },
+  { q: 'What data does churn prediction use?', a: 'Usage frequency, support tickets, payment patterns, feature adoption, login recency, NPS scores, and engagement metrics. The model identifies at-risk customers 30-60 days before they churn.' },
+  { q: 'Can it integrate with my billing system?', a: 'Yes. Direct integrations with Stripe, PayPal, Chargebee, and Paddle. Webhook-based integration for any billing system. Import historical revenue data via CSV or API.' },
+  { q: 'How accurate are revenue forecasts?', a: 'Typically within 5-10% accuracy for 90-day forecasts, improving with more historical data. The model accounts for seasonality, growth trends, churn rates, and expansion revenue.' },
 ]
 
 const features = [
@@ -48,7 +48,7 @@ export default function RevenueEnginePage() {
   return (
     <>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Revenue Engine', href: '/revenue-engine' }]} />
-      <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <FaqSchema faqs={faqs} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 16, background: 'linear-gradient(135deg, #10b981, #059669)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Echo Revenue Engine</h1>
@@ -93,7 +93,7 @@ export default function RevenueEnginePage() {
         </section>
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
-          {faqs.map((faq) => (<details key={faq.question} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.question}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.answer}</p></details>))}
+          {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
         </section>
       </div>
     </>
