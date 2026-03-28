@@ -409,6 +409,26 @@ const jsonLd = {
       offers: { '@type': 'AggregateOffer', lowPrice: '29', highPrice: '299', priceCurrency: 'USD', offerCount: 3 },
       provider: { '@id': 'https://echo-ept.com/#organization' },
     },
+    {
+      '@type': 'SoftwareApplication',
+      name: 'Echo Report Generator',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      description: 'AI-powered professional report generation from 5,500+ intelligence engines. Doctrine-backed PDFs with authority citations, risk assessments, and adversary positions across 19 domains.',
+      url: 'https://echo-ept.com/report-generator',
+      offers: { '@type': 'AggregateOffer', lowPrice: '29', highPrice: '349', priceCurrency: 'USD', offerCount: 3 },
+      provider: { '@id': 'https://echo-ept.com/#organization' },
+    },
+    {
+      '@type': 'SoftwareApplication',
+      name: 'Echo Analytics Engine',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      description: 'Unified fleet analytics for AI infrastructure: engine metrics, doctrine tracking, fleet health scoring, growth trends, and multi-service aggregation across 90+ Cloudflare Workers.',
+      url: 'https://echo-ept.com/analytics-engine',
+      offers: { '@type': 'AggregateOffer', lowPrice: '19', highPrice: '249', priceCurrency: 'USD', offerCount: 3 },
+      provider: { '@id': 'https://echo-ept.com/#organization' },
+    },
   ],
 };
 

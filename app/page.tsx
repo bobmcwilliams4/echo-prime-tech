@@ -838,6 +838,8 @@ export default function HomePage() {
                   { label: 'eBay AI', href: '/ebay-ai' },
                   { label: 'MEGA Gateway', href: '/mega-gateway' },
                   { label: 'Phoenix Cloud', href: '/phoenix-cloud' },
+                  { label: 'Report Generator', href: '/report-generator' },
+                  { label: 'Analytics Engine', href: '/analytics-engine' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}

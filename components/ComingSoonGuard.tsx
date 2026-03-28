@@ -117,6 +117,8 @@ const EXEMPT_PREFIXES = [
   '/ebay-ai',            // Echo eBay AI
   '/mega-gateway',       // Echo MEGA Gateway
   '/phoenix-cloud',      // Echo Phoenix Cloud
+  '/report-generator',   // Echo Report Generator
+  '/analytics-engine',   // Echo Analytics Engine
 
   // ── Documentation pages ──
   '/docs',               // Documentation Hub + all sub-routes
