@@ -343,7 +343,7 @@ export default function SDKPage() {
 
   return (
     <div style={{ color: textPrimary, minHeight: '100vh' }}>
-      <FaqSchema faqs={FAQS} />
+      <FaqSchema faqs={FAQS} name="Echo Prime SDK Developer FAQ" />
       <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Developers',href:'/sdk'},{name:'SDK Gateway',href:'/sdk'}]} />
       {/* ═══════════════ NAVIGATION ═══════════════ */}
       <nav

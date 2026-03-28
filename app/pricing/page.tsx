@@ -233,7 +233,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
-      <FaqSchema faqs={PRICING_FAQS} />
+      <FaqSchema faqs={PRICING_FAQS} name="Echo Prime Technology Pricing FAQ" />
       <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Pricing',href:'/pricing'}]} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
