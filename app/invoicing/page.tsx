@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '@/lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 /*  ═══════════════════════════════════════════════════════════════════
     Echo Invoicing — AI-Powered Invoicing & Billing
@@ -128,6 +129,12 @@ export default function InvoicingPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl font-bold text-center mb-2" style={{ color: 'var(--ept-text)' }}>Ready to Get Paid Faster?</h2>
+        <p className="text-center mb-6" style={{ color: 'var(--ept-text-secondary)' }}>AI-powered invoicing with payment prediction. No credit card required.</p>
+        <TrialCTA serviceId="echo-invoicing" tier="starter" productName="Echo Invoicing" />
       </section>
 
       <footer className="text-center py-10 text-sm" style={{ color: 'var(--ept-text-muted)' }}>

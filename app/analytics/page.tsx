@@ -1,6 +1,7 @@
 'use client';
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -179,12 +180,10 @@ export default function AnalyticsPage() {
       </section>
 
       {/* CTA */}
-      <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
-        <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-          <h2 className="text-3xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>See Your Entire Stack in One Dashboard</h2>
-          <p className="mb-6" style={{ color: 'var(--ept-text-secondary)' }}>14-day free trial. No credit card required.</p>
-          <Link href="/checkout?service=analytics&tier=starter" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
-        </div>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>See Your Entire Stack in One Dashboard</h2>
+        <p className="mb-6 text-center" style={{ color: 'var(--ept-text-secondary)' }}>14-day free trial. No credit card required.</p>
+        <TrialCTA serviceId="echo-analytics" tier="starter" productName="Echo Analytics" />
       </section>
 
       {/* Footer */}

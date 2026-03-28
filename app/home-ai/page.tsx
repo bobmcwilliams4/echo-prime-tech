@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 /* ==============================================================================
    ECHO HOME AI — Whole-Home Intelligence & Automation
@@ -347,14 +348,10 @@ export default function HomeAIPage() {
       </section>
 
       {/* ── Footer CTA ── */}
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Take Control of Your Home?</h2>
-        <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>Stop juggling ten apps. Start running your home from one intelligent platform.</p>
-        <div className="flex flex-wrap justify-center gap-4">
-          <Link href="/checkout?service=home-ai&tier=starter" className="px-8 py-4 rounded-xl text-base font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
-          <Link href="/checkout?service=home-ai&tier=family" className="px-8 py-4 rounded-xl text-base font-semibold border" style={{ borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)' }}>Get Family Plan</Link>
-          <a href="mailto:bob@echo-op.com" className="px-8 py-4 rounded-xl text-base font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>Contact Sales</a>
-        </div>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Take Control of Your Home?</h2>
+        <p className="text-lg mb-8 max-w-xl mx-auto text-center" style={{ color: 'var(--ept-text-secondary)' }}>Stop juggling ten apps. Start running your home from one intelligent platform.</p>
+        <TrialCTA serviceId="echo-home-ai" tier="starter" productName="Echo Home AI" />
       </section>
 
       {/* ── Footer ── */}

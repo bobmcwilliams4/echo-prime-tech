@@ -5,6 +5,7 @@ import BreadcrumbSchema from '@/components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '@/lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 /*  ═══════════════════════════════════════════════════════════════════
     Echo Appointments — AI-Powered Scheduling & Booking
@@ -128,6 +129,12 @@ export default function AppointmentsPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl font-bold text-center mb-2" style={{ color: 'var(--ept-text)' }}>Ready to Fill Your Calendar?</h2>
+        <p className="text-center mb-6" style={{ color: 'var(--ept-text-secondary)' }}>Automate bookings and reduce no-shows. No credit card required.</p>
+        <TrialCTA serviceId="echo-appointments" tier="starter" productName="Echo Appointments" />
       </section>
 
       <footer className="text-center py-10 text-sm" style={{ color: 'var(--ept-text-muted)' }}>

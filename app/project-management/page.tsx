@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '@/lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 /*  ═══════════════════════════════════════════════════════════════════
     Echo Project Management — AI-Powered Project & Task Tracking
@@ -128,6 +129,12 @@ export default function ProjectManagementPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl font-bold text-center mb-2" style={{ color: 'var(--ept-text)' }}>Ready to Ship Projects Faster?</h2>
+        <p className="text-center mb-6" style={{ color: 'var(--ept-text-secondary)' }}>AI-powered project tracking with kanban boards and sprint planning.</p>
+        <TrialCTA serviceId="echo-project-management" tier="starter" productName="Echo Project Management" />
       </section>
 
       <footer className="text-center py-10 text-sm" style={{ color: 'var(--ept-text-muted)' }}>

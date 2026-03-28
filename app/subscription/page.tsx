@@ -4,6 +4,7 @@ import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: '💳', title: 'Subscription Plans', desc: 'Create monthly, yearly, weekly, or custom interval plans with trial periods, setup fees, and feature lists. Public or private plans.' },
@@ -143,10 +144,10 @@ export default function SubscriptionPage() {
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Automate Your Billing?</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Join SaaS teams using AI-powered subscription billing to maximize revenue and reduce churn.</p>
-        <Link href="/checkout?service=subscription&tier=growth" className="px-8 py-4 rounded-xl font-semibold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold mb-4 text-center">Ready to Automate Your Billing?</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Join SaaS teams using AI-powered subscription billing to maximize revenue and reduce churn.</p>
+        <TrialCTA serviceId="echo-subscription" tier="starter" productName="Echo Subscription" />
       </section>
     </div>
   );

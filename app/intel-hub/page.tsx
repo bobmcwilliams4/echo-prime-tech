@@ -9,6 +9,7 @@ import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import SubscriptionGate from '../../components/SubscriptionGate';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 /* ==============================================================================
    ECHO INTEL HUB — Digital Intelligence & Monitoring Platform
@@ -362,22 +363,14 @@ function IntelHubContent() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="max-w-4xl mx-auto px-6 pb-20">
-        <div
-          className="p-10 md:p-16 rounded-2xl border text-center"
-          style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-accent)', boxShadow: isDark ? '0 0 60px rgba(20,184,166,0.08)' : 'none' }}
-        >
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>
-            See Everything. <span className="gradient-text">Miss Nothing.</span>
-          </h2>
-          <p className="text-lg max-w-2xl mx-auto mb-8" style={{ color: 'var(--ept-text-secondary)' }}>
-            Start monitoring in minutes. Full dashboard, real-time alerts, AI anomaly detection. No hardware required.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/checkout?service=intel-hub&tier=family" className="px-8 py-4 rounded-xl font-semibold text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>Start Free Trial</Link>
-            <Link href="mailto:bob@echo-op.com" className="px-8 py-4 rounded-xl border font-semibold" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>Contact Sales</Link>
-          </div>
-        </div>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>
+          See Everything. <span className="gradient-text">Miss Nothing.</span>
+        </h2>
+        <p className="text-center text-lg max-w-2xl mx-auto mb-8" style={{ color: 'var(--ept-text-secondary)' }}>
+          Start monitoring in minutes. Full dashboard, real-time alerts, AI anomaly detection. No hardware required.
+        </p>
+        <TrialCTA serviceId="echo-intel-hub" tier="starter" productName="Echo Intel Hub" />
       </section>
 
       {/* ── Footer ── */}

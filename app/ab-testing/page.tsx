@@ -3,6 +3,7 @@
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
+import TrialCTA from '@/components/TrialCTA'
 
 const faqs = [
   {
@@ -167,6 +168,11 @@ export default function AbTestingPage() {
               <p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p>
             </details>
           ))}
+        </section>
+        <section className="max-w-xl mx-auto px-6 py-20">
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 16 }}>Ready to Start Testing?</h2>
+          <p style={{ textAlign: 'center', marginBottom: 32, opacity: 0.8 }}>Launch your first A/B test in under 5 minutes with a free trial.</p>
+          <TrialCTA serviceId="echo-ab-testing" tier="starter" productName="Echo A/B Testing" />
         </section>
       </div>
     </>

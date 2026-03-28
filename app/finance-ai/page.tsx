@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
+import TrialCTA from '@/components/TrialCTA';
 
 /* ==============================================================================
    ECHO FINANCE AI — Personal & Business Finance Intelligence
@@ -228,13 +229,10 @@ export default function FinanceAIPage() {
       </section>
 
       {/* CTA */}
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Take Control of Your Financial Future</h2>
-        <p className="text-lg mb-8" style={{ color: 'var(--ept-text-secondary)' }}>55 endpoints. 13 modules. AI that works for your money, not against it.</p>
-        <div className="flex gap-4 justify-center">
-          <Link href="/checkout?service=finance-ai&tier=starter" className="px-8 py-4 rounded-xl font-bold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started Free</Link>
-          <Link href="/pricing" className="px-8 py-4 rounded-xl font-bold text-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}>View Pricing</Link>
-        </div>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Take Control of Your Financial Future</h2>
+        <p className="text-lg mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>55 endpoints. 13 modules. AI that works for your money, not against it.</p>
+        <TrialCTA serviceId="echo-finance-ai" tier="starter" productName="Echo Finance AI" />
       </section>
 
       {/* Footer */}

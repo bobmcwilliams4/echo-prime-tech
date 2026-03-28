@@ -11,6 +11,7 @@ import SubscriptionGate from '../../components/SubscriptionGate';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 /* ══════════════════════════════════════════════════════════════════════
    CONVAI WIDGET — ElevenLabs Voice AI Demo
@@ -566,45 +567,14 @@ function CloserLandingPage() {
         </section>
 
         {/* Final CTA */}
-        <section className="mb-16">
-          <div
-            className="p-10 md:p-16 rounded-2xl border text-center"
-            style={{
-              backgroundColor: 'var(--ept-card-bg)',
-              borderColor: 'var(--ept-accent)',
-              boxShadow: isDark ? '0 0 60px rgba(20,184,166,0.08)' : 'none',
-            }}
-          >
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>
-              Ready to <span className="gradient-text">Close More Deals?</span>
-            </h2>
-            <p className="text-lg max-w-2xl mx-auto mb-8" style={{ color: 'var(--ept-text-secondary)' }}>
-              Get your own AI Sales Agent deployed in 24 hours. $0 setup, no contracts, everything included.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <button
-                onClick={() => { setDemoActive(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className="flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white transition-all hover:opacity-90"
-                style={{ backgroundColor: 'var(--ept-accent)' }}
-              >
-                Try Live Demo
-              </button>
-              <Link
-                href="/checkout?service=ai-closer&tier=professional"
-                className="flex items-center gap-2 px-8 py-4 rounded-xl border font-semibold transition-all hover:opacity-80"
-                style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}
-              >
-                Buy Now
-              </Link>
-              <Link
-                href="/pricing"
-                className="flex items-center gap-2 px-8 py-4 rounded-xl border font-semibold transition-all hover:opacity-80"
-                style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}
-              >
-                View All Plans
-              </Link>
-            </div>
-          </div>
+        <section className="max-w-xl mx-auto px-6 py-20">
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>
+            Ready to <span className="gradient-text">Close More Deals?</span>
+          </h2>
+          <p className="text-center text-lg max-w-2xl mx-auto mb-8" style={{ color: 'var(--ept-text-secondary)' }}>
+            Get your own AI Sales Agent deployed in 24 hours. $0 setup, no contracts, everything included.
+          </p>
+          <TrialCTA serviceId="echo-closer" tier="starter" productName="Echo Closer AI" />
         </section>
 
         {/* Related Services */}

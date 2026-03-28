@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '@/lib/theme-context';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 /*  ═══════════════════════════════════════════════════════════════════
     Echo HR Management — AI-Powered People Management
@@ -128,6 +129,12 @@ export default function HRManagementPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl font-bold text-center mb-2" style={{ color: 'var(--ept-text)' }}>Ready to Simplify HR?</h2>
+        <p className="text-center mb-6" style={{ color: 'var(--ept-text-secondary)' }}>AI-powered people management without the enterprise price tag.</p>
+        <TrialCTA serviceId="echo-hr-management" tier="starter" productName="Echo HR Management" />
       </section>
 
       <footer className="text-center py-10 text-sm" style={{ color: 'var(--ept-text-muted)' }}>

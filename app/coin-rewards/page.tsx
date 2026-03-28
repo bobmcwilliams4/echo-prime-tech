@@ -3,6 +3,7 @@
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
+import TrialCTA from '@/components/TrialCTA'
 
 const faqs = [
   { q: 'How does the token economy work?', a: 'Users earn Echo Coins for actions you define — purchases, referrals, reviews, engagement, milestones. Coins are redeemable for discounts, exclusive content, upgrades, or custom rewards. The exchange rate and reward catalog are fully customizable.' },
@@ -94,6 +95,11 @@ export default function CoinRewardsPage() {
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
           {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
+        </section>
+        <section className="max-w-xl mx-auto px-6 py-20">
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 16 }}>Ready to Reward Your Customers?</h2>
+          <p style={{ textAlign: 'center', marginBottom: 32, opacity: 0.8 }}>Launch your loyalty program in minutes with a free trial.</p>
+          <TrialCTA serviceId="echo-coin-rewards" tier="starter" productName="Echo Coin Rewards" />
         </section>
       </div>
     </>

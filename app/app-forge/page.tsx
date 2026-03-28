@@ -3,6 +3,7 @@
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
+import TrialCTA from '@/components/TrialCTA'
 
 const faqs = [
   { q: 'What types of apps can it generate?', a: 'Six archetypes: Electron desktop apps, Next.js web apps, React Native mobile, CLI tools, Chrome extensions, and MCP servers. Each archetype has specialized templates and build pipelines.' },
@@ -94,6 +95,11 @@ export default function AppForgePage() {
         <section style={{ padding: '60px 20px 80px', maxWidth: 800, margin: '0 auto' }}>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 40 }}>Frequently Asked Questions</h2>
           {faqs.map((faq) => (<details key={faq.q} style={{ marginBottom: 16, padding: 20, borderRadius: 12, background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}><summary style={{ fontWeight: 700, cursor: 'pointer', fontSize: '1.05rem' }}>{faq.q}</summary><p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p></details>))}
+        </section>
+        <section className="max-w-xl mx-auto px-6 py-20">
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, textAlign: 'center', marginBottom: 16 }}>Ready to Build Your App?</h2>
+          <p style={{ textAlign: 'center', marginBottom: 32, opacity: 0.8 }}>Describe it. We build it. Start your free trial now.</p>
+          <TrialCTA serviceId="echo-app-forge" tier="starter" productName="Echo App Forge" />
         </section>
       </div>
     </>

@@ -5,6 +5,7 @@ import FaqSchema from '../../components/FaqSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { title: 'Visual Workflow Builder', desc: 'Create automation workflows with drag-and-drop steps. Supports actions, conditions, notifications, AI analysis, webhooks, and delays.' },
@@ -131,6 +132,12 @@ export default function WorkflowsPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-extrabold mb-4 text-center">Ready to Automate?</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Start your free trial and build your first workflow in minutes.</p>
+        <TrialCTA serviceId="echo-workflows" tier="starter" productName="Echo Workflows" />
       </section>
 
       <footer className="text-center py-10 text-sm" style={{ color: 'var(--ept-text-muted)' }}>

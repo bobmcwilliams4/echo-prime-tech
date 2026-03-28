@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { title: 'Multi-Account Tracking', desc: 'Track checking, savings, credit, and investment accounts with real-time balances. Connect all your financial accounts in one dashboard.' },
@@ -131,6 +132,12 @@ export default function FinancePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl font-bold text-center mb-2" style={{ color: 'var(--ept-text)' }}>Ready to Take Control of Your Finances?</h2>
+        <p className="text-center mb-6" style={{ color: 'var(--ept-text-secondary)' }}>AI-powered budgeting and spending insights. No credit card required.</p>
+        <TrialCTA serviceId="echo-finance" tier="starter" productName="Echo Finance" />
       </section>
 
       <footer className="text-center py-10 text-sm" style={{ color: 'var(--ept-text-muted)' }}>

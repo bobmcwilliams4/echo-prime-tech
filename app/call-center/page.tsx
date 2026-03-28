@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '@/components/BreadcrumbSchema';
 import FaqSchema from '@/components/FaqSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 /* ══════════════════════════════════════════════════════════════
    DATA
@@ -784,40 +785,15 @@ export default function CallCenterPage() {
         </section>
 
         {/* CTA */}
-        <section className="mb-16">
-          <div
-            className="p-8 md:p-12 rounded-2xl text-center"
-            style={{
-              background: isDark
-                ? 'linear-gradient(135deg, rgba(20,184,166,0.1), rgba(59,130,246,0.08))'
-                : 'linear-gradient(135deg, rgba(13,115,119,0.06), rgba(59,130,246,0.04))',
-              border: `1px solid ${isDark ? 'rgba(20,184,166,0.2)' : 'rgba(13,115,119,0.15)'}`,
-            }}
-          >
-            <h2 className="text-2xl md:text-3xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>
-              Ready to Scale Your Call Operations?
-            </h2>
-            <p className="max-w-lg mx-auto mb-6" style={{ color: 'var(--ept-text-secondary)' }}>
-              Deploy AI agents that handle thousands of calls simultaneously.
-              Start your free trial today — no credit card required.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/checkout?service=call-center&tier=business"
-                className="px-8 py-4 rounded-xl font-semibold text-lg text-white"
-                style={{ backgroundColor: 'var(--ept-accent)' }}
-              >
-                Start Free Trial
-              </Link>
-              <Link
-                href="/support"
-                className="px-8 py-4 rounded-xl border font-semibold text-lg"
-                style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}
-              >
-                Talk to Sales
-              </Link>
-            </div>
-          </div>
+        <section className="max-w-xl mx-auto px-6 py-20">
+          <h2 className="text-2xl md:text-3xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>
+            Ready to Scale Your Call Operations?
+          </h2>
+          <p className="max-w-lg mx-auto mb-6 text-center" style={{ color: 'var(--ept-text-secondary)' }}>
+            Deploy AI agents that handle thousands of calls simultaneously.
+            Start your free trial today — no credit card required.
+          </p>
+          <TrialCTA serviceId="echo-call-center" tier="professional" productName="Echo Call Center" />
         </section>
       </div>
 

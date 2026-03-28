@@ -2,6 +2,7 @@
 
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
 
@@ -140,10 +141,10 @@ export default function FeatureFlagsPage() {
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Ship Features Fearlessly?</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Join teams releasing faster with controlled rollouts and instant kill switches.</p>
-        <Link href="/checkout?service=feature-flags&tier=growth" className="px-8 py-4 rounded-xl font-semibold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold mb-4 text-center">Ready to Ship Features Fearlessly?</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Join teams releasing faster with controlled rollouts and instant kill switches.</p>
+        <TrialCTA serviceId="echo-feature-flags" tier="starter" productName="Echo Feature Flags" />
       </section>
     </div>
   );

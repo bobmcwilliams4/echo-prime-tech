@@ -2,6 +2,7 @@
 
 import { useTheme } from '../../lib/theme-context'
 import BreadcrumbSchema from '../../components/BreadcrumbSchema'
+import TrialCTA from '@/components/TrialCTA'
 
 function FaqSchema() {
   const faq = {
@@ -170,6 +171,12 @@ export default function DataRoomPage() {
             <p style={{ marginTop: 10, fontSize: 14, color: dark ? '#a1a1aa' : '#6b7280', lineHeight: 1.7 }}>{f.a}</p>
           </details>
         ))}
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 style={{ textAlign: 'center', fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Ready to Secure Your Deal Room?</h2>
+        <p style={{ textAlign: 'center', color: dark ? '#a1a1aa' : '#6b7280', marginBottom: 24 }}>Start sharing documents securely in minutes. No credit card required.</p>
+        <TrialCTA serviceId="echo-data-room" tier="starter" productName="Echo Data Room" />
       </section>
     </div>
   )

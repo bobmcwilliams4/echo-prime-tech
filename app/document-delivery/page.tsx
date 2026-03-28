@@ -6,6 +6,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 /* ==============================================================================
    ECHO DOCUMENT DELIVERY — Universal Print/PDF/Email/SMS Document Pipeline
@@ -208,13 +209,10 @@ export default function DocumentDeliveryPage() {
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Documents That Deliver Themselves</h2>
-        <p className="text-lg mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Print, PDF, email, SMS — one API for every delivery channel. Zero-cost PDF generation. Professional branding.</p>
-        <div className="flex gap-4 justify-center">
-          <Link href="/checkout?service=document-delivery&tier=starter" className="px-8 py-4 rounded-xl font-bold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started Free</Link>
-          <Link href="/sdk/docs" className="px-8 py-4 rounded-xl font-bold text-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}>API Documentation</Link>
-        </div>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Documents That Deliver Themselves</h2>
+        <p className="text-lg mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Print, PDF, email, SMS — one API for every delivery channel. Zero-cost PDF generation. Professional branding.</p>
+        <TrialCTA serviceId="echo-document-delivery" tier="starter" productName="Echo Document Delivery" />
       </section>
 
       <footer className="border-t px-6 py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

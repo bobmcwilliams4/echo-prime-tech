@@ -1,6 +1,7 @@
 'use client';
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '@/components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
@@ -487,21 +488,14 @@ export default function ShepherdPage() {
       </section>
 
       {/* ── Final CTA ── */}
-      <section className="px-6 py-20 text-center" style={{ backgroundColor: 'var(--ept-surface)' }}>
-        <h2 className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>
           Ready to Shepherd Smarter?
         </h2>
-        <p className="text-base mb-8 max-w-lg mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
+        <p className="text-base mb-8 max-w-lg mx-auto text-center" style={{ color: 'var(--ept-text-secondary)' }}>
           14-day free trial. No credit card required. Set up your church in under 5 minutes.
         </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          <Link href="/checkout?service=shepherd&tier=shepherd" className="px-8 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
-            Start Free Trial
-          </Link>
-          <a href="mailto:bob@echo-op.com?subject=Shepherd%20AI%20Demo%20Request" className="px-8 py-3 rounded-xl border font-semibold" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
-            Request a Demo
-          </a>
-        </div>
+        <TrialCTA serviceId="echo-shepherd-ai" tier="starter" productName="Echo Shepherd AI" />
       </section>
 
       {/* ── Footer ── */}

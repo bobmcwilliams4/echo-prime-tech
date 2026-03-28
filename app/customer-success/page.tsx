@@ -2,6 +2,7 @@
 
 import { useTheme } from '../../lib/theme-context'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
+import TrialCTA from '@/components/TrialCTA'
 
 function FaqSchema() {
   const faq = {
@@ -184,6 +185,12 @@ export default function CustomerSuccessPage() {
             <p style={{ marginTop: 10, fontSize: 14, color: dark ? '#a1a1aa' : '#6b7280', lineHeight: 1.7 }}>{f.a}</p>
           </details>
         ))}
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 style={{ textAlign: 'center', fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Ready to Reduce Churn?</h2>
+        <p style={{ textAlign: 'center', color: dark ? '#a1a1aa' : '#6b7280', marginBottom: 24 }}>Start tracking customer health and predicting churn in minutes.</p>
+        <TrialCTA serviceId="echo-customer-success" tier="starter" productName="Echo Customer Success" />
       </section>
     </div>
   )

@@ -8,6 +8,7 @@ import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '@/components/TrialCTA';
 
 // ─── Constants ───
 const TTS_API = 'https://tts.echo-op.com';
@@ -2731,15 +2732,10 @@ export default function VoicePage() {
       </div>
 
       {/* ─── CTA ─── */}
-      <section className="max-w-3xl mx-auto px-6 pb-16 text-center">
-        <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>Ready to Add Voice to Your AI?</h2>
-          <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>AI-powered text-to-speech with 14 natural voices, real-time streaming, and voice cloning.</p>
-          <div className="flex items-center justify-center gap-4">
-            <Link href="/checkout?service=voice&tier=professional" className="inline-block px-10 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started</Link>
-            <Link href="/pricing" className="inline-block px-10 py-3 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>View Pricing</Link>
-          </div>
-        </div>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl font-bold mb-3 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Add Voice to Your AI?</h2>
+        <p className="text-sm mb-6 text-center" style={{ color: 'var(--ept-text-muted)' }}>AI-powered text-to-speech with 14 natural voices, real-time streaming, and voice cloning.</p>
+        <TrialCTA serviceId="echo-speak-cloud" tier="starter" productName="Echo Voice AI" />
       </section>
 
       {/* ─── Cross-Sell ─── */}

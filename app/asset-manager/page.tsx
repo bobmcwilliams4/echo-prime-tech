@@ -2,6 +2,7 @@
 
 import { useTheme } from '../../lib/theme-context'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
+import TrialCTA from '@/components/TrialCTA'
 
 function FaqSchema() {
   const faq = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [
@@ -146,6 +147,11 @@ export default function AssetManagerPage() {
             <p style={{ marginTop: 10, fontSize: 14, color: dark ? '#a1a1aa' : '#6b7280', lineHeight: 1.7 }}>{f.a}</p>
           </details>
         ))}
+      </section>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 700, marginBottom: 16 }}>Ready to Track Your Assets?</h2>
+        <p style={{ textAlign: 'center', color: dark ? '#a1a1aa' : '#6b7280', marginBottom: 32 }}>Start managing your asset lifecycle with a free trial.</p>
+        <TrialCTA serviceId="echo-asset-manager" tier="starter" productName="Echo Asset Manager" />
       </section>
     </div>
   )

@@ -3,6 +3,7 @@
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
 import BreadcrumbSchema from '@/components/BreadcrumbSchema'
+import TrialCTA from '@/components/TrialCTA'
 
 const faqs = [
   {
@@ -179,6 +180,12 @@ export default function VendorManagerPage() {
               <p style={{ marginTop: 12, opacity: 0.8, lineHeight: 1.6 }}>{faq.a}</p>
             </details>
           ))}
+        </section>
+
+        <section className="max-w-xl mx-auto px-6 py-20">
+          <h2 style={{ textAlign: 'center', fontSize: '1.5rem', fontWeight: 700, marginBottom: 8 }}>Ready to Streamline Vendor Management?</h2>
+          <p style={{ textAlign: 'center', opacity: 0.7, marginBottom: 24 }}>Get AI-powered vendor risk scoring and procurement in minutes.</p>
+          <TrialCTA serviceId="echo-vendor-manager" tier="starter" productName="Echo Vendor Manager" />
         </section>
       </div>
     </>

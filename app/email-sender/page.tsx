@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { title: 'Transactional Email', desc: 'Send invoices, receipts, password resets, and order confirmations with guaranteed delivery. Template-based with dynamic variable injection.' },
@@ -179,12 +180,10 @@ export default function EmailSenderPage() {
       </section>
 
       {/* CTA */}
-      <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
-        <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-          <h2 className="text-3xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Send Smarter?</h2>
-          <p className="mb-6" style={{ color: 'var(--ept-text-secondary)' }}>100 free emails/day for 30 days. No credit card required.</p>
-          <Link href="/checkout?service=email-sender&tier=starter" className="inline-block px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
-        </div>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Ready to Send Smarter?</h2>
+        <p className="mb-6 text-center" style={{ color: 'var(--ept-text-secondary)' }}>100 free emails/day for 30 days. No credit card required.</p>
+        <TrialCTA serviceId="echo-email-sender" tier="starter" productName="Echo Email Sender" />
       </section>
 
       {/* Footer */}
