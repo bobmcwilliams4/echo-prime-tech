@@ -89,6 +89,10 @@ const categories: DocCategory[] = [
       { name: 'OKR Tracking', href: '/docs/okr', badge: 'Docs' },
       { name: 'Payments', href: '/docs/payments', badge: 'Docs' },
       { name: 'Documents', href: '/docs/documents', badge: 'Docs' },
+      { name: 'Invoice', href: '/docs/invoice', badge: 'Docs' },
+      { name: 'Expense', href: '/docs/expense', badge: 'Docs' },
+      { name: 'HR', href: '/docs/hr', badge: 'Docs' },
+      { name: 'Project Manager', href: '/docs/project-manager', badge: 'Docs' },
     ],
   },
   {
