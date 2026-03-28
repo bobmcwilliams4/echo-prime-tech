@@ -6,7 +6,7 @@ const BOT_WORKERS: Record<string, string> = {
   linkedin: 'https://echo-linkedin.bmcii1976.workers.dev',
   reddit: 'https://echo-reddit-bot.bmcii1976.workers.dev',
   telegram: 'https://echo-telegram.bmcii1976.workers.dev',
-  discord: 'https://echo-discord-bot.bmcii1976.workers.dev',
+  discord: 'https://echo-prime-discord.bmcii1976.workers.dev',
   slack: 'https://echo-slack.bmcii1976.workers.dev',
   whatsapp: 'https://echo-whatsapp.bmcii1976.workers.dev',
   messenger: 'https://echo-messenger.bmcii1976.workers.dev',
