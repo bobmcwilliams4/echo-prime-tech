@@ -550,6 +550,24 @@
   <url><loc>https://echo-ept.com/docs/rewards</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/docs/sec-intel</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
+  <!-- CC10 Docs Batch 3: 16 more docs pages (2026-03-28) -->
+  <url><loc>https://echo-ept.com/docs/payments</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/ecommerce</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/document-delivery</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/diagnostics</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/report-generator</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/scrapers</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/model-host</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/runway</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/news</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/shopify</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/orchestration</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/pipelines</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/documents</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/workflows</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/websites</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/analytics</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+
   <!-- CC10 Blog Articles (2026-03-28) -->
   <url><loc>https://echo-ept.com/blog/ai-knowledge-scout-research-automation</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/blog/cloudflare-worker-fleet-management</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
