@@ -8,7 +8,47 @@
     <lastBuildDate>Sat, 28 Mar 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
 
-    <!-- 122 Articles (4 new: diagnostics, echocad, ecommerce, runway) -->
+    <!-- 127 Articles (5 new: compliance, payroll, qr-menu, knowledge-engine, fleet) -->
+    <item>
+      <title>AI Compliance Automation: How to Automate SOC 2, HIPAA, and GDPR in 2026</title>
+      <link>https://echo-ept.com/blog/ai-compliance-soc2-hipaa-gdpr-automation-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-compliance-soc2-hipaa-gdpr-automation-2026</guid>
+      <category>AI &amp; Business</category>
+      <description>Manual compliance audits take months and cost six figures. AI compliance automation continuously monitors controls, auto-generates evidence, and keeps you audit-ready 365 days a year.</description>
+    </item>
+    <item>
+      <title>AI Payroll vs ADP vs Gusto: Why AI-Native Payroll Wins in 2026</title>
+      <link>https://echo-ept.com/blog/ai-payroll-vs-adp-gusto-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-payroll-vs-adp-gusto-2026</guid>
+      <category>AI &amp; Business</category>
+      <description>ADP charges per employee. Gusto caps at 100 seats. AI-native payroll calculates all 50 states, predicts costs, and scales without per-head pricing.</description>
+    </item>
+    <item>
+      <title>QR Code Digital Menus: The Technology Transforming Restaurant Operations</title>
+      <link>https://echo-ept.com/blog/qr-code-digital-menu-restaurant-technology-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/qr-code-digital-menu-restaurant-technology-2026</guid>
+      <category>AI &amp; Business</category>
+      <description>Paper menus cost $2-5 each to reprint. QR digital menus update instantly, track scan analytics, enable table ordering, and support multi-language translation.</description>
+    </item>
+    <item>
+      <title>Building a Knowledge Engine: How to Turn Domain Expertise into AI Infrastructure</title>
+      <link>https://echo-ept.com/blog/knowledge-engine-architecture-domain-expertise-ai-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/knowledge-engine-architecture-domain-expertise-ai-2026</guid>
+      <category>AI &amp; Engineering</category>
+      <description>RAG retrieves text. Knowledge engines encode domain expertise as structured doctrine blocks with citations, adversary positions, and appeals strategies.</description>
+    </item>
+    <item>
+      <title>Autonomous Fleet Management: How AI Workers Monitor, Heal, and Scale Themselves</title>
+      <link>https://echo-ept.com/blog/autonomous-fleet-management-ai-workers-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/autonomous-fleet-management-ai-workers-2026</guid>
+      <category>AI &amp; Engineering</category>
+      <description>Managing 200+ cloud workers manually is impossible. Autonomous fleet management uses daemon monitoring, builder agents, and QA testers to keep everything running without human intervention.</description>
+    </item>
     <item>
       <title>Autonomous Code Diagnostics: How AI Agents Are Replacing SonarQube and Snyk</title>
       <link>https://echo-ept.com/blog/autonomous-code-diagnostics-ai-vs-sonarqube-snyk-2026</link>
