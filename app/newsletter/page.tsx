@@ -4,6 +4,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import FaqSchema from '../../components/FaqSchema';
+
+const FAQS = [
+  { q: 'How many subscribers can I have?', a: 'Starter supports 1,000 subscribers, Growth supports 10,000, and Scale supports 100,000. All plans include unlimited lists and segments.' },
+  { q: 'Does Echo Newsletter take a cut of paid subscriptions?', a: 'No. Echo Newsletter charges a flat monthly fee with zero revenue share. Unlike Substack which takes 10% of your subscription revenue forever, you keep 100% of what your readers pay.' },
+  { q: 'Can I migrate from Substack or Beehiiv?', a: 'Yes. You can bulk import subscribers via CSV or API. Upload up to 500 subscribers per batch with automatic duplicate detection and validation.' },
+  { q: 'How does the embeddable widget work?', a: 'Add a single script tag to any website. A branded subscribe form appears instantly — no iframe, no dependencies, no configuration required. It works on any static site, WordPress, or custom app.' },
+  { q: 'What does AI content generation do?', a: 'Provide a topic and tone, and the AI generates a publication-ready HTML newsletter draft. Available on Growth plans and above. Powered by the Echo Engine Runtime.' },
+  { q: 'Can I use my own domain for sending?', a: 'Yes. Custom sending domains are available on Growth and Scale plans. Configure your DNS records and send newsletters from your own branded email address.' },
+];
 
 const FEATURES = [
   { icon: 'S', title: 'Subscriber Management', desc: 'Import, segment, and manage unlimited subscribers with custom fields, lists, and double opt-in support' },
@@ -128,6 +138,22 @@ export default function NewsletterPage() {
               <ul className="space-y-2 mb-6">{t.features.map((f) => <li key={f} className="text-sm flex items-center gap-2" style={{ color: 'var(--ept-text-secondary)' }}><span style={{ color: 'var(--ept-accent)' }}>&#10003;</span>{f}</li>)}</ul>
               <Link href={`/checkout?service=newsletter&tier=${t.name.toLowerCase()}`} className="block text-center px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: t.popular ? 'var(--ept-accent)' : 'transparent', color: t.popular ? '#fff' : 'var(--ept-accent)', border: t.popular ? 'none' : '1px solid var(--ept-border)' }}>Get Started</Link>
             </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="max-w-4xl mx-auto px-6 py-16">
+        <h2 className="text-3xl font-bold text-center mb-10" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <FaqSchema faqs={FAQS} name="Echo Newsletter FAQ" />
+        <div className="space-y-4">
+          {FAQS.map((faq) => (
+            <details key={faq.q} className="p-5 rounded-xl border group" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <summary className="font-semibold cursor-pointer list-none flex items-center justify-between" style={{ color: 'var(--ept-text)' }}>
+                {faq.q}
+                <span className="ml-2 transition-transform group-open:rotate-45 text-xl" style={{ color: 'var(--ept-accent)' }}>+</span>
+              </summary>
+              <p className="mt-3 text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </details>
           ))}
         </div>
       </section>

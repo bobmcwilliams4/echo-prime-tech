@@ -4,6 +4,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import FaqSchema from '../../components/FaqSchema';
+
+const FAQS = [
+  { q: 'How does the referral system work?', a: 'Every person who signs up gets a unique referral link. When someone joins through that link, the referrer moves up in line. The more referrals, the higher the position. This creates a viral growth loop where signups drive more signups.' },
+  { q: 'What are milestone rewards?', a: 'Set referral thresholds (e.g., 3 referrals, 10 referrals) with unlockable rewards like badges, early access, discount codes, or custom perks. Users see their progress toward the next milestone on the waitlist page.' },
+  { q: 'Can I run multiple waitlists at once?', a: 'Yes. Growth plans support 5 campaigns and Scale supports unlimited. Each campaign has independent settings, branding, and subscriber lists — great for testing multiple products or launches.' },
+  { q: 'How do I invite people off the waitlist?', a: 'Use the bulk invite feature to invite the top N people in one click. They receive an email notification that they have been selected. You control the pace of your rollout.' },
+  { q: 'What happens when someone signs up?', a: 'They immediately receive a confirmation email with their position number and unique referral link. The email drives instant sharing by showing how referrals move them up the list.' },
+  { q: 'Is there protection against fake signups?', a: 'Yes. Built-in IP-based rate limiting prevents bots from flooding your list. The system also deduplicates emails and validates format before accepting signups.' },
+];
 
 const FEATURES = [
   { icon: 'V', title: 'Viral Referral Loops', desc: 'Every signup gets a unique referral link. Friends who join boost the referrer up the list automatically' },
@@ -125,6 +135,22 @@ export default function WaitlistPage() {
               <ul className="space-y-2 mb-6">{t.features.map((f) => <li key={f} className="text-sm flex items-center gap-2" style={{ color: 'var(--ept-text-secondary)' }}><span style={{ color: 'var(--ept-accent)' }}>&#10003;</span>{f}</li>)}</ul>
               <Link href={`/checkout?service=waitlist&tier=${t.name.toLowerCase()}`} className="block text-center px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: t.popular ? 'var(--ept-accent)' : 'transparent', color: t.popular ? '#fff' : 'var(--ept-accent)', border: t.popular ? 'none' : '1px solid var(--ept-border)' }}>Get Started</Link>
             </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="max-w-4xl mx-auto px-6 py-16">
+        <h2 className="text-3xl font-bold text-center mb-10" style={{ color: 'var(--ept-text)' }}>Frequently Asked Questions</h2>
+        <FaqSchema faqs={FAQS} name="Echo Waitlist FAQ" />
+        <div className="space-y-4">
+          {FAQS.map((faq) => (
+            <details key={faq.q} className="p-5 rounded-xl border group" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <summary className="font-semibold cursor-pointer list-none flex items-center justify-between" style={{ color: 'var(--ept-text)' }}>
+                {faq.q}
+                <span className="ml-2 transition-transform group-open:rotate-45 text-xl" style={{ color: 'var(--ept-accent)' }}>+</span>
+              </summary>
+              <p className="mt-3 text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
+            </details>
           ))}
         </div>
       </section>
