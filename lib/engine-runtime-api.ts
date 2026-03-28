@@ -57,6 +57,9 @@ export interface QueryResponse {
   domain?: string;
   domains?: string[];
   latency_ms: number;
+  match_quality?: 'strong' | 'moderate' | 'weak' | 'none';
+  match_guidance?: string;
+  top_score?: number;
 }
 
 export interface EngineInfo {
@@ -144,6 +147,21 @@ export function getConfidenceBadge(confidence: string): { label: string; color: 
       return { label: 'Low Confidence', color: '#ef4444' };
     default:
       return { label: confidence || 'Unknown', color: '#64748b' };
+  }
+}
+
+export function getMatchQualityBadge(quality?: string): { label: string; color: string; icon: string } {
+  switch (quality) {
+    case 'strong':
+      return { label: 'Strong Match', color: '#10b981', icon: '●' };
+    case 'moderate':
+      return { label: 'Partial Match', color: '#f59e0b', icon: '◐' };
+    case 'weak':
+      return { label: 'Weak Match', color: '#ef4444', icon: '○' };
+    case 'none':
+      return { label: 'No Match', color: '#64748b', icon: '✕' };
+    default:
+      return { label: '', color: '#64748b', icon: '' };
   }
 }
 

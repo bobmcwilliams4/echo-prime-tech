@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useEngineQuery } from '../lib/hooks/use-engine-query';
-import { getRuntimeStats, getConfidenceBadge, formatDoctrineCount, type CategoryStats } from '../lib/engine-runtime-api';
+import { getRuntimeStats, getConfidenceBadge, getMatchQualityBadge, formatDoctrineCount, type CategoryStats } from '../lib/engine-runtime-api';
 
 interface Props {
   domain?: string;
@@ -166,10 +166,23 @@ export function EngineQueryPanel({
       {result && result.results && result.results.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
-              {result.total} doctrine{result.total !== 1 ? 's' : ''} matched
-              {result.latency_ms > 0 && ` · ${result.latency_ms}ms`}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+                {result.total} doctrine{result.total !== 1 ? 's' : ''} matched
+                {result.latency_ms > 0 && ` · ${result.latency_ms}ms`}
+              </span>
+              {result.match_quality && (() => {
+                const mqBadge = getMatchQualityBadge(result.match_quality);
+                return (
+                  <span
+                    className="px-2 py-0.5 rounded-full text-xs font-medium inline-flex items-center gap-1"
+                    style={{ backgroundColor: mqBadge.color + '1a', color: mqBadge.color }}
+                  >
+                    {mqBadge.icon} {mqBadge.label}
+                  </span>
+                );
+              })()}
+            </div>
             <button
               onClick={clear}
               className="text-xs px-2 py-1 rounded"
@@ -178,6 +191,23 @@ export function EngineQueryPanel({
               Clear
             </button>
           </div>
+
+          {/* Match guidance warning for weak/none matches */}
+          {result.match_guidance && result.match_quality && result.match_quality !== 'strong' && (
+            <div
+              className="px-4 py-2.5 rounded-xl text-xs"
+              style={{
+                backgroundColor: result.match_quality === 'weak' || result.match_quality === 'none'
+                  ? '#f59e0b12' : 'var(--ept-surface)',
+                color: result.match_quality === 'weak' || result.match_quality === 'none'
+                  ? '#f59e0b' : 'var(--ept-text-muted)',
+                border: `1px solid ${result.match_quality === 'weak' || result.match_quality === 'none'
+                  ? '#f59e0b30' : 'var(--ept-border)'}`,
+              }}
+            >
+              {result.match_guidance}
+            </div>
+          )}
 
           {result.results.map((doc, i) => {
             const badge = getConfidenceBadge(doc.confidence);
