@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '@/components/BreadcrumbSchema';
+import FaqSchema from '@/components/FaqSchema';
 
 const FEATURES = [
   { icon: 'M', title: 'Multi-Tier Commissions', desc: 'Percentage, flat rate, tiered, or recurring commissions. Sub-affiliate earnings with automatic parent credit. Custom rates per affiliate.' },
@@ -50,6 +51,14 @@ export default function AffiliatePage() {
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Affiliate Program', href: '/affiliate' }]} />
+      <FaqSchema faqs={[
+        { q: 'How does multi-tier commission work?', a: 'When an affiliate recruits sub-affiliates, they earn a percentage of their sub-affiliates\' commissions automatically. You set the sub-commission rate (default 10%). This incentivizes your top affiliates to recruit more partners.' },
+        { q: 'How does AI fraud detection work?', a: 'Every conversion is scored for fraud risk based on transaction value, missing data, velocity patterns, and custom rules. High-risk conversions are flagged for manual review.' },
+        { q: 'Can I integrate with my existing checkout?', a: 'Yes. Use the POST /convert API endpoint from any platform — Shopify, WooCommerce, Stripe webhooks, or custom checkouts. Commissions are calculated automatically.' },
+        { q: 'How do payouts work?', a: 'Set your payout frequency (weekly, biweekly, monthly, or manual). When triggered, the system generates payouts for all affiliates above the minimum threshold.' },
+        { q: 'Is there a limit on affiliates or programs?', a: 'Starter plans include 1 program with unlimited affiliates. Growth and Scale plans include unlimited programs with no limits on clicks, conversions, or tracking links.' },
+        { q: 'Do affiliates need to create an account?', a: 'No. Affiliates apply through your branded signup page and get a referral code and dashboard link instantly. No separate login system required.' },
+      ]} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={140} height={36} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} /></Link>
         <div className="flex items-center gap-4">

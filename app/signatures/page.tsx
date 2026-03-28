@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '@/components/BreadcrumbSchema';
+import FaqSchema from '@/components/FaqSchema';
 
 const FEATURES = [
   { icon: 'S', title: 'Draw-to-Sign', desc: 'Signers draw their signature on an HTML5 Canvas right in the browser. Touch-optimized for mobile. Legally binding with IP and timestamp audit.' },
@@ -49,6 +50,14 @@ export default function SignaturesPage() {
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Digital Signatures', href: '/signatures' }]} />
+      <FaqSchema faqs={[
+        { q: 'Are these signatures legally binding?', a: 'Yes. Echo Signatures creates legally binding electronic signatures that comply with the ESIGN Act and UETA. Every signature includes a full audit trail with signer name, email, IP address, timestamp, and user agent.' },
+        { q: 'How does sequential signing work?', a: 'When sequential mode is enabled, signers receive the document one at a time in the order you specify. The next signer is only notified after the previous one signs.' },
+        { q: 'Can I send to multiple signers at once?', a: 'Yes. Add as many signers as you need with roles (signer, approver, viewer, CC). In parallel mode, all signers receive the document simultaneously.' },
+        { q: 'What happens when all signers complete?', a: 'You receive an email notification. The envelope status changes to completed. A completion certificate is generated with the full audit trail.' },
+        { q: 'How do reminders work?', a: 'Set a reminder interval (default 3 days). The system automatically emails unsigned signers when the interval passes. You can also manually trigger reminders.' },
+        { q: 'Can signers decline?', a: 'Yes. Signers can decline with an optional reason. You are notified immediately, and the full decline is recorded in the audit trail.' },
+      ]} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={140} height={36} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} /></Link>
         <div className="flex items-center gap-4">

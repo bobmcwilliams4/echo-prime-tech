@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import FaqSchema from '../../components/FaqSchema';
 
 const FEATURES = [
   { icon: 'Q', title: 'QR Code Generator', desc: 'Generate unique QR codes for each table, counter, or location. Bulk create up to 100 codes at once. Custom styling with your brand colors.' },
@@ -49,6 +50,14 @@ export default function QrMenuPage() {
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'QR Menu', href: '/qr-menu' }]} />
+      <FaqSchema faqs={[
+        { q: 'Do customers need to download an app?', a: 'No. Customers scan the QR code with their phone camera and the menu opens instantly in their browser. No app download, no signup, no friction.' },
+        { q: 'How do I update my menu?', a: 'Log in to your dashboard, change prices, add items, swap photos — changes are live instantly. No reprinting needed.' },
+        { q: 'Can customers order from the menu?', a: 'Yes. Table ordering is built in. Customers browse the menu, select items, and submit their order. Orders appear in your dashboard in real-time.' },
+        { q: 'Can I have different menus for different times?', a: 'Yes. Create separate menus for Breakfast, Lunch, Dinner, Happy Hour. Set availability windows and the correct menu shows automatically based on the time.' },
+        { q: 'Is the menu available in multiple languages?', a: 'Yes. Add translations for each menu item. The menu auto-detects the visitor\'s browser language and shows the appropriate translation.' },
+        { q: 'How do QR codes work?', a: 'Each QR code links to a unique short URL. You can print the QR code on table tents, stickers, or receipts. We provide downloadable SVG files for high-quality printing.' },
+      ]} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={140} height={36} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} /></Link>
         <div className="flex items-center gap-4">
