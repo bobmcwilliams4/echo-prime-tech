@@ -14,6 +14,7 @@ import {
   type ProfileResponse as EngineProfile,
 } from '../../lib/engine-cloud-api';
 import ProductTutorialButton from '../../components/product-tutorial-button';
+import { getTrialStatus, type TrialInfo } from '../../lib/trial-api';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function DashboardPage() {
   const [engineUsage, setEngineUsage] = useState<UsageResponse | null>(null);
   const [engineProfile, setEngineProfile] = useState<EngineProfile | null>(null);
   const [commanderMode, setCommanderMode] = useState(false);
+  const [trials, setTrials] = useState<TrialInfo[]>([]);
 
   useEffect(() => {
     if (!loading && !user) router.push('/login');
@@ -41,6 +43,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (role === 'owner') setCommanderMode(true);
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.email) {
+      getTrialStatus(user.email).then(r => { if (r.ok && r.trials) setTrials(r.trials); }).catch(() => {});
+    }
   }, [user]);
 
   const [viewMode, setViewMode] = useState<'owner' | 'user'>('owner');
@@ -189,6 +197,50 @@ export default function DashboardPage() {
           </div>
         </Link>
       </div>
+
+      {/* Active Trials */}
+      {trials.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--ept-text)' }}>Your Trials</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            {trials.map(t => (
+              <div key={t.id} className="p-5 rounded-xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: t.days_remaining <= 3 ? '#ef444460' : 'var(--ept-card-border)' }}>
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className="text-lg font-bold" style={{ color: 'var(--ept-text)' }}>{t.product_name}</h3>
+                    <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>{t.tier} tier — free trial</p>
+                  </div>
+                  <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{
+                    backgroundColor: t.expired ? '#ef444418' : t.days_remaining <= 3 ? '#f59e0b18' : '#10b98118',
+                    color: t.expired ? '#ef4444' : t.days_remaining <= 3 ? '#f59e0b' : '#10b981',
+                    border: `1px solid ${t.expired ? '#ef444440' : t.days_remaining <= 3 ? '#f59e0b40' : '#10b98140'}`,
+                  }}>
+                    {t.expired ? 'Expired' : `${t.days_remaining} days left`}
+                  </span>
+                </div>
+                {/* Progress bar */}
+                <div className="w-full h-1.5 rounded-full mb-4" style={{ backgroundColor: 'var(--ept-surface)' }}>
+                  <div className="h-full rounded-full transition-all" style={{
+                    width: `${Math.max(5, ((14 - t.days_remaining) / 14) * 100)}%`,
+                    backgroundColor: t.expired ? '#ef4444' : t.days_remaining <= 3 ? '#f59e0b' : 'var(--ept-accent)',
+                  }} />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Link href={t.product_url} className="text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+                    Open Product
+                  </Link>
+                  <a href={t.api_url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium px-3 py-1.5 rounded-lg border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+                    API
+                  </a>
+                  <Link href={`/checkout?service=${t.service_id}&tier=${t.tier}`} className="text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ backgroundColor: t.days_remaining <= 3 ? '#f59e0b' : 'var(--ept-surface)', color: t.days_remaining <= 3 ? '#fff' : 'var(--ept-text-secondary)' }}>
+                    {t.expired ? 'Reactivate' : 'Upgrade'}
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Subscribed Services */}
       <div data-tutorial="dashboard-services">
