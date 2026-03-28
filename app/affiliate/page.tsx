@@ -188,6 +188,12 @@ export default function AffiliatePage() {
         </div>
       </section>
 
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Launch Your Affiliate Program?</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Multi-tier commissions, AI fraud detection, and automated payouts from day one.</p>
+        <TrialCTA serviceId="echo-affiliate" tier="starter" productName="Echo Affiliate" />
+      </section>
+
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
         <p>&copy; 2026 Echo Prime Technology. All rights reserved.</p>
       </footer>

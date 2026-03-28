@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { icon: 'A', title: 'AI Content Generation', desc: 'Describe your project and AI generates a complete proposal with executive summary, scope, timeline, and pricing — ready to customize' },
@@ -158,6 +159,12 @@ export default function ProposalsPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-4" style={{ color: 'var(--ept-text)' }}>Ready to Close More Deals?</h2>
+        <p className="text-center mb-8" style={{ color: 'var(--ept-text-secondary)' }}>AI-generated proposals with e-signatures, view tracking, and interactive pricing.</p>
+        <TrialCTA serviceId="echo-proposals" tier="starter" productName="Echo Proposals" />
       </section>
 
       <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>

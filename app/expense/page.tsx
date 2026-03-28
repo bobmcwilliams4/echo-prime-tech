@@ -3,6 +3,7 @@
 import FaqSchema from '../../components/FaqSchema';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
 const FEATURES = [
@@ -140,10 +141,10 @@ export default function ExpensePage() {
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Eliminate Expense Report Headaches?</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Join teams saving hours every month with AI-powered expense tracking and policy enforcement.</p>
-        <Link href="/checkout?service=expense&tier=growth" className="px-8 py-4 rounded-xl font-semibold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold mb-4 text-center">Ready to Eliminate Expense Report Headaches?</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Join teams saving hours every month with AI-powered expense tracking and policy enforcement.</p>
+        <TrialCTA serviceId="echo-expense" tier="starter" productName="Echo Expense" />
       </section>
     </div>
   );

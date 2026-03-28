@@ -5,6 +5,7 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '@/components/TrialCTA';
 
 const FEATURES = [
   { title: 'Multi-Warehouse', desc: 'Track stock across unlimited warehouses with per-location bin assignments, lot tracking, and expiry date management.' },
@@ -129,12 +130,10 @@ export default function InventoryPage() {
         </div>
       </section>
 
-      <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
-        <div className="p-10 rounded-2xl" style={{ backgroundColor: 'var(--ept-card-bg)', border: '1px solid var(--ept-card-border)' }}>
-          <h2 className="text-2xl md:text-3xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Stop Guessing. Start Knowing.</h2>
-          <p className="mb-6" style={{ color: 'var(--ept-text-secondary)' }}>Real-time stock levels, AI-powered forecasting, and automatic reorder alerts — all in one platform.</p>
-          <Link href="/checkout?service=inventory&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
-        </div>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-2xl md:text-3xl font-extrabold mb-4 text-center" style={{ color: 'var(--ept-text)' }}>Stop Guessing. Start Knowing.</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Real-time stock levels, AI-powered forecasting, and automatic reorder alerts — all in one platform.</p>
+        <TrialCTA serviceId="echo-inventory" tier="starter" productName="Echo Inventory" />
       </section>
     </div>
   );

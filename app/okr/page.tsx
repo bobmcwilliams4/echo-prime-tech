@@ -141,10 +141,10 @@ export default function OKRPage() {
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Align Your Team on What Matters?</h2>
-        <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Join teams hitting their goals with AI-powered OKR tracking and alignment.</p>
-        <Link href="/checkout?service=okr&tier=growth" className="px-8 py-4 rounded-xl font-semibold text-lg inline-block" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Your Free Trial</Link>
+      <section className="max-w-xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold mb-4 text-center">Ready to Align Your Team on What Matters?</h2>
+        <p className="mb-8 text-center" style={{ color: 'var(--ept-text-secondary)' }}>Join teams hitting their goals with AI-powered OKR tracking and alignment.</p>
+        <TrialCTA serviceId="echo-okr" tier="starter" productName="Echo OKR" />
       </section>
     </div>
   );
