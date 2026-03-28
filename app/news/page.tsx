@@ -114,7 +114,7 @@ export default function NewsPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
-      <FaqSchema faqs={FAQS.map(f => ({ question: f.q, answer: f.a }))} name="Echo AI News Aggregator FAQ" />
+      <FaqSchema faqs={FAQS} name="Echo AI News Aggregator FAQ" />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'AI News Aggregator', href: '/news' }]} />
 
       {/* Nav */}
