@@ -47,6 +47,7 @@ export interface DoctrineResult {
   domain: string;
   score: number;
   keywords?: string[];
+  quality_tier?: 'gold' | 'standard';
 }
 
 export interface QueryResponse {

@@ -226,6 +226,14 @@ export function EngineQueryPanel({
                     {doc.topic}
                   </h4>
                   <div className="flex gap-2 shrink-0">
+                    {doc.quality_tier === 'gold' && (
+                      <span
+                        className="px-2 py-0.5 rounded-full text-xs font-semibold"
+                        style={{ backgroundColor: '#d4a01420', color: '#d4a014', border: '1px solid #d4a01440' }}
+                      >
+                        GOLD
+                      </span>
+                    )}
                     <span
                       className="px-2 py-0.5 rounded-full text-xs font-medium"
                       style={{ backgroundColor: badge.color + '1a', color: badge.color }}
