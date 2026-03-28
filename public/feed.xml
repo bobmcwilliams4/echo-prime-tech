@@ -5,10 +5,42 @@
     <link>https://echo-ept.com</link>
     <description>Technical blog and changelog from Echo Prime Technologies — AI engineering, intelligence engines, oilfield tech, tax intelligence, and autonomous systems.</description>
     <language>en-us</language>
-    <lastBuildDate>Thu, 26 Mar 2026 00:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 28 Mar 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
 
-    <!-- 118 Articles (3 new: expense management, contract management, payroll) -->
+    <!-- 122 Articles (4 new: diagnostics, echocad, ecommerce, runway) -->
+    <item>
+      <title>Autonomous Code Diagnostics: How AI Agents Are Replacing SonarQube and Snyk</title>
+      <link>https://echo-ept.com/blog/autonomous-code-diagnostics-ai-vs-sonarqube-snyk-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/autonomous-code-diagnostics-ai-vs-sonarqube-snyk-2026</guid>
+      <category>AI &amp; Engineering</category>
+      <description>SonarQube finds problems. Snyk flags vulnerabilities. Neither one fixes anything. Autonomous diagnostics agents scan, detect, generate patches, and push fixes to GitHub.</description>
+    </item>
+    <item>
+      <title>AI CAD Automation: Why EchoCAD Beats AutoCAD and Fusion 360 for Repetitive Design Work</title>
+      <link>https://echo-ept.com/blog/ai-cad-automation-echocad-vs-autocad-fusion-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-cad-automation-echocad-vs-autocad-fusion-2026</guid>
+      <category>AI &amp; Engineering</category>
+      <description>AutoCAD costs $1,975/year and still requires manual drawing for every revision. AI-powered CAD automation generates designs from natural language descriptions.</description>
+    </item>
+    <item>
+      <title>AI Ecommerce in 2026: Why Shopify's Plans Can't Compete With AI-Native Storefronts</title>
+      <link>https://echo-ept.com/blog/ai-ecommerce-platform-vs-shopify-woocommerce-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-ecommerce-platform-vs-shopify-woocommerce-2026</guid>
+      <category>Product Updates</category>
+      <description>Shopify charges up to $2,300/year plus transaction fees. AI ecommerce platforms include product descriptions, SEO, inventory forecasting, and recommendations by default.</description>
+    </item>
+    <item>
+      <title>AI Fashion Content Pipelines: From Product Photos to Full Lookbooks in Minutes</title>
+      <link>https://echo-ept.com/blog/ai-fashion-content-pipeline-runway-lookbook-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-fashion-content-pipeline-runway-lookbook-2026</guid>
+      <category>AI &amp; Engineering</category>
+      <description>Fashion brands spend $5,000-$50,000 per photoshoot. AI content pipelines generate professional lookbooks and social assets from a single product photo at 1% of the cost.</description>
+    </item>
     <item>
       <title>AI Expense Management Software in 2026: Echo Expense vs Expensify vs SAP Concur</title>
       <link>https://echo-ept.com/blog/ai-expense-management-vs-expensify-sap-concur-2026</link>

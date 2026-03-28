@@ -449,4 +449,9 @@
   <url><loc>https://echo-ept.com/docs/surveillance</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/docs/pentesting</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/runway</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <!-- Blog articles (2026-03-28 batch) -->
+  <url><loc>https://echo-ept.com/blog/autonomous-code-diagnostics-ai-vs-sonarqube-snyk-2026</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-cad-automation-echocad-vs-autocad-fusion-2026</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-ecommerce-platform-vs-shopify-woocommerce-2026</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-fashion-content-pipeline-runway-lookbook-2026</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>
