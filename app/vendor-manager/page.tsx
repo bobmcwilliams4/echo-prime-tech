@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
   {
@@ -69,6 +70,7 @@ export default function VendorManagerPage() {
   return (
     <>
       <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Vendor Manager', href: '/vendor-manager' }]} />
       <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Vendor Manager — AI-Powered Vendor & Procurement Management</h1><p>AI-powered vendor lifecycle management from onboarding to performance review. Features include 29-field vendor profiles, AI risk assessment across financial, operational, compliance, and reputational dimensions, purchase order creation with auto-approval thresholds, contract tracking with renewal alerts, vendor performance reviews with 4-category scoring, spend analytics with daily automated snapshots, compliance document management with expiry monitoring, diversity certification tracking, and full CSV/JSON export. Pricing from $29/mo compared to $50K+/yr for SAP Ariba and $30K+/yr for Coupa.</p></div></noscript>
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
 

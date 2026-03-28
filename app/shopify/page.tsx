@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
   { q: 'How does it connect to my Shopify store?', a: 'Install the app from our dashboard, authenticate via Shopify OAuth, and your catalog syncs automatically. Products, orders, customers, and inventory all sync in real-time via the Admin API and webhooks.' },
@@ -46,6 +47,7 @@ export default function ShopifyPage() {
   return (
     <>
       <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Shopify Integration', href: '/shopify' }]} />
       <noscript><div style={{padding:'40px',maxWidth:'800px',margin:'0 auto'}}><h1>Echo Shopify — AI-Powered Shopify Integration & E-commerce Automation</h1><p>Supercharge your Shopify store with AI-powered product recommendations, automated catalog sync, smart checkout optimization, and real-time analytics. Features include automatic product sync via Storefront and Admin APIs, smart product recommendations based on browsing and purchase behavior, optimized checkout flows with AI-driven upsells and cross-sells, unified order management with fulfillment tracking, AI demand forecasting to predict stockouts, real-time webhook processing for orders and inventory, customer segmentation by behavior and lifetime value, AI-generated SEO-optimized product descriptions, multi-location inventory support, revenue and conversion analytics, discount engine with AI-optimized pricing, and edge performance via Cloudflare Workers. Pricing from $39/mo.</p></div></noscript>
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>

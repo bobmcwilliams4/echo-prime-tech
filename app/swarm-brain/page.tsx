@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
   { question: 'What is multi-agent AI orchestration?', answer: 'Instead of one AI handling everything, Swarm Brain coordinates fleets of specialized agents working in parallel. A research agent gathers data, an analysis agent processes it, a writing agent drafts output — all simultaneously, with intelligent task delegation.' },
@@ -48,6 +49,7 @@ export default function SwarmBrainPage() {
   return (
     <>
       <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Swarm Brain', href: '/swarm-brain' }]} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 16, background: 'linear-gradient(135deg, #e11d48, #f59e0b)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Echo Swarm Brain</h1>

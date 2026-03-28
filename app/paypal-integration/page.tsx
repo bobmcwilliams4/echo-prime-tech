@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
   { question: 'How does PayPal integration work?', answer: 'Connect your PayPal business account in minutes. Our API wraps PayPal REST APIs with AI enrichment — automatic categorization, fraud scoring, reconciliation, and analytics. Accept one-time payments, subscriptions, and invoices through a unified interface.' },
@@ -47,6 +48,7 @@ export default function PayPalIntegrationPage() {
   return (
     <>
       <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'PayPal Integration', href: '/paypal-integration' }]} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 16, background: 'linear-gradient(135deg, #0070ba, #003087)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Echo PayPal Integration</h1>

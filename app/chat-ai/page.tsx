@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
   { q: 'How many AI personalities are available?', a: '14 distinct personalities out of the box — from professional business advisor to creative storyteller. Each has unique tone, knowledge focus, and conversation style. Enterprise plans support custom personality creation.' },
@@ -47,6 +48,7 @@ export default function ChatAiPage() {
   return (
     <>
       <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Echo Chat AI', href: '/chat-ai' }]} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 16, background: 'linear-gradient(135deg, #06b6d4, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Echo Chat AI</h1>

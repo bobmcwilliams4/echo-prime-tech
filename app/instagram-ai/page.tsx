@@ -2,6 +2,7 @@
 
 import { useTheme } from '@/lib/theme-context'
 import FaqSchema from '@/components/FaqSchema'
+import BreadcrumbSchema from '@/components/BreadcrumbSchema'
 
 const faqs = [
   { question: 'How does Instagram automation work?', answer: 'Connect your Instagram Business account via OAuth. Schedule posts, stories, and reels with AI-optimized timing. AI generates captions, suggests hashtags, and analyzes engagement patterns to maximize reach.' },
@@ -47,6 +48,7 @@ export default function InstagramAiPage() {
   return (
     <>
       <FaqSchema faqs={faqs.map(f => ({ q: f.question, a: f.answer }))} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Instagram AI', href: '/instagram-ai' }]} />
       <div style={{ minHeight: '100vh', background: dark ? 'var(--ept-bg-dark, #0a0a0a)' : 'var(--ept-bg-light, #ffffff)', color: dark ? '#e5e7eb' : '#1f2937' }}>
         <section style={{ padding: '80px 20px 60px', textAlign: 'center', maxWidth: 900, margin: '0 auto' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 16, background: 'linear-gradient(135deg, #e1306c, #fd1d1d, #f77737)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Echo Instagram AI</h1>

@@ -1,5 +1,6 @@
 'use client';
 import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -107,6 +108,7 @@ export default function WebsiteBuilderPage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
       <FaqSchema faqs={FAQS} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'AI Website Builder', href: '/websites' }]} />
 
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between sticky top-0 z-50"
