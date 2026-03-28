@@ -129,6 +129,16 @@ const EXEMPT_PREFIXES = [
   '/hr-management',      // Echo HR Management
   '/expense',            // Echo Expense
   '/sec-intel',          // Security Intelligence
+  '/knowledge-scout',    // AI Research & Discovery Agent
+  '/sdk-gateway',        // Unified API Gateway
+  '/landman-pipeline',   // AI Title Intelligence Pipeline
+  '/arcanum',            // Sovereign Build Template Library
+  '/news-scraper',       // AI News Intelligence Pipeline
+  '/prometheus-ai',      // AI Surveillance & Monitoring
+  '/fleet-commander',    // Worker Fleet Management
+  '/bot-factory',        // AI Bot Builder Platform
+  '/tool-discovery',     // MCP Tool Search & Integration
+  '/forge-marketplace',  // AI Engine Template Store
 
   // ── Documentation pages ──
   '/docs',               // Documentation Hub + all sub-routes
