@@ -42,10 +42,13 @@ const categories: DocCategory[] = [
     items: [
       { name: 'Sentinel AI', href: '/docs/sentinel', badge: 'Docs' },
       { name: 'Intelligence Engines', href: '/docs/engines', badge: 'Docs' },
-      { name: 'Knowledge Forge', href: '/knowledge' },
+      { name: 'Knowledge Forge', href: '/docs/knowledge', badge: 'Docs' },
       { name: 'Knowledge Scout', href: '/docs/knowledge-scout', badge: 'Docs' },
       { name: 'Graph RAG', href: '/docs/graph-rag', badge: 'Docs' },
       { name: 'Forge Marketplace', href: '/docs/forge-marketplace', badge: 'Docs' },
+      { name: 'Memory Prime', href: '/docs/memory-prime', badge: 'Docs' },
+      { name: 'Chat AI', href: '/docs/chat-ai', badge: 'Docs' },
+      { name: 'Mega Gateway', href: '/docs/mega-gateway', badge: 'Docs' },
       { name: 'Agentic Engine', href: '/agentic-engine' },
     ],
   },
@@ -61,7 +64,9 @@ const categories: DocCategory[] = [
       { name: 'Expense Tracking', href: '/docs/expense', badge: 'Docs' },
       { name: 'Finance AI', href: '/docs/finance-ai', badge: 'Docs' },
       { name: 'HR Management', href: '/docs/hr', badge: 'Docs' },
-      { name: 'Project Management', href: '/project-manager' },
+      { name: 'Project Management', href: '/docs/project-manager', badge: 'Docs' },
+      { name: 'Revenue Engine', href: '/docs/revenue-engine', badge: 'Docs' },
+      { name: 'PayPal Integration', href: '/docs/paypal-integration', badge: 'Docs' },
       { name: 'Payroll', href: '/docs/payroll', badge: 'Docs' },
       { name: 'Contracts', href: '/docs/contracts', badge: 'Docs' },
       { name: 'Proposals', href: '/docs/proposals', badge: 'Docs' },
@@ -106,9 +111,11 @@ const categories: DocCategory[] = [
       { name: 'Voice AI / TTS', href: '/docs/voice', badge: 'Docs' },
       { name: 'Telegram Bot', href: '/docs/telegram-bot', badge: 'Docs' },
       { name: 'WhatsApp Bot', href: '/docs/whatsapp-bot', badge: 'Docs' },
-      { name: 'LinkedIn Bot', href: '/linkedin' },
-      { name: 'X/Twitter Bot', href: '/x-bot' },
-      { name: 'Speak Cloud', href: '/speak-cloud' },
+      { name: 'LinkedIn Bot', href: '/docs/linkedin', badge: 'Docs' },
+      { name: 'X/Twitter Bot', href: '/docs/x-bot', badge: 'Docs' },
+      { name: 'Instagram Bot', href: '/docs/instagram-ai', badge: 'Docs' },
+      { name: 'Reddit Bot', href: '/docs/reddit', badge: 'Docs' },
+      { name: 'Speak Cloud', href: '/docs/speak-cloud', badge: 'Docs' },
       { name: 'Email Sender', href: '/docs/email-sender', badge: 'Docs' },
     ],
   },
@@ -124,7 +131,7 @@ const categories: DocCategory[] = [
       { name: 'Prometheus AI', href: '/docs/prometheus-ai', badge: 'Docs' },
       { name: 'Intel Hub', href: '/docs/intel-hub', badge: 'Docs' },
       { name: 'Scanner', href: '/docs/scanner', badge: 'Docs' },
-      { name: 'Vault', href: '/vault' },
+      { name: 'Vault', href: '/docs/vault', badge: 'Docs' },
     ],
   },
   {
@@ -132,13 +139,13 @@ const categories: DocCategory[] = [
     icon: '🏭',
     desc: 'Oil & gas, tax, legal, and more.',
     items: [
-      { name: 'Permian Basin Intel', href: '/permian', badge: 'Flagship' },
+      { name: 'Permian Basin Intel', href: '/docs/permian', badge: 'Flagship' },
       { name: 'Tax Returns', href: '/docs/tax-returns', badge: 'Docs' },
       { name: 'County Records', href: '/docs/county-records', badge: 'Docs' },
       { name: 'EchoCAD', href: '/docs/echocad', badge: 'Docs' },
       { name: 'Title Intelligence', href: '/docs/title-intelligence', badge: 'Docs' },
       { name: 'Landman Pipeline', href: '/docs/landman-pipeline', badge: 'Docs' },
-      { name: 'Grading / Collectibles', href: '/grading' },
+      { name: 'Grading / Collectibles', href: '/docs/grading', badge: 'Docs' },
     ],
   },
   {
@@ -171,7 +178,10 @@ const categories: DocCategory[] = [
       { name: 'Fleet Commander', href: '/docs/fleet-commander', badge: 'Docs' },
       { name: 'News Scraper', href: '/docs/news-scraper', badge: 'Docs' },
       { name: 'Knowledge Base', href: '/docs/knowledge-base', badge: 'Docs' },
-      { name: 'Vendor Manager', href: '/vendor-manager' },
+      { name: 'Vendor Manager', href: '/docs/vendor-manager', badge: 'Docs' },
+      { name: 'Autonomous Builder', href: '/docs/autonomous-builder', badge: 'Docs' },
+      { name: 'Status Page', href: '/docs/status-page', badge: 'Docs' },
+      { name: 'Phoenix Cloud', href: '/docs/phoenix-cloud', badge: 'Docs' },
     ],
   },
   {
@@ -250,7 +260,7 @@ export default function DocsPage() {
           <div className="flex justify-center gap-8 mt-8 flex-wrap">
             {[
               { value: '160+', label: 'Product Pages' },
-              { value: '83', label: 'Full User Manuals' },
+              { value: '98', label: 'Full User Manuals' },
               { value: '142', label: 'Blog Articles' },
               { value: '10', label: 'Doc Categories' },
             ].map(s => (
@@ -353,7 +363,7 @@ export default function DocsPage() {
 
         {/* Footer */}
         <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
-          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 160+ products. 83 user manuals. 646K+ doctrines.</p>
+          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 160+ products. 98 user manuals. 646K+ doctrines.</p>
           <div className="flex justify-center gap-6 mt-3">
             <Link href="/" style={{ color: 'var(--ept-accent)' }}>Home</Link>
             <Link href="/blog" style={{ color: 'var(--ept-accent)' }}>Blog</Link>

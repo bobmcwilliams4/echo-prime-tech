@@ -1,88 +1,117 @@
 'use client'
 
-import ProductDoc from '@/components/ProductDoc'
+import ProductDoc, { ProductDocProps } from '@/components/ProductDoc'
 
-const data = {
+const data: ProductDocProps = {
   name: 'Echo Workflow Automation',
-  tagline: 'Visual workflow builder with 200+ triggers, AI decision nodes, and cross-product orchestration \u2014 automate any business process.',
-  accent: '#06b6d4',
+  tagline: 'Multi-step workflow engine with 6 step types, 18 Echo integrations, webhook triggers, and AI-powered workflow generation.',
+  accent: '#14b8a6',
   productUrl: '/workflow-automation',
   workerUrl: 'https://echo-workflow-automation.bmcii1976.workers.dev',
   version: '1.0.0',
+
   overview: [
-    'Echo Workflow Automation is a visual process builder that connects every product in the Echo ecosystem into automated workflows. Define triggers (schedule, webhook, email, form submission, database change, or any of 200+ event types), add processing steps (AI analysis, data transformation, API calls, human approval), and configure outputs (email, SMS, Slack, CRM update, database write, or any webhook destination).',
-    'What sets it apart from generic workflow tools is deep integration with the Echo Intelligence Engine ecosystem. A workflow step can query a tax engine for IRC analysis, run a security scan, generate a voice message, search the knowledge graph, or delegate to the AI Swarm \u2014 all as native workflow nodes, not external API calls. This means enterprise processes that combine AI analysis with business logic run entirely within the platform.',
-    'Workflows are durable \u2014 they survive Worker restarts and handle long-running processes (title chain investigations, multi-day approval chains, scheduled report sequences) without losing state. Built on Cloudflare Durable Objects for exactly-once execution semantics and D1 for persistent workflow state.',
+    'Echo Workflow Automation is a powerful multi-step workflow engine that connects your Echo products, external APIs, and business logic into automated pipelines without writing infrastructure code. Define workflows as sequences of typed steps — HTTP requests, data transforms, conditional branches, delays, Echo service calls, and AI operations — then trigger them via webhooks, schedules, or manual invocation.',
+    'The step execution engine processes each step in order, passing the output of one step as the input to the next. Six step types cover virtually every automation need: HTTP steps call any external API, transform steps reshape data with JSONata or JavaScript expressions, condition steps create branches based on runtime values, delay steps introduce time-based pauses, echo_service steps call any Echo product directly, and AI steps invoke Engine Runtime for intelligent processing within the pipeline.',
+    'Eighteen built-in Echo integrations give workflows direct access to the full Echo product ecosystem — CRM, email sender, knowledge base, feature flags, document manager, and more — with pre-configured connection templates that eliminate authentication boilerplate. A growing template library of pre-built workflows covers common business patterns so teams ship automations in minutes, not days.',
   ],
+
   gettingStarted: [
-    { step: 1, title: 'Create a Workflow', desc: 'Use the visual builder or POST to /api/workflows. Start with a trigger node \u2014 the event that kicks off the workflow. Common triggers: schedule (cron), webhook, form submission, or database change.' },
-    { step: 2, title: 'Add Processing Steps', desc: 'Drag processing nodes onto the canvas. Choose from: AI Query (engine analysis), Transform (data mapping), Condition (if/else branching), Loop (iterate over arrays), Human Approval (pause for review), or Custom Code (JavaScript).' },
-    { step: 3, title: 'Configure Outputs', desc: 'Add output nodes: Send Email, Send SMS, Post to Slack, Update CRM, Write to Database, Call Webhook, or Generate Report. Each output node has its own configuration for formatting and delivery.' },
-    { step: 4, title: 'Test and Activate', desc: 'Use the test runner to execute the workflow with sample data. Review each step\'s input/output in the execution log. Once satisfied, activate the workflow \u2014 it runs automatically on every trigger event.' },
-    { step: 5, title: 'Monitor Executions', desc: 'The execution dashboard shows every workflow run with status, duration, step-by-step details, and any errors. Set up alerts for failed executions or performance degradation.' },
+    { step: 1, title: 'Create Your First Workflow', desc: 'POST to /workflows with a name, trigger type (webhook/schedule/manual), and an array of steps. Start with a simple two-step workflow: one HTTP step to fetch data from an external API and one echo_service step to write the result to Echo CRM.' },
+    { step: 2, title: 'Configure Your Trigger', desc: 'Webhook-triggered workflows return a unique inbound URL you send events to. Schedule-triggered workflows accept a cron expression (e.g. "0 9 * * 1-5" for weekdays at 9 AM). Manual triggers expose a /workflows/:id/run endpoint for on-demand execution.' },
+    { step: 3, title: 'Add Step Logic', desc: 'Chain steps together by referencing previous step outputs with the {{steps.step_name.output}} syntax. Add a condition step to branch based on a field value. Add a transform step to reshape data before passing it downstream.' },
+    { step: 4, title: 'Connect an Echo Integration', desc: 'Browse the 18 built-in integrations in /connections. Select the Echo product, choose the action (e.g. "create contact" in Echo CRM), and map your workflow data to the action inputs. No authentication configuration needed — integrations use your account credentials automatically.' },
+    { step: 5, title: 'Monitor Runs and Debug', desc: 'Every execution is logged as a run record. GET /runs/:id/logs shows the step-by-step execution trace — inputs, outputs, duration, and any errors per step. Use the run trace to debug failures and refine step expressions before re-enabling the workflow.' },
   ],
+
   features: [
-    { title: '200+ Trigger Types', desc: 'Schedule (cron), webhook, email receipt, form submission, database change, file upload, payment received, new lead, ticket created, custom API events, and 190+ more trigger types.' },
-    { title: 'AI Decision Nodes', desc: 'Native integration with Intelligence Engines. A workflow step can query any of 5,486 engines for domain analysis, confidence scoring, and doctrine-backed recommendations.' },
-    { title: 'Visual Canvas Builder', desc: 'Drag-and-drop workflow editor with real-time preview. Connect nodes with data mapping, add conditions for branching, and configure parallel execution paths.' },
-    { title: 'Human-in-the-Loop', desc: 'Pause workflow execution for human review and approval. Approvers receive email or Slack notifications with context. Timeout and escalation rules configurable.' },
-    { title: 'Durable Execution', desc: 'Workflows survive crashes, restarts, and long delays. Built on Cloudflare Durable Objects for exactly-once semantics. Multi-day approval chains run reliably.' },
-    { title: 'Cross-Product Integration', desc: 'Native nodes for every Echo product: Engine queries, Voice TTS, Knowledge search, Swarm delegation, Email campaigns, CRM updates, Scanner checks, and more.' },
-    { title: 'Conditional Branching', desc: 'If/else nodes with complex conditions: compare values, check AI confidence levels, evaluate regex patterns, or use custom JavaScript expressions.' },
-    { title: 'Loop Processing', desc: 'Iterate over arrays and process each item through subsequent steps. Supports parallel iteration for independent items with configurable concurrency limits.' },
-    { title: 'Error Handling', desc: 'Per-step retry policies, fallback paths, error notification routing, and dead letter queues. Failed steps do not block the entire workflow \u2014 configurable error isolation.' },
-    { title: 'Version Control', desc: 'Workflow definitions are versioned. Roll back to any previous version. Active executions continue on their version while new triggers use the latest.' },
-    { title: 'Execution Analytics', desc: 'Dashboards for execution volume, success rates, average duration, bottleneck identification, and cost per execution. Export data for custom reporting.' },
-    { title: 'Template Marketplace', desc: 'Pre-built workflow templates for common patterns: lead scoring, invoice processing, compliance checks, report generation, customer onboarding, and incident response.' },
+    { title: 'HTTP Steps', desc: 'Call any external REST API with configurable method, URL, headers, and body. Supports templated values from previous step outputs, secret injection from the vault for Authorization headers, and response body mapping to named outputs for downstream steps.' },
+    { title: 'Transform Steps', desc: 'Reshape, filter, and compute data using JSONata expressions or JavaScript arrow functions. Transform steps can rename fields, flatten nested objects, compute derived values, filter arrays, and convert types — all without an external compute resource.' },
+    { title: 'Condition Steps', desc: 'Branch workflow execution based on runtime data. Conditions support equality, comparison, contains, regex, and null checks against any step output or trigger payload field. Each branch continues as an independent step sequence with its own error handling.' },
+    { title: 'Delay Steps', desc: 'Introduce fixed or dynamic time delays between steps. Fixed delays accept a duration in seconds, minutes, or hours. Dynamic delays read a datetime value from a previous step output and wait until that moment — useful for scheduled follow-ups and SLA-based escalations.' },
+    { title: 'Echo Service Steps', desc: 'Call any Echo product directly via internal service binding — zero network latency, no authentication, full response data available to subsequent steps. Supported: CRM, Email Sender, Knowledge Base, Feature Flags, Document Manager, and 13 other Echo services.' },
+    { title: 'AI Steps', desc: 'Invoke Engine Runtime within a workflow for document classification, sentiment analysis, entity extraction, summarization, or custom prompt evaluation. AI step outputs are structured JSON objects that downstream steps can branch on or pass to other systems.' },
+    { title: 'Webhook Triggers', desc: 'Every webhook-triggered workflow gets a unique inbound URL. Validate incoming webhook signatures, filter triggers by payload field values, and transform the raw webhook body before the first step executes.' },
+    { title: 'Schedule Triggers', desc: 'Run workflows on cron schedules with timezone support. Schedules are evaluated at the edge with sub-second precision. Missed executions (due to maintenance windows) are tracked and optionally retried when the service resumes.' },
+    { title: '18 Built-In Echo Integrations', desc: 'Pre-configured connections to all 18 Echo products eliminate authentication setup. Each integration exposes typed actions with input schemas so you configure workflow data mappings instead of raw HTTP calls.' },
+    { title: 'Error Handling', desc: 'Configure per-step error handling: retry with exponential backoff, skip the step and continue, or stop the run and emit an error event. Global workflow-level error handlers can notify via Echo Email Sender or webhook on any run failure.' },
+    { title: 'Template Library', desc: 'Curated library of pre-built workflow templates covering onboarding sequences, lead enrichment, invoice processing, report generation, and data sync patterns. Import a template, configure your connections, and activate in minutes.' },
+    { title: 'Run History & Analytics', desc: 'Complete execution history per workflow with run status (success/failed/skipped), duration, step counts, and trigger metadata. Analytics dashboard shows run volume trends, error rates by step, and average execution duration over time.' },
   ],
+
   apiEndpoints: [
-    { method: 'POST', path: '/api/workflows', desc: 'Create a new workflow definition with trigger, steps, and output configuration. Returns workflow ID.', auth: true },
-    { method: 'GET', path: '/api/workflows', desc: 'List all workflows with status, trigger type, last execution time, and success rate.', auth: true },
-    { method: 'POST', path: '/api/workflows/:id/execute', desc: 'Manually trigger a workflow execution with input data. Returns execution ID for tracking.', auth: true },
-    { method: 'GET', path: '/api/workflows/:id/executions', desc: 'List executions for a workflow with status, duration, and step-by-step results. Supports pagination and date filtering.', auth: true },
-    { method: 'POST', path: '/api/workflows/:id/test', desc: 'Test a workflow with sample data without activating the trigger. Returns full execution trace with intermediate results.', auth: true },
-    { method: 'GET', path: '/api/executions/:id', desc: 'Get detailed execution results including every step\'s input, output, duration, and status.', auth: true },
-    { method: 'POST', path: '/api/approvals/:id/approve', desc: 'Approve a human-in-the-loop step. Workflow execution resumes from the approval point.', auth: true },
-    { method: 'GET', path: '/api/templates', desc: 'Browse pre-built workflow templates. Filter by category, trigger type, or use case.', auth: false },
+    { method: 'POST', path: '/workflows', desc: 'Create a new workflow with name, description, trigger config (type, cron, webhook filter), and steps array. Each step has a type, name, config, and error_handling policy. Returns workflow ID and inbound webhook URL if applicable.', auth: true },
+    { method: 'POST', path: '/workflows/:id/run', desc: 'Manually trigger a workflow execution. Accepts an optional payload object injected as the trigger data. Executes synchronously for runs under 30 seconds; returns a run ID for async polling for longer workflows.', auth: true },
+    { method: 'GET', path: '/runs', desc: 'List workflow execution runs with filtering by workflow ID, status (success/failed/running), date range, and trigger type. Returns run ID, start time, duration, step count, and final status per run.', auth: true },
+    { method: 'GET', path: '/runs/:id/logs', desc: 'Retrieve the step-by-step execution log for a specific run. Returns each step with input data, output data, start and end timestamps, duration, and error details if failed. Essential for debugging complex workflow failures.', auth: true },
+    { method: 'POST', path: '/templates', desc: 'Save a workflow definition as a reusable template with name, description, category, and tags. Templates are available to all workspace members and returned by the template library endpoint.', auth: true },
+    { method: 'POST', path: '/connections', desc: 'Create a named connection to an external service with authentication credentials (API key, OAuth token, basic auth). Connections are referenced by name in HTTP step configurations and stored in the vault — never in workflow definitions.', auth: true },
+    { method: 'POST', path: '/webhooks', desc: 'Register an outbound webhook endpoint to receive workflow lifecycle events — run started, run completed, run failed. Accepts URL, secret for HMAC signing, and event type filters.', auth: true },
+    { method: 'GET', path: '/analytics', desc: 'Workflow analytics with run volume by day, success rate, average duration, most-used steps, and error frequency by step type and connection. Filterable by workflow ID and date range.', auth: true },
   ],
+
   userGuide: [
-    { id: 'triggers', title: 'Configuring Triggers', content: [
-      'Every workflow starts with a trigger \u2014 the event that initiates execution. Schedule triggers use cron syntax for recurring workflows (daily reports, weekly audits). Webhook triggers accept HTTP requests from any external system.',
-      'Database triggers fire when specific tables are updated. Configure which tables, which operations (INSERT, UPDATE, DELETE), and optionally filter by column values. This is powerful for event-driven architectures.',
-      'Composite triggers combine multiple conditions: "fire when a new lead is created AND their company size is over 100 employees AND they are in the technology industry." Use the AND/OR logic builder in the trigger configuration.',
-    ]},
-    { id: 'ai-nodes', title: 'Using AI Decision Nodes', content: [
-      'AI nodes query Intelligence Engines as workflow steps. Configure the engine domain (tax, legal, security, etc.) and pass workflow data as the query. The engine returns an analysis with confidence scoring and doctrine citations.',
-      'Use AI node outputs for conditional branching: if confidence is DEFENSIBLE, proceed to the approval step; if AGGRESSIVE, route to a senior reviewer; if HIGH_RISK, flag and notify compliance. This embeds domain expertise into automated processes.',
-      'AI nodes support batch mode: process an array of items through the same engine query. Useful for bulk analysis workflows like processing a list of transactions through tax compliance checks.',
-    ]},
-    { id: 'error-handling', title: 'Error Handling Strategies', content: [
-      'Each step can have its own retry policy: immediate retry, exponential backoff, or fixed delay. Configure max retry attempts and the action on final failure (skip step, halt workflow, or route to error path).',
-      'Error paths are separate branches in the workflow that execute only when a step fails. Use error paths to send notifications, log incidents, create support tickets, or execute compensating actions.',
-      'Dead letter queues capture executions that fail all retries. Review the dead letter queue in the dashboard to identify systemic issues. Reprocess items individually or in bulk once the issue is resolved.',
-    ]},
+    {
+      title: 'Building Workflows',
+      id: 'building-workflows',
+      content: [
+        'A workflow is a named, versioned definition containing a trigger and an ordered array of steps. Each step has a unique name within the workflow (used to reference its output), a type, a configuration object specific to that type, and an error_handling policy. Steps execute in order — the output of step N is available to step N+1 via the {{steps.step_name.output}} template syntax.',
+        'Start simple: create a two-step workflow to test the pattern, verify it runs correctly, then add complexity. The most common source of errors in new workflows is expression syntax in transform steps or incorrect field paths when referencing previous step outputs. Use the /workflows/:id/run endpoint with a test payload to iterate quickly before enabling the production trigger.',
+        'Version your workflows by incrementing the version field when making breaking changes. Previous versions are archived and can be restored. This lets you test a new version while the previous version continues processing live traffic, then promote the new version atomically when confident.',
+      ],
+    },
+    {
+      title: 'Step Types In Depth',
+      id: 'step-types',
+      content: [
+        'HTTP steps are the most versatile: they call any URL with any method and headers. Use the vault_secret() expression in header values to inject API keys without hardcoding them — for example, "Authorization": "Bearer {{vault_secret(\'my_api_key\')}}" resolves the secret at runtime. The response body is automatically parsed as JSON if the Content-Type is application/json.',
+        'Transform steps use JSONata, a declarative query and transformation language for JSON. A transform step expression like "{ \\"name\\": first_name & \\" \\" & last_name, \\"email\\": email_address }" reshapes the input object into a new structure. JSONata supports filters, aggregations, string functions, and custom function definitions for complex transformations.',
+        'AI steps accept a prompt template and an optional engine_id targeting a specific Engine Runtime doctrine block. The step output is a structured JSON object with a result field containing the model response and a metadata field with model ID, token counts, and latency. Downstream condition steps can branch on result.classification or result.score from AI step outputs.',
+      ],
+    },
+    {
+      title: 'Using Echo Service Integrations',
+      id: 'echo-integrations',
+      content: [
+        'Echo service steps call any of the 18 built-in Echo products via internal service bindings — not public HTTP. This means no network round-trip, no rate limiting, and no authentication headers required. Configure an echo_service step with the service name ("echo-crm"), the action name ("create_contact"), and a mapping of your workflow data to the action input fields.',
+        'Each action has a typed input schema — open the integration catalog at /connections to see all available actions and their required fields. Required fields that are missing at runtime cause the step to fail with a validation error. Use the test run feature to verify your field mappings before activating the workflow against live data.',
+        'When an Echo service step fails, the error response from the target service is available in the step output under steps.step_name.error. Use this in downstream condition steps to implement fallback logic — for example, if a CRM contact creation fails due to a duplicate, redirect to an update action instead of stopping the workflow.',
+      ],
+    },
+    {
+      title: 'Error Handling Strategies',
+      id: 'error-handling',
+      content: [
+        'Each step has an error_handling object with three configurable policies: retry, skip, and stop. Retry accepts max_attempts and backoff_seconds — the step is retried up to max_attempts times with exponential backoff before falling through to the fallback policy. Use retry for transient failures in HTTP steps calling external APIs with occasional timeouts.',
+        'Skip means: if this step fails, log the error, mark the step as skipped, and continue to the next step. Use skip for non-critical enrichment steps where a partial result is acceptable. Stop is the default: a step failure halts the entire run and marks it as failed. Stop is appropriate for critical steps where partial execution would cause data integrity issues.',
+        'At the workflow level, configure an on_error handler that fires when any step reaches a Stop failure. The on_error handler is itself a step array — typically an HTTP step posting to a Slack channel or an echo_service step sending an email via Echo Email Sender with the run ID and error details for immediate investigation.',
+      ],
+    },
   ],
+
   aiCapabilities: [
-    { capability: 'Smart Routing', desc: 'AI analyzes workflow input data and automatically routes to the most appropriate processing path. Reduces branching complexity for workflows that handle diverse input types.' },
-    { capability: 'Anomaly Detection', desc: 'AI monitors workflow execution patterns and flags anomalies: unusual execution times, unexpected branching paths, or data values outside normal ranges.' },
-    { capability: 'Natural Language Workflow Creation', desc: 'Describe what you want to automate in plain English. AI generates a complete workflow definition with appropriate triggers, steps, conditions, and outputs.' },
-    { capability: 'Performance Optimization', desc: 'AI identifies bottleneck steps and suggests optimizations: parallel execution, caching, batching, or step reordering to minimize total workflow duration.' },
+    { capability: 'Workflow Generation', desc: 'Describe your automation goal in plain English and Engine Runtime generates a complete workflow definition — trigger type, step sequence, and configuration — as a JSON object ready to POST to /workflows. Generated workflows require review and connection configuration before activation.' },
+    { capability: 'Workflow Optimization', desc: 'Analyzes existing workflow definitions and execution logs to identify inefficiencies — redundant HTTP calls that could be batched, transform steps that could be merged, delays that could be eliminated by switching trigger types. Returns a ranked list of optimization suggestions with expected impact.' },
+    { capability: 'Error Pattern Analysis', desc: 'Scans run failure logs across all workflows to identify recurring error patterns — specific API endpoints that fail disproportionately, expression syntax errors that recur, or timeout patterns indicating step timeout misconfiguration. Surfaces actionable remediation steps.' },
+    { capability: 'Step Output Classification', desc: 'AI steps within workflows can classify, categorize, or score incoming data — classifying support tickets by urgency, scoring lead quality from form submissions, extracting structured fields from unstructured text. Classification outputs flow into condition steps for intelligent branching.' },
   ],
+
   troubleshooting: [
-    { issue: 'Workflow not triggering on schedule', solution: 'Verify the cron expression is correct using a cron syntax checker. Ensure the workflow status is ACTIVE. Check the Cloudflare Workers cron trigger dashboard for execution history.' },
-    { issue: 'AI node returning low confidence on all queries', solution: 'Check the engine domain configuration \u2014 your data may be routing to the wrong engine. Add domain context to the query template. Review the engine catalog for a better-suited engine.' },
-    { issue: 'Human approval step stuck waiting', solution: 'Check if the approval notification was delivered (email/Slack). Verify the approver has the correct permissions. Review timeout settings \u2014 set an escalation path for overdue approvals.' },
-    { issue: 'Workflow execution is slow', solution: 'Check the execution trace for the slowest step. Common causes: external API timeouts, AI engine queries on complex topics, or database operations on large datasets. Consider adding parallel execution for independent steps.' },
+    { issue: 'Workflow run fails at HTTP step with "Connection refused"', solution: 'The target URL is either unreachable from the Cloudflare edge or the connection is blocked. Verify the URL is publicly accessible. Internal services on private networks must be exposed via a public URL — Cloudflare Workers cannot reach private network addresses. Check that the Authorization header is correctly configured and the credential has not expired.' },
+    { issue: 'Transform step returns null or undefined output', solution: 'The JSONata expression likely references a field path that does not exist in the input data. Open the run log and inspect the transform step input to see the actual data structure. Verify your expression against the real input using the JSONata Exerciser online tool. Wrap optional field references in the JSONata $exists() check to handle missing fields gracefully.' },
+    { issue: 'Scheduled workflow not triggering at expected time', solution: 'Verify the cron expression is correct for your intended schedule — cron syntax is evaluated in UTC. Use a cron expression validator to confirm the schedule matches your intent. Check the workflow is in Active state and not Paused. Missed runs are logged with a "skipped" status and retried only if retry_missed is set to true in the trigger config.' },
+    { issue: 'Echo service step fails with "Action not found"', solution: 'Verify the action name matches exactly the action identifier in the integration catalog at /connections — action names are case-sensitive. Check that the target Echo product is active. If the action was recently added to the integration catalog, re-save the workflow to pick up the updated action schema.' },
   ],
+
   faq: [
-    { q: 'How many workflows can I create?', a: 'Free tier: 5 workflows, 100 executions/month. Starter: 25 workflows, 5,000 executions/month. Pro: unlimited workflows, 50,000 executions/month. Enterprise: unlimited everything with priority execution.' },
-    { q: 'Can workflows call external APIs?', a: 'Yes. The HTTP Request node can call any REST API with configurable method, headers, body, and authentication. Response data is available to subsequent workflow steps.' },
-    { q: 'How long can a workflow run?', a: 'Individual steps time out at 30 seconds (configurable to 5 minutes for Enterprise). Total workflow duration is unlimited \u2014 human approval steps and scheduled delays can span days or weeks.' },
-    { q: 'Can I use custom JavaScript in workflows?', a: 'Yes. The Custom Code node executes JavaScript with access to workflow context data. Use it for data transformation, complex conditions, or custom business logic that does not fit pre-built nodes.' },
-    { q: 'Are workflow executions logged?', a: 'Yes. Every execution is logged with full step-by-step trace: inputs, outputs, duration, and status. Logs are retained for 90 days (unlimited for Enterprise). Export to external analytics anytime.' },
+    { q: 'How many workflows can I create?', a: 'Starter plans include up to 10 active workflows. Pro plans support 100 active workflows. Business plans are unlimited. Inactive (paused) workflows do not count toward your limit. All plans include unlimited run history retention for 90 days.' },
+    { q: 'What is the maximum execution time for a workflow run?', a: 'Workflow runs have a maximum wall-clock time of 30 minutes. Individual step timeouts are configurable up to 5 minutes per step. Long-running workflows should use delay steps to pause between phases. Runs that exceed the timeout are automatically terminated and marked as failed with a timeout error.' },
+    { q: 'Can workflows call external APIs that require OAuth?', a: 'Yes. Create a connection with OAuth credentials via POST /connections. The connection stores the refresh token and automatically handles token refresh before each workflow run. Supported OAuth flows: authorization code, client credentials, and refresh token. For browser-based OAuth, generate the initial token manually and store it as the connection credential.' },
+    { q: 'How are secrets and API keys secured in workflows?', a: 'Never store secrets in workflow step configurations directly. Use the vault_secret() expression in step config values to pull secrets from the vault at runtime. Connection objects store credentials in the vault automatically. Workflow definitions in D1 and API responses never include secret values — only the secret name references.' },
+    { q: 'Can I trigger a workflow from another workflow?', a: 'Yes. Use an echo_service step with service "echo-workflow-automation" and action "trigger_workflow", passing the target workflow ID and payload. This creates a parent-child run relationship visible in the run logs. Circular trigger chains are detected and blocked at activation time to prevent infinite loops.' },
   ],
 }
 
-export default function WorkflowAutomationDocPage() {
+export default function EchoWorkflowAutomationDocsPage() {
   return <ProductDoc {...data} />
 }
