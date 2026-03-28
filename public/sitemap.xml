@@ -472,4 +472,11 @@
   <url><loc>https://echo-ept.com/bot-factory</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/tool-discovery</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/forge-marketplace</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+
+  <!-- CC10 Blog Articles (2026-03-28) -->
+  <url><loc>https://echo-ept.com/blog/ai-knowledge-scout-research-automation</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/cloudflare-worker-fleet-management</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-engine-marketplace-doctrines</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/mcp-tool-discovery-integration</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/blog/ai-social-media-bot-builder</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>

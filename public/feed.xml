@@ -8,7 +8,47 @@
     <lastBuildDate>Sat, 28 Mar 2026 00:00:00 GMT</lastBuildDate>
     <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
 
-    <!-- 127 Articles (5 new: compliance, payroll, qr-menu, knowledge-engine, fleet) -->
+    <!-- 132 Articles (5 new: knowledge-scout, fleet-commander, forge-marketplace, tool-discovery, bot-factory) -->
+    <item>
+      <title>AI Knowledge Scout: How Autonomous Research Agents Monitor 7+ Sources for Emerging Trends</title>
+      <link>https://echo-ept.com/blog/ai-knowledge-scout-research-automation</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-knowledge-scout-research-automation</guid>
+      <category>AI &amp; Engineering</category>
+      <description>Manual research takes analysts 20+ hours per week scanning feeds. AI Knowledge Scout monitors 7+ sources continuously — news, academic papers, patents, regulatory changes, social signals — and delivers prioritized briefings in real time.</description>
+    </item>
+    <item>
+      <title>Fleet Commander: How to Manage 200+ Cloudflare Workers From One Dashboard</title>
+      <link>https://echo-ept.com/blog/cloudflare-worker-fleet-management</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/cloudflare-worker-fleet-management</guid>
+      <category>AI &amp; Engineering</category>
+      <description>Managing dozens of Cloudflare Workers with wrangler CLI becomes unmanageable at scale. Fleet Commander provides unified health monitoring, batch deployment, secret rotation, and autonomous healing for 200+ Workers.</description>
+    </item>
+    <item>
+      <title>Forge Marketplace: The AI Engine Template Store With 632K+ Doctrines</title>
+      <link>https://echo-ept.com/blog/ai-engine-marketplace-doctrines</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-engine-marketplace-doctrines</guid>
+      <category>AI &amp; Engineering</category>
+      <description>Building AI engines from scratch takes months. Forge Marketplace gives developers access to 632,000+ pre-built doctrine blocks, certified engine templates, and domain-specific knowledge modules that deploy in minutes.</description>
+    </item>
+    <item>
+      <title>Tool Discovery: How to Search 37,475+ MCP Tools Across 1,873 Servers</title>
+      <link>https://echo-ept.com/blog/mcp-tool-discovery-integration</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/mcp-tool-discovery-integration</guid>
+      <category>AI &amp; Engineering</category>
+      <description>The MCP ecosystem has exploded to 37,475+ tools across 1,873 servers. Finding the right tool is the new bottleneck. Tool Discovery indexes, categorizes, and ranks every MCP tool available.</description>
+    </item>
+    <item>
+      <title>Bot Factory: Build AI Social Media Bots Across 8 Platforms in Minutes</title>
+      <link>https://echo-ept.com/blog/ai-social-media-bot-builder</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-social-media-bot-builder</guid>
+      <category>Product Updates</category>
+      <description>Building social media bots requires platform-specific APIs, auth flows, and content moderation for each network. Bot Factory deploys AI-powered bots to 8 platforms from a single interface.</description>
+    </item>
     <item>
       <title>AI Compliance Automation: How to Automate SOC 2, HIPAA, and GDPR in 2026</title>
       <link>https://echo-ept.com/blog/ai-compliance-soc2-hipaa-gdpr-automation-2026</link>
