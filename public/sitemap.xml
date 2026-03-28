@@ -503,6 +503,19 @@
   <url><loc>https://echo-ept.com/tool-discovery</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/forge-marketplace</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
+  <!-- CC10 Docs Batch 7-8 + HR (2026-03-28) -->
+  <url><loc>https://echo-ept.com/docs/hr</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/timesheet</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/okr</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/knowledge-base</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/qr-menu</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/reviews</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/expense</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/email-sender</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/feature-flags</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/document-manager</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/workflow-automation</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+
   <!-- CC10 Blog Articles (2026-03-28) -->
   <url><loc>https://echo-ept.com/blog/ai-knowledge-scout-research-automation</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/blog/cloudflare-worker-fleet-management</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>

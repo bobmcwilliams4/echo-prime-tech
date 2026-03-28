@@ -1,13 +1,13 @@
 'use client'
 
-import ProductDoc from '@/components/ProductDoc'
+import ProductDoc, { ProductDocProps } from '@/components/ProductDoc'
 
-const data = {
-  name: 'Echo Expense Management',
-  tagline: 'AI-powered expense tracking and reimbursement — receipts to reports in seconds, not hours.',
-  accent: '#059669',
+const data: ProductDocProps = {
+  name: 'Echo Expense',
+  tagline: 'AI expense management — receipt scanning, policy enforcement, and automated approvals.',
+  accent: '#14b8a6',
   productUrl: '/expense',
-  workerUrl: 'https://echo-expense-management.bmcii1976.workers.dev',
+  workerUrl: 'https://echo-expense.bmcii1976.workers.dev',
   version: '1.0.0',
 
   overview: [
@@ -40,14 +40,15 @@ const data = {
   ],
 
   apiEndpoints: [
-    { method: 'POST', path: '/api/expenses', desc: 'Submit a new expense with receipt image, amount, currency, category, date, merchant, and optional memo. Receipt is processed via OCR and validated against company policy.', auth: true },
-    { method: 'GET', path: '/api/expenses', desc: 'List expenses with filtering by status, category, date range, employee, department, and amount range. Supports pagination, sorting, and search by merchant name or memo text.', auth: true },
-    { method: 'GET', path: '/api/expenses/:id', desc: 'Retrieve full expense details including receipt image, OCR extracted data, category, policy compliance status, approval chain progress, and complete audit trail.', auth: true },
-    { method: 'POST', path: '/api/reports', desc: 'Create an expense report by grouping multiple expense line items. Attach to a trip, project, or cost center. Submits the report into the configured approval workflow.', auth: true },
-    { method: 'PUT', path: '/api/reports/:id/approve', desc: 'Approve or reject an expense report at the current approval level. Supports partial approval (approve some line items, reject others) and request-for-information responses.', auth: true },
-    { method: 'GET', path: '/api/cards/transactions', desc: 'List unreconciled corporate card transactions for the authenticated user or, for admins, across all cardholders. Includes merchant, amount, date, and match status.', auth: true },
-    { method: 'POST', path: '/api/mileage/trip', desc: 'Record a mileage trip with start/end coordinates, distance, purpose, and date. Applies configured reimbursement rate and creates the expense line item automatically.', auth: true },
-    { method: 'GET', path: '/api/analytics/spending', desc: 'Retrieve spending analytics with breakdowns by department, category, employee, time period, and project. Returns budget utilization, trend data, and anomaly flags.', auth: true },
+    { method: 'POST', path: '/expenses', desc: 'Submit a new expense with receipt image, amount, currency, category, date, merchant, and optional memo. Receipt is processed via OCR and validated against company policy.', auth: true },
+    { method: 'GET', path: '/expenses', desc: 'List expenses with filtering by status, category, date range, employee, department, and amount range. Supports pagination, sorting, and search by merchant name or memo text.', auth: true },
+    { method: 'POST', path: '/reports', desc: 'Create an expense report by grouping multiple expense IDs. Attach to a trip, project, or cost center. Submits the report into the configured approval workflow.', auth: true },
+    { method: 'POST', path: '/approve', desc: 'Approve or reject an expense or expense report. Requires manager or finance role. Rejections require a comment. Approved expenses queue for reimbursement.', auth: true },
+    { method: 'POST', path: '/ai/scan-receipt', desc: 'Submit a receipt image (base64 or URL) for AI OCR extraction. Returns merchant, date, amount, tax, currency, and suggested expense category with confidence scores.', auth: true },
+    { method: 'GET', path: '/policies', desc: 'Retrieve the current expense policy configuration — category limits, per diem rates by city, mileage rates, auto-approve thresholds, and required fields by category.', auth: true },
+    { method: 'POST', path: '/mileage', desc: 'Submit a mileage expense with origin, destination, date, and purpose. System calculates distance via routing API and applies configured reimbursement rate.', auth: true },
+    { method: 'GET', path: '/budgets', desc: 'Retrieve department and category budget status — allocated amount, consumed to date, remaining, and projected month-end based on current spending velocity.', auth: true },
+    { method: 'GET', path: '/analytics', desc: 'Spending analytics for a date range — total by department, category, employee, and project. Top spenders, policy violation rates, average approval times, and reimbursement cycle times.', auth: true },
   ],
 
   userGuide: [
@@ -114,6 +115,6 @@ const data = {
   ],
 }
 
-export default function ExpenseDocsPage() {
+export default function EchoExpenseDocsPage() {
   return <ProductDoc {...data} />
 }

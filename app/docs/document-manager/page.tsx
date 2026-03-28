@@ -1,95 +1,116 @@
-'use client'
+﻿'use client'
 
-import ProductDoc from '@/components/ProductDoc'
+import ProductDoc, { ProductDocProps } from '@/components/ProductDoc'
 
-export default function DocumentManagerDocPage() {
-  return (
-    <ProductDoc
-      name="Echo Document Manager"
-      tagline="AI-powered cloud file management — store, search, share, and collaborate with intelligence built into every file."
-      accent="#0369a1"
-      productUrl="/document-manager"
-      workerUrl="https://echo-document-manager.bmcii1976.workers.dev"
-      version="1.3.0"
-      overview={[
-        'Echo Document Manager is an AI-powered cloud file management platform that replaces Google Drive, Dropbox, and SharePoint with a smarter, faster, and more secure alternative. Every file you upload is automatically analyzed, indexed, and made searchable by content — not just filename. Ask a question in natural language and Document Manager finds the exact paragraph in the exact document that answers it.',
-        'The platform is built for teams that need more than basic file storage. Version control tracks every change to every file with full diff history and one-click rollback. Granular sharing permissions control who can view, edit, comment, or manage each file and folder. Team folders with configurable workflows handle review cycles, approvals, and publishing with built-in audit trails that satisfy compliance requirements.',
-        'Unlike traditional file managers that treat files as opaque blobs, Echo Document Manager understands your content. OCR makes scanned documents searchable. AI tagging automatically categorizes files by topic, project, and document type. Smart folders auto-populate based on content rules. And the preview engine renders over 200 file formats directly in the browser — no downloads or external applications needed.',
-      ]}
-      gettingStarted={[
-        { step: 1, title: 'Create Your Workspace', desc: 'Sign up and create your document workspace. Set your workspace name, upload your company logo for branding, and configure the default storage region. Invite team members with email and assign initial roles (Admin, Editor, Viewer).' },
-        { step: 2, title: 'Upload Your Files', desc: 'Drag and drop files or folders into the workspace, or use the upload button to select from your device. Bulk upload supports thousands of files at once. The desktop sync client enables automatic background synchronization of local folders.' },
-        { step: 3, title: 'Organize with Folders & Tags', desc: 'Create folder hierarchies for your team structure or project organization. Add tags manually or let the AI auto-tag based on content analysis. Create smart folders that auto-populate based on tag, type, or content rules.' },
-        { step: 4, title: 'Set Sharing & Permissions', desc: 'Right-click any file or folder to configure sharing. Set permissions per user or group: View Only, Can Comment, Can Edit, Full Access. Generate shareable links with optional password protection and expiration dates.' },
-        { step: 5, title: 'Install Desktop & Mobile Sync', desc: 'Download the desktop sync client for Windows or Mac to keep local folders in sync with your cloud workspace. Install the mobile app for on-the-go access, offline viewing, and camera-to-cloud document capture.' },
-      ]}
-      features={[
-        { title: 'Cloud File Storage', desc: 'Secure cloud storage with automatic redundancy across multiple data centers. Files are encrypted at rest (AES-256) and in transit (TLS 1.3). Storage scales automatically — no provisioning needed. Supports files up to 10GB each.' },
-        { title: 'Version Control', desc: 'Every edit creates a new version with full change history. View diffs between any two versions, restore previous versions with one click, and set version retention policies. Supports branching for collaborative editing workflows.' },
-        { title: 'Sharing & Permissions', desc: 'Granular permissions at the file, folder, and workspace level. Share with specific users, groups, or via public/password-protected links. Set expiration dates on shared links. Revoke access instantly from the sharing dashboard.' },
-        { title: 'AI-Powered Search', desc: 'Search by content, not just filename. Natural language queries find the exact paragraph that answers your question across all documents. Supports boolean operators, date filters, file type filters, and tag filters. Results ranked by relevance with highlighted matches.' },
-        { title: 'Document Preview', desc: 'In-browser preview for over 200 file formats including PDF, Word, Excel, PowerPoint, images, videos, audio, CAD files, and code files. No downloads or external applications required. Annotate and comment directly on previews.' },
-        { title: 'OCR Processing', desc: 'Scanned documents, photos of paper, and image-based PDFs are automatically processed with OCR to extract text content. Makes every document searchable regardless of how it was created. Supports 30+ languages.' },
-        { title: 'Team Folders', desc: 'Shared folders with configurable team access and workflows. Assign folder-level roles (Owner, Manager, Contributor, Viewer). Set up review and approval workflows for controlled document publishing. Activity feeds show all team actions.' },
-        { title: 'Audit Trail', desc: 'Complete audit log of every action: uploads, downloads, edits, shares, deletions, permission changes, and logins. Filterable by user, action type, and date range. Exportable for compliance reporting. Tamper-proof storage ensures log integrity.' },
-        { title: 'Integrations', desc: 'Connect with Slack (file notifications), email (share via email), Zapier (workflow automation), and the Echo ecosystem. REST API for custom integrations. Webhook support for real-time event notifications.' },
-        { title: 'Offline Sync', desc: 'Mark files and folders for offline access on desktop and mobile. Changes made offline sync automatically when connectivity is restored. Conflict resolution handles simultaneous edits with merge or version branching options.' },
-        { title: 'Smart Folders', desc: 'Auto-populating folders based on rules you define. Create a folder that automatically contains all PDFs tagged "contracts" from the last 90 days. Rules support file type, tags, date, author, and content keyword conditions.' },
-        { title: 'Trash & Recovery', desc: 'Deleted files go to Trash and are retained for 30 days (configurable up to 365 days). Restore any deleted file or folder with one click, including all versions and permissions. Permanent deletion requires admin confirmation.' },
-      ]}
-      apiEndpoints={[
-        { method: 'POST', path: '/api/files/upload', desc: 'Upload a file with metadata (tags, folder, description). Supports multipart upload for large files.', auth: true },
-        { method: 'GET', path: '/api/files/:id', desc: 'Get file metadata including versions, tags, permissions, and preview URL.', auth: true },
-        { method: 'GET', path: '/api/files/:id/content', desc: 'Download the file content. Supports range requests for partial downloads.', auth: true },
-        { method: 'GET', path: '/api/search', desc: 'Full-text content search across all accessible files. Supports natural language and boolean queries.', auth: true },
-        { method: 'POST', path: '/api/folders', desc: 'Create a new folder with name, parent, permissions, and optional smart folder rules.', auth: true },
-        { method: 'PUT', path: '/api/files/:id/permissions', desc: 'Update sharing permissions for a file. Add/remove users, change access levels, set link sharing options.', auth: true },
-        { method: 'GET', path: '/api/files/:id/versions', desc: 'List all versions of a file with timestamps, author, size, and change summary.', auth: true },
-        { method: 'GET', path: '/api/audit', desc: 'Query the audit trail with filters for user, action type, file, and date range.', auth: true },
-      ]}
-      userGuide={[
-        { id: 'file-management', title: 'Managing Files & Folders', content: [
-          'The workspace view is your primary interface for managing files. Navigate folders in the left sidebar, or use the breadcrumb trail at the top. The main area shows files in either grid view (with thumbnails) or list view (with metadata columns). Sort by name, date modified, size, or type. Filter by tags, file type, or author.',
-          'To upload files, drag them directly into the workspace view or click the Upload button. Folder uploads preserve the directory structure. During upload, you can add tags, select a destination folder, and write a description. The AI automatically suggests additional tags based on content analysis after upload completes.',
-          'Move, copy, rename, and delete files using right-click context menus or keyboard shortcuts. Bulk operations are supported — select multiple files with checkboxes and apply actions to all at once. Deleted files go to Trash where they are recoverable for the configured retention period.',
-        ]},
-        { id: 'collaboration', title: 'Team Collaboration & Sharing', content: [
-          'Share any file or folder by right-clicking and selecting Share. Add specific users by email, select a permission level (View Only, Can Comment, Can Edit, Full Access), and optionally add a message. Recipients receive an email notification with a direct link to the shared content.',
-          'For external sharing, generate a shareable link. Configure link options: password protection, expiration date (auto-revokes access), download permission (allow or view-only), and watermarking for sensitive documents. Track link analytics to see who accessed shared content and when.',
-          'Team folders provide persistent shared spaces for project teams. The folder owner sets default permissions, and managers can adjust access for individual members. Activity feeds in team folders show all member actions. @mention team members in comments to direct their attention to specific files or discussions.',
-        ]},
-        { id: 'search-discovery', title: 'Search & Content Discovery', content: [
-          'The search bar at the top of every page supports natural language queries. Type a question like "what is the liability limit in the Smith contract" and the AI finds the relevant clause across all your documents. Results show the matching text with context, file name, and a direct link to the exact location in the document.',
-          'Advanced search operators let you refine results: type:pdf for file type filtering, tag:contracts for tag filtering, author:john for author filtering, and date:2026-01 for date ranges. Combine operators with natural language for precise queries like "NDA amendments type:docx date:2025".',
-          'Smart folders extend search into automatic organization. Create rules that continuously filter your workspace — for example, a smart folder that shows all Excel files tagged "financials" modified in the last quarter. Smart folders update in real time as files are added, modified, or retagged.',
-        ]},
-        { id: 'version-control', title: 'Version Control & History', content: [
-          'Every time a file is edited and saved, Document Manager creates a new version automatically. The version history panel (accessible from the file detail view) shows every version with timestamp, author, file size, and a brief change summary generated by the AI.',
-          'Compare any two versions side by side with the diff viewer. For text documents, changes are highlighted at the word level. For spreadsheets, changed cells are marked. For images and PDFs, a visual diff overlay shows modifications. This makes it easy to understand exactly what changed between versions.',
-          'Restore a previous version with one click — the restored version becomes the new current version without deleting the intermediate versions. Version retention policies can be configured per folder: keep all versions, keep versions for N days, or keep only the last N versions. Admins can also lock versions to prevent accidental deletion.',
-        ]},
-      ]}
-      aiCapabilities={[
-        { capability: 'Semantic Search', desc: 'Understands the meaning behind your queries, not just keywords. Ask "what are our payment terms with Acme Corp" and the AI finds the relevant contract clause even if those exact words do not appear. Contextual ranking ensures the most relevant results appear first.' },
-        { capability: 'Auto-Tagging', desc: 'AI analyzes uploaded files and automatically suggests tags based on content, document type, and context. Learns from your tagging patterns to improve suggestions over time. Supports custom tag taxonomies for enterprise classification requirements.' },
-        { capability: 'Document Summarization', desc: 'Generates concise summaries of long documents — contracts, reports, proposals, and technical specifications. Summaries appear in search results and file previews, making it faster to find the right document without opening each one.' },
-        { capability: 'OCR & Text Extraction', desc: 'Processes scanned documents, photos, and image-based PDFs through advanced OCR to extract text content. Handles handwritten text, stamps, signatures, and multi-column layouts. Extracted text is indexed for full-text search.' },
-        { capability: 'Content Classification', desc: 'Automatically classifies documents by type (contract, invoice, report, correspondence, specification) and sensitivity level (public, internal, confidential, restricted). Classification drives smart folder population and access policy suggestions.' },
-        { capability: 'Duplicate Detection', desc: 'Identifies duplicate and near-duplicate files across your workspace using content fingerprinting. Catches exact copies, renamed files, and files with minor modifications. Helps reduce storage waste and version confusion.' },
-      ]}
-      troubleshooting={[
-        { issue: 'File upload fails or hangs at a percentage', solution: 'Large files (over 100MB) use chunked upload which may fail on unstable connections. Switch to a wired connection or use the desktop sync client which supports automatic retry and resume. Check that you have not exceeded your storage quota in Settings > Storage. Verify your firewall is not blocking upload requests.' },
-        { issue: 'Search not finding a recently uploaded file', solution: 'Content indexing takes 1-5 minutes after upload depending on file size and type. OCR processing for scanned documents may take up to 15 minutes. Check the file detail page for indexing status. If the file shows "Indexed" but search still fails, try different search terms or check that you have access to the folder containing the file.' },
-        { issue: 'Desktop sync client not syncing', solution: 'Check the sync client status icon in your system tray. A red icon indicates an error — click for details. Common issues: expired authentication (re-login in the sync client), full local disk, or a file locked by another application. The sync log (accessible from client settings) shows detailed error messages for each failed file.' },
-        { issue: 'Cannot preview a specific file type', solution: 'The preview engine supports over 200 formats, but some proprietary or uncommon formats may not render. Check the supported formats list in Settings > Preview. For unsupported formats, the platform offers a download option. If a normally-supported format fails to preview, the file may be corrupted — try re-uploading.' },
-      ]}
-      faq={[
-        { q: 'How much storage is included with each plan?', a: 'Starter includes 100GB, Professional includes 1TB, and Enterprise includes 10TB with the option to add more. Storage is shared across all workspace members. File versions count toward storage — configure version retention policies to manage usage. The storage dashboard shows usage breakdown by folder, user, and file type.' },
-        { q: 'Can I migrate from Google Drive or Dropbox?', a: 'Yes. The Migration Tool in Settings > Import supports direct migration from Google Drive, Dropbox, OneDrive, and Box. It preserves folder structure, sharing permissions (where possible), and version history. Large migrations are processed in the background with progress notifications.' },
-        { q: 'Is Document Manager compliant with SOC 2 and HIPAA?', a: 'The Enterprise plan includes SOC 2 Type II compliance with annual audits. HIPAA compliance is available as an add-on with BAA signing, enhanced audit logging, and data residency controls. All plans include AES-256 encryption at rest and TLS 1.3 in transit.' },
-        { q: 'Can I restrict where my data is stored geographically?', a: 'Enterprise plans support data residency controls. Choose from US, EU, or APAC storage regions. All file data, metadata, and backups are stored exclusively in the selected region. This satisfies GDPR, data sovereignty, and government data handling requirements.' },
-        { q: 'What happens if I accidentally delete an important file?', a: 'Deleted files go to Trash and are recoverable for 30 days by default (configurable up to 365 days on Professional and Enterprise plans). Restoring a file recovers all versions, tags, and permissions. Permanent deletion requires admin confirmation and a 24-hour grace period before data is actually purged.' },
-      ]}
-    />
-  )
+const data: ProductDocProps = {
+  name: 'Echo Document Manager',
+  tagline: 'Cloud document management with R2 storage, version history, share links, threaded comments, and AI summarization.',
+  accent: '#14b8a6',
+  productUrl: '/document-manager',
+  workerUrl: 'https://echo-document-manager.bmcii1976.workers.dev',
+  version: '1.0.0',
+
+  overview: [
+    'Echo Document Manager is a full-featured cloud document management system built on Cloudflare R2 object storage and D1 relational database. It provides teams with a structured, searchable repository for every file â€” contracts, reports, invoices, design assets, spreadsheets, and more â€” with enterprise-grade access control, version history, and a rich sharing model that works with or without a login.',
+    'Files are organized in nested folders with no depth limit. Every upload automatically captures metadata â€” file type, size, uploader, upload timestamp, MIME type, and content hash. Version history preserves every revision of a file with one-click restore. When someone uploads a new version of an existing file, the previous version is archived but never deleted unless you explicitly purge it.',
+    'The sharing system generates secure tokenized links with configurable permissions (view-only vs download), optional password protection, expiry dates, and download count limits. Recipients click the share link and access the file immediately without creating an account. Threaded comments attach directly to individual files and support @mentions, reactions, and resolved threads. AI summarization via Engine Runtime generates document summaries and auto-applies descriptive tags on upload.',
+  ],
+
+  gettingStarted: [
+    { step: 1, title: 'Create Your Root Folder', desc: 'POST to /folders with a name and null parent_id to create your top-level folder structure. Organize by department, project, client, or document type â€” the folder hierarchy is completely flexible and can be reorganized at any time.' },
+    { step: 2, title: 'Upload Your First File', desc: 'POST to /files/upload with the file as multipart form data and a folder_id. The file is stored in R2 immediately, metadata is written to D1, and the AI auto-tagging runs asynchronously in the background without blocking the upload response.' },
+    { step: 3, title: 'Create a Share Link', desc: 'POST to /shares with the file_id, expiry date, and optional password. The response includes a public share token that anyone with the link can use to access the file without authentication â€” ideal for sharing with clients or external collaborators.' },
+    { step: 4, title: 'Enable Version Tracking', desc: 'Subsequent uploads to the same file path or with the same filename in the same folder automatically create a new version. Use GET /versions/:id to see the full version history and POST to restore a previous version as the current one.' },
+    { step: 5, title: 'Search and Organize', desc: 'Use GET /search with a query string to find files across all folders by filename, tag, content type, uploader, or AI-generated summary keywords. Search results include relevance ranking and breadcrumb paths to the file location.' },
+  ],
+
+  features: [
+    { title: 'R2 File Storage', desc: 'All files stored in Cloudflare R2 â€” globally distributed, 99.999999999% durability, and zero egress fees. Files are served directly from R2 for downloads, eliminating bandwidth costs that would apply with AWS S3 or Google Cloud Storage.' },
+    { title: 'Nested Folder Structure', desc: 'Unlimited-depth folder hierarchy with drag-and-drop reorganization in the dashboard. Move files and entire folder trees between locations. Folder permissions cascade to contents so you can control access at the department or project level.' },
+    { title: 'Version History', desc: 'Every file update creates a new version automatically. Version list shows uploader, timestamp, file size, and change notes per revision. Restore any previous version as current in one click. Versions are never deleted unless explicitly purged.' },
+    { title: 'Share Links', desc: 'Generate tokenized share URLs with configurable view vs. download permissions, optional password, expiry datetime, and maximum download count. Revoke share links at any time. Track every access â€” who accessed, when, from what IP â€” in the share access log.' },
+    { title: 'Password-Protected Shares', desc: 'Add a password to any share link for an extra layer of protection on sensitive documents. Recipients enter the password once per session. Passwords are hashed with bcrypt and never stored in plaintext in the share record.' },
+    { title: 'Threaded Comments', desc: 'Attach threaded conversations to any file. Support for @mentions that notify team members, emoji reactions, inline replies, and resolved thread marking. Comments are searchable and included in the file activity timeline.' },
+    { title: 'Trash & 30-Day Purge', desc: 'Deleted files move to trash and are automatically purged after 30 days, matching standard data retention workflows. Restore any file from trash before purge. Admins can permanently delete or immediately purge files with appropriate permissions.' },
+    { title: 'Storage Quotas', desc: 'Set per-user and per-folder storage quotas in the admin panel. Quota enforcement prevents runaway uploads from consuming team storage. Quota usage dashboards show consumption per user, department, and folder tree.' },
+    { title: 'Bulk Operations', desc: 'Select multiple files or folders for bulk move, copy, download (as ZIP), tag, share, or delete. Bulk operations are processed asynchronously with progress tracking so large operations do not block the UI.' },
+    { title: 'Access Control', desc: 'Granular permissions at the folder and file level â€” view, comment, upload, manage, and admin roles. Inherit permissions from parent folders or override per resource. Guest links bypass authentication while respecting the permission model.' },
+  ],
+
+  apiEndpoints: [
+    { method: 'POST', path: '/files/upload', desc: 'Upload a file as multipart form data. Accepts folder_id, description, and tags. Stores in R2, writes metadata to D1, triggers async AI summarization and auto-tagging. Returns file_id, version_id, R2 key, and download URL.', auth: true },
+    { method: 'GET', path: '/files', desc: 'List files in a folder with pagination. Accepts folder_id, sort (name/date/size), and filter by file type or tag. Returns metadata array with file ID, name, size, type, uploader, version count, and share count.', auth: true },
+    { method: 'POST', path: '/folders', desc: 'Create a new folder. Accepts name, parent_id (null for root), description, and initial permission overrides. Returns the folder ID and full path from root.', auth: true },
+    { method: 'GET', path: '/versions/:id', desc: 'Retrieve the full version history for a file by file ID. Returns array of versions with version number, uploader, timestamp, size, change notes, and restore status. Supports version restoration via PUT.', auth: true },
+    { method: 'POST', path: '/shares', desc: 'Create a share link for a file. Accepts file_id, permission (view/download), password, expires_at, and max_downloads. Returns a public share token and the full share URL.', auth: true },
+    { method: 'GET', path: '/shares/:token', desc: 'Public endpoint â€” retrieve a shared file by token without authentication. Returns file metadata and a time-limited presigned R2 download URL. Requires password header if the share is password-protected.', auth: false },
+    { method: 'POST', path: '/comments', desc: 'Add a comment to a file. Accepts file_id, body text, optional parent_comment_id for threaded replies, and @mention user IDs. Returns comment ID and triggers mention notifications.', auth: true },
+    { method: 'DELETE', path: '/trash/:id', desc: 'Permanently delete a file from trash before the 30-day automatic purge. This action is irreversible and removes both the D1 metadata record and the R2 object. Requires admin or file-owner permission.', auth: true },
+    { method: 'GET', path: '/search', desc: 'Full-text search across file names, AI-generated summaries, tags, comments, and metadata. Accepts query string, folder scope, file type filter, and date range. Returns ranked results with match context and breadcrumb paths.', auth: true },
+  ],
+
+  userGuide: [
+    {
+      title: 'Organizing with Folders',
+      id: 'organizing-folders',
+      content: [
+        'The folder hierarchy is the primary organizational structure in Echo Document Manager. Design your top-level folders around your business structure â€” departments, clients, projects, or document types â€” then nest sub-folders as needed for granular organization. There is no depth limit, but deeply nested structures (more than 5 levels) become difficult to navigate. Prefer breadth over depth for most use cases.',
+        'Move files and folders by dragging in the dashboard or by updating the parent_id via the API. Moving a folder moves all its contents recursively. Permissions set on the source folder do not automatically transfer to the destination â€” they inherit the destination folder permissions after the move. Review permissions after any reorganization.',
+        'Use tags in addition to folder structure for cross-cutting organization. A contract might live in Clients/AcmeCorp/ but also be tagged with "signed", "2026", and "SaaS" so it surfaces in tag-based searches alongside contracts from other clients. Tags are added at upload time or via bulk tag operations after the fact.',
+      ],
+    },
+    {
+      title: 'Version History',
+      id: 'version-history',
+      content: [
+        'Every time a file is updated â€” either by uploading a new file with the same name to the same folder, or by explicitly creating a new version via the API â€” Echo Document Manager archives the previous version and makes the new upload the current version. The version counter increments with each update and is displayed in the file metadata.',
+        'To view version history, open the file detail panel and click the Versions tab. Each version shows the uploader identity, upload timestamp, file size, and optional change notes. You can download any specific version directly without making it the current version â€” useful for reference without affecting what collaborators see.',
+        'Restore a previous version by clicking the Restore button next to it in the version history. Restoration creates a new version that is a copy of the selected historical version â€” the current version is archived, not deleted. This preserves the complete change history even when restoring to an earlier state.',
+      ],
+    },
+    {
+      title: 'Creating and Managing Share Links',
+      id: 'sharing',
+      content: [
+        'Share links let you provide file access to anyone â€” clients, contractors, partners â€” without requiring them to create an account. Each share link has a unique cryptographic token embedded in the URL. View-permission links let recipients see and download the file. View-only links serve the file in a browser preview without offering a download button.',
+        'Add a password to share links for sensitive documents. The password is set when creating the share and never displayed again after creation â€” record it in a secure channel when sharing with the recipient. Password-protected shares prompt for the password on first access and cache the authorization for the duration of the browser session.',
+        'Monitor share access in the Share Access Log accessible from each file detail panel. Every access event records the timestamp, recipient IP address, country, user agent, and whether a file download occurred. Revoke a share link at any time by deleting it from the Shares list â€” the token becomes invalid immediately.',
+      ],
+    },
+    {
+      title: 'Storage Quotas and Trash',
+      id: 'storage-quotas',
+      content: [
+        'Storage quotas prevent individual users or teams from consuming disproportionate shared storage. Set quotas in the Admin panel under Users or Folders. Quota checks run at upload time â€” if an upload would exceed the quota, it is rejected with a 413 response and an error message directing the user to free space or contact their admin.',
+        'Deleted files go to the Trash view immediately. Files in Trash are invisible to regular users but remain accessible to file owners and admins. The 30-day purge timer starts from the deletion date, not the upload date. Permanently delete a file from Trash at any time â€” this removes both the R2 object and all D1 metadata including version history and comments.',
+        'Monitor storage consumption from the Admin Storage dashboard. The usage chart breaks down consumption by user, folder, and file type. Click any segment to drill into the contributing files. Use the bulk export feature to download all files in a folder as a ZIP when migrating or archiving large document collections.',
+      ],
+    },
+  ],
+
+  aiCapabilities: [
+    { capability: 'Document Summarization', desc: 'Engine Runtime generates a plain-English summary of uploaded documents â€” PDFs, Word files, text files, and spreadsheets â€” within seconds of upload. Summaries are stored in D1 and surfaced in search results, giving you insight into document contents without opening the file.' },
+    { capability: 'Auto-Tagging', desc: 'Analyzes document content and metadata to assign descriptive tags automatically â€” document type, subject area, named entities (companies, people, dates), and topic keywords. Auto-tags supplement manual tags and significantly improve search recall.' },
+    { capability: 'Duplicate Detection', desc: 'Content hash comparison on upload identifies files identical to or very similar to existing documents. Duplicate detection prevents wasted storage, alerts uploaders to existing versions, and helps maintain a clean, non-redundant document library.' },
+    { capability: 'Smart Search Ranking', desc: 'Search results are ranked by a combination of lexical match, AI-generated summary relevance, tag match, recency, and access frequency. The ranking model learns from which search results users click to improve relevance over time.' },
+  ],
+
+  troubleshooting: [
+    { issue: 'Upload fails with 413 error', solution: 'The upload exceeds either the per-file size limit (5GB by default) or the user storage quota. Check the error response body for the specific limit exceeded. If it is a quota issue, delete unnecessary files or ask your admin to increase your quota. If it is a file size issue, contact support to request an increased per-file limit for your plan.' },
+    { issue: 'Share link returns 404 or "Link expired"', solution: 'The share link has been revoked by the file owner or admin, has reached its maximum download count, or has passed its expiry date. The file owner can generate a new share link. For links that should not have expired, check the Shares list in the file detail panel for the link status and expiry settings.' },
+    { issue: 'Search not returning expected files', solution: 'Full-text search indexes file names, tags, and AI summaries but not the raw binary content of all file types. Verify the file has completed AI processing â€” check the ai_status field in the file metadata, which should show "complete". Ensure you have permission to view the files you are searching for â€” results are filtered by access rights.' },
+    { issue: 'Version history shows only one version', solution: 'Versioning creates a new version only when a file with the same name is uploaded to the same folder, or when the API POST /files/:id/version endpoint is used explicitly. If you uploaded a renamed file, it is treated as a new file. Use the manual version endpoint to associate the new upload with the existing file ID.' },
+  ],
+
+  faq: [
+    { q: 'What file types are supported?', a: 'Echo Document Manager supports any file type â€” there are no restrictions on format. AI summarization and auto-tagging work with PDF, DOCX, XLSX, PPTX, TXT, CSV, and common image formats. Binary files, videos, and other formats are stored and served without AI processing but support all other features including versioning, sharing, and comments.' },
+    { q: 'How long are deleted files kept in trash?', a: 'Deleted files remain in trash for 30 days before automatic permanent deletion. You can restore any file during this window from the Trash view. Admins can permanently delete files immediately, bypassing the 30-day hold when necessary for compliance or storage management.' },
+    { q: 'Can external users access shared files without an account?', a: 'Yes. Share links are public URLs that require no login. Recipients click the link and access the file immediately. If the share has a password, they enter it once per browser session. For secure sharing with specific individuals, combine a share link with a password shared through a separate channel.' },
+    { q: 'Is there a limit on version history?', a: 'Starter plans retain the last 10 versions per file. Pro plans retain 50 versions. Business and Enterprise plans have unlimited version history. Older versions beyond your plan limit are automatically purged from oldest to newest. All plans can manually purge specific versions to free storage.' },
+    { q: 'How does R2 storage compare to S3 or Google Cloud Storage?', a: 'Cloudflare R2 provides equivalent durability (11 nines) and performance to AWS S3 or GCS but charges zero egress fees â€” downloads are free regardless of volume. This is why Echo Document Manager uses R2: high-frequency file access does not generate bandwidth costs that would be passed on to users.' },
+  ],
+}
+
+export default function EchoDocumentManagerDocsPage() {
+  return <ProductDoc {...data} />
 }

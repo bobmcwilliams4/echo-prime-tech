@@ -60,7 +60,7 @@ const categories: DocCategory[] = [
       { name: 'Booking', href: '/docs/booking', badge: 'Docs' },
       { name: 'Expense Tracking', href: '/docs/expense', badge: 'Docs' },
       { name: 'Finance AI', href: '/docs/finance-ai', badge: 'Docs' },
-      { name: 'HR Management', href: '/hr' },
+      { name: 'HR Management', href: '/docs/hr', badge: 'Docs' },
       { name: 'Project Management', href: '/project-manager' },
       { name: 'Payroll', href: '/docs/payroll', badge: 'Docs' },
       { name: 'Contracts', href: '/docs/contracts', badge: 'Docs' },
@@ -70,6 +70,8 @@ const categories: DocCategory[] = [
       { name: 'Calendar', href: '/docs/calendar', badge: 'Docs' },
       { name: 'Affiliate', href: '/docs/affiliate', badge: 'Docs' },
       { name: 'Inventory', href: '/docs/inventory', badge: 'Docs' },
+      { name: 'Timesheet', href: '/docs/timesheet', badge: 'Docs' },
+      { name: 'OKR Tracking', href: '/docs/okr', badge: 'Docs' },
     ],
   },
   {
@@ -91,6 +93,7 @@ const categories: DocCategory[] = [
       { name: 'Link Shortener', href: '/docs/link-shortener', badge: 'Docs' },
       { name: 'Waitlist', href: '/docs/waitlist', badge: 'Docs' },
       { name: 'Web Analytics', href: '/docs/web-analytics', badge: 'Docs' },
+      { name: 'Reviews', href: '/docs/reviews', badge: 'Docs' },
     ],
   },
   {
@@ -106,6 +109,7 @@ const categories: DocCategory[] = [
       { name: 'LinkedIn Bot', href: '/linkedin' },
       { name: 'X/Twitter Bot', href: '/x-bot' },
       { name: 'Speak Cloud', href: '/speak-cloud' },
+      { name: 'Email Sender', href: '/docs/email-sender', badge: 'Docs' },
     ],
   },
   {
@@ -151,6 +155,7 @@ const categories: DocCategory[] = [
       { name: 'SDK Quickstart', href: '/sdk/quickstart' },
       { name: 'App Forge', href: '/app-forge' },
       { name: 'Prompt Forge', href: '/prompt-forge' },
+      { name: 'Feature Flags', href: '/docs/feature-flags', badge: 'Docs' },
     ],
   },
   {
@@ -165,6 +170,7 @@ const categories: DocCategory[] = [
       { name: 'Workflow Automation', href: '/docs/workflow-automation', badge: 'Docs' },
       { name: 'Fleet Commander', href: '/docs/fleet-commander', badge: 'Docs' },
       { name: 'News Scraper', href: '/docs/news-scraper', badge: 'Docs' },
+      { name: 'Knowledge Base', href: '/docs/knowledge-base', badge: 'Docs' },
       { name: 'Vendor Manager', href: '/vendor-manager' },
     ],
   },
@@ -180,6 +186,7 @@ const categories: DocCategory[] = [
       { name: 'Coin Rewards', href: '/docs/coin-rewards', badge: 'Docs' },
       { name: 'Price Alerts', href: '/docs/price-alerts', badge: 'Docs' },
       { name: 'Podcast', href: '/docs/podcast', badge: 'Docs' },
+      { name: 'QR Menu', href: '/docs/qr-menu', badge: 'Docs' },
       { name: 'Bree Assistant', href: '/bree-assistant' },
     ],
   },
@@ -243,7 +250,7 @@ export default function DocsPage() {
           <div className="flex justify-center gap-8 mt-8 flex-wrap">
             {[
               { value: '160+', label: 'Product Pages' },
-              { value: '72', label: 'Full User Manuals' },
+              { value: '83', label: 'Full User Manuals' },
               { value: '142', label: 'Blog Articles' },
               { value: '10', label: 'Doc Categories' },
             ].map(s => (
@@ -346,7 +353,7 @@ export default function DocsPage() {
 
         {/* Footer */}
         <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
-          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 160+ products. 72 user manuals. 646K+ doctrines.</p>
+          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 160+ products. 83 user manuals. 646K+ doctrines.</p>
           <div className="flex justify-center gap-6 mt-3">
             <Link href="/" style={{ color: 'var(--ept-accent)' }}>Home</Link>
             <Link href="/blog" style={{ color: 'var(--ept-accent)' }}>Blog</Link>
