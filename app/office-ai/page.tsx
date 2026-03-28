@@ -6,6 +6,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
+import TrialCTA from '../../components/TrialCTA';
 
 /* ==============================================================================
    ECHO OFFICE AI — Complete AI Business Operations Platform
@@ -197,7 +198,8 @@ export default function OfficeAiPage() {
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold mb-4">Stop Paying for 10 Tools. Use One.</h2>
             <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Replace your invoicing, CRM, HR, helpdesk, and marketing tools with a single AI-powered platform that costs less than any one of them.</p>
-            <Link href="/pricing" className="inline-block px-10 py-4 rounded-xl font-semibold text-lg text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>Start Free Trial</Link>
+            <div className="mb-6"><Link href="/pricing" className="inline-block px-10 py-4 rounded-xl font-semibold text-lg text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>View All Pricing</Link></div>
+            <TrialCTA serviceId="echo-office-ai" tier="starter" productName="Echo Office AI" />
           </div>
         </section>
 

@@ -11,6 +11,7 @@ import { startAsyncInvestigation, getJobProgress, type AsyncJobProgress, type Pi
 import TitleChainReport from '../../components/TitleChainReport';
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import TrialCTA from '../../components/TrialCTA';
 
 // ════════════════════════════════════════════════════════════════
 // ECHO PRIME TECHNOLOGIES — Title Intelligence Product Page
@@ -855,6 +856,10 @@ export default function TitleIntelligencePage() {
               </div>
             ))}
           </div>
+        </section>
+
+        <section className="max-w-2xl mx-auto px-6 mt-16">
+          <TrialCTA serviceId="echo-title-intelligence" tier="starter" productName="Title Intelligence" />
         </section>
 
         <footer className="max-w-5xl mx-auto px-6 mt-20 pt-8 border-t text-center" style={{ borderColor: 'var(--ept-border)' }}>

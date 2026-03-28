@@ -22,6 +22,7 @@ import {
 } from '../../lib/tax-return-api';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
 import SubscriptionGate from '../../components/SubscriptionGate';
+import TrialCTA from '../../components/TrialCTA';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import FaqSchema from '../../components/FaqSchema';
@@ -2124,6 +2125,19 @@ function NeedReturn({ onGo, message }: { onGo: () => void; message: string }) {
   );
 }
 
+function TaxReturnTrialSection() {
+  return (
+    <section className="max-w-2xl mx-auto px-6 py-12">
+      <TrialCTA serviceId="echo-tax-return" tier="starter" productName="Tax Return Prep" />
+    </section>
+  );
+}
+
 export default function TaxReturnPage() {
-  return <SubscriptionGate serviceId="tax-return-prep"><TaxReturnPageContent /></SubscriptionGate>;
+  return (
+    <>
+      <SubscriptionGate serviceId="tax-return-prep"><TaxReturnPageContent /></SubscriptionGate>
+      <TaxReturnTrialSection />
+    </>
+  );
 }
