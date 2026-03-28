@@ -18,6 +18,23 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-03-28',
+    version: 'v2026.22',
+    title: '10 New Product Pages + SEO Layouts + Expanded Homepage Grid + 5 Blog Articles',
+    type: 'launch',
+    description: '10 new product pages built for infrastructure and intelligence products: Knowledge Scout, SDK Gateway, Landman Pipeline, Arcanum Templates, News Intelligence, Prometheus AI, Fleet Commander, Bot Factory, Tool Discovery, and Forge Marketplace. Full SEO metadata, JSON-LD entries, and homepage visibility.',
+    highlights: [
+      '10 new product pages: knowledge-scout, sdk-gateway, landman-pipeline, arcanum, news-scraper, prometheus-ai, fleet-commander, bot-factory, tool-discovery, forge-marketplace',
+      '10 layout.tsx files with full SEO Metadata (title, description, keywords, openGraph, twitter, canonical)',
+      '10 products added to homepage CAPABILITIES grid (80+ products now visible)',
+      '7 new JSON-LD SoftwareApplication entries for Google rich results',
+      '10 new footer links for product discoverability',
+      '5 new blog articles covering the new products',
+      '143+ blog articles total',
+    ],
+    link: '/knowledge-scout',
+  },
+  {
     date: '2026-03-27',
     version: 'v2026.21',
     title: '128 Blog Articles + 135 BreadcrumbSchema + 143 openGraph + Expanded Homepage Product Grid',

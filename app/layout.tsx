@@ -519,6 +519,16 @@ const jsonLd = {
       offers: { '@type': 'AggregateOffer', lowPrice: '49', highPrice: '399', priceCurrency: 'USD', offerCount: 3 },
       provider: { '@id': 'https://echo-ept.com/#organization' },
     },
+    {
+      '@type': 'SoftwareApplication',
+      name: 'Landman Pipeline',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      description: 'AI-powered title intelligence automating chain of title research, deed analysis, and run sheet generation across 80+ Texas counties.',
+      url: 'https://echo-ept.com/landman-pipeline',
+      offers: { '@type': 'AggregateOffer', lowPrice: '99', highPrice: '999', priceCurrency: 'USD', offerCount: 3 },
+      provider: { '@id': 'https://echo-ept.com/#organization' },
+    },
   ],
 };
 

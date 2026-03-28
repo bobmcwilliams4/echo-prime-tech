@@ -300,6 +300,38 @@ const CAPABILITIES = [
     icon: '📰',
     link: '/news-scraper',
   },
+  {
+    title: 'SDK Gateway',
+    description: 'Unified API gateway routing to 50+ AI services through one endpoint. Rate limiting, usage tracking, auth management, and service discovery for the entire Echo ecosystem.',
+    stat: '50+',
+    statLabel: 'Services',
+    icon: '🔌',
+    link: '/sdk-gateway',
+  },
+  {
+    title: 'Landman Pipeline',
+    description: 'AI-powered title intelligence automating chain of title research, deed analysis, and run sheet generation across 80+ Texas counties. From weeks of manual work to minutes.',
+    stat: '80+',
+    statLabel: 'Counties',
+    icon: '🏗️',
+    link: '/landman-pipeline',
+  },
+  {
+    title: 'Prometheus AI',
+    description: '69 security tools across 20 categories — network recon, vulnerability scanning, web app testing, forensics, and more. Autonomous patrol mode with AI-driven threat analysis.',
+    stat: '69',
+    statLabel: 'Security Tools',
+    icon: '🛡️',
+    link: '/prometheus-ai',
+  },
+  {
+    title: 'Bot Factory',
+    description: 'Build and deploy AI-powered social media bots across 8 platforms. 14 personality presets, AI content generation, lead capture, OPSEC protection, and cross-platform analytics.',
+    stat: '8',
+    statLabel: 'Platforms',
+    icon: '🤖',
+    link: '/bot-factory',
+  },
 ];
 
 const FALLBACK_INDUSTRIES = [
@@ -957,6 +989,16 @@ export default function HomePage() {
                   { label: 'Document Delivery', href: '/document-delivery' },
                   { label: 'Autonomous Builder', href: '/autonomous-builder' },
                   { label: 'Diagnostics Agent', href: '/diagnostics' },
+                  { label: 'Knowledge Scout', href: '/knowledge-scout' },
+                  { label: 'Fleet Commander', href: '/fleet-commander' },
+                  { label: 'Tool Discovery', href: '/tool-discovery' },
+                  { label: 'Forge Marketplace', href: '/forge-marketplace' },
+                  { label: 'Arcanum Templates', href: '/arcanum' },
+                  { label: 'News Intelligence', href: '/news-scraper' },
+                  { label: 'Landman Pipeline', href: '/landman-pipeline' },
+                  { label: 'Prometheus AI', href: '/prometheus-ai' },
+                  { label: 'SDK Gateway Pro', href: '/sdk-gateway' },
+                  { label: 'Bot Factory', href: '/bot-factory' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}
