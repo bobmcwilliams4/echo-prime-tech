@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
 import { getServices, Service, createCheckout } from '../../lib/ept-api';
+import { startTrial } from '../../lib/trial-api';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
@@ -15,7 +16,7 @@ const PRICING_FAQS = [
   { q: 'Can I switch between monthly and annual billing?', a: 'Yes. Switch anytime from your account settings. Moving to annual billing applies the 20% discount immediately. Moving to monthly takes effect at the end of your current annual term.' },
   { q: 'Do you offer refunds?', a: 'Every paid plan comes with a 30-day money-back guarantee. If you are not satisfied within the first 30 days, contact us for a full refund — no questions asked.' },
   { q: 'Can I use multiple services under one account?', a: 'Yes. One account manages all your subscriptions. Each service has its own dashboard section, but billing, user management, and analytics are unified. Bundle discounts are available for 3+ services.' },
-  { q: 'What payment methods are accepted?', a: 'We accept PayPal, Venmo, and Pay Later options. Enterprise clients can request NET 30 invoicing. All transactions are processed securely through Stripe and PayPal.' },
+  { q: 'What payment methods are accepted?', a: 'We accept all major credit/debit cards via Stripe, PayPal, Venmo, and Pay Later options. Enterprise clients can request NET 30 invoicing. All transactions are processed securely with PCI-compliant encryption.' },
   { q: 'Is there a contract or commitment?', a: 'No contracts on any self-service plan. Monthly plans can be cancelled anytime. Annual plans are billed upfront but include the 30-day money-back guarantee.' },
 ];
 
@@ -189,6 +190,9 @@ export default function PricingPage() {
   const [activeService, setActiveService] = useState<string | null>(null);
   const [checkingOut, setCheckingOut] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+  const [trialLoading, setTrialLoading] = useState<string | null>(null);
+  const [trialSuccess, setTrialSuccess] = useState<string | null>(null);
+  const [trialError, setTrialError] = useState<string | null>(null);
 
   const getDisplayPrice = (monthlyPrice: number | null): number | null => {
     if (monthlyPrice === null || monthlyPrice === 0) return monthlyPrice;
@@ -218,13 +222,33 @@ export default function PricingPage() {
     window.location.href = checkoutUrl;
   };
 
+  const handleTrial = async (serviceId: string, tierName: string) => {
+    if (!user) { window.location.href = `/signup?redirect=${encodeURIComponent(`/pricing?trial=${serviceId}&tier=${tierName}`)}`; return; }
+    const key = `${serviceId}-${tierName}`;
+    setTrialLoading(key);
+    setTrialError(null);
+    try {
+      const res = await startTrial({ email: user.email!, name: user.displayName || '', service_id: serviceId, tier: tierName });
+      if (res.ok) {
+        setTrialSuccess(key);
+        setTrialLoading(null);
+      } else {
+        setTrialError(res.error || 'Trial could not be started');
+        setTrialLoading(null);
+      }
+    } catch {
+      setTrialError('Network error — please try again');
+      setTrialLoading(null);
+    }
+  };
+
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: [
       { '@type': 'Question', name: 'Can I switch plans anytime?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Upgrade or downgrade at any time. Changes take effect on your next billing cycle. No lock-in contracts.' } },
-      { '@type': 'Question', name: 'Do you offer a free trial?', acceptedAnswer: { '@type': 'Answer', text: 'Many services have free tiers or trial periods. Sentinel AI, Grading, and the Knowledge systems all offer free access to get started.' } },
-      { '@type': 'Question', name: 'What payment methods do you accept?', acceptedAnswer: { '@type': 'Answer', text: 'We accept PayPal, Venmo, and Pay Later. Enterprise clients can request invoicing with NET 30 terms.' } },
+      { '@type': 'Question', name: 'Do you offer a free trial?', acceptedAnswer: { '@type': 'Answer', text: 'Yes! Every paid plan includes a 14-day free trial with no credit card required. Some services also have permanent free tiers. Start any trial directly from the pricing page.' } },
+      { '@type': 'Question', name: 'What payment methods do you accept?', acceptedAnswer: { '@type': 'Answer', text: 'We accept all major credit/debit cards via Stripe, PayPal, Venmo, and Pay Later. Enterprise clients can request invoicing with NET 30 terms.' } },
       { '@type': 'Question', name: 'How does the AI engine pricing work?', acceptedAnswer: { '@type': 'Answer', text: 'Engine queries are priced per-use or via monthly subscriptions. Each query hits our doctrine cache first (free, under 200ms), then semantic retrieval, then deep analysis.' } },
       { '@type': 'Question', name: 'Is there a setup fee?', acceptedAnswer: { '@type': 'Answer', text: 'No setup fees for any self-service plan. Enterprise and custom deployments may include onboarding costs depending on scope.' } },
       { '@type': 'Question', name: 'Can I combine multiple services?', acceptedAnswer: { '@type': 'Answer', text: 'Absolutely. Our services are designed to work together. Data Pipelines feed into Title Intelligence, engines power the AI Closer, and Sentinel monitors everything. Contact us for bundle pricing.' } },
@@ -379,6 +403,23 @@ export default function PricingPage() {
                   )}
                   {!isOwner && !tier.custom && tier.price !== null && tier.price > 0 && (
                     <p className="text-center text-[10px] mt-2" style={{ color: 'var(--ept-text-muted)' }}>30-day money-back guarantee</p>
+                  )}
+                  {!isOwner && !tier.custom && tier.price !== null && tier.price > 0 && (
+                    trialSuccess === `${current.id}-${tier.tier}` ? (
+                      <p className="text-center text-[10px] mt-1 font-semibold" style={{ color: '#10b981' }}>Trial activated! Check your email.</p>
+                    ) : (
+                      <button
+                        onClick={() => handleTrial(current.id, tier.tier.toLowerCase())}
+                        disabled={!!trialLoading}
+                        className="w-full text-center text-[11px] mt-1 underline cursor-pointer bg-transparent border-none"
+                        style={{ color: 'var(--ept-accent)', opacity: trialLoading === `${current.id}-${tier.tier}` ? 0.5 : 1 }}
+                      >
+                        {trialLoading === `${current.id}-${tier.tier}` ? 'Starting trial...' : 'or start 14-day free trial'}
+                      </button>
+                    )
+                  )}
+                  {trialError && trialLoading === null && (
+                    <p className="text-center text-[10px] mt-1" style={{ color: '#ef4444' }}>{trialError}</p>
                   )}
                 </div>
               ))}
