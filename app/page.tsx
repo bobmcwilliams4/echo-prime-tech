@@ -500,6 +500,72 @@ export default function HomePage() {
               ))}
             </div>
           </div>
+          <div className="mt-10 mb-8">
+            <h3 className="text-xl font-bold text-center mb-6" style={{ color: 'var(--ept-text)' }}>Marketing &amp; Growth</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {[
+                { label: 'Email Marketing', price: '$19', href: '/email-marketing' },
+                { label: 'Newsletter', price: '$12', href: '/newsletter' },
+                { label: 'Social Media', price: '$29', href: '/social-media' },
+                { label: 'Surveys', price: 'Free', href: '/surveys' },
+                { label: 'Reviews', price: '$19', href: '/reviews' },
+                { label: 'Feedback Board', price: 'Free', href: '/feedback-board' },
+                { label: 'Affiliate', price: '$29', href: '/affiliate' },
+                { label: 'Waitlist', price: 'Free', href: '/waitlist' },
+                { label: 'Link Shortener', price: 'Free', href: '/link-shortener' },
+                { label: 'Web Analytics', price: 'Free', href: '/web-analytics' },
+                { label: 'A/B Testing', price: '$19', href: '/ab-testing' },
+                { label: 'Status Page', price: 'Free', href: '/status-page' },
+              ].map((p) => (
+                <Link key={p.href} href={p.href} className="p-3 rounded-xl border text-center transition-all hover:scale-[1.03] card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                  <div className="text-sm font-bold" style={{ color: 'var(--ept-text)' }}>{p.label}</div>
+                  <div className="text-xs font-mono mt-1" style={{ color: 'var(--ept-accent)' }}>{p.price}/mo</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="mt-8 mb-8">
+            <h3 className="text-xl font-bold text-center mb-6" style={{ color: 'var(--ept-text)' }}>Operations &amp; HR</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {[
+                { label: 'Payroll', price: '$39', href: '/payroll' },
+                { label: 'Recruiting', price: '$29', href: '/recruiting' },
+                { label: 'Timesheet', price: '$15', href: '/timesheet' },
+                { label: 'Calendar', price: '$15', href: '/calendar' },
+                { label: 'Compliance', price: '$39', href: '/compliance' },
+                { label: 'OKR Tracking', price: '$19', href: '/okr' },
+                { label: 'Expense Mgmt', price: '$15', href: '/expense-management' },
+                { label: 'Knowledge Base', price: 'Free', href: '/knowledge-base' },
+                { label: 'Signatures', price: '$15', href: '/signatures' },
+                { label: 'Proposals', price: '$25', href: '/proposals' },
+                { label: 'Feature Flags', price: '$19', href: '/feature-flags' },
+                { label: 'Podcast', price: '$12', href: '/podcast' },
+              ].map((p) => (
+                <Link key={p.href} href={p.href} className="p-3 rounded-xl border text-center transition-all hover:scale-[1.03] card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                  <div className="text-sm font-bold" style={{ color: 'var(--ept-text)' }}>{p.label}</div>
+                  <div className="text-xs font-mono mt-1" style={{ color: 'var(--ept-accent)' }}>{p.price}/mo</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="mt-8 mb-8">
+            <h3 className="text-xl font-bold text-center mb-6" style={{ color: 'var(--ept-text)' }}>Hospitality &amp; Retail</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {[
+                { label: 'QR Menu', price: '$19', href: '/qr-menu' },
+                { label: 'Booking', price: '$19', href: '/booking' },
+                { label: 'Live Chat', price: '$19', href: '/live-chat' },
+                { label: 'Payments', price: '$0', href: '/payments' },
+                { label: 'Store', price: '$29', href: '/ecommerce' },
+                { label: 'Subscription', price: '$19', href: '/subscription' },
+              ].map((p) => (
+                <Link key={p.href} href={p.href} className="p-3 rounded-xl border text-center transition-all hover:scale-[1.03] card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                  <div className="text-sm font-bold" style={{ color: 'var(--ept-text)' }}>{p.label}</div>
+                  <div className="text-xs font-mono mt-1" style={{ color: 'var(--ept-accent)' }}>{p.price}/mo</div>
+                </Link>
+              ))}
+            </div>
+          </div>
           <div className="mt-8 text-center">
             <Link href="/pricing" className="text-sm font-semibold transition-colors hover:opacity-80" style={{ color: 'var(--ept-accent)' }}>View all pricing &amp; plans &rarr;</Link>
           </div>
@@ -665,7 +731,7 @@ export default function HomePage() {
               <h2 className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Latest from the Blog</h2>
               <p className="mt-2 text-sm" style={{ color: 'var(--ept-text-secondary)' }}>Technical deep-dives on AI engineering, oilfield tech, tax intelligence, and security</p>
             </div>
-            <Link href="/blog" className="text-sm font-semibold hidden md:block" style={{ color: 'var(--ept-accent)' }}>View all 110 articles &rarr;</Link>
+            <Link href="/blog" className="text-sm font-semibold hidden md:block" style={{ color: 'var(--ept-accent)' }}>View all 128 articles &rarr;</Link>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {[
@@ -684,7 +750,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="mt-6 text-center md:hidden">
-            <Link href="/blog" className="text-sm font-semibold" style={{ color: 'var(--ept-accent)' }}>View all 110 articles &rarr;</Link>
+            <Link href="/blog" className="text-sm font-semibold" style={{ color: 'var(--ept-accent)' }}>View all 128 articles &rarr;</Link>
           </div>
         </div>
       </section>

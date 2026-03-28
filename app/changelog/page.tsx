@@ -18,6 +18,24 @@ interface ChangelogEntry {
 
 const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-03-27',
+    version: 'v2026.21',
+    title: '128 Blog Articles + 135 BreadcrumbSchema + 143 openGraph + Expanded Homepage Product Grid',
+    type: 'launch',
+    description: 'Major SEO and product discovery expansion: 128 blog articles (12 new competitive comparison articles), openGraph metadata on 143+ pages, Related cross-links on all 128 articles, 3 new categorized product grids on homepage (Marketing & Growth, Operations & HR, Hospitality & Retail — 30 additional products visible above-fold).',
+    highlights: [
+      '128 blog articles (12 new: timesheet, podcast, qr-menu, affiliate, link-shortener, calendar, okr, web-analytics, waitlist, proposals, signatures, reviews)',
+      'All 128 blog articles now have Related article cross-links for internal SEO',
+      'openGraph metadata added to 19 more product layout.tsx files (143+ total)',
+      'FaqSchema added to affiliate, qr-menu, signatures pages (130+ total)',
+      '24 broken blog cross-reference slugs fixed across all articles',
+      'Homepage expanded: 3 new categorized product grids — 30 additional products visible (was 40, now 70)',
+      'Blog article count updated across homepage (128 articles)',
+      '329+ sitemap URLs, 134+ RSS feed items',
+    ],
+    link: '/blog',
+  },
+  {
     date: '2026-03-26',
     version: 'v2026.20',
     title: '98 Blog Articles + 81 FaqSchema + 80 BreadcrumbSchema + 271 Pages + 222 Sitemap URLs',
