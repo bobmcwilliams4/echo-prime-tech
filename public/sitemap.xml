@@ -448,6 +448,16 @@
   <url><loc>https://echo-ept.com/docs/scanner</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/docs/surveillance</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/docs/pentesting</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/knowledge-scout</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/sdk-gateway</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/landman-pipeline</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/arcanum</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/news-scraper</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/prometheus-ai</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/fleet-commander</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/bot-factory</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/tool-discovery</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://echo-ept.com/docs/forge-marketplace</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://echo-ept.com/runway</loc><lastmod>2026-03-28</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <!-- Blog articles (2026-03-28 batch) -->
   <url><loc>https://echo-ept.com/blog/autonomous-code-diagnostics-ai-vs-sonarqube-snyk-2026</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>

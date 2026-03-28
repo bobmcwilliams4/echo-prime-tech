@@ -43,8 +43,9 @@ const categories: DocCategory[] = [
       { name: 'Sentinel AI', href: '/docs/sentinel', badge: 'Docs' },
       { name: 'Intelligence Engines', href: '/docs/engines', badge: 'Docs' },
       { name: 'Knowledge Forge', href: '/knowledge' },
+      { name: 'Knowledge Scout', href: '/docs/knowledge-scout', badge: 'Docs' },
       { name: 'Graph RAG', href: '/docs/graph-rag', badge: 'Docs' },
-      { name: 'Doctrine System', href: '/engines/marketplace' },
+      { name: 'Forge Marketplace', href: '/docs/forge-marketplace', badge: 'Docs' },
       { name: 'Agentic Engine', href: '/agentic-engine' },
     ],
   },
@@ -88,6 +89,7 @@ const categories: DocCategory[] = [
     desc: 'Bots, voice, and messaging.',
     items: [
       { name: 'Bot Fleet', href: '/docs/bots', badge: 'Docs' },
+      { name: 'Bot Factory', href: '/docs/bot-factory', badge: 'Docs' },
       { name: 'Voice AI / TTS', href: '/docs/voice', badge: 'Docs' },
       { name: 'Telegram Bot', href: '/docs/telegram-bot', badge: 'Docs' },
       { name: 'WhatsApp Bot', href: '/docs/whatsapp-bot', badge: 'Docs' },
@@ -105,6 +107,8 @@ const categories: DocCategory[] = [
       { name: 'Dark Web Intel', href: '/docs/dark-web-intel', badge: 'Docs' },
       { name: 'Pentesting', href: '/docs/pentesting', badge: 'Docs' },
       { name: 'Surveillance', href: '/docs/surveillance', badge: 'Docs' },
+      { name: 'Prometheus AI', href: '/docs/prometheus-ai', badge: 'Docs' },
+      { name: 'Intel Hub', href: '/docs/intel-hub', badge: 'Docs' },
       { name: 'Scanner', href: '/docs/scanner', badge: 'Docs' },
       { name: 'Vault', href: '/vault' },
     ],
@@ -119,6 +123,7 @@ const categories: DocCategory[] = [
       { name: 'County Records', href: '/docs/county-records', badge: 'Docs' },
       { name: 'EchoCAD', href: '/docs/echocad', badge: 'Docs' },
       { name: 'Title Intelligence', href: '/docs/title-intelligence', badge: 'Docs' },
+      { name: 'Landman Pipeline', href: '/docs/landman-pipeline', badge: 'Docs' },
       { name: 'Grading / Collectibles', href: '/grading' },
     ],
   },
@@ -127,10 +132,12 @@ const categories: DocCategory[] = [
     icon: '⚡',
     desc: 'APIs, SDKs, and integrations.',
     items: [
-      { name: 'SDK Gateway', href: '/docs/sdk', badge: 'Docs' },
+      { name: 'SDK Gateway', href: '/docs/sdk-gateway', badge: 'Docs' },
       { name: 'Hephaestion Forge', href: '/docs/hephaestion-forge', badge: 'Docs' },
       { name: 'Daedalus Forge', href: '/docs/daedalus-forge', badge: 'Docs' },
       { name: 'Swarm Brain', href: '/docs/swarm-brain', badge: 'Docs' },
+      { name: 'Tool Discovery', href: '/docs/tool-discovery', badge: 'Docs' },
+      { name: 'Arcanum Templates', href: '/docs/arcanum', badge: 'Docs' },
       { name: 'SDK Quickstart', href: '/sdk/quickstart' },
       { name: 'App Forge', href: '/app-forge' },
       { name: 'Prompt Forge', href: '/prompt-forge' },
@@ -146,6 +153,8 @@ const categories: DocCategory[] = [
       { name: 'Incident Manager', href: '/docs/incident-manager', badge: 'Docs' },
       { name: 'Document Manager', href: '/docs/document-manager', badge: 'Docs' },
       { name: 'Workflow Automation', href: '/docs/workflow-automation', badge: 'Docs' },
+      { name: 'Fleet Commander', href: '/docs/fleet-commander', badge: 'Docs' },
+      { name: 'News Scraper', href: '/docs/news-scraper', badge: 'Docs' },
       { name: 'Vendor Manager', href: '/vendor-manager' },
     ],
   },
@@ -222,9 +231,9 @@ export default function DocsPage() {
           {/* Stats */}
           <div className="flex justify-center gap-8 mt-8 flex-wrap">
             {[
-              { value: '130+', label: 'Product Pages' },
-              { value: '33', label: 'Full User Manuals' },
-              { value: '106', label: 'Blog Articles' },
+              { value: '160+', label: 'Product Pages' },
+              { value: '52', label: 'Full User Manuals' },
+              { value: '142', label: 'Blog Articles' },
               { value: '10', label: 'Doc Categories' },
             ].map(s => (
               <div key={s.label} className="text-center">
@@ -326,7 +335,7 @@ export default function DocsPage() {
 
         {/* Footer */}
         <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
-          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 130+ products. 33 user manuals. 611K+ doctrines.</p>
+          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 160+ products. 52 user manuals. 646K+ doctrines.</p>
           <div className="flex justify-center gap-6 mt-3">
             <Link href="/" style={{ color: 'var(--ept-accent)' }}>Home</Link>
             <Link href="/blog" style={{ color: 'var(--ept-accent)' }}>Blog</Link>
