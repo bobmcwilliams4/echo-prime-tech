@@ -999,6 +999,8 @@ export default function HomePage() {
                   { label: 'Prometheus AI', href: '/prometheus-ai' },
                   { label: 'SDK Gateway Pro', href: '/sdk-gateway' },
                   { label: 'Bot Factory', href: '/bot-factory' },
+                  { label: 'Polymarket Intel', href: '/polymarket-intel' },
+                  { label: 'Runway', href: '/runway' },
                 ].map(item => (
                   <Link key={item.href} href={item.href} className="text-xs hover:opacity-80 transition-opacity" style={{ color: 'var(--ept-text-muted)' }}>{item.label}</Link>
                 ))}

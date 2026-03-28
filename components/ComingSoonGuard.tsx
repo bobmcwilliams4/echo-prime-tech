@@ -162,6 +162,7 @@ const EXEMPT_PREFIXES = [
   '/scrapers',           // Custom Scraper Factory (full product page)
   '/pipelines',          // Data Pipelines (full product page)
   '/runway',             // Echo Runway (AI Fashion Platform)
+  '/polymarket-intel',   // Polymarket Intel (Prediction Markets)
 
   // ── BLOCKED (redirect to /coming-soon): ──
   // '/orchestration'    — internal infra, redirect to /engines
