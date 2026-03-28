@@ -3,6 +3,11 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Echo Document Delivery — Print, PDF, Email & SMS Documents | Echo Prime Technologies',
   description: 'Universal document delivery system: generate branded invoices, estimates, and reports as HTML, PDF, email, or SMS. Token-based sharing, R2 cloud storage, and company branding customization.',
+  openGraph: {
+    title: 'Echo Document Delivery — Print, PDF, Email & SMS Documents',
+    description: 'Universal document delivery system: generate branded invoices, estimates, and reports as HTML, PDF, email, or SMS. Token-based sharing, R2 cloud storage, and company branding customization.',
+    url: 'https://echo-ept.com/document-delivery',
+  },
   twitter: {
     card: 'summary_large_image',
     title: 'Echo Document Delivery — Print, PDF, Email & SMS Documents | Echo Prime Technologies',
