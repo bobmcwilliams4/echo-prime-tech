@@ -66,6 +66,12 @@ export default function ImmortalityVaultPage() {
 
   return (
     <>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Immortality Vault - Echo Prime Technologies</h1>
+          <p>Preserve your loved ones forever with AI voice cloning, memory capture sessions, personality engine, and life story timeline. Capture voice, memories, and wisdom so you can talk to them anytime. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <FaqSchema faqs={FAQS} />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Immortality Vault', href: '/immortality-vault' }]} />
 

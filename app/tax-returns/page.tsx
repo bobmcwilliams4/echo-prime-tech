@@ -485,6 +485,12 @@ function TaxReturnPageContent() {
 
   return (
     <div data-tutorial="tax-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Tax Intelligence &amp; Preparation - Echo Prime Technologies</h1>
+          <p>AI-powered tax preparation with 14 specialized Tax Intelligence Engines that analyze your situation against the full Internal Revenue Code. Automated document extraction, deduction optimization, audit risk scoring, and licensed preparer review. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Products',href:'/services'},{name:'Tax Intelligence',href:'/tax-returns'}]} />
       <FaqSchema faqs={[
         { q: 'How does AI tax preparation actually work?', a: 'You upload your tax documents (W-2s, 1099s, receipts) and our system extracts all data automatically using OCR and AI classification. 14 specialized Tax Intelligence Engines then analyze your situation against the full Internal Revenue Code, identifying every applicable deduction, credit, and optimization strategy before generating your complete return.' },

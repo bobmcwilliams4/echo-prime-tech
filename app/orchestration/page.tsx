@@ -18,6 +18,12 @@ export default function RedirectPage() {
   useEffect(() => { router.replace('/engines'); }, [router]);
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Workflow Orchestration - Echo Prime Technologies</h1>
+          <p>Automate multi-step business processes including data pipelines, approval chains, API integrations, and scheduled tasks on Cloudflare's edge network with sub-50ms latency. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Orchestration', href: '/orchestration' }]} />
       <FaqSchema faqs={FAQS} />
       <p>Redirecting...</p>

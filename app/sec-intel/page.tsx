@@ -38,6 +38,12 @@ export default function SecIntelPage() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--ept-bg)' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>SEC Intelligence - Echo Prime Technologies</h1>
+          <p>Real-time SEC filing surveillance, insider trading detection, and compliance analytics powered by AI-driven pipelines. Monitor 10-K, 10-Q, 8-K, Form 4, and 13F filings with sub-15-second latency. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'SEC Intel', href: '/sec-intel' }]} />
       <FaqSchema faqs={FAQS} />
       {/* Nav */}

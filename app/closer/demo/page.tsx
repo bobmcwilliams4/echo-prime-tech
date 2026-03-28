@@ -237,6 +237,12 @@ export default function CloserDemoPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>AI Sales Agent Demo - Echo Prime Technologies</h1>
+          <p>Interactive demo of the AI Closer platform featuring autonomous voice sales agents with ElevenLabs voice AI, CRM integration, and real-time call analytics. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       {/* Hero / Demo Mode Banner */}
       <div className="border-b" style={{ borderColor: 'var(--ept-border)' }}>
         <div className="max-w-6xl mx-auto px-6 py-8">

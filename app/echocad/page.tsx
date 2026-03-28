@@ -84,6 +84,12 @@ export default function EchoCADPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>EchoCAD - Echo Prime Technologies</h1>
+          <p>AI-powered CAD automation platform featuring AI drafting, parametric design generation, structural analysis, tolerance optimization, and export to DXF/DWG/STEP formats. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'EchoCAD', href: '/echocad' }]} />
       <FaqSchema faqs={FAQS} />
 

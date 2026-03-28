@@ -67,6 +67,12 @@ export default function OfficeAiPage() {
 
   return (
     <>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Office AI Platform - Echo Prime Technologies</h1>
+          <p>Complete AI-powered business operations platform with 22 modules including invoicing, payroll, HR, inventory, CRM, helpdesk, contracts, email marketing, and more — all in one platform starting at $49/mo. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <FaqSchema faqs={FAQS} />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Office AI', href: '/office-ai' }]} />
 

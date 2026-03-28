@@ -233,6 +233,12 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Pricing - Echo Prime Technologies</h1>
+          <p>Transparent pricing for all Echo Prime products including AI Sales Agent, Intelligence Engines, Collectibles Grading, Surveillance, EchoCAD, Office AI, and more. Free tiers available with no credit card required. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <FaqSchema faqs={PRICING_FAQS} name="Echo Prime Technology Pricing FAQ" />
       <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Pricing',href:'/pricing'}]} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />

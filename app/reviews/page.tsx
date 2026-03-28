@@ -58,6 +58,12 @@ export default function ReviewsPage() {
   const { isDark } = useTheme();
   return (
     <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)', minHeight: '100vh' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Echo Reviews - Echo Prime Technologies</h1>
+          <p>Automated review collection, AI sentiment analysis, response suggestions, embeddable widgets, and competitor tracking to turn happy customers into your best marketing. Starting at $14/mo. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <FaqSchema faqs={FAQS} />
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/pricing' }, { name: 'Reviews', href: '/reviews' }]} />
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>

@@ -73,6 +73,12 @@ export default function RewardsPage() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Echo Coin Rewards - Echo Prime Technologies</h1>
+          <p>Earn Echo Coins for every interaction with Echo Prime products. Stake for up to 15% APY, climb membership tiers from Bronze to Sovereign, and redeem for platform discounts. Deployed on Base (Coinbase L2). Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Rewards', href: '/rewards' }]} />
       <FaqSchema faqs={FAQS} />
 

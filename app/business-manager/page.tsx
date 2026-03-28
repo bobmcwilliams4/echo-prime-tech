@@ -22,6 +22,12 @@ export default function BusinessManagerRedirect() {
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Echo Business Manager - Echo Prime Technologies</h1>
+          <p>Echo Business Manager is now Echo Office AI — a complete AI-powered business operations platform with 22 modules including phone systems, invoicing, CRM, employee management, bookings, and analytics. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Business Manager', href: '/business-manager' }]} />
       <FaqSchema faqs={FAQS} />
       <p className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>Redirecting to Echo Office AI...</p>

@@ -3519,6 +3519,12 @@ function GradingLanding() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Collectibles Grading - Echo Prime Technologies</h1>
+          <p>AI-powered collectibles grading using 5 vision models (Claude Opus, GPT-4o, Gemini, Grok, Qwen) across 19 collectible types including comics, trading cards, coins, and more. Instant results with eBay integration for one-click listing. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority /></Link>

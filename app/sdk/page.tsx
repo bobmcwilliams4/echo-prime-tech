@@ -343,6 +343,12 @@ export default function SDKPage() {
 
   return (
     <div style={{ color: textPrimary, minHeight: '100vh' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Echo Prime SDK - Echo Prime Technologies</h1>
+          <p>Developer SDK and API gateway for integrating Echo Prime Intelligence Engines, Sentinel AI, Knowledge Forge, and 50+ services into your applications. TypeScript, Python, and cURL support with instant API key provisioning. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <FaqSchema faqs={FAQS} name="Echo Prime SDK Developer FAQ" />
       <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Developers',href:'/sdk'},{name:'SDK Gateway',href:'/sdk'}]} />
       {/* ═══════════════ NAVIGATION ═══════════════ */}

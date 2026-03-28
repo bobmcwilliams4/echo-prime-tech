@@ -411,6 +411,12 @@ export default function TutorialPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Closer AI Tutorial - Echo Prime Technologies</h1>
+          <p>Step-by-step tutorials to learn the AI Sales Agent platform, from setup to booking your first appointment. Built for real salespeople with no tech jargon. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       {/* Nav bar */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <div className="flex items-center gap-4">

@@ -112,6 +112,12 @@ export default function SurveillancePage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Prometheus Surveillance - Echo Prime Technologies</h1>
+          <p>AI-powered intelligence and physical monitoring platform with GPS tracking, cell tower triangulation, IP intelligence, camera integration, network interception, and predictive analytics. Built for authorized security professionals. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Surveillance', href: '/surveillance' }]} />
       <FaqSchema faqs={FAQS} />
       {/* Nav */}

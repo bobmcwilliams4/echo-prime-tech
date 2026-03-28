@@ -211,6 +211,12 @@ export default function EnginesPage() {
 
   return (
     <div data-tutorial="engines-hero" className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
+      <noscript>
+        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
+          <h1>Intelligence Engines - Echo Prime Technologies</h1>
+          <p>Over 5,500 domain-specific AI engines across 40+ domains including Tax Intelligence, Legal Analysis, Drilling Engineering, Cybersecurity, and more. Each engine returns defensible, citation-backed answers grounded in real doctrine. Visit echo-ept.com for the full interactive experience.</p>
+        </div>
+      </noscript>
       <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Products',href:'/services'},{name:'AI Engines',href:'/engines'}]} />
       <FaqSchema faqs={ENGINE_FAQS} name="Echo Intelligence Engines FAQ" />
       {/* Nav */}
