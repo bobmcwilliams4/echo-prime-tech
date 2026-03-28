@@ -69,7 +69,7 @@ const categories: DocCategory[] = [
       { name: 'Recruiting', href: '/docs/recruiting', badge: 'Docs' },
       { name: 'Calendar', href: '/docs/calendar', badge: 'Docs' },
       { name: 'Affiliate', href: '/docs/affiliate', badge: 'Docs' },
-      { name: 'Inventory', href: '/inventory' },
+      { name: 'Inventory', href: '/docs/inventory', badge: 'Docs' },
     ],
   },
   {
@@ -83,9 +83,14 @@ const categories: DocCategory[] = [
       { name: 'Social Media', href: '/docs/social-media', badge: 'Docs' },
       { name: 'Live Chat', href: '/docs/live-chat', badge: 'Docs' },
       { name: 'Signatures', href: '/docs/signatures', badge: 'Docs' },
-      { name: 'Surveys', href: '/surveys' },
-      { name: 'Forms', href: '/forms' },
-      { name: 'LMS / Courses', href: '/lms' },
+      { name: 'Newsletter', href: '/docs/newsletter', badge: 'Docs' },
+      { name: 'Surveys', href: '/docs/surveys', badge: 'Docs' },
+      { name: 'Forms', href: '/docs/forms', badge: 'Docs' },
+      { name: 'LMS / Courses', href: '/docs/lms', badge: 'Docs' },
+      { name: 'Feedback Board', href: '/docs/feedback-board', badge: 'Docs' },
+      { name: 'Link Shortener', href: '/docs/link-shortener', badge: 'Docs' },
+      { name: 'Waitlist', href: '/docs/waitlist', badge: 'Docs' },
+      { name: 'Web Analytics', href: '/docs/web-analytics', badge: 'Docs' },
     ],
   },
   {
@@ -174,6 +179,7 @@ const categories: DocCategory[] = [
       { name: 'Gamer Companion', href: '/docs/gamer-companion', badge: 'Docs' },
       { name: 'Coin Rewards', href: '/docs/coin-rewards', badge: 'Docs' },
       { name: 'Price Alerts', href: '/docs/price-alerts', badge: 'Docs' },
+      { name: 'Podcast', href: '/docs/podcast', badge: 'Docs' },
       { name: 'Bree Assistant', href: '/bree-assistant' },
     ],
   },
@@ -237,7 +243,7 @@ export default function DocsPage() {
           <div className="flex justify-center gap-8 mt-8 flex-wrap">
             {[
               { value: '160+', label: 'Product Pages' },
-              { value: '62', label: 'Full User Manuals' },
+              { value: '72', label: 'Full User Manuals' },
               { value: '142', label: 'Blog Articles' },
               { value: '10', label: 'Doc Categories' },
             ].map(s => (
@@ -340,7 +346,7 @@ export default function DocsPage() {
 
         {/* Footer */}
         <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
-          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 160+ products. 62 user manuals. 646K+ doctrines.</p>
+          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 160+ products. 72 user manuals. 646K+ doctrines.</p>
           <div className="flex justify-center gap-6 mt-3">
             <Link href="/" style={{ color: 'var(--ept-accent)' }}>Home</Link>
             <Link href="/blog" style={{ color: 'var(--ept-accent)' }}>Blog</Link>
