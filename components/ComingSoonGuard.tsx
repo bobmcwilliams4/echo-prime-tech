@@ -119,6 +119,9 @@ const EXEMPT_PREFIXES = [
   '/phoenix-cloud',      // Echo Phoenix Cloud
   '/report-generator',   // Echo Report Generator
   '/analytics-engine',   // Echo Analytics Engine
+  '/document-delivery',  // Echo Document Delivery
+  '/autonomous-builder', // Echo Autonomous Builder
+  '/diagnostics',        // Echo Diagnostics Agent
 
   // ── Documentation pages ──
   '/docs',               // Documentation Hub + all sub-routes
