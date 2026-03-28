@@ -1,7 +1,7 @@
 'use client';
 import FaqSchema from '../../components/FaqSchema';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../lib/auth-context';
@@ -210,6 +210,21 @@ export default function PricingPage() {
       .then(d => { setServices(d.services); if (d.services.length > 0) setActiveService(d.services[0].id); })
       .catch(() => { setServices(FALLBACK_SERVICES); setActiveService(FALLBACK_SERVICES[0].id); });
   }, []);
+
+  // Auto-start trial after redirect from signup (handles /pricing?trial=sentinel&tier=pro)
+  const trialAutoStarted = useRef(false);
+  useEffect(() => {
+    if (trialAutoStarted.current || !user || loading) return;
+    const params = new URLSearchParams(window.location.search);
+    const trialService = params.get('trial');
+    const trialTier = params.get('tier');
+    if (trialService && trialTier) {
+      trialAutoStarted.current = true;
+      handleTrial(trialService, trialTier);
+      // Clean URL without reload
+      window.history.replaceState({}, '', '/pricing');
+    }
+  }, [user, loading]);
 
   const current = services.find(s => s.id === activeService);
 
