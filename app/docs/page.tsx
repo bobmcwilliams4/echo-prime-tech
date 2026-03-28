@@ -62,10 +62,14 @@ const categories: DocCategory[] = [
       { name: 'Finance AI', href: '/docs/finance-ai', badge: 'Docs' },
       { name: 'HR Management', href: '/hr' },
       { name: 'Project Management', href: '/project-manager' },
-      { name: 'Payroll', href: '/payroll' },
+      { name: 'Payroll', href: '/docs/payroll', badge: 'Docs' },
+      { name: 'Contracts', href: '/docs/contracts', badge: 'Docs' },
+      { name: 'Proposals', href: '/docs/proposals', badge: 'Docs' },
+      { name: 'Compliance', href: '/docs/compliance', badge: 'Docs' },
+      { name: 'Recruiting', href: '/docs/recruiting', badge: 'Docs' },
+      { name: 'Calendar', href: '/docs/calendar', badge: 'Docs' },
+      { name: 'Affiliate', href: '/docs/affiliate', badge: 'Docs' },
       { name: 'Inventory', href: '/inventory' },
-      { name: 'Contracts', href: '/contracts' },
-      { name: 'Proposals', href: '/proposals' },
     ],
   },
   {
@@ -76,8 +80,9 @@ const categories: DocCategory[] = [
       { name: 'Closer AI Sales', href: '/docs/closer', badge: 'Docs' },
       { name: 'A/B Testing', href: '/docs/ab-testing', badge: 'Docs' },
       { name: 'Email Marketing', href: '/docs/email-marketing', badge: 'Docs' },
-      { name: 'Social Media', href: '/social-media' },
-      { name: 'Live Chat', href: '/live-chat' },
+      { name: 'Social Media', href: '/docs/social-media', badge: 'Docs' },
+      { name: 'Live Chat', href: '/docs/live-chat', badge: 'Docs' },
+      { name: 'Signatures', href: '/docs/signatures', badge: 'Docs' },
       { name: 'Surveys', href: '/surveys' },
       { name: 'Forms', href: '/forms' },
       { name: 'LMS / Courses', href: '/lms' },
@@ -232,7 +237,7 @@ export default function DocsPage() {
           <div className="flex justify-center gap-8 mt-8 flex-wrap">
             {[
               { value: '160+', label: 'Product Pages' },
-              { value: '52', label: 'Full User Manuals' },
+              { value: '62', label: 'Full User Manuals' },
               { value: '142', label: 'Blog Articles' },
               { value: '10', label: 'Doc Categories' },
             ].map(s => (
@@ -335,7 +340,7 @@ export default function DocsPage() {
 
         {/* Footer */}
         <footer className="border-t py-8 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
-          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 160+ products. 52 user manuals. 646K+ doctrines.</p>
+          <p>&copy; {new Date().getFullYear()} Echo Prime Technologies. 160+ products. 62 user manuals. 646K+ doctrines.</p>
           <div className="flex justify-center gap-6 mt-3">
             <Link href="/" style={{ color: 'var(--ept-accent)' }}>Home</Link>
             <Link href="/blog" style={{ color: 'var(--ept-accent)' }}>Blog</Link>
