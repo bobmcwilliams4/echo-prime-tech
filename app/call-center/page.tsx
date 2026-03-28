@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '@/components/BreadcrumbSchema';
+import FaqSchema from '@/components/FaqSchema';
 
 /* ══════════════════════════════════════════════════════════════
    DATA
@@ -475,6 +476,16 @@ export default function CallCenterPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Call Center', href: '/call-center' }]} />
+      <FaqSchema faqs={[
+        { q: 'Do I need my own Twilio account?', a: 'Yes, bring your own Twilio account and phone numbers. We handle all the routing logic, AI, and call management — Twilio handles the telephony.' },
+        { q: 'Can AI agents handle complex conversations?', a: 'Absolutely. Our AI agents use the Echo Chat engine with branching scripts, objection handling, sentiment detection, and ElevenLabs voice cloning for natural conversations.' },
+        { q: 'How does VIP routing work?', a: 'When a known VIP caller dials in, the system auto-detects them from your contacts database, skips the queue, and routes directly to their preferred agent.' },
+        { q: 'What happens when all agents are busy?', a: 'Callers can opt for a callback by pressing 1 while on hold. The system auto-schedules the callback and dials them back when an agent is free.' },
+        { q: 'Is this TCPA compliant?', a: 'Yes. The compliance engine enforces recording consent announcements, time-zone restrictions (no calls before 8am or after 9pm local), DNC enforcement, and maintains a full audit trail.' },
+        { q: 'Can I integrate with my CRM?', a: 'Yes. Set up HMAC-signed webhooks that fire on any event — call completed, voicemail received, SLA breach, etc. Push real-time data to Salesforce, HubSpot, or any system.' },
+        { q: 'How fast can I set up?', a: 'Most customers are live within 24 hours. Connect Twilio numbers, configure queues and AI agents, import leads, and start taking calls.' },
+        { q: 'What is the AI Closer vs Call Center?', a: 'AI Closer is our solo sales agent — great for small teams handling up to 50 concurrent calls. AI Call Center is the enterprise version with unlimited scale, queues, VIP routing, and full compliance.' },
+      ]} />
       {/* Nav */}
       <nav
         className="border-b px-6 py-4 flex items-center justify-between sticky top-0 z-40"

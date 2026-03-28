@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import FaqSchema from '../../components/FaqSchema';
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    Free Tier — Conversion Landing Page
@@ -122,6 +123,13 @@ export default function FreePage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
       <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Free Tier', href: '/free' }]} />
+      <FaqSchema faqs={[
+        { q: 'Is the free tier really free forever?', a: 'Yes. The free tier has no expiration date. Use it as long as you want. We only charge when you upgrade to access higher limits or premium features.' },
+        { q: 'Do I need a credit card to sign up?', a: 'No. Sign up with just your email address. No credit card, no payment info, no commitments.' },
+        { q: 'What happens if I hit my free tier limits?', a: 'Your requests will return a rate limit response (HTTP 429). Your data and configuration are preserved — just upgrade your plan or wait for the daily reset.' },
+        { q: 'Can I use the free tier for commercial projects?', a: 'Yes. The free tier can be used for any purpose, including commercial applications. Attribution is appreciated but not required.' },
+        { q: 'How do I upgrade?', a: 'Run `echo upgrade` in the CLI or visit the pricing page. Upgrades take effect immediately with prorated billing.' },
+      ]} />
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
         <Link href="/">
