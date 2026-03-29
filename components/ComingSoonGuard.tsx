@@ -163,6 +163,7 @@ const EXEMPT_PREFIXES = [
   '/pipelines',          // Data Pipelines (full product page)
   '/runway',             // Echo Runway (AI Fashion Platform)
   '/polymarket-intel',   // Polymarket Intel (Prediction Markets)
+  '/surface-landman',    // Echo Surface Landman (ROW Acquisition)
 
   // ── BLOCKED (redirect to /coming-soon): ──
   // '/orchestration'    — internal infra, redirect to /engines

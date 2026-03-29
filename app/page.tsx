@@ -928,6 +928,7 @@ export default function HomePage() {
                   { label: 'Web Analytics', href: '/web-analytics' },
                   { label: 'Title Intelligence', href: '/title-intelligence' },
                   { label: 'Permian Basin AI', href: '/permian' },
+                  { label: 'Surface Landman', href: '/surface-landman' },
                   { label: 'Tax Preparation', href: '/tax-returns' },
                   { label: 'Sentinel AI', href: '/sentinel' },
                   { label: 'Voice Studio', href: '/voice' },
