@@ -6,13 +6,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
 import { BLOG_POSTS, CATEGORIES, formatDate } from './blog-data';
+import NewsletterSignup from '../../components/NewsletterSignup';
 
 export default function BlogPage() {
   const { isDark } = useTheme();
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const filtered = useMemo(() => {
     let posts = activeCategory === 'All' ? BLOG_POSTS : BLOG_POSTS.filter(p => p.category === activeCategory);
@@ -146,62 +145,8 @@ export default function BlogPage() {
         </div>
 
         {/* Newsletter CTA */}
-        <div className="mt-16 p-10 rounded-2xl text-center" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
-          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>Stay ahead of the curve</h2>
-          <p className="text-sm mb-6 max-w-lg mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
-            Get weekly technical deep-dives on AI engineering, oilfield automation, tax intelligence, and more. No spam, no fluff — just real insights from production systems.
-          </p>
-          {newsletterStatus === 'success' ? (
-            <div className="py-4 px-6 rounded-xl inline-block" style={{ backgroundColor: isDark ? '#14b8a620' : '#0d737720' }}>
-              <p className="text-sm font-semibold" style={{ color: 'var(--ept-accent)' }}>You&apos;re in! Watch your inbox for our next deep-dive.</p>
-            </div>
-          ) : (
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                if (!newsletterEmail || !newsletterEmail.includes('@')) return;
-                setNewsletterStatus('loading');
-                try {
-                  const res = await fetch('https://ept-api.bmcii1976.workers.dev/api/leads', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: newsletterEmail, source: 'blog_newsletter', page: '/blog' }),
-                  });
-                  if (res.ok) {
-                    setNewsletterStatus('success');
-                    setNewsletterEmail('');
-                  } else {
-                    setNewsletterStatus('error');
-                  }
-                } catch {
-                  setNewsletterStatus('error');
-                }
-              }}
-              className="flex justify-center gap-3 max-w-md mx-auto"
-            >
-              <input
-                type="email"
-                required
-                value={newsletterEmail}
-                onChange={(e) => { setNewsletterEmail(e.target.value); if (newsletterStatus === 'error') setNewsletterStatus('idle'); }}
-                placeholder="your@email.com"
-                className="flex-1 px-4 py-3 rounded-xl text-sm outline-none border"
-                style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: newsletterStatus === 'error' ? '#ef4444' : 'var(--ept-border)', color: 'var(--ept-text)' }}
-              />
-              <button
-                type="submit"
-                disabled={newsletterStatus === 'loading'}
-                className="px-6 py-3 rounded-xl font-semibold text-sm text-white whitespace-nowrap transition-opacity"
-                style={{ backgroundColor: 'var(--ept-accent)', opacity: newsletterStatus === 'loading' ? 0.7 : 1 }}
-              >
-                {newsletterStatus === 'loading' ? 'Subscribing...' : 'Subscribe'}
-              </button>
-            </form>
-          )}
-          {newsletterStatus === 'error' && (
-            <p className="text-xs mt-2" style={{ color: '#ef4444' }}>Something went wrong. Please try again.</p>
-          )}
-          <p className="text-xs mt-3" style={{ color: 'var(--ept-text-muted)' }}>Join 500+ engineers and operators. Unsubscribe anytime.</p>
+        <div className="mt-16 max-w-xl mx-auto">
+          <NewsletterSignup />
         </div>
 
         {/* Footer CTA */}

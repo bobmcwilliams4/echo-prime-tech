@@ -8,6 +8,7 @@ import { useTheme } from '../lib/theme-context';
 import { SmokeDivider } from '../components/ParticleBackground';
 import ReadAloudButton from '../components/ReadAloudButton';
 import { Menu, X } from 'lucide-react';
+import NewsletterSignup from '../components/NewsletterSignup';
 
 interface LiveStats {
   engines: string;
@@ -872,6 +873,13 @@ export default function HomePage() {
             <span className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>No credit card required</span>
             <a href="mailto:bob@echo-op.com" className="text-sm underline" style={{ color: 'var(--ept-accent)' }}>Enterprise inquiries</a>
           </div>
+        </div>
+      </section>
+
+      {/* ─── Newsletter ─── */}
+      <section className="py-16 px-6">
+        <div className="max-w-xl mx-auto">
+          <NewsletterSignup />
         </div>
       </section>
 
