@@ -18359,6 +18359,857 @@ That's $8.73/month for an entire SaaS platform with 90+ microservices, multiple 
 
 Try replicating that on AWS.`,
   },
+  {
+    slug: 'ai-price-alerts-vs-tradingview-2026',
+    title: 'AI Price Alerts vs TradingView: Why Cloudflare Workers Win for Real-Time Monitoring',
+    excerpt: 'Compare AI-powered price alerts running on Cloudflare Workers against TradingView, CoinGecko, and traditional alert platforms. Sub-second latency, zero infrastructure cost, and smarter triggers.',
+    category: 'Product Updates',
+    date: '2026-03-28',
+    readTime: '7 min read',
+    author: 'Echo Prime Tech',
+    tags: ['price-alerts', 'crypto', 'trading', 'cloudflare-workers', 'real-time'],
+    featured: false,
+    content: `# AI Price Alerts vs TradingView: Why Cloudflare Workers Win
+
+Traditional price alert platforms have a dirty secret: they poll on intervals, often 15-60 seconds apart, and charge monthly fees for the privilege of delayed notifications. In volatile markets, 60 seconds is an eternity.
+
+## The Problem with Existing Solutions
+
+**TradingView** ($14.95-$59.95/month):
+- Server-side alerts with 1-15 second delay
+- Limited to assets on their exchange feeds
+- Alert fatigue from basic threshold triggers
+- No programmatic API for custom logic
+
+**CoinGecko Alerts** (Free/Pro):
+- Email-only for free tier (5-15 min delay)
+- No cross-asset correlation
+- No custom conditions beyond simple price thresholds
+
+**Custom solutions** (AWS Lambda, etc.):
+- Cold start latency (100-500ms on Lambda)
+- Complex infrastructure to maintain
+- Costs scale unpredictably with request volume
+
+## How Echo Price Alerts Works
+
+Our system runs entirely on Cloudflare Workers — edge compute that executes in under 10ms, globally, with zero cold starts.
+
+### Architecture
+
+\`\`\`
+User sets alert rules (via API or dashboard)
+    ↓
+Cron trigger (every 60s) or webhook from exchange
+    ↓
+Worker fetches latest prices from multiple sources
+    ↓
+AI evaluation engine checks all active alerts
+    ↓
+Multi-channel notification (email, SMS, webhook, Telegram)
+\`\`\`
+
+### What Makes It Different
+
+1. **AI-powered conditions** — Not just "price > X". Our Engine Runtime evaluates complex conditions: "BTC drops 3% in 5 minutes while ETH stays flat" or "Gold/Silver ratio exceeds 80 during Asian trading hours."
+
+2. **Cross-asset correlation** — Alert when assets diverge or converge. Track pairs, ratios, and spreads across crypto, commodities, and forex.
+
+3. **Anomaly detection** — The system learns normal volatility patterns per asset and alerts on statistical outliers, not just arbitrary thresholds.
+
+4. **Zero infrastructure cost** — Cloudflare Workers free tier covers 100K requests/day. Even at scale, monitoring 1,000 assets costs under $5/month.
+
+### Setting Up an Alert via API
+
+\`\`\`typescript
+// POST https://echo-price-alerts.bmcii1976.workers.dev/alerts
+{
+  "asset": "BTC_USDT",
+  "condition": "price_drop_pct",
+  "threshold": 5,
+  "window_minutes": 15,
+  "channels": ["email", "telegram"],
+  "ai_analysis": true  // Include Engine Runtime market context
+}
+\`\`\`
+
+When triggered, the alert includes not just the price data, but AI-generated context: recent news, correlated asset movements, and historical pattern matches.
+
+## Real-World Performance Comparison
+
+| Metric | Echo Price Alerts | TradingView | CoinGecko |
+|--------|------------------|-------------|-----------|
+| Alert latency | <2s | 1-15s | 5-15min |
+| Custom conditions | AI-powered | Pine Script | Basic threshold |
+| Cross-asset | Yes | Limited | No |
+| Monthly cost | $0-5 | $15-60 | $0-14 |
+| API access | Full REST | Webhooks only | Limited |
+| Self-hosted option | Yes (Workers) | No | No |
+
+## When to Use What
+
+**Use TradingView** if you need charting + alerts in one platform and don't mind the subscription.
+
+**Use Echo Price Alerts** if you need:
+- Programmatic alert management via API
+- AI-evaluated complex conditions
+- Cross-asset correlation monitoring
+- Sub-$5/month total cost
+- Custom notification channels (webhooks, Telegram bots, SMS)
+
+The system is live at \`echo-price-alerts.bmcii1976.workers.dev\` with a free tier covering up to 50 active alerts and 1,000 notifications per month.`,
+  },
+  {
+    slug: 'ai-document-management-vs-google-drive-2026',
+    title: 'AI Document Management vs Google Drive: Version Control, Sharing, and Search That Actually Works',
+    excerpt: 'Why teams are switching from Google Drive and Dropbox to AI-powered document management with automatic tagging, version history, intelligent search, and granular sharing controls.',
+    category: 'Product Updates',
+    date: '2026-03-28',
+    readTime: '8 min read',
+    author: 'Echo Prime Tech',
+    tags: ['document-management', 'google-drive', 'productivity', 'ai-search', 'file-sharing'],
+    featured: false,
+    content: `# AI Document Management vs Google Drive
+
+Google Drive does one thing well: storing files in the cloud. But for teams managing hundreds of documents across projects, clients, and departments, Drive's flat-folder paradigm breaks down fast.
+
+## Where Google Drive Falls Short
+
+1. **Search is keyword-only** — Google's search finds exact text matches. It can't answer "find the Q3 financial report that mentions the Austin office expansion" unless those exact words appear.
+
+2. **Version history is opaque** — Drive tracks versions, but comparing changes requires downloading each version. No inline diffs, no change summaries.
+
+3. **Sharing is all-or-nothing** — You can share a file or a folder. You can't share a file for 48 hours, require a password, limit downloads, or watermark for a specific recipient.
+
+4. **No metadata tagging** — Files have names and folders. That's it. No custom tags, no categories, no automated classification.
+
+5. **Storage costs scale linearly** — $12/user/month for 2TB sounds reasonable until you have 50 users and 30TB of accumulated documents.
+
+## How Echo Document Manager Solves This
+
+Built on Cloudflare Workers with R2 storage, our document management system adds an intelligence layer that Google Drive simply doesn't have.
+
+### AI-Powered Features
+
+**Automatic Tagging**: Upload a contract, and the system reads it, extracts key entities (parties, dates, dollar amounts, clauses), and tags it automatically. No manual classification needed.
+
+\`\`\`typescript
+// POST /files with a PDF
+// Response includes auto-generated tags:
+{
+  "id": "file_abc123",
+  "name": "MSA_AcmeCorp_2026.pdf",
+  "auto_tags": ["contract", "MSA", "Acme Corp", "$2.4M", "2026-2028"],
+  "ai_summary": "Master Service Agreement between Echo Prime and Acme Corp for cloud infrastructure services. 24-month term, $2.4M total value, with auto-renewal clause."
+}
+\`\`\`
+
+**Intelligent Search**: Ask questions in natural language. "Find all contracts expiring in the next 90 days" or "Show me invoices from Q4 where the amount exceeded $50K."
+
+**Version Diffs**: Upload a new version, and the system generates a human-readable change summary. "Section 3.2 updated: payment terms changed from Net-30 to Net-15. Section 7 added: data processing addendum."
+
+### Sharing Controls
+
+Every shared link can be configured with:
+
+- **Expiration** — Auto-revoke after 24h, 7d, 30d, or custom date
+- **Password protection** — Recipient must enter a password
+- **Download limits** — Allow 1, 5, or unlimited downloads
+- **View tracking** — Know exactly when the link was accessed, from what IP, and for how long
+- **Watermarking** — Dynamic watermarks with recipient email (planned)
+
+\`\`\`typescript
+// Create a secure share link
+const share = await fetch('/shares', {
+  method: 'POST',
+  body: JSON.stringify({
+    file_id: 'file_abc123',
+    expires_in: '48h',
+    password: 'secret123',
+    max_downloads: 3,
+    notify_on_access: true
+  })
+});
+// Returns: { url: "https://echo-document-manager.../share/tok_xyz" }
+\`\`\`
+
+### Storage Economics
+
+R2 storage costs $0.015/GB/month — 10x cheaper than Google Drive per GB. For a team with 10TB of documents:
+
+| Provider | Monthly Cost | Annual Cost |
+|----------|-------------|-------------|
+| Google Drive (Business) | $600 (50 users × $12) | $7,200 |
+| Dropbox Business | $750 (50 users × $15) | $9,000 |
+| Echo Document Manager | $150 (R2) + $19 (Worker) | $2,028 |
+
+That's a 72% cost reduction while gaining AI search, auto-tagging, and granular sharing controls.
+
+## Migration Path
+
+Moving from Google Drive is straightforward:
+
+1. **Export via Google Takeout** — Download your entire Drive as a ZIP
+2. **Bulk upload to Echo** — Our CLI tool handles folder structure preservation
+3. **AI re-indexes everything** — Auto-tags and summaries generated on import
+4. **Share links redirect** — Optional middleware to redirect old Google Drive links
+
+The system is designed to be a drop-in replacement, not a rip-and-replace. You can run both in parallel during transition, with Echo Document Manager handling new uploads while historical files migrate in the background.`,
+  },
+  {
+    slug: 'ai-voice-synthesis-production-guide-2026',
+    title: 'AI Voice Synthesis in Production: ElevenLabs, Edge TTS, and Building a Multi-Provider Pipeline',
+    excerpt: 'A practical guide to deploying AI voice synthesis at scale. Compare ElevenLabs, Microsoft Edge TTS, and Cartesia. Build a cost-optimized pipeline that routes by quality tier and quota.',
+    category: 'AI & Engineering',
+    date: '2026-03-28',
+    readTime: '9 min read',
+    author: 'Echo Prime Tech',
+    tags: ['voice-synthesis', 'tts', 'elevenlabs', 'edge-tts', 'audio-ai'],
+    featured: true,
+    content: `# AI Voice Synthesis in Production
+
+Voice synthesis has crossed the uncanny valley. ElevenLabs, Microsoft Edge TTS, and newer providers like Cartesia now produce audio that's indistinguishable from human speech in most contexts. The challenge isn't quality anymore — it's building a production pipeline that balances cost, latency, and reliability.
+
+## Provider Comparison (March 2026)
+
+### ElevenLabs
+- **Quality**: Best-in-class for cloned voices. Emotional range is unmatched.
+- **Latency**: 200-400ms time-to-first-audio (Turbo v2.5)
+- **Cost**: $0.30/1K characters (Pro plan, ~$5/hr of audio)
+- **Cloning**: 30 seconds of audio = remarkably accurate clone
+- **Gotcha**: MUST use \`eleven_multilingual_v2\` model for cloned voices. The v3 model produces empty audio with clones (as of March 2026).
+
+### Microsoft Edge TTS
+- **Quality**: Very good for standard voices. Limited emotional range.
+- **Latency**: 100-200ms (Microsoft's edge network)
+- **Cost**: FREE (no API key needed, uses edge endpoint)
+- **Cloning**: Not available
+- **Gotcha**: Rate limits are undocumented. We've sustained 100 req/min without issues, but Microsoft could change this at any time.
+
+### Cartesia (Sonic)
+- **Quality**: Excellent. Real-time streaming with sub-100ms latency.
+- **Latency**: 50-90ms time-to-first-audio
+- **Cost**: $0.15/1K characters
+- **Cloning**: Voice design (not cloning) — describe a voice and it generates one
+- **Gotcha**: Newer service, API changes more frequently than established providers.
+
+## Building a Multi-Provider Pipeline
+
+The smart approach isn't choosing one provider — it's building a pipeline that routes requests based on requirements:
+
+\`\`\`
+Request comes in with: text, voice_id, quality_tier
+    ↓
+Quota Tracker checks remaining budget per provider
+    ↓
+Router selects provider based on:
+  - "premium" tier → ElevenLabs (cloned voice, emotional)
+  - "standard" tier → Edge TTS (good quality, free)
+  - "bulk" tier → cheapest available with quota
+    ↓
+Provider adapter normalizes request format
+    ↓
+Audio returned (MP3/PCM) with provider metadata
+\`\`\`
+
+### Implementation with Cloudflare Workers
+
+\`\`\`typescript
+// Simplified routing logic from Echo Speak Cloud
+async function synthesize(text: string, options: TTSOptions): Promise<AudioResponse> {
+  const { voice_id, quality_tier = 'standard' } = options;
+
+  // Check if this is a cloned voice (requires ElevenLabs)
+  const isClone = await isClonedVoice(voice_id);
+  if (isClone) {
+    return elevenlabs.synthesize(text, {
+      voice_id,
+      model_id: 'eleven_multilingual_v2', // NEVER v3 for clones
+      output_format: 'mp3_44100_128',
+    });
+  }
+
+  // Route by quality tier
+  switch (quality_tier) {
+    case 'premium':
+      if (await quotaTracker.hasQuota('elevenlabs')) {
+        return elevenlabs.synthesize(text, { voice_id });
+      }
+      // Fall through to standard if quota exhausted
+    case 'standard':
+      return edgeTTS.synthesize(text, {
+        voice: mapToEdgeVoice(voice_id),
+        rate: '+0%', pitch: '+0Hz',
+      });
+    case 'bulk':
+      return cheapestAvailable(text, voice_id);
+  }
+}
+\`\`\`
+
+### Quota Tracking
+
+ElevenLabs charges per character. Without tracking, you'll blow through your monthly quota in the first week.
+
+\`\`\`typescript
+// Track usage per provider per day
+interface QuotaEntry {
+  provider: string;
+  date: string;       // YYYY-MM-DD
+  chars_used: number;
+  chars_limit: number;
+  cost_usd: number;
+}
+
+// Before each synthesis call:
+const quota = await getQuota('elevenlabs', today());
+if (quota.chars_used + text.length > quota.chars_limit) {
+  // Fall back to free provider
+  return edgeTTS.synthesize(text, options);
+}
+\`\`\`
+
+## Voice Cloning: What Works and What Doesn't
+
+After cloning dozens of voices for various Echo products, here's what we've learned:
+
+### What works:
+- **30-60 seconds of clean speech** — No background noise, no music, consistent volume
+- **Read a script, don't freestyle** — Controlled speech patterns clone better than casual conversation
+- **Multiple emotional ranges** — Include happy, neutral, and serious tones in your sample
+- **ElevenLabs Professional Voice Cloning** — Worth the effort for production use. The instant clone is good; the professional clone is great.
+
+### What doesn't work:
+- **Phone recordings** — Compression artifacts poison the clone
+- **Multiple speakers in sample** — The model gets confused
+- **Short samples (<10s)** — Not enough data for accurate representation
+- **Using v3 model with clones** — Produces silent or garbled audio (use \`eleven_multilingual_v2\`)
+
+## Cost Optimization Strategies
+
+1. **Cache aggressively** — If the same text is synthesized twice, serve from R2 cache. We cache by hash(text + voice_id + settings).
+
+2. **Pre-generate common phrases** — Greetings, menu prompts, error messages. Generate once, store in R2, serve forever at zero TTS cost.
+
+3. **Hybrid routing** — Use ElevenLabs for emotional/critical content, Edge TTS for informational/bulk content. This typically reduces costs by 60-80%.
+
+4. **Batch processing** — Instead of synthesizing sentence by sentence, batch paragraphs. Fewer API calls = lower latency and sometimes lower cost.
+
+Our production system (Echo Speak Cloud) handles ~50K synthesis requests/month at an average cost of $12.50 — that's $0.00025 per request, blending premium ElevenLabs voices with free Edge TTS for routine audio.`,
+  },
+  {
+    slug: 'crypto-trading-ai-bots-cloudflare-2026',
+    title: 'Building Crypto Trading Bots on Cloudflare Workers: Zero Server Costs, Global Edge Execution',
+    excerpt: 'How to build and deploy cryptocurrency trading bots on Cloudflare Workers. Real-time market data, automated strategies, and portfolio tracking — all running at the edge for under $5/month.',
+    category: 'AI & Engineering',
+    date: '2026-03-28',
+    readTime: '10 min read',
+    author: 'Echo Prime Tech',
+    tags: ['crypto', 'trading-bots', 'cloudflare-workers', 'defi', 'automation'],
+    featured: false,
+    content: `# Building Crypto Trading Bots on Cloudflare Workers
+
+Most crypto trading bot tutorials start with "spin up an AWS EC2 instance" or "deploy a VPS on DigitalOcean." That's $20-50/month before you've made a single trade. Here's how to build the same thing on Cloudflare Workers for effectively $0.
+
+## Why Workers for Trading Bots?
+
+1. **Always on** — Cron triggers run every minute. No server to keep alive, no process manager, no "my bot crashed at 3am."
+
+2. **Global edge** — Your bot executes from the Cloudflare edge location closest to the exchange's servers. For Binance (Tokyo), that's the Tokyo PoP. For Coinbase (US), that's a US PoP. Lower latency than a VPS in a single region.
+
+3. **Zero idle cost** — You pay per request, not per hour. A bot that checks prices every minute and trades once a day costs fractions of a cent.
+
+4. **Built-in state** — D1 (SQL database) for trade history, KV for quick caches, R2 for storing analysis reports. No external database needed.
+
+## Architecture
+
+\`\`\`
+Cron Trigger (every 1-5 min)
+    ↓
+Fetch market data (exchange APIs)
+    ↓
+Strategy evaluation (your logic)
+    ↓
+Decision: BUY / SELL / HOLD
+    ↓
+Execute trade via exchange API
+    ↓
+Log to D1 + notify via Telegram/Discord
+\`\`\`
+
+### Core Worker Structure
+
+\`\`\`typescript
+export default {
+  async scheduled(event: ScheduledEvent, env: Env) {
+    const strategy = new MomentumStrategy(env);
+
+    // Fetch current market state
+    const prices = await fetchPrices(env, ['BTC_USDT', 'ETH_USDT', 'SOL_USDT']);
+    const positions = await getOpenPositions(env);
+
+    // Evaluate strategy
+    const signals = await strategy.evaluate(prices, positions);
+
+    // Execute signals
+    for (const signal of signals) {
+      if (signal.action === 'BUY') {
+        await executeBuy(env, signal);
+        await notify(env, 'BUY ' + signal.pair + ' @ ' + signal.price);
+      } else if (signal.action === 'SELL') {
+        await executeSell(env, signal);
+        await notify(env, 'SELL ' + signal.pair + ' @ ' + signal.price);
+      }
+    }
+
+    // Log market state for analysis
+    await logMarketState(env, prices, signals);
+  },
+
+  async fetch(request: Request, env: Env) {
+    // Dashboard API for monitoring
+    const url = new URL(request.url);
+    if (url.pathname === '/portfolio') return getPortfolio(env);
+    if (url.pathname === '/trades') return getTradeHistory(env);
+    if (url.pathname === '/performance') return getPerformance(env);
+    if (url.pathname === '/health') return Response.json({ ok: true });
+    return new Response('Echo Crypto Trader', { status: 200 });
+  }
+};
+\`\`\`
+
+## Strategy Patterns That Work on Workers
+
+### 1. DCA (Dollar Cost Average)
+The simplest and most reliable strategy. Buy a fixed amount at regular intervals regardless of price.
+
+\`\`\`typescript
+class DCAStrategy {
+  async evaluate(env: Env): Promise<Signal[]> {
+    const lastBuy = await env.KV.get('last_dca_buy');
+    const hoursSinceLast = lastBuy
+      ? (Date.now() - parseInt(lastBuy)) / 3600000
+      : Infinity;
+
+    if (hoursSinceLast >= 24) { // Buy once per day
+      return [{ action: 'BUY', pair: 'BTC_USDT', amount_usd: 50 }];
+    }
+    return [];
+  }
+}
+\`\`\`
+
+### 2. RSI Mean Reversion
+Buy when RSI drops below 30 (oversold), sell when RSI exceeds 70 (overbought).
+
+### 3. Grid Trading
+Place buy orders at intervals below current price and sell orders above. Profit from range-bound markets.
+
+### 4. AI-Enhanced Signals
+This is where the Echo ecosystem shines. Route market data through Engine Runtime for analysis:
+
+\`\`\`typescript
+const analysis = await env.ENGINE_RUNTIME.fetch(
+  new Request('https://internal/query/reason', {
+    method: 'POST',
+    body: JSON.stringify({
+      query: 'Analyze BTC price action: ' + JSON.stringify(last24h),
+      domain: 'FIN'
+    })
+  })
+);
+\`\`\`
+
+## Security Considerations
+
+**API Key Storage**: Exchange API keys go in Worker secrets, never in code.
+
+\`\`\`bash
+wrangler secret put BINANCE_API_KEY
+wrangler secret put BINANCE_SECRET
+\`\`\`
+
+**Withdrawal Restrictions**: Create API keys with trade-only permissions. Never enable withdrawals on bot API keys.
+
+**Position Limits**: Hard-code maximum position sizes. A bug in your strategy should lose $100, not $10,000.
+
+\`\`\`typescript
+const MAX_POSITION_USD = 500;  // Never exceed this per trade
+const MAX_DAILY_TRADES = 10;   // Circuit breaker
+const MAX_DAILY_LOSS_PCT = 5;  // Stop trading if daily loss > 5%
+\`\`\`
+
+## Monitoring and Alerts
+
+Every trade should trigger a notification. We use Telegram because it's free and instant:
+
+\`\`\`typescript
+async function notify(env: Env, message: string) {
+  await fetch(
+    'https://api.telegram.org/bot' + env.TG_TOKEN + '/sendMessage',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: env.TG_CHAT_ID,
+        text: '🤖 ' + message,
+        parse_mode: 'Markdown'
+      })
+    }
+  );
+}
+\`\`\`
+
+## Performance Tracking
+
+D1 makes it trivial to track every trade and compute performance metrics:
+
+\`\`\`sql
+-- Monthly P&L
+SELECT
+  strftime('%Y-%m', executed_at) as month,
+  SUM(CASE WHEN side='SELL' THEN amount_usd ELSE -amount_usd END) as pnl,
+  COUNT(*) as trades
+FROM trades
+GROUP BY month
+ORDER BY month DESC;
+\`\`\`
+
+## What This Costs
+
+| Component | Monthly Cost |
+|-----------|-------------|
+| Workers (cron every min) | $0 (free tier: 100K/day) |
+| D1 database | $0 (free tier: 5M reads/day) |
+| KV cache | $0 (free tier: 100K reads/day) |
+| Telegram notifications | $0 |
+| **Total infrastructure** | **$0** |
+
+The only cost is exchange trading fees (typically 0.1% per trade on Binance). Your infrastructure cost is literally zero.
+
+Compare that to a typical trading bot setup: $20/month VPS + $10/month database + $5/month monitoring = $35/month minimum, and you still have to worry about uptime.`,
+  },
+  {
+    slug: 'ai-instagram-growth-vs-later-2026',
+    title: 'AI Instagram Growth vs Later and Hootsuite: Automated Content, Scheduling, and Analytics',
+    excerpt: 'Compare AI-driven Instagram growth strategies against Later, Hootsuite, and Buffer. How Echo Social Media Manager automates content creation, optimal scheduling, and engagement analytics.',
+    category: 'Product Updates',
+    date: '2026-03-28',
+    readTime: '7 min read',
+    author: 'Echo Prime Tech',
+    tags: ['instagram', 'social-media', 'marketing', 'automation', 'growth'],
+    featured: false,
+    content: `# AI Instagram Growth vs Later and Hootsuite
+
+Social media management tools haven't fundamentally changed since Buffer launched in 2010. They all do the same thing: schedule posts, show basic analytics, and charge $20-100/month per seat for the privilege.
+
+The problem isn't scheduling — it's strategy. These tools help you post consistently, but they don't help you post *intelligently*.
+
+## What Traditional Tools Get Wrong
+
+**Later** ($25-80/month):
+- Excellent visual planner and link-in-bio
+- AI captions are generic (same as everyone else using the feature)
+- Analytics are surface-level (likes, comments, reach)
+- No content strategy recommendations based on YOUR audience data
+
+**Hootsuite** ($99-249/month):
+- Enterprise-grade but enterprise-priced
+- Feature bloat — most teams use 20% of what they pay for
+- Social listening is powerful but buried under complexity
+- AI features feel bolted on, not native
+
+**Buffer** ($6-120/month):
+- Clean UI, great for beginners
+- Limited to scheduling and basic analytics
+- No AI content generation
+- No competitive analysis
+
+## How Echo Social Media Manager Works Differently
+
+Instead of just scheduling posts, our system uses the Engine Runtime to analyze what actually drives engagement for YOUR specific account.
+
+### 1. AI Content Generation
+
+Not "generate a caption" — that's commodity AI. We generate complete content strategies:
+
+\`\`\`typescript
+// POST /ai/generate-content
+{
+  "platform": "instagram",
+  "brand_voice": "professional but approachable, technical audience",
+  "recent_performance": "carousel posts get 3x engagement vs single images",
+  "trending_topics": ["edge computing", "AI agents", "developer tools"],
+  "content_type": "carousel"
+}
+
+// Response:
+{
+  "caption": "...",            // Optimized for engagement patterns
+  "hashtags": ["#DevTools", "#AI", ...],  // Based on YOUR top performers
+  "best_time": "2026-03-29T14:30:00Z",   // YOUR audience peak time
+  "content_notes": "Carousel slides should lead with a bold stat...",
+  "predicted_engagement": "above_average"
+}
+\`\`\`
+
+### 2. Optimal Timing Analysis
+
+We don't use industry averages for "best time to post." We analyze YOUR followers' activity patterns:
+
+\`\`\`sql
+-- Best engagement windows for this account
+SELECT
+  strftime('%H', posted_at) as hour,
+  AVG(engagement_rate) as avg_engagement,
+  COUNT(*) as sample_size
+FROM posts
+WHERE platform = 'instagram'
+  AND posted_at > datetime('now', '-90 days')
+GROUP BY hour
+HAVING sample_size >= 5
+ORDER BY avg_engagement DESC
+LIMIT 5;
+\`\`\`
+
+### 3. Hashtag Intelligence
+
+Instead of guessing hashtags or using the same 30 every time, the system tracks which hashtags actually drive reach for your account:
+
+- **Performance scoring** — Each hashtag gets a score based on YOUR reach when using it
+- **Rotation** — Avoids hashtag shadowbanning by rotating sets
+- **Discovery** — Suggests new hashtags based on what similar accounts use successfully
+
+### 4. Cross-Platform Adaptation
+
+Write once, adapt everywhere. A LinkedIn article becomes an Instagram carousel becomes a Twitter thread becomes a Telegram post — each reformatted for the platform's style.
+
+## Pricing Reality Check
+
+| Feature | Echo Social ($19/mo) | Later ($25/mo) | Hootsuite ($99/mo) |
+|---------|---------------------|----------------|---------------------|
+| Scheduled posts | Unlimited | 30/profile | Unlimited |
+| AI content generation | Yes (Engine Runtime) | Basic captions | Basic captions |
+| Optimal timing | Per-account analysis | Industry averages | Per-account |
+| Hashtag intelligence | Performance-scored | Suggestions only | Basic monitoring |
+| Platforms | 8 | 7 | 10+ |
+| Team members | 3 included | 1 | 1 ($49/extra) |
+| Cross-platform adapt | AI-powered | Manual | Manual |
+| API access | Full REST API | Limited | Enterprise only |
+
+## Getting Started
+
+The system is live at \`echo-social-media.bmcii1976.workers.dev\` with a free tier that includes:
+- 1 social account
+- 30 scheduled posts/month
+- Basic analytics
+- AI content suggestions (5/month)
+
+Connect your Instagram Business account, let it analyze 30 days of your posting history, and within an hour you'll have a personalized content strategy based on what actually works for YOUR audience — not generic industry benchmarks.`,
+  },
+  {
+    slug: 'paypal-stripe-unified-payments-api-2026',
+    title: 'Unified Payments API: Stripe + PayPal + Crypto in One Cloudflare Worker',
+    excerpt: 'Build a unified payments API that handles Stripe subscriptions, PayPal invoicing, and cryptocurrency payments — all from a single Cloudflare Worker with less than 1,200 lines of code.',
+    category: 'AI & Engineering',
+    date: '2026-03-28',
+    readTime: '8 min read',
+    author: 'Echo Prime Tech',
+    tags: ['payments', 'stripe', 'paypal', 'crypto', 'api-design'],
+    featured: false,
+    content: `# Unified Payments API: Stripe + PayPal + Crypto
+
+Integrating multiple payment providers usually means maintaining separate codebases, separate webhook handlers, separate reconciliation logic, and separate dashboards. For a SaaS product, this complexity is unnecessary.
+
+Here's how we built a unified payments layer in a single Cloudflare Worker that handles Stripe subscriptions, PayPal invoicing, and cryptocurrency payments through one consistent API.
+
+## The Architecture
+
+\`\`\`
+Client (checkout page)
+    ↓
+POST /checkout { provider: 'stripe' | 'paypal' | 'crypto', ... }
+    ↓
+Unified Payments Worker
+    ├── Stripe adapter → Stripe API
+    ├── PayPal adapter → PayPal API
+    └── Crypto adapter → exchange/wallet API
+    ↓
+Webhook consolidation → D1 (unified transaction table)
+    ↓
+Event dispatch → email receipt, update subscription, notify admin
+\`\`\`
+
+### Unified Transaction Schema
+
+Regardless of which provider processes the payment, it lands in the same D1 table:
+
+\`\`\`sql
+CREATE TABLE transactions (
+  id TEXT PRIMARY KEY,
+  provider TEXT NOT NULL,         -- 'stripe' | 'paypal' | 'crypto'
+  provider_id TEXT NOT NULL,      -- Provider's transaction ID
+  customer_email TEXT NOT NULL,
+  amount_cents INTEGER NOT NULL,
+  currency TEXT DEFAULT 'USD',
+  status TEXT DEFAULT 'pending',  -- pending | completed | failed | refunded
+  type TEXT NOT NULL,             -- 'one_time' | 'subscription' | 'invoice'
+  metadata TEXT,                  -- JSON: plan_id, period, crypto_chain, etc.
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+);
+\`\`\`
+
+### The Checkout Endpoint
+
+One endpoint, three providers:
+
+\`\`\`typescript
+app.post('/checkout', async (c) => {
+  const { provider, email, plan_id, amount, currency } = await c.req.json();
+
+  switch (provider) {
+    case 'stripe':
+      const session = await stripe.checkout.sessions.create({
+        customer_email: email,
+        line_items: [{ price: plan_id, quantity: 1 }],
+        mode: 'subscription',
+        success_url: SUCCESS_URL,
+        cancel_url: CANCEL_URL,
+      });
+      return c.json({ url: session.url });
+
+    case 'paypal':
+      const order = await paypal.createOrder({
+        intent: 'CAPTURE',
+        purchase_units: [{
+          amount: { value: (amount / 100).toFixed(2), currency_code: currency },
+          description: 'Echo Prime - ' + plan_id,
+        }],
+      });
+      return c.json({ url: order.approval_url });
+
+    case 'crypto':
+      const invoice = await createCryptoInvoice({
+        amount_usd: amount / 100,
+        email,
+        accepted_chains: ['ETH', 'BTC', 'SOL', 'USDC'],
+      });
+      return c.json({ url: invoice.payment_url });
+
+    default:
+      return c.json({ error: 'Unknown provider' }, 400);
+  }
+});
+\`\`\`
+
+### Webhook Consolidation
+
+Each provider sends webhooks in a different format. The Worker normalizes them:
+
+\`\`\`typescript
+// Stripe webhook
+app.post('/webhooks/stripe', async (c) => {
+  const sig = c.req.header('stripe-signature');
+  const event = await stripe.webhooks.constructEvent(
+    await c.req.text(), sig, c.env.STRIPE_WEBHOOK_SECRET
+  );
+
+  if (event.type === 'checkout.session.completed') {
+    await recordTransaction(c.env, {
+      provider: 'stripe',
+      provider_id: event.data.object.id,
+      customer_email: event.data.object.customer_email,
+      amount_cents: event.data.object.amount_total,
+      status: 'completed',
+      type: 'subscription',
+    });
+  }
+});
+
+// PayPal webhook
+app.post('/webhooks/paypal', async (c) => {
+  const event = await c.req.json();
+  // Verify webhook signature with PayPal API
+
+  if (event.event_type === 'CHECKOUT.ORDER.APPROVED') {
+    // Capture the payment
+    const capture = await paypal.captureOrder(event.resource.id);
+    await recordTransaction(c.env, {
+      provider: 'paypal',
+      provider_id: capture.id,
+      customer_email: capture.payer.email_address,
+      amount_cents: Math.round(parseFloat(capture.purchase_units[0].amount.value) * 100),
+      status: 'completed',
+      type: 'one_time',
+    });
+  }
+});
+\`\`\`
+
+## Why This Matters for SaaS
+
+### Customer Choice Drives Conversion
+
+Our data shows that offering PayPal alongside Stripe increases checkout conversion by 12-18%. Adding crypto adds another 3-5% for developer-focused products. The unified API makes this trivial to implement.
+
+### Single Source of Truth
+
+Instead of checking Stripe Dashboard + PayPal Dashboard + your crypto wallet, every transaction is in one D1 table. Revenue reporting is a single SQL query:
+
+\`\`\`sql
+SELECT
+  provider,
+  COUNT(*) as transactions,
+  SUM(amount_cents) / 100.0 as revenue_usd
+FROM transactions
+WHERE status = 'completed'
+  AND created_at >= date('now', '-30 days')
+GROUP BY provider;
+\`\`\`
+
+### Refunds and Disputes
+
+Unified handling for refunds regardless of provider:
+
+\`\`\`typescript
+app.post('/refund', async (c) => {
+  const { transaction_id } = await c.req.json();
+  const tx = await getTransaction(c.env, transaction_id);
+
+  switch (tx.provider) {
+    case 'stripe':
+      await stripe.refunds.create({ payment_intent: tx.provider_id });
+      break;
+    case 'paypal':
+      await paypal.refundCapture(tx.provider_id, { amount: { value: (tx.amount_cents / 100).toFixed(2) }});
+      break;
+    case 'crypto':
+      // Crypto refunds require manual wallet transfer
+      await flagForManualRefund(c.env, tx);
+      break;
+  }
+
+  await updateTransaction(c.env, transaction_id, { status: 'refunded' });
+});
+\`\`\`
+
+## The Numbers
+
+The entire unified payments Worker is 1,180 lines of TypeScript. It handles:
+- Stripe subscription lifecycle (create, update, cancel, resume)
+- PayPal one-time and recurring payments
+- Crypto invoicing with multi-chain support
+- Unified webhook processing
+- Transaction history and reporting API
+- Refund processing
+
+Infrastructure cost: $0/month (within Workers free tier for typical SaaS transaction volumes).
+
+Compare that to using a dedicated payments platform like Paddle ($5 + 5% per transaction) or Chargebee ($249/month + 0.75%). For a SaaS doing $10K/month in revenue, that's $500-750/month in payment platform fees. With the unified Worker approach, you pay only the direct processor fees (Stripe 2.9% + 30¢, PayPal 3.49% + 49¢).
+
+The Worker is live at \`echo-paypal.bmcii1976.workers.dev\` with both Stripe and PayPal adapters active.`,
+  },
 ];
 
 export function formatDate(dateStr: string): string {

@@ -9,6 +9,55 @@
     <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
 
     <item>
+      <title>Unified Payments API: Stripe + PayPal + Crypto in One Cloudflare Worker</title>
+      <link>https://echo-ept.com/blog/paypal-stripe-unified-payments-api-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/paypal-stripe-unified-payments-api-2026</guid>
+      <description>Build a unified payments API that handles Stripe subscriptions, PayPal invoicing, and cryptocurrency payments from a single Cloudflare Worker.</description>
+      <category>AI &amp; Engineering</category>
+    </item>
+    <item>
+      <title>AI Instagram Growth vs Later and Hootsuite: Automated Content, Scheduling, and Analytics</title>
+      <link>https://echo-ept.com/blog/ai-instagram-growth-vs-later-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-instagram-growth-vs-later-2026</guid>
+      <description>Compare AI-driven Instagram growth strategies against Later, Hootsuite, and Buffer.</description>
+      <category>Product Updates</category>
+    </item>
+    <item>
+      <title>Building Crypto Trading Bots on Cloudflare Workers: Zero Server Costs, Global Edge Execution</title>
+      <link>https://echo-ept.com/blog/crypto-trading-ai-bots-cloudflare-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/crypto-trading-ai-bots-cloudflare-2026</guid>
+      <description>How to build and deploy cryptocurrency trading bots on Cloudflare Workers for under $5/month.</description>
+      <category>AI &amp; Engineering</category>
+    </item>
+    <item>
+      <title>AI Voice Synthesis in Production: ElevenLabs, Edge TTS, and Building a Multi-Provider Pipeline</title>
+      <link>https://echo-ept.com/blog/ai-voice-synthesis-production-guide-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-voice-synthesis-production-guide-2026</guid>
+      <description>A practical guide to deploying AI voice synthesis at scale with ElevenLabs, Edge TTS, and Cartesia.</description>
+      <category>AI &amp; Engineering</category>
+    </item>
+    <item>
+      <title>AI Document Management vs Google Drive: Version Control, Sharing, and Search That Actually Works</title>
+      <link>https://echo-ept.com/blog/ai-document-management-vs-google-drive-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-document-management-vs-google-drive-2026</guid>
+      <description>Why teams are switching from Google Drive and Dropbox to AI-powered document management.</description>
+      <category>Product Updates</category>
+    </item>
+    <item>
+      <title>AI Price Alerts vs TradingView: Why Cloudflare Workers Win for Real-Time Monitoring</title>
+      <link>https://echo-ept.com/blog/ai-price-alerts-vs-tradingview-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-price-alerts-vs-tradingview-2026</guid>
+      <description>Compare AI-powered price alerts on Cloudflare Workers against TradingView and CoinGecko.</description>
+      <category>Product Updates</category>
+    </item>
+
+    <item>
       <title>AI-Powered Payroll vs ADP: Why Small Businesses Are Switching in 2026</title>
       <link>https://echo-ept.com/blog/ai-payroll-vs-adp-small-business-2026</link>
       <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
