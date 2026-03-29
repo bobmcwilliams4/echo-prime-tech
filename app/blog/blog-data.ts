@@ -19220,7 +19220,7 @@ The Worker is live at \`echo-paypal.bmcii1976.workers.dev\` with both Stripe and
     author: 'Echo Prime Tech',
     tags: ['timesheet', 'time-tracking', 'project-management', 'invoicing', 'cloudflare-workers'],
     featured: false,
-    content: \`# AI Timesheet Tracking vs Harvest & Toggl: One-Click Timers That Actually Work
+    content: `# AI Timesheet Tracking vs Harvest & Toggl: One-Click Timers That Actually Work
 
 Time tracking is the most hated administrative task in every professional services firm. Your team forgets to start timers, submits inaccurate entries on Friday afternoon, and billable hours vanish into the ether. The existing tools don't help — they just give you a prettier interface to be bad at time tracking.
 
@@ -19251,14 +19251,14 @@ Time tracking is the most hated administrative task in every professional servic
 Our Cloudflare Worker handles everything the incumbents charge per-seat for:
 
 ### One-Click Timer
-\\\`\\\`\\\`
+
 POST /api/timers/start
 { "project_id": "proj_abc", "task": "Client meeting" }
 
 // Returns running timer with real-time elapsed tracking
 // Auto-stops previous timer if one was running
 // Handles timezone conversion automatically
-\\\`\\\`\\\`
+
 
 ### Automatic Overtime
 The system calculates overtime automatically based on configurable rules — standard 40h/week, California daily overtime (8h threshold), or custom thresholds per employee. No spreadsheet formulas required.
@@ -19283,7 +19283,7 @@ Select a date range, a client, and a project — the system generates an invoice
 
 For a 10-person consulting firm, the annual savings versus Harvest range from $1,290-2,586. And that's before counting the hours saved by automatic overtime calculation and one-click invoice generation.
 
-The Worker runs on Cloudflare's edge at \`echo-timesheet.bmcii1976.workers.dev\`, with 50+ API endpoints, D1 for storage, and KV for rate limiting.\`,
+The Worker runs on Cloudflare's edge at \`echo-timesheet.bmcii1976.workers.dev\`, with 50+ API endpoints, D1 for storage, and KV for rate limiting.`,
   },
   {
     slug: 'ai-workflow-automation-vs-zapier-make-2026',
@@ -19295,7 +19295,7 @@ The Worker runs on Cloudflare's edge at \`echo-timesheet.bmcii1976.workers.dev\`
     author: 'Echo Prime Tech',
     tags: ['workflow-automation', 'zapier-alternative', 'integration', 'cloudflare-workers', 'ai'],
     featured: true,
-    content: \`# AI Workflow Automation vs Zapier & Make: Build Intelligent Pipelines Without Per-Task Pricing
+    content: `# AI Workflow Automation vs Zapier & Make: Build Intelligent Pipelines Without Per-Task Pricing
 
 Zapier charges you per task. Make charges you per operation. Both get expensive fast when you're automating real business processes that fire thousands of times per day. And neither of them has native AI reasoning built into the pipeline.
 
@@ -19326,7 +19326,7 @@ Zapier charges you per task. Make charges you per operation. Both get expensive 
 Our Cloudflare Worker runs a full multi-step execution engine with 6 built-in step types, including an AI reasoning step that can make decisions mid-workflow.
 
 ### Step Types
-\\\`\\\`\\\`typescript
+
 // 1. HTTP — call any external API
 { type: "http", config: { url: "https://api.stripe.com/...", method: "POST" } }
 
@@ -19344,7 +19344,7 @@ Our Cloudflare Worker runs a full multi-step execution engine with 6 built-in st
 
 // 6. AI — Claude/LLM reasoning mid-pipeline
 { type: "ai", config: { prompt: "Classify this support ticket: {{input}}" } }
-\\\`\\\`\\\`
+
 
 ### Triggers
 - **Webhook**: Any external service POSTs to your workflow URL
@@ -19361,7 +19361,7 @@ A webhook fires when a new lead submits a form. The workflow:
 4b. **Echo Service** — Adds to Echo Email Marketing nurture sequence
 5. **HTTP** — Posts notification to Slack
 
-This runs on Cloudflare Workers. No per-task fees. The \\\`*/15\\\` cron processes scheduled workflows. Cost for 100,000 executions/month: approximately $0.50 in Workers requests.
+This runs on Cloudflare Workers. No per-task fees. The \`*/15\` cron processes scheduled workflows. Cost for 100,000 executions/month: approximately $0.50 in Workers requests.
 
 ## Template Library
 
@@ -19383,7 +19383,7 @@ Each template is a starting point you can customize. No dragging boxes on a canv
 | 100,000 tasks/month | $299+ | $99+ | ~$0.50 |
 | 1M tasks/month | Enterprise ($$$) | Enterprise ($$$) | ~$5.00 |
 
-The Worker is live at \`echo-workflow-automation.bmcii1976.workers.dev\` with 50+ endpoints, cron execution, and 18 built-in Echo service integrations.\`,
+The Worker is live at \`echo-workflow-automation.bmcii1976.workers.dev\` with 50+ endpoints, cron execution, and 18 built-in Echo service integrations.`,
   },
   {
     slug: 'ai-expense-management-vs-expensify-brex-2026',
@@ -19395,7 +19395,7 @@ The Worker is live at \`echo-workflow-automation.bmcii1976.workers.dev\` with 50
     author: 'Echo Prime Tech',
     tags: ['expense-management', 'receipt-scanning', 'finance', 'cloudflare-workers', 'ai'],
     featured: false,
-    content: \`# AI Expense Management vs Expensify & Brex: Receipt Scanning Without the $12/User Tax
+    content: `# AI Expense Management vs Expensify & Brex: Receipt Scanning Without the $12/User Tax
 
 Expense management software follows a predictable pattern: charge per user per month, add friction to the reimbursement process, and make the admin's life slightly less miserable while extracting maximum revenue from the company. We built something different.
 
@@ -19454,7 +19454,7 @@ The system fingerprints each expense by merchant + amount + date. Duplicates wit
 
 For a 25-person company, switching from Expensify Collect ($5/user) saves $1,494/year. Switching from SAP Concur saves significantly more.
 
-The Worker runs at \`echo-expense.bmcii1976.workers.dev\` with 55+ endpoints, 11 D1 tables, and AI receipt scanning via Engine Runtime.\`,
+The Worker runs at \`echo-expense.bmcii1976.workers.dev\` with 55+ endpoints, 11 D1 tables, and AI receipt scanning via Engine Runtime.`,
   },
   {
     slug: 'ai-virtual-data-room-vs-intralinks-ansarada-2026',
@@ -19466,7 +19466,7 @@ The Worker runs at \`echo-expense.bmcii1976.workers.dev\` with 55+ endpoints, 11
     author: 'Echo Prime Tech',
     tags: ['data-room', 'virtual-data-room', 'M&A', 'due-diligence', 'cloudflare-workers'],
     featured: false,
-    content: \`# AI Virtual Data Room vs Intralinks & Ansarada: Secure Document Sharing at 1% the Cost
+    content: `# AI Virtual Data Room vs Intralinks & Ansarada: Secure Document Sharing at 1% the Cost
 
 Virtual data rooms are the most overpriced category in enterprise software. You're paying $15,000-50,000/month for what is essentially a file sharing service with an audit log and some access controls. The margins are astronomical because the buyers — M&A attorneys and investment bankers — expense it to the deal and nobody questions the cost.
 
@@ -19512,7 +19512,7 @@ Our Cloudflare Worker architecture provides enterprise-grade security at a fract
 Documents stored in Cloudflare R2 with server-side encryption. No egress fees — a critical cost factor when buyers download hundreds of documents during due diligence. Intralinks charges per-page for downloads. We charge nothing.
 
 ### Granular Permissions
-\\\`\\\`\\\`
+
 // Room-level, folder-level, or document-level permissions
 {
   "user": "buyer-counsel@lawfirm.com",
@@ -19527,7 +19527,7 @@ Documents stored in Cloudflare R2 with server-side encryption. No egress fees �
   "folders": ["financials", "contracts", "ip"],
   "excluded": ["management-presentations/internal-only"]
 }
-\\\`\\\`\\\`
+
 
 ### AI Document Analysis
 Upload a contract and the Engine Runtime's LG-01 (Contract Analysis) engine extracts key terms, identifies risks, and generates a summary. Upload a full cap table and the finance engines analyze dilution scenarios. The AI doesn't replace the lawyers — it gives them a 10-minute head start on every document.
@@ -19550,7 +19550,7 @@ Even if we're conservative and assume the Echo Data Room needs premium R2 storag
 
 A mid-market M&A advisory firm running 5 deals/year spends $200,000-400,000 annually on data room subscriptions. That's a direct hit to margins on a business that operates on 1-2% of deal value.
 
-The Worker is live at \`echo-data-room.bmcii1976.workers.dev\` with folder hierarchy, versioning, granular permissions, audit trails, and AI document analysis integration.\`,
+The Worker is live at \`echo-data-room.bmcii1976.workers.dev\` with folder hierarchy, versioning, granular permissions, audit trails, and AI document analysis integration.`,
   },
   {
     slug: 'ai-customer-success-platform-vs-gainsight-totango-2026',
@@ -19562,7 +19562,7 @@ The Worker is live at \`echo-data-room.bmcii1976.workers.dev\` with folder hiera
     author: 'Echo Prime Tech',
     tags: ['customer-success', 'churn-prediction', 'retention', 'saas', 'cloudflare-workers'],
     featured: false,
-    content: \`# AI Customer Success vs Gainsight & Totango: Predict Churn Before It Happens
+    content: `# AI Customer Success vs Gainsight & Totango: Predict Churn Before It Happens
 
 Customer success platforms promise to reduce churn. They also happen to be some of the most expensive tools in the SaaS stack — typically $30,000-150,000/year, often with multi-year commitments. For many companies, the customer success tool costs more than the churn it prevents.
 
@@ -19612,7 +19612,7 @@ The system computes health scores from multiple signals:
 Each signal has configurable weight. The Engine Runtime's analytics capabilities identify patterns that precede churn: declining usage over 30 days, increasing support tickets, missed meetings.
 
 ### Automated Playbooks
-\\\`\\\`\\\`
+
 // Trigger playbook when health drops below threshold
 {
   "trigger": "health_score_below",
@@ -19624,7 +19624,7 @@ Each signal has configurable weight. The Engine Runtime's analytics capabilities
     { "type": "create_task", "assignee": "account_csm" }
   ]
 }
-\\\`\\\`\\\`
+
 
 ### Churn Prediction
 The AI analyzes behavioral patterns across your customer base to identify at-risk accounts weeks before they consider churning. The model considers:
@@ -19650,7 +19650,7 @@ Track ARR by customer, segment, and cohort. The system projects renewal likeliho
 
 For a B2B SaaS with 200 customers doing $2M ARR, preventing even 2% additional churn saves $40,000/year. The traditional CS platforms cost more than the churn savings for many companies in this segment. The Echo approach costs less than a team lunch.
 
-The Worker runs at \`echo-customer-success.bmcii1976.workers.dev\` with health scoring, playbook automation, renewal tracking, and AI-powered churn prediction.\`,
+The Worker runs at \`echo-customer-success.bmcii1976.workers.dev\` with health scoring, playbook automation, renewal tracking, and AI-powered churn prediction.`,
   },
   {
     slug: 'ai-vendor-management-vs-coupa-sap-ariba-2026',
@@ -19662,7 +19662,7 @@ The Worker runs at \`echo-customer-success.bmcii1976.workers.dev\` with health s
     author: 'Echo Prime Tech',
     tags: ['vendor-management', 'procurement', 'supply-chain', 'cloudflare-workers', 'ai'],
     featured: false,
-    content: \`# AI Vendor Management vs Coupa & SAP Ariba: Procurement Intelligence Without Enterprise Pricing
+    content: `# AI Vendor Management vs Coupa & SAP Ariba: Procurement Intelligence Without Enterprise Pricing
 
 Procurement software is the enterprise category where vendors charge you $100,000+ to help you save money on your other vendors. The irony is not lost on anyone except the procurement software salespeople.
 
@@ -19727,7 +19727,7 @@ Upload a vendor contract and the Engine Runtime's LG-01 engine extracts key term
 The system alerts you 90/60/30 days before renewal deadlines so you never auto-renew a bad contract by accident.
 
 ### Spend Analysis
-\\\`\\\`\\\`
+
 GET /api/spend/analysis?period=12m&group_by=category
 
 // Returns spend breakdown with trends
@@ -19742,7 +19742,7 @@ GET /api/spend/analysis?period=12m&group_by=category
     { "category": "IT Services", "recommendation": "Consolidate 3 overlapping SaaS tools", "est_savings": 45000 }
   ]
 }
-\\\`\\\`\\\`
+
 
 The AI identifies consolidation opportunities, price anomalies (paying 40% more than market for the same service), and vendors that should be renegotiated.
 
@@ -19759,7 +19759,7 @@ The AI identifies consolidation opportunities, price anomalies (paying 40% more 
 
 For a mid-market company managing 50-200 vendors, the Echo approach provides 90% of the functionality at less than 0.1% of the cost. The remaining 10% — things like full AP automation, three-way matching at scale, and global procurement compliance — might justify enterprise platforms for Fortune 500 companies. For everyone else, it's paying for features you'll never use.
 
-The Worker runs at \`echo-vendor-manager.bmcii1976.workers.dev\` with vendor scoring, contract tracking, spend analysis, and AI-powered procurement intelligence.\`,
+The Worker runs at \`echo-vendor-manager.bmcii1976.workers.dev\` with vendor scoring, contract tracking, spend analysis, and AI-powered procurement intelligence.`,
   },
 ];
 
