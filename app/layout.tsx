@@ -9,6 +9,7 @@ import { GuidedTutorialProvider } from '../lib/guided-tutorial-context';
 import GuidedOverlay from '../components/guided-overlay';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'Echo Prime Technologies | AI Intelligence Engines, Sales Agents & Enterprise AI',
@@ -818,9 +819,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <link rel="alternate" type="application/rss+xml" title="Echo Prime Technologies Changelog" href="/feed.xml" />
-        <script defer src="https://echo-web-analytics.bmcii1976.workers.dev/script.js?id=71d45bf104094a69" />
       </head>
       <body className="antialiased">
+        <Script src="https://echo-web-analytics.bmcii1976.workers.dev/script.js?id=71d45bf104094a69" strategy="afterInteractive" />
         <AuthProvider>
           <ThemeProvider>
             <ParticleBackground />
