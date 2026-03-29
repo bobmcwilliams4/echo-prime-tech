@@ -19210,6 +19210,557 @@ Compare that to using a dedicated payments platform like Paddle ($5 + 5% per tra
 
 The Worker is live at \`echo-paypal.bmcii1976.workers.dev\` with both Stripe and PayPal adapters active.`,
   },
+  {
+    slug: 'ai-timesheet-tracking-vs-harvest-toggl-2026',
+    title: 'AI Timesheet Tracking vs Harvest & Toggl: One-Click Timers That Actually Work',
+    excerpt: 'Compare AI-powered timesheet tracking on Cloudflare Workers against Harvest, Toggl, and Clockify. One-click timers, automatic overtime calculations, and invoice generation from billable hours.',
+    category: 'Product Updates',
+    date: '2026-03-28',
+    readTime: '8 min read',
+    author: 'Echo Prime Tech',
+    tags: ['timesheet', 'time-tracking', 'project-management', 'invoicing', 'cloudflare-workers'],
+    featured: false,
+    content: \`# AI Timesheet Tracking vs Harvest & Toggl: One-Click Timers That Actually Work
+
+Time tracking is the most hated administrative task in every professional services firm. Your team forgets to start timers, submits inaccurate entries on Friday afternoon, and billable hours vanish into the ether. The existing tools don't help — they just give you a prettier interface to be bad at time tracking.
+
+## The Problem with Current Solutions
+
+**Harvest** ($10.80/user/month):
+- Manual timer start/stop with no intelligence
+- No automatic overtime detection
+- Invoice generation requires separate module ($10.80/user addon)
+- No AI insights on productivity patterns
+- Minimum viable time tracking at maximum viable pricing
+
+**Toggl Track** ($9-18/user/month):
+- Clean interface, zero intelligence
+- No built-in invoicing — requires Toggl integrations ($$$)
+- No timesheet approval workflow for managers
+- Time estimates are manual guesswork
+- Premium features locked behind $18/user tier
+
+**Clockify** (Free-$11.99/user/month):
+- Free tier exists but is severely limited
+- No project budget tracking without paid plan
+- No approval workflows without paid plan
+- "Free" is marketing — real features cost $7.99+/user
+
+## The Echo Timesheet Approach
+
+Our Cloudflare Worker handles everything the incumbents charge per-seat for:
+
+### One-Click Timer
+\\\`\\\`\\\`
+POST /api/timers/start
+{ "project_id": "proj_abc", "task": "Client meeting" }
+
+// Returns running timer with real-time elapsed tracking
+// Auto-stops previous timer if one was running
+// Handles timezone conversion automatically
+\\\`\\\`\\\`
+
+### Automatic Overtime
+The system calculates overtime automatically based on configurable rules — standard 40h/week, California daily overtime (8h threshold), or custom thresholds per employee. No spreadsheet formulas required.
+
+### Weekly Timesheet Approval
+Managers see pending timesheets with total hours, overtime flags, and project breakdowns. One-click approve or reject with comments. Rejected entries go back to the employee with specific feedback.
+
+### Invoice Generation from Billable Hours
+Select a date range, a client, and a project — the system generates an invoice line item for every billable entry, calculates totals with the employee's billing rate, and creates a draft invoice ready to send.
+
+## Cost Comparison
+
+| Feature | Harvest | Toggl | Echo Timesheet |
+|---------|---------|-------|----------------|
+| Timer tracking | $10.80/user | $9/user | $0 (Workers free) |
+| Project budgets | Included | $18/user | Included |
+| Overtime calc | Manual | Manual | Automatic |
+| Approval workflow | Basic | $18/user | Full workflow |
+| Invoice from hours | $10.80/user addon | Not built-in | Included |
+| AI productivity insights | None | None | AI-powered |
+| 10-person team cost | $108-216/month | $90-180/month | ~$0.50/month |
+
+For a 10-person consulting firm, the annual savings versus Harvest range from $1,290-2,586. And that's before counting the hours saved by automatic overtime calculation and one-click invoice generation.
+
+The Worker runs on Cloudflare's edge at \`echo-timesheet.bmcii1976.workers.dev\`, with 50+ API endpoints, D1 for storage, and KV for rate limiting.\`,
+  },
+  {
+    slug: 'ai-workflow-automation-vs-zapier-make-2026',
+    title: 'AI Workflow Automation vs Zapier & Make: Build Intelligent Pipelines Without Per-Task Pricing',
+    excerpt: 'Compare AI-powered workflow automation on Cloudflare Workers against Zapier, Make, and n8n. Multi-step execution engines, webhook triggers, and AI decision steps without per-task fees.',
+    category: 'AI & Engineering',
+    date: '2026-03-28',
+    readTime: '9 min read',
+    author: 'Echo Prime Tech',
+    tags: ['workflow-automation', 'zapier-alternative', 'integration', 'cloudflare-workers', 'ai'],
+    featured: true,
+    content: \`# AI Workflow Automation vs Zapier & Make: Build Intelligent Pipelines Without Per-Task Pricing
+
+Zapier charges you per task. Make charges you per operation. Both get expensive fast when you're automating real business processes that fire thousands of times per day. And neither of them has native AI reasoning built into the pipeline.
+
+## Why Existing Platforms Fall Short
+
+**Zapier** ($19.99-$69.99/month, then per-task):
+- 750 tasks/month on Starter ($19.99). That's 25 tasks/day
+- Multi-step Zaps require $49.99+ plan
+- Conditional logic (Paths) requires $69.99+ plan
+- AI steps require "AI by Zapier" addon
+- 5,000 tasks = $299/month. 100,000 tasks = enterprise pricing
+- No self-hosting option. Your data flows through Zapier's servers
+
+**Make (Integromat)** ($9-16/month, then per-operation):
+- 10,000 operations/month on Core ($9). Each step in a workflow = 1 operation
+- A 5-step workflow processing 100 items/day burns 15,000 operations/month
+- No built-in AI steps — requires external HTTP calls
+- Complex data transformations often timeout
+
+**n8n** (Free self-hosted, $20+ cloud):
+- Excellent open-source option but requires self-hosting for free tier
+- Cloud tier starts at $20/month with execution limits
+- No native AI reasoning capabilities
+- Community nodes vary wildly in quality
+
+## The Echo Approach: AI-Native Workflow Engine
+
+Our Cloudflare Worker runs a full multi-step execution engine with 6 built-in step types, including an AI reasoning step that can make decisions mid-workflow.
+
+### Step Types
+\\\`\\\`\\\`typescript
+// 1. HTTP — call any external API
+{ type: "http", config: { url: "https://api.stripe.com/...", method: "POST" } }
+
+// 2. Transform — reshape data between steps
+{ type: "transform", config: { template: "{{step1.result.email}}" } }
+
+// 3. Condition — branch based on data
+{ type: "condition", config: { field: "amount", op: "gt", value: 1000 } }
+
+// 4. Delay — wait between steps
+{ type: "delay", config: { seconds: 300 } }
+
+// 5. Echo Service — call any of 18 internal Echo services
+{ type: "echo_service", config: { service: "engine-runtime", path: "/query" } }
+
+// 6. AI — Claude/LLM reasoning mid-pipeline
+{ type: "ai", config: { prompt: "Classify this support ticket: {{input}}" } }
+\\\`\\\`\\\`
+
+### Triggers
+- **Webhook**: Any external service POSTs to your workflow URL
+- **Schedule**: Cron expressions (every 15 min, hourly, daily, custom)
+- **Manual**: API call to start a run on demand
+
+### Real Example: Lead Scoring Pipeline
+
+A webhook fires when a new lead submits a form. The workflow:
+1. **HTTP** — Enriches the lead via Clearbit/Apollo
+2. **AI** — Scores the lead 0-100 based on enrichment data + your ICP criteria
+3. **Condition** — If score > 70, route to Step 4a; else Step 4b
+4a. **Echo Service** — Creates deal in Echo CRM, assigns to sales rep
+4b. **Echo Service** — Adds to Echo Email Marketing nurture sequence
+5. **HTTP** — Posts notification to Slack
+
+This runs on Cloudflare Workers. No per-task fees. The \\\`*/15\\\` cron processes scheduled workflows. Cost for 100,000 executions/month: approximately $0.50 in Workers requests.
+
+## Template Library
+
+Pre-built workflow templates ship with the platform:
+- Lead capture → CRM → Email sequence
+- Support ticket → AI classify → Route to team
+- Invoice overdue → Email reminder → Slack alert
+- Form submission → Validate → Store → Notify
+- Webhook → Transform → Forward to N services
+
+Each template is a starting point you can customize. No dragging boxes on a canvas — define your steps in JSON and the engine handles execution, retries, error handling, and logging.
+
+## Cost Comparison
+
+| Volume | Zapier | Make | Echo Workflows |
+|--------|--------|------|----------------|
+| 1,000 tasks/month | $19.99 | $9 | ~$0 (free tier) |
+| 10,000 tasks/month | $49.99 | $16 | ~$0.05 |
+| 100,000 tasks/month | $299+ | $99+ | ~$0.50 |
+| 1M tasks/month | Enterprise ($$$) | Enterprise ($$$) | ~$5.00 |
+
+The Worker is live at \`echo-workflow-automation.bmcii1976.workers.dev\` with 50+ endpoints, cron execution, and 18 built-in Echo service integrations.\`,
+  },
+  {
+    slug: 'ai-expense-management-vs-expensify-brex-2026',
+    title: 'AI Expense Management vs Expensify & Brex: Receipt Scanning Without the $12/User Tax',
+    excerpt: 'Compare AI-powered expense management on Cloudflare Workers against Expensify, Brex, and SAP Concur. AI receipt scanning, auto-approval rules, and mileage calculation without per-seat pricing.',
+    category: 'Product Updates',
+    date: '2026-03-28',
+    readTime: '8 min read',
+    author: 'Echo Prime Tech',
+    tags: ['expense-management', 'receipt-scanning', 'finance', 'cloudflare-workers', 'ai'],
+    featured: false,
+    content: \`# AI Expense Management vs Expensify & Brex: Receipt Scanning Without the $12/User Tax
+
+Expense management software follows a predictable pattern: charge per user per month, add friction to the reimbursement process, and make the admin's life slightly less miserable while extracting maximum revenue from the company. We built something different.
+
+## The Industry Problem
+
+**Expensify** ($5-18/user/month):
+- SmartScan receipt recognition is decent but not instant
+- Per-user pricing makes it expensive for growing teams
+- Auto-approval requires Enterprise plan ($18/user)
+- Mileage tracking is basic — no IRS rate auto-updates
+- Duplicate detection works sometimes
+
+**SAP Concur** ($8-25/user/month):
+- Enterprise-grade with enterprise-grade complexity
+- Implementation takes weeks to months
+- Mobile app reviews are consistently poor
+- Pricing is opaque and negotiation-dependent
+- Integrations require professional services
+
+**Brex** (Free with Brex card):
+- Free is compelling but requires switching to Brex corporate cards
+- Limited if you want expense management without their banking product
+- No standalone expense reimbursement workflow
+- Focused on card spend, not employee reimbursements
+
+## The Echo Expense Approach
+
+Our Cloudflare Worker handles the full expense lifecycle — from receipt capture to reimbursement — with AI intelligence baked in.
+
+### AI Receipt Scanning
+Submit a receipt image and the AI extracts merchant, date, amount, category, and tax — then validates against your company's expense policy in real-time. If the lunch exceeds $50/person, it flags immediately instead of waiting for a human reviewer three weeks later.
+
+### Auto-Mileage Calculation
+Enter start and end addresses. The system calculates distance, applies the current IRS mileage rate ($0.70/mile for 2026), and auto-generates the expense entry. Per-diem rates are calculated based on the GSA tables for the destination city.
+
+### Policy Violation Detection
+Define rules: max meal amount, approved hotel rates, required pre-approval for expenses over $500. The system checks every expense against your policy matrix at submission time and flags violations before they enter the approval queue.
+
+### Expense Reports with Approval Workflow
+Employees bundle expenses into reports. Reports route to the appropriate approver based on department and amount. Auto-approve kicks in for expenses under your configured threshold — a $12 lunch from a senior engineer doesn't need VP approval.
+
+### Duplicate Detection
+The system fingerprints each expense by merchant + amount + date. Duplicates within a 7-day window are flagged automatically. No more accidental double-submissions from employees who forgot they already filed the receipt.
+
+## Cost Comparison
+
+| Feature | Expensify | Concur | Echo Expense |
+|---------|-----------|--------|--------------|
+| Receipt scanning | $5-18/user | $8-25/user | Included |
+| Auto-approval | $18/user | Enterprise | Included |
+| Mileage calc | Basic | Add-on | IRS rate auto |
+| Per-diem | Manual | Add-on | GSA auto |
+| Duplicate detection | Basic | Yes | AI-powered |
+| Policy engine | $18/user | Enterprise | Included |
+| 25-person team/year | $1,500-5,400 | $2,400-7,500 | ~$6/year |
+
+For a 25-person company, switching from Expensify Collect ($5/user) saves $1,494/year. Switching from SAP Concur saves significantly more.
+
+The Worker runs at \`echo-expense.bmcii1976.workers.dev\` with 55+ endpoints, 11 D1 tables, and AI receipt scanning via Engine Runtime.\`,
+  },
+  {
+    slug: 'ai-virtual-data-room-vs-intralinks-ansarada-2026',
+    title: 'AI Virtual Data Room vs Intralinks & Ansarada: Secure Document Sharing at 1% the Cost',
+    excerpt: 'Compare AI-powered virtual data rooms on Cloudflare Workers against Intralinks, Ansarada, and Datasite. Granular permissions, audit trails, and AI document analysis without five-figure monthly bills.',
+    category: 'AI & Engineering',
+    date: '2026-03-28',
+    readTime: '9 min read',
+    author: 'Echo Prime Tech',
+    tags: ['data-room', 'virtual-data-room', 'M&A', 'due-diligence', 'cloudflare-workers'],
+    featured: false,
+    content: \`# AI Virtual Data Room vs Intralinks & Ansarada: Secure Document Sharing at 1% the Cost
+
+Virtual data rooms are the most overpriced category in enterprise software. You're paying $15,000-50,000/month for what is essentially a file sharing service with an audit log and some access controls. The margins are astronomical because the buyers — M&A attorneys and investment bankers — expense it to the deal and nobody questions the cost.
+
+## The Pricing Racket
+
+**Intralinks** ($15,000-50,000/month):
+- Per-page pricing models still exist (yes, really)
+- Setup fees of $5,000-15,000
+- "Enterprise" pricing that requires a sales call to discover
+- Lock-in contracts with early termination fees
+- Charges extra for AI-powered redaction
+
+**Ansarada** ($499-999/month for small deals):
+- More reasonable for smaller transactions
+- But scales to $5,000+ for larger data rooms
+- AI features locked behind highest tier
+- Limited customization without professional services
+
+**Datasite (Merrill)** ($10,000-40,000/month):
+- The legacy incumbent that banks default to
+- Interface has improved but still feels dated
+- Per-user and per-page pricing tiers
+- Change management nightmare for infrequent users
+
+## What a Data Room Actually Needs
+
+Strip away the enterprise pricing and a virtual data room is:
+1. Secure file storage with folder hierarchy
+2. Granular user permissions (view, download, print, watermark)
+3. Complete audit trail (who viewed what, when, for how long)
+4. Q&A workflow (buyer asks, seller answers, all tracked)
+5. NDA/access agreement signing before entry
+6. Bulk upload/download capability
+7. Document indexing and search
+
+That's it. None of this requires a $50,000/month platform.
+
+## The Echo Data Room Approach
+
+Our Cloudflare Worker architecture provides enterprise-grade security at a fraction of the cost:
+
+### R2-Backed Storage
+Documents stored in Cloudflare R2 with server-side encryption. No egress fees — a critical cost factor when buyers download hundreds of documents during due diligence. Intralinks charges per-page for downloads. We charge nothing.
+
+### Granular Permissions
+\\\`\\\`\\\`
+// Room-level, folder-level, or document-level permissions
+{
+  "user": "buyer-counsel@lawfirm.com",
+  "role": "reviewer",
+  "permissions": {
+    "view": true,
+    "download": true,
+    "print": false,
+    "watermark": "dynamic", // User's email watermarked on every page
+    "expires": "2026-06-30"
+  },
+  "folders": ["financials", "contracts", "ip"],
+  "excluded": ["management-presentations/internal-only"]
+}
+\\\`\\\`\\\`
+
+### AI Document Analysis
+Upload a contract and the Engine Runtime's LG-01 (Contract Analysis) engine extracts key terms, identifies risks, and generates a summary. Upload a full cap table and the finance engines analyze dilution scenarios. The AI doesn't replace the lawyers — it gives them a 10-minute head start on every document.
+
+### Audit Trail
+Every action is logged: login, page view (with duration), download, print attempt, permission change, Q&A submission. The audit report exports to CSV/PDF for deal documentation. This is the feature that justifies data room pricing at traditional vendors — and it's essentially a database query.
+
+## Cost Comparison for a Typical M&A Deal (90 days)
+
+| | Intralinks | Ansarada | Echo Data Room |
+|---|-----------|----------|----------------|
+| Monthly fee | $25,000 | $2,000 | ~$5 |
+| Setup fee | $10,000 | $500 | $0 |
+| Per-page fees | $0.10-0.50/page | None | None |
+| 90-day total (5,000 pages) | $77,500-85,000 | $6,500 | ~$15 |
+
+Even if we're conservative and assume the Echo Data Room needs premium R2 storage, custom domain, and heavy API usage, the 90-day cost stays under $100. The traditional vendors charge 500-5,000x more for fundamentally the same capability.
+
+## Why This Matters for Deal Teams
+
+A mid-market M&A advisory firm running 5 deals/year spends $200,000-400,000 annually on data room subscriptions. That's a direct hit to margins on a business that operates on 1-2% of deal value.
+
+The Worker is live at \`echo-data-room.bmcii1976.workers.dev\` with folder hierarchy, versioning, granular permissions, audit trails, and AI document analysis integration.\`,
+  },
+  {
+    slug: 'ai-customer-success-platform-vs-gainsight-totango-2026',
+    title: 'AI Customer Success vs Gainsight & Totango: Predict Churn Before It Happens',
+    excerpt: 'Compare AI-powered customer success platforms on Cloudflare Workers against Gainsight, Totango, and ChurnZero. Health scores, playbooks, and churn prediction without six-figure annual contracts.',
+    category: 'Product Updates',
+    date: '2026-03-28',
+    readTime: '8 min read',
+    author: 'Echo Prime Tech',
+    tags: ['customer-success', 'churn-prediction', 'retention', 'saas', 'cloudflare-workers'],
+    featured: false,
+    content: \`# AI Customer Success vs Gainsight & Totango: Predict Churn Before It Happens
+
+Customer success platforms promise to reduce churn. They also happen to be some of the most expensive tools in the SaaS stack — typically $30,000-150,000/year, often with multi-year commitments. For many companies, the customer success tool costs more than the churn it prevents.
+
+## The Incumbent Problem
+
+**Gainsight** ($30,000-150,000/year):
+- The market leader with a price tag to match
+- Implementation takes 2-6 months with professional services
+- Complex data integration requirements
+- AI features are add-ons to already-expensive plans
+- Minimum contract is typically 12 months
+
+**Totango** ($12,000-80,000/year):
+- "Freemium" tier exists but is severely limited
+- Community tier gives you basic health scores only
+- Enterprise features (playbooks, SuccessBLOCs) start at $12,000/year
+- Pricing scales with customer count — gets expensive fast
+
+**ChurnZero** ($15,000-60,000/year):
+- Real-time usage tracking is strong
+- But pricing starts at $15K/year minimum
+- Implementation requires dedicated onboarding specialist
+- Custom integrations charged separately
+
+## What Customer Success Actually Requires
+
+The core requirements are straightforward:
+1. Customer health scoring based on product usage, support tickets, and engagement
+2. Playbook automation — trigger specific actions when health drops
+3. Renewal tracking and revenue forecasting
+4. Stakeholder mapping within customer accounts
+5. Communication logging (emails, calls, meetings)
+6. Churn prediction — ideally before the customer even thinks about leaving
+
+Traditional vendors wrap these in complex platforms because complexity justifies high pricing.
+
+## The Echo Approach
+
+### AI Health Scoring
+The system computes health scores from multiple signals:
+- Product usage frequency and depth (API call patterns)
+- Support ticket volume and severity trends
+- NPS/CSAT survey responses
+- Payment history (late payments = risk signal)
+- Communication frequency with CSM
+
+Each signal has configurable weight. The Engine Runtime's analytics capabilities identify patterns that precede churn: declining usage over 30 days, increasing support tickets, missed meetings.
+
+### Automated Playbooks
+\\\`\\\`\\\`
+// Trigger playbook when health drops below threshold
+{
+  "trigger": "health_score_below",
+  "threshold": 60,
+  "actions": [
+    { "type": "alert_csm", "channel": "slack" },
+    { "type": "schedule_call", "template": "health_check" },
+    { "type": "send_email", "template": "value_reinforcement" },
+    { "type": "create_task", "assignee": "account_csm" }
+  ]
+}
+\\\`\\\`\\\`
+
+### Churn Prediction
+The AI analyzes behavioral patterns across your customer base to identify at-risk accounts weeks before they consider churning. The model considers:
+- Usage decay rate (not just current usage — the slope matters)
+- Support sentiment trends
+- Contract renewal proximity
+- Champion departure signals (primary contact goes quiet)
+- Competitive mention patterns in support tickets
+
+### Revenue Forecasting
+Track ARR by customer, segment, and cohort. The system projects renewal likelihood based on health scores and engagement patterns, giving you a realistic revenue forecast instead of the "assume 100% renewal" fiction.
+
+## Cost Comparison
+
+| Feature | Gainsight | Totango | Echo CS |
+|---------|-----------|---------|---------|
+| Health scoring | $30K+/year | $12K+/year | Included |
+| Playbooks | $50K+/year | $25K+/year | Included |
+| Churn prediction | Add-on | Enterprise | AI-powered |
+| Renewal tracking | Included | $12K+/year | Included |
+| Implementation | 2-6 months + $$ | 1-3 months | Hours |
+| Annual cost (200 customers) | $30-80K | $12-40K | ~$60 |
+
+For a B2B SaaS with 200 customers doing $2M ARR, preventing even 2% additional churn saves $40,000/year. The traditional CS platforms cost more than the churn savings for many companies in this segment. The Echo approach costs less than a team lunch.
+
+The Worker runs at \`echo-customer-success.bmcii1976.workers.dev\` with health scoring, playbook automation, renewal tracking, and AI-powered churn prediction.\`,
+  },
+  {
+    slug: 'ai-vendor-management-vs-coupa-sap-ariba-2026',
+    title: 'AI Vendor Management vs Coupa & SAP Ariba: Procurement Intelligence Without Enterprise Pricing',
+    excerpt: 'Compare AI-powered vendor management on Cloudflare Workers against Coupa, SAP Ariba, and Procurify. Vendor scoring, contract tracking, and spend analysis without six-figure implementation projects.',
+    category: 'Product Updates',
+    date: '2026-03-28',
+    readTime: '7 min read',
+    author: 'Echo Prime Tech',
+    tags: ['vendor-management', 'procurement', 'supply-chain', 'cloudflare-workers', 'ai'],
+    featured: false,
+    content: \`# AI Vendor Management vs Coupa & SAP Ariba: Procurement Intelligence Without Enterprise Pricing
+
+Procurement software is the enterprise category where vendors charge you $100,000+ to help you save money on your other vendors. The irony is not lost on anyone except the procurement software salespeople.
+
+## The Enterprise Tax
+
+**Coupa** ($100,000-500,000/year):
+- Best-in-class procurement platform
+- Also best-in-class pricing
+- Implementation projects run $200,000-1,000,000
+- 6-18 month deployment timeline
+- Requires dedicated admin team to maintain
+- Annual contract with auto-renewal
+
+**SAP Ariba** ($50,000-250,000/year):
+- Deep SAP ecosystem integration (if you're already SAP)
+- Opaque pricing based on transaction volume
+- Ariba Network fees apply on top of software license
+- Legacy interface despite recent updates
+- Configuration requires SAP consultants ($250-400/hr)
+
+**Procurify** ($1,000-5,000/month):
+- More approachable for mid-market
+- But still $12,000-60,000/year
+- Limited AI capabilities
+- Approval workflows can be rigid
+- Integration library is growing but not comprehensive
+
+## What Most Companies Actually Need
+
+Unless you're a Fortune 500 managing 10,000+ vendors across 50 countries, here's what vendor management requires:
+
+1. **Vendor database** with contacts, contracts, certifications, and risk ratings
+2. **Contract tracking** with renewal dates, auto-renewal alerts, and term visibility
+3. **Spend analysis** by vendor, category, department, and time period
+4. **Performance scoring** based on delivery, quality, and responsiveness
+5. **Approval workflows** for new vendors and purchase orders
+6. **Compliance tracking** for insurance, certifications, and SLA adherence
+
+That's a Cloudflare Worker with D1 tables, not a $500,000 enterprise platform.
+
+## The Echo Approach
+
+### Vendor Scoring
+Each vendor gets a composite score based on:
+- On-time delivery rate
+- Quality metrics (defect rate, return rate)
+- Price competitiveness vs market benchmarks
+- Responsiveness to inquiries
+- Compliance status (insurance current, certs valid)
+- Payment terms favorability
+
+The AI identifies vendors that are trending negatively before they become supply chain risks.
+
+### Contract Intelligence
+Upload a vendor contract and the Engine Runtime's LG-01 engine extracts key terms:
+- Contract value and payment schedule
+- Auto-renewal clauses and notice periods
+- Termination conditions
+- SLA commitments and penalty clauses
+- Insurance requirements
+
+The system alerts you 90/60/30 days before renewal deadlines so you never auto-renew a bad contract by accident.
+
+### Spend Analysis
+\\\`\\\`\\\`
+GET /api/spend/analysis?period=12m&group_by=category
+
+// Returns spend breakdown with trends
+{
+  "total_spend": 2340000,
+  "categories": [
+    { "name": "IT Services", "spend": 890000, "trend": "+12%", "vendor_count": 8 },
+    { "name": "Office Supplies", "spend": 67000, "trend": "-3%", "vendor_count": 3 },
+    { "name": "Professional Services", "spend": 456000, "trend": "+28%", "top_vendor": "Acme Consulting" }
+  ],
+  "savings_opportunities": [
+    { "category": "IT Services", "recommendation": "Consolidate 3 overlapping SaaS tools", "est_savings": 45000 }
+  ]
+}
+\\\`\\\`\\\`
+
+The AI identifies consolidation opportunities, price anomalies (paying 40% more than market for the same service), and vendors that should be renegotiated.
+
+## Cost Comparison
+
+| Feature | Coupa | SAP Ariba | Procurify | Echo Vendor Mgr |
+|---------|-------|-----------|-----------|-----------------|
+| Vendor database | $100K+/yr | $50K+/yr | $12K+/yr | Included |
+| Contract tracking | Included | Included | $24K+/yr | Included |
+| Spend analytics | Included | Add-on | $36K+/yr | AI-powered |
+| AI insights | Add-on | Add-on | None | Included |
+| Implementation | $200K-1M | $100-500K | $5-15K | Hours |
+| Annual cost | $100-500K | $50-250K | $12-60K | ~$60 |
+
+For a mid-market company managing 50-200 vendors, the Echo approach provides 90% of the functionality at less than 0.1% of the cost. The remaining 10% — things like full AP automation, three-way matching at scale, and global procurement compliance — might justify enterprise platforms for Fortune 500 companies. For everyone else, it's paying for features you'll never use.
+
+The Worker runs at \`echo-vendor-manager.bmcii1976.workers.dev\` with vendor scoring, contract tracking, spend analysis, and AI-powered procurement intelligence.\`,
+  },
 ];
 
 export function formatDate(dateStr: string): string {

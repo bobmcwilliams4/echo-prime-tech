@@ -9,6 +9,55 @@
     <atom:link href="https://echo-ept.com/feed.xml" rel="self" type="application/rss+xml"/>
 
     <item>
+      <title>AI Vendor Management vs Coupa &amp; SAP Ariba: Procurement Intelligence Without Enterprise Pricing</title>
+      <link>https://echo-ept.com/blog/ai-vendor-management-vs-coupa-sap-ariba-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-vendor-management-vs-coupa-sap-ariba-2026</guid>
+      <description>Compare AI-powered vendor management on Cloudflare Workers against Coupa, SAP Ariba, and Procurify.</description>
+      <category>Product Updates</category>
+    </item>
+    <item>
+      <title>AI Customer Success vs Gainsight &amp; Totango: Predict Churn Before It Happens</title>
+      <link>https://echo-ept.com/blog/ai-customer-success-platform-vs-gainsight-totango-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-customer-success-platform-vs-gainsight-totango-2026</guid>
+      <description>Compare AI-powered customer success platforms on Cloudflare Workers against Gainsight, Totango, and ChurnZero.</description>
+      <category>Product Updates</category>
+    </item>
+    <item>
+      <title>AI Virtual Data Room vs Intralinks &amp; Ansarada: Secure Document Sharing at 1% the Cost</title>
+      <link>https://echo-ept.com/blog/ai-virtual-data-room-vs-intralinks-ansarada-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-virtual-data-room-vs-intralinks-ansarada-2026</guid>
+      <description>Compare AI-powered virtual data rooms on Cloudflare Workers against Intralinks, Ansarada, and Datasite.</description>
+      <category>AI &amp; Engineering</category>
+    </item>
+    <item>
+      <title>AI Expense Management vs Expensify &amp; Brex: Receipt Scanning Without the $12/User Tax</title>
+      <link>https://echo-ept.com/blog/ai-expense-management-vs-expensify-brex-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-expense-management-vs-expensify-brex-2026</guid>
+      <description>Compare AI-powered expense management on Cloudflare Workers against Expensify, Brex, and SAP Concur.</description>
+      <category>Product Updates</category>
+    </item>
+    <item>
+      <title>AI Workflow Automation vs Zapier &amp; Make: Build Intelligent Pipelines Without Per-Task Pricing</title>
+      <link>https://echo-ept.com/blog/ai-workflow-automation-vs-zapier-make-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-workflow-automation-vs-zapier-make-2026</guid>
+      <description>Compare AI-powered workflow automation on Cloudflare Workers against Zapier, Make, and n8n.</description>
+      <category>AI &amp; Engineering</category>
+    </item>
+    <item>
+      <title>AI Timesheet Tracking vs Harvest &amp; Toggl: One-Click Timers That Actually Work</title>
+      <link>https://echo-ept.com/blog/ai-timesheet-tracking-vs-harvest-toggl-2026</link>
+      <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">https://echo-ept.com/blog/ai-timesheet-tracking-vs-harvest-toggl-2026</guid>
+      <description>Compare AI-powered timesheet tracking on Cloudflare Workers against Harvest, Toggl, and Clockify.</description>
+      <category>Product Updates</category>
+    </item>
+
+    <item>
       <title>Unified Payments API: Stripe + PayPal + Crypto in One Cloudflare Worker</title>
       <link>https://echo-ept.com/blog/paypal-stripe-unified-payments-api-2026</link>
       <pubDate>Sat, 28 Mar 2026 00:00:00 GMT</pubDate>
