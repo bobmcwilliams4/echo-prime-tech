@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '../../../lib/theme-context';
 import { type BlogPost, formatDate, BLOG_POSTS } from '../blog-data';
+import NewsletterSignup from '../../../components/NewsletterSignup';
 
 function renderMarkdown(md: string) {
   const lines = md.split('\n');
@@ -189,6 +190,11 @@ export default function ArticleContent({ post }: { post: BlogPost }) {
               {tag}
             </span>
           ))}
+        </div>
+
+        {/* Newsletter Signup */}
+        <div className="mt-10">
+          <NewsletterSignup />
         </div>
 
         {/* Related Articles */}
