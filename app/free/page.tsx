@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import FaqSchema from '../../components/FaqSchema';
+import { subscribeToNewsletter } from '@/lib/newsletter-api';
+import NewsletterSignup from '../../components/NewsletterSignup';
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    Free Tier — Conversion Landing Page
@@ -109,11 +111,7 @@ export default function FreePage() {
     if (!email || !email.includes('@')) return;
     setStatus('loading');
     try {
-      const res = await fetch('https://ept-api.bmcii1976.workers.dev/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'free_tier_landing', page: '/free' }),
-      });
+      const res = await subscribeToNewsletter(email);
       setStatus(res.ok ? 'success' : 'error');
     } catch {
       setStatus('error');
@@ -334,6 +332,13 @@ export default function FreePage() {
           <Link href="/sdk/docs" className="px-8 py-3 rounded-xl border font-semibold" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
             Read the Docs
           </Link>
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="py-12 px-6">
+        <div className="max-w-xl mx-auto">
+          <NewsletterSignup />
         </div>
       </section>
 
