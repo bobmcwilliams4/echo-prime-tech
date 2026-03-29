@@ -17,7 +17,13 @@ export default function SignupPage() {
   const [tab, setTab] = useState<AuthTab>('email');
   const getRedirectUrl = () => {
     if (typeof window === 'undefined') return '/services';
-    return new URLSearchParams(window.location.search).get('redirect') || '/services';
+    const params = new URLSearchParams(window.location.search);
+    // Support both ?redirect=/path and ?service=name (redirect to product page)
+    const redirect = params.get('redirect');
+    if (redirect) return redirect;
+    const service = params.get('service');
+    if (service) return `/${service}`;
+    return '/services';
   };
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

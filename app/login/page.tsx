@@ -17,7 +17,12 @@ export default function LoginPage() {
   const [tab, setTab] = useState<AuthTab>('email');
   const getRedirectUrl = () => {
     if (typeof window === 'undefined') return '/dashboard';
-    return new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('redirect');
+    if (redirect) return redirect;
+    const service = params.get('service');
+    if (service) return `/${service}`;
+    return '/dashboard';
   };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
