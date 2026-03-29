@@ -165,9 +165,9 @@ const EXEMPT_PREFIXES = [
   '/polymarket-intel',   // Polymarket Intel (Prediction Markets)
   '/surface-landman',    // Echo Surface Landman (ROW Acquisition)
 
-  // ── BLOCKED (redirect to /coming-soon): ──
-  // '/orchestration'    — internal infra, redirect to /engines
-  // '/sandbox'          — CTF training, not a product
+  '/finance',            // Echo Finance (alt route for finance-ai)
+  '/workflows',          // Echo Workflows (alt route for workflow-automation)
+  '/orchestration',      // Echo Orchestration
 ];
 
 // Utility/non-service pages — do NOT redirect
