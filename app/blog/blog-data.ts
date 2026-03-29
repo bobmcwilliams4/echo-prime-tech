@@ -183,7 +183,7 @@ The QR menu revolution — accelerated by the pandemic — promised to reduce co
 
 ### 1. Branded Mobile Menu Pages
 
-Each QR code maps to a branded, mobile-first menu page at \\`/m/:code\\`. The page renders instantly on any phone — no app download, no account creation. Your branding, your colors, your logo.
+Each QR code maps to a branded, mobile-first menu page at \`/m/:code\`. The page renders instantly on any phone — no app download, no account creation. Your branding, your colors, your logo.
 
 ### 2. Table Ordering
 
@@ -312,8 +312,8 @@ For SaaS companies, D2C brands, and digital product creators, these prices are p
 | Commission Types | All | Percentage/flat | Percentage/flat | Percentage/flat/tiered/recurring |
 | Multi-Tier (Sub-Affiliates) | Yes | Limited | Basic | Full (parent credit) |
 | Fraud Detection | Enterprise AI | Basic rules | Manual | AI-powered + custom rules |
-| Branded Signup Pages | Yes | Yes | Yes | Public \\`/join/:slug\\` |
-| Click Tracking | Advanced | Good | Good | Cookie attribution \\`/go/:slug\\` |
+| Branded Signup Pages | Yes | Yes | Yes | Public \`/join/:slug\` |
+| Click Tracking | Advanced | Good | Good | Cookie attribution \`/go/:slug\` |
 | Automated Payouts | Yes | Yes | Manual | Auto payout generation |
 | Creative Library | Yes | Basic | Yes | Full asset management |
 | Real-Time Analytics | Yes | Good | Good | AI performance insights |
@@ -340,7 +340,7 @@ The AI analyzes each affiliate's conversion rate, average order value, customer 
 
 ### 4. Branded Affiliate Experience
 
-Each program gets a public signup page at \\`/join/:slug\\` where potential affiliates can apply. Approved affiliates get tracking links at \\`/go/:slug\\` with cookie-based attribution. The creative library provides banners, email templates, and social media assets — all downloadable from the affiliate dashboard.
+Each program gets a public signup page at \`/join/:slug\` where potential affiliates can apply. Approved affiliates get tracking links at \`/go/:slug\` with cookie-based attribution. The creative library provides banners, email templates, and social media assets — all downloadable from the affiliate dashboard.
 
 ### 5. Automated Payout Generation
 
