@@ -11,6 +11,7 @@ import { useTheme } from '../../lib/theme-context';
 import { getServices, Service } from '../../lib/ept-api';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import { EngineQueryPanel } from '../../components/EngineQueryPanel';
+import NewsletterSignup from '../../components/NewsletterSignup';
 
 const FAQS = [
   { q: 'How do I activate a service after signing up?', a: 'Simply select the services you want from the grid above and click Continue to Checkout. Once payment is confirmed, your service is live immediately — no setup delay, no manual provisioning.' },
@@ -141,6 +142,13 @@ export default function ServicesPage() {
           placeholder="Ask about consulting, project management..."
           exampleQueries={['How to scope a software consulting engagement', 'Best practices for SOW writing', 'Project estimation techniques']}
         />
+      </section>
+
+      {/* Newsletter */}
+      <section className="py-12 px-6">
+        <div className="max-w-xl mx-auto">
+          <NewsletterSignup />
+        </div>
       </section>
 
       <section className="py-16 px-6 max-w-3xl mx-auto">

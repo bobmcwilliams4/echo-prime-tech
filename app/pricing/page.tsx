@@ -10,6 +10,7 @@ import { getServices, Service, createCheckout } from '../../lib/ept-api';
 import { startTrial } from '../../lib/trial-api';
 import ReadAloudButton from '../../components/ReadAloudButton';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import NewsletterSignup from '../../components/NewsletterSignup';
 
 const PRICING_FAQS = [
   { q: 'What happens if I exceed my plan limits?', a: 'We notify you before you hit any limit. You can upgrade instantly from your dashboard with no downtime. Overages are never charged without your explicit approval — we pause the service and let you decide.' },
@@ -552,6 +553,13 @@ export default function PricingPage() {
                 <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Newsletter */}
+        <section className="py-12 px-6">
+          <div className="max-w-xl mx-auto">
+            <NewsletterSignup />
           </div>
         </section>
 

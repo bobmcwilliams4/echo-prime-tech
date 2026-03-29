@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from '../../lib/theme-context';
 import FaqSchema from '../../components/FaqSchema';
+import NewsletterSignup from '../../components/NewsletterSignup';
 
 const NAV_ITEMS = [
   { label: 'Home', href: '/' },
@@ -285,6 +286,13 @@ export default function AboutPage() {
               View Pricing
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="py-12 px-6">
+        <div className="max-w-xl mx-auto">
+          <NewsletterSignup />
         </div>
       </section>
 

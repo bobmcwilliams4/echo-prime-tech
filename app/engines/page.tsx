@@ -18,6 +18,7 @@ import {
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import FaqSchema from '../../components/FaqSchema';
+import NewsletterSignup from '../../components/NewsletterSignup';
 
 const ENGINE_FAQS = [
   { q: 'What are Echo Intelligence Engines?', a: 'Echo Intelligence Engines are domain-specific AI systems trained on authoritative sources — IRC code, case law, engineering standards, medical literature, and more. Each engine returns defensible, citation-backed answers grounded in real doctrine, not AI-generated opinions.' },
@@ -664,6 +665,13 @@ export default function EnginesPage() {
                 <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Newsletter */}
+        <section className="py-12 px-6">
+          <div className="max-w-xl mx-auto">
+            <NewsletterSignup />
           </div>
         </section>
 

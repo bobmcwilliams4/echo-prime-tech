@@ -7,6 +7,7 @@ import { useTheme } from '../../lib/theme-context';
 import { useAuth } from '../../lib/auth-context';
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import NewsletterSignup from '../../components/NewsletterSignup';
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    Echo Prime SDK — Developer Sales + Signup Page
@@ -937,6 +938,13 @@ export default function SDKPage() {
               <p className="text-sm" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="py-12 px-6">
+        <div className="max-w-xl mx-auto">
+          <NewsletterSignup />
         </div>
       </section>
 
