@@ -10,7 +10,9 @@ import NewsletterSignup from '../../components/NewsletterSignup';
 const NAV_ITEMS = [
   { label: 'Home', href: '/' },
   { label: 'Engines', href: '/engines' },
-  { label: 'Services', href: '/services' },
+  { label: 'Architecture', href: '/architecture' },
+  { label: 'Benchmarks', href: '/benchmarks' },
+  { label: 'Case Studies', href: '/case-studies' },
   { label: 'Pricing', href: '/pricing' },
 ];
 
@@ -149,29 +151,76 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Founder */}
+      {/* Leadership */}
       <section className="px-6 py-16 border-t" style={{ borderColor: 'var(--ept-border)' }}>
-        <div className="max-w-4xl mx-auto">
-          <div className="p-8 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--ept-accent)' }}>Leadership</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--ept-text)' }}>Meet the Founder</h2>
+          </div>
+          <div className="p-8 md:p-12 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
             <div className="flex flex-col md:flex-row gap-8 items-start">
-              <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-extrabold text-white flex-shrink-0" style={{ backgroundColor: 'var(--ept-accent)' }}>
-                BM
+              <div className="flex flex-col items-center gap-4 flex-shrink-0">
+                <div className="w-28 h-28 rounded-2xl flex items-center justify-center text-4xl font-extrabold text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>
+                  BM
+                </div>
+                <div className="flex flex-col items-center gap-1.5">
+                  <a href="mailto:bobbymcwilliams@echo-op.com" className="text-xs font-medium transition-colors hover:opacity-80" style={{ color: 'var(--ept-accent)' }}>bobbymcwilliams@echo-op.com</a>
+                  <a href="tel:+14325276112" className="text-xs transition-colors hover:opacity-80" style={{ color: 'var(--ept-text-muted)' }}>(432) 527-6112</a>
+                  <a href="https://www.linkedin.com/in/bobby-mcwilliams" target="_blank" rel="noopener noreferrer" className="text-xs transition-colors hover:opacity-80" style={{ color: 'var(--ept-text-muted)' }}>LinkedIn</a>
+                </div>
               </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-extrabold mb-2" style={{ color: 'var(--ept-text)' }}>Bobby Don McWilliams II</h2>
-                <p className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: 'var(--ept-accent)' }}>Founder & CEO</p>
+                <h2 className="text-2xl md:text-3xl font-extrabold mb-1" style={{ color: 'var(--ept-text)' }}>Bobby Don McWilliams II</h2>
+                <p className="text-sm font-semibold uppercase tracking-wider mb-5" style={{ color: 'var(--ept-accent)' }}>Founder &amp; CEO</p>
                 <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--ept-text-secondary)' }}>
-                  After three decades in the West Texas oilfield — from roughnecking to production optimization — Bobby taught himself
+                  After three decades in the West Texas oilfield — from roughnecking to production optimization to landman operations — Bobby taught himself
                   to code and spent 14 months building Echo Prime Technologies from scratch. No computer science degree. No VC funding.
                   No corporate backing. Just relentless engineering and domain expertise earned the hard way.
                 </p>
-                <p className="text-base leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>
-                  The oilfield taught him that systems need to work at 3 AM when nobody&apos;s watching. That downtime costs real money.
+                <p className="text-base leading-relaxed mb-4" style={{ color: 'var(--ept-text-secondary)' }}>
+                  His background spans the full oil &amp; gas value chain: drilling operations, production optimization, surface and mineral title examination,
+                  right-of-way acquisition, and regulatory compliance across the Permian Basin. This deep industry expertise is baked into every engine Echo Prime builds —
+                  real domain knowledge from someone who&apos;s been on location at 3 AM, not scraped from a textbook.
+                </p>
+                <p className="text-base leading-relaxed mb-6" style={{ color: 'var(--ept-text-secondary)' }}>
+                  The oilfield taught him that systems need to work when nobody&apos;s watching. That downtime costs real money.
                   That the difference between a good solution and a great one is whether it survives contact with reality.
                   He built Echo Prime with that philosophy: autonomous, reliable, and battle-tested.
                 </p>
+                <blockquote className="pl-5 border-l-2 italic text-base" style={{ borderColor: 'var(--ept-accent)', color: 'var(--ept-text-secondary)' }}>
+                  &ldquo;I didn&apos;t build this company to compete with Silicon Valley. I built it because the industries I know — oil &amp; gas, title, tax, security —
+                  deserve AI that actually understands their work. Not a chatbot with a nice UI. Real engines with real expertise.&rdquo;
+                </blockquote>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why We're Different */}
+      <section className="px-6 py-16 border-t" style={{ borderColor: 'var(--ept-border)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--ept-text)' }}>Why We&apos;re Different</h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
+              Most AI companies wrap an API and call it a product. We build the engines.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {[
+              { title: 'Engines, Not Wrappers', desc: 'Every domain has purpose-built intelligence engines with real doctrine — IRC sections, case law citations, NIST frameworks, API standards. Not prompt templates piped to GPT.' },
+              { title: 'Domain Expertise First', desc: 'Our founder spent 30 years in oil & gas before writing a line of code. That expertise is embedded in every engine — you can\'t fake industry knowledge with a fine-tuned model.' },
+              { title: 'Fully Autonomous Infrastructure', desc: '144 Cloudflare Workers running 24/7 on global edge. Self-healing, self-monitoring, self-deploying. Zero cold starts. Zero single points of failure. $0.04/month infrastructure cost.' },
+              { title: '70+ SaaS Products, One Platform', desc: 'CRM, invoicing, helpdesk, payroll, compliance, recruiting, contracts, LMS, email marketing, booking, forms, signatures — all built in-house, all with AI, all on one subscription.' },
+              { title: 'Transparent Stack', desc: 'We publish our architecture, our benchmarks, and our engine count. Live stats on the homepage pulled directly from production. No inflated numbers, no vaporware.' },
+              { title: 'Built in Midland, TX', desc: 'Not Silicon Valley. Not a coast. Built where the oil comes from, where the landmen work, where the tax returns get filed. Proximity to the problem is a feature.' },
+            ].map(item => (
+              <div key={item.title} className="p-6 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+                <h3 className="text-lg font-bold mb-3" style={{ color: 'var(--ept-text)' }}>{item.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -311,15 +360,40 @@ export default function AboutPage() {
 
       {/* Footer */}
       <footer className="border-t px-6 py-8" style={{ borderColor: 'var(--ept-border)' }}>
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>
-            &copy; 2026 Echo Prime Technologies. Built in Midland, TX.
-          </p>
-          <div className="flex gap-6">
-            <Link href="/legal/privacy" className="text-sm hover:opacity-80" style={{ color: 'var(--ept-text-muted)' }}>Privacy</Link>
-            <Link href="/legal/terms" className="text-sm hover:opacity-80" style={{ color: 'var(--ept-text-muted)' }}>Terms</Link>
-            <Link href="/pricing" className="text-sm hover:opacity-80" style={{ color: 'var(--ept-text-muted)' }}>Pricing</Link>
+        <div className="max-w-5xl mx-auto flex flex-col items-center gap-5">
+          {/* Social Media Links */}
+          <div className="flex items-center gap-5">
+            {[
+              { label: 'X / Twitter', href: 'https://x.com/EchoPrimeTech', icon: <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> },
+              { label: 'LinkedIn', href: 'https://www.linkedin.com/company/echo-prime-tech', icon: <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> },
+              { label: 'YouTube', href: 'https://www.youtube.com/@EchoPrimeTech', icon: <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> },
+              { label: 'GitHub', href: 'https://github.com/ECHO-OMEGA-PRIME', icon: <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg> },
+            ].map(social => (
+              <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.label} className="transition-all duration-300 hover:scale-110" style={{ color: 'var(--ept-text-muted)' }} onMouseEnter={e => { e.currentTarget.style.color = 'var(--ept-accent)'; e.currentTarget.style.filter = 'drop-shadow(0 0 6px var(--ept-accent))'; }} onMouseLeave={e => { e.currentTarget.style.color = 'var(--ept-text-muted)'; e.currentTarget.style.filter = 'none'; }}>
+                {social.icon}
+              </a>
+            ))}
           </div>
+          <div className="flex flex-wrap justify-center gap-4 text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+            <Link href="/" className="hover:underline">Home</Link>
+            <Link href="/engines" className="hover:underline">Engines</Link>
+            <Link href="/architecture" className="hover:underline">Architecture</Link>
+            <Link href="/benchmarks" className="hover:underline">Benchmarks</Link>
+            <Link href="/case-studies" className="hover:underline">Case Studies</Link>
+            <Link href="/security" className="hover:underline">Security</Link>
+            <Link href="/pricing" className="hover:underline">Pricing</Link>
+            <Link href="/blog" className="hover:underline">Blog</Link>
+          </div>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
+            <p className="text-sm" style={{ color: 'var(--ept-text-muted)' }}>
+              &copy; {new Date().getFullYear()} Echo Prime Technologies. Built with autonomous AI in Midland, TX.
+            </p>
+            <div className="flex gap-6">
+              <Link href="/legal/privacy" className="text-sm hover:opacity-80" style={{ color: 'var(--ept-text-muted)' }}>Privacy</Link>
+              <Link href="/legal/terms" className="text-sm hover:opacity-80" style={{ color: 'var(--ept-text-muted)' }}>Terms</Link>
+            </div>
+          </div>
+          <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>Midland, TX &middot; bobbymcwilliams@echo-op.com</p>
         </div>
       </footer>
     </div>

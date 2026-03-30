@@ -12,6 +12,7 @@ import SubscriptionGate from '../../components/SubscriptionGate';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import FaqSchema from '../../components/FaqSchema';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+import NewsletterSignup from '../../components/NewsletterSignup';
 
 const SERVICE_ID = 'cyber-defense';
 
@@ -204,6 +205,7 @@ function SecurityPageContent() {
   const [service, setService] = useState<Service | null>(null);
   const [checkingOut, setCheckingOut] = useState<string | null>(null);
   const [expandedFeature, setExpandedFeature] = useState<number | null>(null);
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   useEffect(() => {
     getServices().then(d => {
@@ -231,18 +233,39 @@ function SecurityPageContent() {
       <FaqSchema faqs={FAQS} />
       <BreadcrumbSchema items={[{name:'Home',href:'/'},{name:'Products',href:'/services'},{name:'Cybersecurity',href:'/security'}]} />
       {/* ─── Nav ─── */}
-      <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
-        <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="EPT" width={400} height={260} className="w-[160px] md:w-[200px] h-auto" style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority /></Link>
-        <div className="flex items-center gap-3">
+      <nav className="sticky top-0 z-50 border-b px-6 py-4 flex items-center justify-between backdrop-blur-xl"
+        style={{ borderColor: 'var(--ept-border)', backgroundColor: isDark ? 'rgba(5,5,8,0.85)' : 'rgba(255,255,255,0.85)' }}>
+        <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={140} height={32} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} priority /></Link>
+        <div className="hidden md:flex items-center gap-6">
+          <Link href="/architecture" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Architecture</Link>
           <Link href="/pentesting" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Offensive Security</Link>
+          <Link href="/benchmarks" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Benchmarks</Link>
           <Link href="/pricing" className="text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Pricing</Link>
+          <Link href="/free" className="text-sm font-medium" style={{ color: 'var(--ept-accent)' }}>Start Free</Link>
           {user ? (
-            <Link href="/dashboard" className="text-sm font-semibold px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Dashboard</Link>
+            <Link href="/dashboard" className="px-4 py-2 rounded-xl text-sm font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Dashboard</Link>
           ) : (
-            <Link href="/login" className="text-sm font-semibold px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started</Link>
+            <Link href="/login" className="px-4 py-2 rounded-xl text-sm font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Sign In</Link>
           )}
         </div>
+        <button className="md:hidden p-2" onClick={() => setMobileMenu(!mobileMenu)} aria-label="Menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--ept-text)' }}>
+            {mobileMenu
+              ? <path d="M6 6l12 12M6 18L18 6" />
+              : <><line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="18" x2="20" y2="18" /></>}
+          </svg>
+        </button>
       </nav>
+      {mobileMenu && (
+        <div className="md:hidden border-b px-6 py-4 space-y-3" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-border)' }}>
+          <Link href="/architecture" className="block text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Architecture</Link>
+          <Link href="/pentesting" className="block text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Offensive Security</Link>
+          <Link href="/benchmarks" className="block text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Benchmarks</Link>
+          <Link href="/pricing" className="block text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>Pricing</Link>
+          <Link href="/free" className="block text-sm font-medium" style={{ color: 'var(--ept-accent)' }}>Start Free</Link>
+          <Link href="/login" className="block text-sm font-medium" style={{ color: 'var(--ept-accent)' }}>Sign In</Link>
+        </div>
+      )}
 
       {/* ─── Hero ─── */}
       <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
@@ -535,6 +558,115 @@ function SecurityPageContent() {
         </div>
       </div>
 
+      {/* ─── Data Policy & Privacy ─── */}
+      <section className="max-w-5xl mx-auto px-6 pb-20">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold" style={{ color: 'var(--ept-text)' }}>Data Policy &amp; Privacy</h2>
+          <p className="mt-3 text-sm max-w-2xl mx-auto" style={{ color: 'var(--ept-text-muted)' }}>Your data security is non-negotiable. Here&apos;s exactly how we protect it.</p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          {[
+            { title: 'Zero Data Retention', desc: 'Queries are processed on Cloudflare\'s edge network and never stored. No centralized server holds your data. API responses are ephemeral — they exist only for the duration of the request.', icon: '\u{1F6AB}' },
+            { title: 'Encryption Everywhere', desc: 'TLS 1.3 in transit. AES-256-GCM at rest. Argon2id key derivation for credential storage. HMAC-SHA256 integrity verification on every vault read. The same standards used by banks and defense contractors.', icon: '\u{1F512}' },
+            { title: 'No Model Training', desc: 'We do not use your queries, documents, or data to train any AI models. Your intellectual property stays yours. Period. This is contractually guaranteed for enterprise customers.', icon: '\u{1F6E1}\u{FE0F}' },
+            { title: 'Edge-Only Processing', desc: 'All computation runs on Cloudflare\'s global edge network across 300+ data centers. Data is processed at the nearest edge location and never leaves the region. No data is sent to third-party AI providers.', icon: '\u{1F30D}' },
+            { title: 'SOC 2 Type II Infrastructure', desc: 'Cloudflare Workers run on SOC 2 Type II certified infrastructure. Annual penetration testing. Continuous monitoring. Incident response within 30 minutes. Full audit trail on all administrative actions.', icon: '\u{1F4CB}' },
+            { title: 'Data Sovereignty', desc: 'For regulated industries, we offer data locality guarantees ensuring your data is processed only within specified geographic regions. Full GDPR Article 28 compliance for EU data.', icon: '\u{1F3F3}\u{FE0F}' },
+          ].map((item, i) => (
+            <div key={i} className="p-6 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+              <div className="text-2xl mb-3">{item.icon}</div>
+              <h3 className="text-sm font-bold mb-2" style={{ color: 'var(--ept-text)' }}>{item.title}</h3>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--ept-text-muted)' }}>{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Certifications & Compliance Roadmap ─── */}
+      <section className="max-w-5xl mx-auto px-6 pb-20">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold" style={{ color: 'var(--ept-text)' }}>Certifications &amp; Compliance Roadmap</h2>
+          <p className="mt-3 text-sm max-w-2xl mx-auto" style={{ color: 'var(--ept-text-muted)' }}>Our commitment to security isn&apos;t just words — it&apos;s a roadmap of certifications and compliance milestones.</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-4">
+          {/* Current */}
+          <div className="p-6 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: '#22c55e' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#22c55e' }} />
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#22c55e' }}>Active Now</span>
+            </div>
+            <ul className="space-y-3">
+              {[
+                'SOC 2 Type II Infrastructure (via Cloudflare)',
+                'TLS 1.3 + AES-256-GCM Encryption',
+                'GDPR Article 28 Compliant',
+                'OWASP Top 10 Tested (Quarterly)',
+                'NIST CSF 2.0 Aligned',
+                'CIS Controls v8 Mapped',
+                'Automated Vulnerability Scanning',
+                'Annual Penetration Testing',
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-2 text-xs" style={{ color: 'var(--ept-text-secondary)' }}>
+                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#22c55e' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* In Progress */}
+          <div className="p-6 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-accent)' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: 'var(--ept-accent)' }} />
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--ept-accent)' }}>In Progress</span>
+            </div>
+            <ul className="space-y-3">
+              {[
+                'SOC 2 Type II Direct Certification',
+                'ISO 27001:2022 Certification',
+                'HIPAA Business Associate Agreement',
+                'PCI-DSS v4.0 Compliance',
+                'FedRAMP Authorization (Moderate)',
+                'Bug Bounty Program Launch',
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-2 text-xs" style={{ color: 'var(--ept-text-secondary)' }}>
+                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'var(--ept-accent)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Planned */}
+          <div className="p-6 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--ept-text-muted)' }} />
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Planned 2026-2027</span>
+            </div>
+            <ul className="space-y-3">
+              {[
+                'NIST 800-53 Rev 5 Full Assessment',
+                'CSA STAR Level 2 Certification',
+                'StateRAMP Authorization',
+                'TX-RAMP Certification (Texas)',
+                'Cyber Essentials Plus (UK)',
+                'IRAP Assessment (Australia)',
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-2 text-xs" style={{ color: 'var(--ept-text-secondary)' }}>
+                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'var(--ept-text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Newsletter ─── */}
+      <section className="max-w-xl mx-auto px-6 pb-16">
+        <NewsletterSignup />
+      </section>
+
       {/* ─── CTA ─── */}
       <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
         <div className="p-10 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
@@ -545,10 +677,43 @@ function SecurityPageContent() {
       </section>
 
       {/* ─── Footer ─── */}
-      <footer className="border-t py-8 text-center" style={{ borderColor: 'var(--ept-border)' }}>
-        <p className="text-xs" style={{ color: 'var(--ept-text-muted)' }}>
-          Questions? <a href="mailto:bob@echo-op.com" className="underline" style={{ color: 'var(--ept-accent)' }}>Contact us</a> | <Link href="/pentesting" className="underline" style={{ color: 'var(--ept-accent)' }}>Penetration Testing</Link> | <Link href="/pricing" className="underline" style={{ color: 'var(--ept-accent)' }}>All Pricing</Link> | <Link href="/" className="underline" style={{ color: 'var(--ept-accent)' }}>Home</Link>
-        </p>
+      <footer className="border-t px-6 py-12" style={{ borderColor: 'var(--ept-border)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="flex justify-center gap-6 mb-8">
+            {[
+              { href: 'https://x.com/EchoPrimeTech', label: 'X / Twitter', d: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z' },
+              { href: 'https://linkedin.com/company/echo-prime-technologies', label: 'LinkedIn', d: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z' },
+              { href: 'https://youtube.com/@EchoPrimeTech', label: 'YouTube', d: 'M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z' },
+              { href: 'https://github.com/ECHO-OMEGA-PRIME', label: 'GitHub', d: 'M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12' },
+            ].map((s, i) => (
+              <a key={i} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
+                className="transition-all duration-300 hover:scale-110"
+                style={{ color: 'var(--ept-text-muted)' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--ept-accent)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--ept-text-muted)')}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d={s.d} /></svg>
+              </a>
+            ))}
+          </div>
+          <div className="flex flex-wrap justify-center gap-6 mb-6 text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+            <Link href="/about" className="hover:underline">About</Link>
+            <Link href="/architecture" className="hover:underline">Architecture</Link>
+            <Link href="/benchmarks" className="hover:underline">Benchmarks</Link>
+            <Link href="/case-studies" className="hover:underline">Case Studies</Link>
+            <Link href="/pentesting" className="hover:underline">Pentesting</Link>
+            <Link href="/pricing" className="hover:underline">Pricing</Link>
+            <Link href="/blog" className="hover:underline">Blog</Link>
+            <Link href="/docs" className="hover:underline">Docs</Link>
+          </div>
+          <p className="text-center text-xs" style={{ color: 'var(--ept-text-muted)' }}>
+            &copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved.{' '}
+            <Link href="/legal/privacy" className="underline">Privacy</Link> &middot;{' '}
+            <Link href="/legal/terms" className="underline">Terms</Link>
+          </p>
+          <p className="text-center text-xs mt-2" style={{ color: 'var(--ept-text-muted)' }}>
+            Midland, TX &middot; bobbymcwilliams@echo-op.com
+          </p>
+        </div>
       </footer>
       <ProductTutorialButton tutorialId="security" productName="Cyber Defense" />
     </div>

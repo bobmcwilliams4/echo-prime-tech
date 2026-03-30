@@ -1,23 +1,26 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Case Studies — AI Success Stories | Echo Prime Technologies',
-  description: 'Real-world AI engine deployments across oil & gas, legal, financial services, cybersecurity, healthcare, and construction. See measurable results from production AI systems.',
-  keywords: ['AI case studies', 'AI success stories', 'enterprise AI', 'oilfield AI', 'legal AI', 'Echo Prime'],
+  title: 'Case Studies — Echo Prime Technologies',
+  description: 'Real-world results: how companies use 5,500+ AI engines to cut title examination time 80%, reduce audit prep from 3 weeks to 2 days, and automate expert-level analysis across oil & gas, tax, legal, cybersecurity, and sales.',
+  keywords: ['case studies', 'AI results', 'title intelligence', 'tax engines', 'legal AI', 'cybersecurity compliance', 'drilling optimization', 'AI sales agent', 'ROI', 'automation'],
   openGraph: {
-    title: 'Case Studies — AI Success Stories Across Industries',
-    description: 'Real-world AI deployments with measurable results. Oil & gas, legal, financial, cybersecurity, healthcare, and construction.',
+    title: 'Case Studies — Echo Prime Technologies',
+    description: 'Real-world results: 80% faster title examination, 98% audit defense rate, $150K/well savings. See what 5,500+ AI engines deliver.',
     url: 'https://echo-ept.com/case-studies',
-    images: [{ url: '/logo-day.png', width: 600, height: 400, alt: 'Echo Prime Technologies' }],
+    siteName: 'Echo Prime Technologies',
+    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Case Studies — Echo Prime Technologies',
-    description: 'Real-world AI deployments with measurable results across 6 industries.',
+    description: 'Real-world results: 80% faster title examination, 98% audit defense rate, $150K/well savings.',
   },
-  alternates: { canonical: '/case-studies' },
+  alternates: {
+    canonical: 'https://echo-ept.com/case-studies',
+  },
 };
 
 export default function CaseStudiesLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return children;
 }
