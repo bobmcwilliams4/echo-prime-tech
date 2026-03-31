@@ -18,7 +18,7 @@ interface LiveStats {
 }
 
 function useLiveStats(): LiveStats {
-  const [stats, setStats] = useState<LiveStats>({ engines: '5,486+', categories: '940+', doctrines: '607K+', industries: [] });
+  const [stats, setStats] = useState<LiveStats>({ engines: '5,600+', categories: '885', doctrines: '136K+', industries: [] });
   useEffect(() => {
     fetch('https://echo-engine-runtime.bmcii1976.workers.dev/stats')
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
