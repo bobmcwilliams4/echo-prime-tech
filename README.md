@@ -1,4 +1,4 @@
-# Echo Prime Technologies -- Commercial Product Platform
+# Echo Prime Technologies — Commercial Product Platform
 
 ![Next.js 15](https://img.shields.io/badge/Next.js-15.3-000000?style=flat-square&logo=next.js&logoColor=white)
 ![React 19](https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black)
@@ -9,289 +9,185 @@
 ![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat-square&logo=vercel&logoColor=white)
 ![License](https://img.shields.io/badge/License-Proprietary-red?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Production-brightgreen?style=flat-square)
+![SDK](https://img.shields.io/badge/SDK-v2.0_Crown_Jewel-gold?style=flat-square)
+![Engines](https://img.shields.io/badge/Engines-5,486+-purple?style=flat-square)
+![Functions](https://img.shields.io/badge/Functions_Indexed-1.8M+-blue?style=flat-square)
+![Workers](https://img.shields.io/badge/CF_Workers-187-orange?style=flat-square)
 
-> The customer-facing commercial storefront for Echo Prime Technologies. 49 pages showcasing 6,500+ AI intelligence engines, security tools, voice synthesis, manufacturing AI, tax returns, title intelligence, and enterprise SaaS products -- with day/night theme, Firebase auth, 3D visualizations, and deep Cloudflare Worker integrations.
+> The customer-facing commercial storefront for Echo Prime Technologies. 49 pages showcasing 5,486+ AI intelligence engines, 607K+ doctrine blocks, 312K+ graph nodes, 187 Cloudflare Workers, SDK v2.0 with 280+ functions across 22 categories, and 1.8M+ indexed code functions — with day/night theme, Firebase auth, 3D visualizations, and deep Cloudflare Worker integrations.
 
 **Live at:** [echo-ept.com](https://echo-ept.com)
+**SDK Gateway:** [echo-sdk-gateway.bmcii1976.workers.dev](https://echo-sdk-gateway.bmcii1976.workers.dev)
+
+---
+
+## SDK v2.0 — "The Crown Jewel"
+
+The ECHO PRIME SDK wraps the entire platform — 187 Workers, 14 MCP servers, 5,486 engines, 607K doctrines, 29 LLM workers, 12 AI personalities, and 1.8M+ indexed functions — into one importable package.
+
+### 22 SDK Categories (280+ Functions)
+
+| # | Category | Functions | Backend |
+|---|----------|-----------|---------|
+| 1 | Voice & Speech | 33 | echo-speak-cloud → ElevenLabs v3, 12 personality voices |
+| 2 | Chat & Personalities | 12 | echo-chat → 14 AI personalities, Trinity Council |
+| 3 | AI Orchestrator | 13 | echo-ai-orchestrator → 29 LLM workers (GPT-5.4, Grok 4.20, Claude, DeepSeek) |
+| 4 | Engine Runtime | 8 | echo-engine-runtime → 5,486 engines, 231K doctrines, <50ms |
+| 5 | Knowledge Forge | 6 | echo-knowledge-forge → 12,217 docs, 78,782 chunks |
+| 6 | Graph RAG | 13 | echo-graph-rag → 312K+ nodes, cross-domain traversal |
+| 7 | Memory Systems | 15 | shared-brain + cortex + prime + omnisync → infinite persistence |
+| 8 | Scanner & Infra | 10 | echo-343-scanner → 187 worker monitoring, cluster mgmt |
+| 9 | Function Library | 8 | D1 functions table → 1.8M+ indexed functions from all drives |
+| 10 | Build Orchestrator | 11 | Hephaestion Forge → 13-stage pipeline, 15 archetypes |
+| 11 | Doctrine Forge | 8 | echo-doctrine-forge → 607K+ blocks, 29 LLM providers |
+| 12 | Security Scanner | 6 | REVENG scanner → MITRE ATT&CK mapping |
+| 13 | County Records | 5 | echo-county-records → 259K+ TX oil & gas records, 80 counties |
+| 14 | Tax Intelligence | 5 | 14 TX engines + TIE → IRC citations, case law |
+| 15 | Vault & Credentials | 4 | echo-vault-api → 541+ stored credentials |
+| 16 | DevOps & Deployment | 8 | Cloudflare/Vercel/GitHub integration |
+| 17 | Social & Messaging | 10 | X, LinkedIn, Telegram, Discord, Slack, Email, SMS |
+| 18 | Scraping & Data | 8 | ENCORE, ShadowGlass v10, data pipelines |
+| 19 | Swarm Intelligence | 6 | X1200 architecture, Trinity Council, 128 CLI agents |
+| 20 | Website Tools | 5 | echo-ept.com codebase access |
+| 21 | Analytics & Monitoring | 6 | Cross-service health and usage tracking |
+| 22 | MEGA Gateway | 6 | 1,873 MCP servers, 35,000+ tools |
+
+### SDK Delivery Formats
+
+- **TypeScript/JavaScript:** `npm install @echo-prime/sdk`
+- **Python:** `pip install echo-prime-sdk`
+- **CLI:** `echo-sdk query engines "tax optimization"`
+- **REST API:** Direct HTTP with API key header
+- **MCP Server:** Claude Desktop / Claude Code integration
+- **React Hooks:** `useEchoEngine()`, `useEchoChat()`, `useEchoVoice()`
+
+### Pricing
+
+| Plan | Price | Calls |
+|------|-------|-------|
+| Free | $0 | 100/day |
+| Starter | $49/mo | 10K/mo |
+| Pro | $199/mo | 100K/mo |
+| Enterprise | $999/mo | Unlimited |
+
+---
+
+## Function Library (1.8M+ Functions)
+
+The function scanner crawls all cluster drives (O:\, I:\, H:\, P:\, M:\, E:\, B:\) extracting every function, class, and method from Python, TypeScript, JavaScript, and PowerShell files. Results stored in Cloudflare D1 (`echo-343-scanner`) with 22-column schema and 6 indexes.
+
+### Breakdown by Category
+- **GEN (General):** 60,547+
+- **ECHO (Core Platform):** 21,653+
+- **WEB (Web Dev):** 7,824+
+- **API (Services):** 2,557+
+- **VOICE (Speech):** 686+
+- **CRYPTO (Blockchain):** 499+
+- **CYBER (Security):** 303+
+- **LEGAL/TAX/OIL:** 266+
+
+### Breakdown by Language
+- **Python:** 88,000+ (dominant)
+- **JavaScript:** 4,735+
+- **PowerShell:** 1,459+
+- **TypeScript:** 186+
+
+Scanner running continuously on BRAVO node, currently at 1.8M+ functions across 7 drives.
+
+---
+
+## Infrastructure
+
+### Cloudflare Workers (187 total)
+
+Core workers responding 200 OK:
+- `echo-sdk-gateway` — SDK unified entry point (2.1s)
+- `echo-ai-orchestrator` — 29 LLM worker routing (516ms)
+- `echo-engine-runtime` — 5,486 engine queries (543ms)
+- `echo-knowledge-forge` — 12K doc semantic search (1.3s)
+- `echo-speak-cloud` — ElevenLabs v3 TTS (411ms)
+- `echo-chat` — 14 personality chat (6ms)
+- `echo-shared-brain` — Infinite memory (1.9s)
+- `echo-memory-cortex` — 9-pillar recall (665ms)
+- `echo-swarm-brain` — Multi-agent swarm (976ms)
+- `echo-build-orchestrator` — Hephaestion Forge (636ms)
+- `echo-vault-api` — 541 credentials (320ms)
+- `echo-doctrine-forge` — Doctrine pipeline (6ms)
+- `echo-autonomous-daemon` — Background tasks (53ms)
+- `omniscient-sync` — Cloud state sync (6ms)
+- `echo-relay` — Message relay (9ms)
+- `echo-canary-beacon` — Health canary (540ms)
+- `echo-x-bot` — X/Twitter bot (7ms)
+- `echo-model-host` — Model hosting (6ms)
+- `echo-rag-orchestrator` — RAG pipeline (4.9s)
+- Plus 168 more specialized workers
+
+### D1 Databases (233 total)
+
+- `echo-343-scanner` — 182MB, 27 tables, 434K+ rows (infra monitoring + function library)
+- `echo-master-vault` — 541 credentials
+- Plus 231 app-specific databases (guardian, landman, polymarket, business, etc.)
+
+### Cluster (4 nodes)
+
+| Node | Status | CPU | GPU | RAM |
+|------|--------|-----|-----|-----|
+| ALPHA | DOWN | i7-12700K | RTX 4080 Super + GTX 1650 | 64GB |
+| BRAVO | ACTIVE | i7-11700F | RTX 4060 | 32GB |
+| CHARLIE | Kali Linux | Mini PC | None | 8GB |
+| DELTA | Future | TBD | TBD | TBD |
 
 ---
 
 ## Overview
 
-echo-ept.com is the production storefront where Echo Prime Technologies sells AI products and services to customers. It is a statically-exported Next.js 15 application with 49 pages, automatic day/night theme switching via CSS custom properties, Firebase authentication (email + Google OAuth), role-based access control, subscription gating, checkout flows, and admin panels.
+echo-ept.com is the production storefront where Echo Prime Technologies sells AI products and services. Next.js 15 with 49 pages, automatic day/night theme, Firebase auth (email + Google OAuth), role-based access, subscription gating, checkout flows, and admin panels.
 
-Every page connects to live Cloudflare Worker backends for real-time engine queries, AI chat with 14 personas, sales agent automation, manufacturing design, and more. The site features a particle background with stars, nebula effects, and matrix rain animation, a floating AI chat button on every page, and TTS read-aloud integration.
+Every page connects to live Cloudflare Worker backends for real-time engine queries, AI chat with 14 personas, sales agent automation, manufacturing design, and more.
 
 ## Architecture
 
 ```
-+------------------------------------------------------------------+
-|                     echo-ept.com (Vercel)                         |
-|              Next.js 15 / React 19 / TypeScript 5.7               |
-|                Static Export (output: 'export')                    |
-+------------------------------------------------------------------+
-|  +----------+ +-----------+ +----------+ +---------------------+  |
-|  | Engines  | | Sentinel  | |  Closer  | | Hephaestion Forge   |  |
-|  | Market   | |  AI Chat  | | AI Sales | | Software Factory    |  |
-|  +----+-----+ +-----+-----+ +----+-----+ +---------+-----------+  |
-|       |              |            |                 |              |
-|  +----+--------------+------------+-----------------+------------+ |
-|  |    ParticleBackground + EchoPrimeChat + ReadAloudButton       | |
-|  |    lib/*-api.ts API Clients + AuthContext + ThemeContext       | |
-|  +------------------------------+--------------------------------+ |
-+-----------------------------  --+----------------------------------+
-                                  | HTTPS + Firebase Auth tokens
-          +-----------------------+------------------------+
-          |                       |                        |
-+---------+-------+  +-----------+---------+  +------------+------+
-| echo-engine-    |  | echo-chat           |  | ept-api           |
-| runtime         |  | (14 AI personas)    |  | (users/subs/roles)|
-| 6,500+ engines  |  | Sentinel, Trinity   |  | Firebase admin    |
-+-----------------+  +---------------------+  +-------------------+
-          |                       |                        |
-+---------+-------+  +-----------+---------+  +------------+------+
-| hephaestion-    |  | daedalus-forge      |  | billymc-api       |
-| forge           |  | (Manufacturing AI)  |  | (AI Sales Agent)  |
-| Software Factory|  | 50-stage pipeline   |  | Closer platform   |
-+-----------------+  +---------------------+  +-------------------+
-          |                       |
-+---------+-------+  +-----------+---------+
-| echo-speak-cloud|  | echo-knowledge-     |
-| (3-tier TTS)    |  | forge (5,387 docs)  |
-+-----------------+  +---------------------+
+Developer App → @echo-prime/sdk → echo-sdk-gateway.workers.dev → 187 backend workers
+                                                                    ↓
+                                    ┌───────────────────────────────────────────┐
+                                    │ echo-speak-cloud (33 voice actions)       │
+                                    │ echo-chat (14 AI personalities)           │
+                                    │ echo-ai-orchestrator (29 LLM workers)    │
+                                    │ echo-engine-runtime (5,486 engines)      │
+                                    │ echo-knowledge-forge (12K docs)          │
+                                    │ echo-graph-rag (312K nodes)              │
+                                    │ echo-shared-brain (infinite memory)      │
+                                    │ echo-343-scanner (infra + function lib)  │
+                                    │ echo-build-orchestrator (13-stage forge) │
+                                    │ echo-doctrine-forge (607K doctrines)     │
+                                    │ + 177 more specialized workers           │
+                                    └───────────────────────────────────────────┘
 ```
-
-## Features
-
-### Product Pages
-
-- **Engines Marketplace** -- Browse, search, and query 6,500+ AI intelligence engines across 1,000+ domains with live stats, pricing tiers, and interactive query panel
-- **Bots** -- Social media bot showcase (X/Twitter, LinkedIn, Telegram, Discord)
-- **Scrapers** -- Data extraction and web scraping service catalog
-- **Pipelines** -- Autonomous data pipeline orchestration tools
-- **Security** -- Enterprise security products and monitoring solutions
-- **Pentesting** -- Penetration testing and vulnerability assessment services
-- **Voice** -- Text-to-speech synthesis with ElevenLabs + Qwen3-TTS integration
-- **Websites** -- Website builder with AI-assisted design tools
-- **Tax Returns** -- AI-powered tax return preparation (14 engines, TX01-TX14)
-- **Title Intelligence** -- Land title examination, chain-of-title analysis, gap detection
-- **EchoCAD** -- AI-assisted CAD automation and design
-- **Knowledge Forge** -- 5,387-document knowledge base query interface
-- **Grading** -- Collectibles and card grading AI system
-- **Immortality Vault** -- Digital legacy and memory preservation platform
-
-### AI Forges
-
-- **Hephaestion Forge** -- 13-stage AI software factory with 42+ LLM providers, 15 project archetypes
-- **Daedalus Forge** -- Manufacturing AI with 50-stage pipeline, 15 guilds, CNC programming, engineering calculators
-
-### Sentinel AI
-
-- **Sentinel Chat** -- 14 AI personalities (Echo, Bree, GS343, Prometheus, Phoenix, Commander, and more)
-- **Trinity Integration** -- Multi-model AI orchestration
-- **Cortex Memory** -- Persistent conversation memory
-
-### Closer AI (Sales Platform)
-
-Full embedded sales automation platform with 10 sub-routes:
-- Demo, leads, lead detail, campaigns, calls, live calls, call review, appointments, analytics, scripts, tutorial, settings
-
-### Commerce
-
-- **Pricing** -- Tiered subscription plans with feature comparison
-- **Checkout** -- Stripe-integrated payment flow with success confirmation
-- **Rewards** -- Customer loyalty and rewards program
-- **Admin Panel** -- Payment management, invoice tracking, user administration
-
-### Platform
-
-- **Dashboard** -- Authenticated user dashboard
-- **Orchestration** -- Multi-agent AI orchestration control
-- **Sandbox** -- Interactive testing environment
-- **Vault** -- Credential and secret management
-- **Login / Signup** -- Firebase authentication with Google OAuth
-- **Legal** -- Terms of service and privacy policy
-
-## Pages & Routes (49)
-
-| Route | Description |
-|-------|-------------|
-| `/` | Landing page -- capabilities, live stats, industry verticals, how-it-works |
-| `/engines` | Engine marketplace with search, filtering, live query panel |
-| `/bots` | Social media bot catalog |
-| `/scrapers` | Data extraction services |
-| `/pipelines` | Data pipeline orchestration |
-| `/security` | Enterprise security products |
-| `/pentesting` | Penetration testing services |
-| `/voice` | TTS voice synthesis |
-| `/websites` | Website builder platform |
-| `/websites/builder` | AI-assisted website builder |
-| `/tax-returns` | AI tax return preparation |
-| `/title-intelligence` | Land title analysis and examination |
-| `/echocad` | CAD automation AI |
-| `/knowledge` | Knowledge Forge query interface |
-| `/grading` | Collectibles grading AI |
-| `/immortality-vault` | Digital legacy platform |
-| `/immortality-vault/app` | Vault application interface |
-| `/hephaestion-forge` | Software factory AI |
-| `/daedalus-forge` | Manufacturing AI |
-| `/sentinel` | AI chat with 14 personas |
-| `/closer` | AI sales platform overview |
-| `/closer/demo` | Sales demo environment |
-| `/closer/leads` | Lead management |
-| `/closer/leads/detail` | Lead detail view |
-| `/closer/campaigns` | Campaign management |
-| `/closer/calls` | Call history |
-| `/closer/calls/live` | Live call monitoring |
-| `/closer/calls/review` | Call review and scoring |
-| `/closer/appointments` | Appointment management |
-| `/closer/analytics` | Sales analytics |
-| `/closer/scripts` | Sales script library |
-| `/closer/tutorial` | Platform tutorial |
-| `/closer/settings` | Closer configuration |
-| `/pricing` | Subscription plans and comparison |
-| `/services` | Services overview |
-| `/checkout` | Payment flow |
-| `/checkout/success` | Payment confirmation |
-| `/rewards` | Loyalty program |
-| `/orchestration` | Multi-agent AI orchestration |
-| `/sandbox` | Testing environment |
-| `/vault` | Secret management |
-| `/dashboard` | User dashboard |
-| `/admin` | Admin panel |
-| `/admin/payments` | Payment management |
-| `/admin/invoices` | Invoice tracking |
-| `/login` | Authentication |
-| `/signup` | Registration |
-| `/legal/terms` | Terms of service |
-| `/legal/privacy` | Privacy policy |
-
-## Key Components
-
-| Component | Purpose |
-|-----------|---------|
-| `ParticleBackground` | Stars, nebula, matrix rain animation (auto-included in layout) |
-| `EchoPrimeChat` | Floating AI chat button, bottom-right on all pages |
-| `NebulaCoreScene` | Three.js 3D scene for product showcases |
-| `AgenticProgressPanel` | Real-time agentic task tracking display |
-| `EngineQueryPanel` | Interactive engine query interface |
-| `DocumentViewer` | PDF and DOCX rendering (pdfjs-dist + mammoth) |
-| `ReadAloudButton` | TTS read-aloud integration |
-| `SubscriptionGate` | Paywall and subscription guard component |
 
 ## Tech Stack
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Next.js | 15.3 | React framework, static export |
-| React | 19.0 | UI component library |
-| TypeScript | 5.7 | Type-safe development |
-| Three.js | 0.183 | 3D WebGL visualizations |
-| React Three Fiber | 9.5 | React renderer for Three.js |
-| React Three Drei | 10.7 | Three.js helper components |
-| Tailwind CSS | 3.4 | Utility-first CSS framework |
-| Firebase | 12.9 | Auth (email + Google OAuth) |
-| pdfjs-dist | 5.5 | PDF document rendering |
-| mammoth | 1.11 | DOCX document parsing |
-| Vercel Analytics | 1.6 | Performance monitoring |
-| Vercel Speed Insights | 1.3 | Core Web Vitals tracking |
+- **Frontend:** Next.js 15.3, React 19, TypeScript 5.7, Tailwind CSS 3.4, Three.js
+- **Auth:** Firebase 12.9 (Email + Google OAuth)
+- **Backend:** 187 Cloudflare Workers, D1, R2, KV
+- **AI:** 29 LLM providers, 5,486 engines, 607K doctrines
+- **Voice:** ElevenLabs v3 Alpha, 12 personality voices
+- **Memory:** 9-layer architecture (Shared Brain, Cortex, Prime, Crystal, OmniSync)
+- **Graph:** 312K+ node knowledge graph with cross-domain traversal
+- **Deploy:** Vercel (auto-deploy from GitHub push)
 
-## Theme System
-
-Automatic day/night toggle using CSS custom properties. All colors are applied via `var(--ept-*)` tokens -- never hardcoded.
-
-| Variable | Day | Night | Usage |
-|----------|-----|-------|-------|
-| `--ept-bg` | #ffffff | #050508 | Page background |
-| `--ept-text` | #0f172a | #e2e8f0 | Primary text |
-| `--ept-text-secondary` | #475569 | #94a3b8 | Secondary text |
-| `--ept-accent` | #0d7377 | #14b8a6 | Buttons, highlights (teal) |
-| `--ept-card-bg` | #ffffff | #0c1220 | Card backgrounds |
-| `--ept-card-border` | #e2e8f0 | #1e293b | Card borders |
-| `--ept-surface` | #f1f5f9 | #0f172a | Input backgrounds |
-
-Fonts: **Inter** (body), **JetBrains Mono** (code). No Orbitron on this site.
-
-## API Clients
-
-| File | Worker | Purpose |
-|------|--------|---------|
-| `engine-cloud-api.ts` | echo-engine-runtime | Engine queries, domain stats, pricing |
-| `sentinel-cloud-api.ts` | echo-chat | AI chat, 14 personas, Sentinel/Trinity/Cortex |
-| `ept-api.ts` | ept-api | Users, subscriptions, roles |
-| `closer-api.ts` | billymc-api | AI sales agent, leads, campaigns |
-| `daedalus-forge-api.ts` | daedalus-forge | Manufacturing AI, engineering calcs |
-| `hephaestion-forge-api.ts` | hephaestion-forge | Software factory, 13-stage pipeline |
-| `echocad-api.ts` | echocad-api | CAD automation |
-| `tax-return-api.ts` | tax-return-api | Tax return preparation |
-| `use-tts.ts` | echo-speak-cloud | Text-to-speech React hook |
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- npm
-
-### Installation
+## Quick Start
 
 ```bash
-git clone https://github.com/bobmcwilliams4/echo-prime-tech.git
+git clone https://github.com/ECHO-OMEGA-PRIME/echo-prime-tech.git
 cd echo-prime-tech
 npm install
-```
-
-### Development
-
-```bash
 npm run dev
-# Application runs on http://localhost:3000
 ```
-
-### Production Build
-
-```bash
-npm run build    # Runs verify-site.js pre-build, generates static export
-npm start        # Serves the production build
-```
-
-## Deployment
-
-Auto-deploys from the `main` branch via Vercel. Push to `main` = production deploy.
-
-Pre-build validation runs `scripts/verify-site.js` to enforce site identity.
-
-| Component | Service |
-|-----------|---------|
-| Frontend Hosting | Vercel (static export, auto-deploy) |
-| Backend Workers | Cloudflare Workers (9+ integrated) |
-| Authentication | Firebase (echo-prime-ai) |
-| Payments | Stripe (via ept-api Worker) |
-| DNS | Cloudflare |
-| Analytics | Vercel Analytics + Speed Insights |
-
-## Connected Workers
-
-| Worker | Purpose |
-|--------|---------|
-| echo-engine-runtime | 6,500+ intelligence engines across 1,000+ domains |
-| echo-chat | 14 AI personality conversations (Sentinel AI) |
-| ept-api | User management, subscriptions, roles |
-| billymc-api | AI sales agent and Closer platform |
-| daedalus-forge | Manufacturing AI with 50-stage pipeline |
-| hephaestion-forge | Software factory with 13-stage pipeline |
-| echo-speak-cloud | 3-tier TTS voice synthesis |
-| echo-knowledge-forge | 5,387 knowledge documents |
-| echo-landman-pipeline | Title research and land analysis |
-
-## Part of ECHO OMEGA PRIME
-
-This is the **commercial storefront** for **[ECHO OMEGA PRIME](https://echo-op.com)** -- a distributed autonomous AI platform spanning 31+ Cloudflare Workers, 4 compute nodes, 6,500+ intelligence engines, and 312K+ knowledge graph nodes.
-
-All products and services available at echo-ept.com are powered by the ECHO OMEGA PRIME infrastructure.
-
-**Built by Echo Prime Technologies** | [echo-ept.com](https://echo-ept.com)
 
 ---
 
-*Proprietary software. All rights reserved.*
+**Commander:** Bobby Don McWilliams II | Authority 11.0 SOVEREIGN
+**Founded:** 2024 | Bootstrapped | No VC
+**Phone:** (432) 527-6112
+**Domains:** echo-ept.com, echo-op.com, barkinglot.org, rah-midland.com
