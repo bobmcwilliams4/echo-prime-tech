@@ -1,17 +1,20 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { signInWithGoogle, signInWithApple, signUpWithEmail, setupRecaptcha, sendSmsCode, verifySmsCode } from '../../lib/firebase';
 import { useAuth } from '../../lib/auth-context';
 import { useTheme } from '../../lib/theme-context';
+import { syncUser } from '../../lib/ept-api';
+import { trackReferral, validateReferralCode } from '../../lib/referral-api';
 
 type AuthTab = 'email' | 'phone';
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, loading } = useAuth();
   const { isDark } = useTheme();
   const [tab, setTab] = useState<AuthTab>('email');
@@ -36,7 +39,40 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [referrerName, setReferrerName] = useState('');
   const recaptchaRef = useRef<HTMLDivElement>(null);
+
+  // Capture ?ref=CODE from URL and store in localStorage
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode) {
+      localStorage.setItem('ept-referral-code', refCode);
+      validateReferralCode(refCode).then(v => {
+        if (v.valid && v.referrer_name) setReferrerName(v.referrer_name);
+      }).catch(() => {});
+    } else {
+      const stored = localStorage.getItem('ept-referral-code');
+      if (stored) {
+        validateReferralCode(stored).then(v => {
+          if (v.valid && v.referrer_name) setReferrerName(v.referrer_name);
+          else localStorage.removeItem('ept-referral-code');
+        }).catch(() => {});
+      }
+    }
+  }, [searchParams]);
+
+  // After signup, sync user then track referral
+  const postSignupFlow = async () => {
+    try {
+      await syncUser();
+      const refCode = localStorage.getItem('ept-referral-code');
+      if (refCode) {
+        await trackReferral(refCode).catch(() => {});
+        localStorage.removeItem('ept-referral-code');
+      }
+    } catch {}
+    router.push(getRedirectUrl());
+  };
 
   useEffect(() => {
     if (!loading && user) router.push(getRedirectUrl());
@@ -50,7 +86,7 @@ export default function SignupPage() {
     setSubmitting(true);
     try {
       await signUpWithEmail(email, password);
-      router.push(getRedirectUrl());
+      await postSignupFlow();
     } catch (err: any) {
       const code = err?.code || '';
       if (code === 'auth/email-already-in-use') {
@@ -94,7 +130,7 @@ export default function SignupPage() {
     setSubmitting(true);
     try {
       const u = await verifySmsCode(smsCode);
-      if (u) router.push(getRedirectUrl());
+      if (u) await postSignupFlow();
     } catch (err: any) {
       const code = err?.code || '';
       if (code === 'auth/invalid-verification-code') {
@@ -111,7 +147,7 @@ export default function SignupPage() {
     setError('');
     try {
       const u = await signInWithGoogle();
-      if (u) router.push(getRedirectUrl());
+      if (u) await postSignupFlow();
     } catch {
       setError('Google sign-in failed.');
     }
@@ -121,7 +157,7 @@ export default function SignupPage() {
     setError('');
     try {
       const u = await signInWithApple();
-      if (u) router.push(getRedirectUrl());
+      if (u) await postSignupFlow();
     } catch {
       setError('Apple sign-in failed.');
     }
@@ -143,7 +179,13 @@ export default function SignupPage() {
         {/* Card */}
         <div className="rounded-2xl border p-8 glow-sm" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
           <h1 className="text-2xl font-extrabold text-center mb-1" style={{ color: 'var(--ept-text)' }}>Create your account</h1>
-          <p className="text-sm text-center mb-8" style={{ color: 'var(--ept-text-muted)' }}>Get started with Echo Prime Technologies</p>
+          <p className="text-sm text-center mb-4" style={{ color: 'var(--ept-text-muted)' }}>Get started with Echo Prime Technologies</p>
+
+          {referrerName && (
+            <div className="mb-6 px-4 py-3 rounded-xl text-center text-sm font-medium" style={{ backgroundColor: 'var(--ept-accent-glow, rgba(20,184,166,0.1))', border: '1px solid var(--ept-accent)', color: 'var(--ept-accent)' }}>
+              Referred by <span className="font-bold">{referrerName}</span>
+            </div>
+          )}
 
           {/* Social buttons */}
           <div className="flex flex-col gap-3 mb-6">

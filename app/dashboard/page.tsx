@@ -15,6 +15,7 @@ import {
 } from '../../lib/engine-cloud-api';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import { getTrialStatus, type TrialInfo } from '../../lib/trial-api';
+import { getReferralStats, type ReferralStats } from '../../lib/referral-api';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -25,6 +26,8 @@ export default function DashboardPage() {
   const [engineProfile, setEngineProfile] = useState<EngineProfile | null>(null);
   const [commanderMode, setCommanderMode] = useState(false);
   const [trials, setTrials] = useState<TrialInfo[]>([]);
+  const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) router.push('/login');
@@ -33,6 +36,13 @@ export default function DashboardPage() {
   useEffect(() => {
     getServices().then(d => setServices(d.services)).catch(() => {});
   }, []);
+
+  // Load referral stats
+  useEffect(() => {
+    if (user) {
+      getReferralStats().then(setReferralStats).catch(() => {});
+    }
+  }, [user]);
 
   useEffect(() => {
     if (hasEngineKey()) {
@@ -156,7 +166,7 @@ export default function DashboardPage() {
           {/* Usage stats row */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" data-tutorial="dashboard-usage">
             <div className="px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
-              <div className="text-lg font-extrabold font-mono" style={{ color: '#818cf8' }}>{engineProfile?.tier || (hasEngineKey() ? '—' : 'Free')}</div>
+              <div className="text-lg font-extrabold font-mono" style={{ color: '#818cf8' }}>{engineProfile?.tier || (hasEngineKey() ? '\u2014' : 'Free')}</div>
               <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Plan</div>
             </div>
             <div className="px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
@@ -242,6 +252,127 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* ── Referral Section ── */}
+      {referralStats && (
+        <div className="mb-8 p-6 rounded-2xl border" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
+          <div className="flex items-start justify-between mb-5">
+            <div>
+              <h2 className="text-xl font-extrabold flex items-center gap-2" style={{ color: 'var(--ept-text)' }}>
+                Refer & Earn
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.3)' }}>
+                  {referralStats.total_referrals} referral{referralStats.total_referrals !== 1 ? 's' : ''}
+                </span>
+              </h2>
+              <p className="text-xs mt-1" style={{ color: 'var(--ept-text-muted)' }}>Share your link and earn rewards when friends sign up.</p>
+            </div>
+          </div>
+
+          {/* Referral link + copy + share */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-5">
+            <div className="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl border font-mono text-sm" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-border)', color: 'var(--ept-text)' }}>
+              <span className="truncate flex-1">{referralStats.referral_link}</span>
+            </div>
+            <button
+              onClick={() => { navigator.clipboard.writeText(referralStats.referral_link); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+              className="px-5 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap"
+              style={{ backgroundColor: copied ? '#10b981' : 'var(--ept-accent)', color: '#fff' }}
+            >
+              {copied ? 'Copied!' : 'Copy Link'}
+            </button>
+          </div>
+
+          {/* Share buttons */}
+          <div className="flex flex-wrap gap-2 mb-5">
+            <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out Echo Prime Technologies \u2014 AI-powered enterprise tools!')}&url=${encodeURIComponent(referralStats.referral_link)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all hover:opacity-80" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              Post on X
+            </a>
+            <a href={`mailto:?subject=${encodeURIComponent('Check out Echo Prime Technologies')}&body=${encodeURIComponent(`I've been using Echo Prime Technologies and thought you'd love it:\n\n${referralStats.referral_link}`)}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all hover:opacity-80" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+              Email
+            </a>
+            <a href={`https://wa.me/?text=${encodeURIComponent(`Check out Echo Prime Technologies: ${referralStats.referral_link}`)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all hover:opacity-80" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.94 9.94 0 01-5.334-1.546l-.382-.23-2.645.887.887-2.645-.23-.382A9.94 9.94 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+              WhatsApp
+            </a>
+          </div>
+
+          {/* Stats row */}
+          <div className="grid grid-cols-3 gap-3 mb-5">
+            <div className="px-3 py-2 rounded-lg text-center" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+              <div className="text-lg font-extrabold font-mono" style={{ color: 'var(--ept-accent)' }}>{referralStats.total_referrals}</div>
+              <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Total</div>
+            </div>
+            <div className="px-3 py-2 rounded-lg text-center" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+              <div className="text-lg font-extrabold font-mono" style={{ color: '#10b981' }}>{referralStats.converted_referrals}</div>
+              <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>Converted</div>
+            </div>
+            <div className="px-3 py-2 rounded-lg text-center" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+              <div className="text-lg font-extrabold font-mono" style={{ color: '#818cf8' }}>{referralStats.this_week}</div>
+              <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--ept-text-muted)' }}>This Week</div>
+            </div>
+          </div>
+
+          {/* Next tier progress */}
+          {referralStats.next_tier && (
+            <div className="mb-5 p-4 rounded-xl" style={{ backgroundColor: 'var(--ept-surface)', border: '1px solid var(--ept-border)' }}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold" style={{ color: 'var(--ept-text-secondary)' }}>
+                  Next reward: <span style={{ color: 'var(--ept-accent)' }}>{referralStats.next_tier.reward_value}</span>
+                </span>
+                <span className="text-xs font-mono" style={{ color: 'var(--ept-text-muted)' }}>
+                  {referralStats.total_referrals}/{referralStats.next_tier.count}
+                </span>
+              </div>
+              <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--ept-border)' }}>
+                <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, (referralStats.total_referrals / referralStats.next_tier.count) * 100)}%`, backgroundColor: 'var(--ept-accent)' }} />
+              </div>
+              <p className="text-[10px] mt-1.5" style={{ color: 'var(--ept-text-muted)' }}>
+                {referralStats.next_tier.remaining} more referral{referralStats.next_tier.remaining !== 1 ? 's' : ''} to unlock
+              </p>
+            </div>
+          )}
+
+          {/* Earned rewards */}
+          {referralStats.rewards.length > 0 && (
+            <div className="mb-5">
+              <h3 className="text-sm font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Earned Rewards</h3>
+              <div className="flex flex-wrap gap-2">
+                {referralStats.rewards.map((r, i) => (
+                  <span key={i} className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full" style={{ backgroundColor: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.3)' }}>
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
+                    {r.reward_value}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Reward tiers */}
+          <div>
+            <h3 className="text-sm font-bold mb-2" style={{ color: 'var(--ept-text)' }}>Reward Tiers</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {[
+                { count: 3, reward: 'Priority Support' },
+                { count: 5, reward: '$25 Credit' },
+                { count: 10, reward: '1 Month Free' },
+                { count: 25, reward: '$100 Credit' },
+                { count: 50, reward: '3 Months Free' },
+                { count: 100, reward: '20% Lifetime' },
+              ].map(tier => {
+                const unlocked = referralStats.total_referrals >= tier.count;
+                return (
+                  <div key={tier.count} className="px-3 py-2 rounded-lg text-center" style={{ backgroundColor: unlocked ? 'rgba(16,185,129,0.08)' : 'var(--ept-surface)', border: `1px solid ${unlocked ? 'rgba(16,185,129,0.3)' : 'var(--ept-border)'}`, opacity: unlocked ? 1 : 0.6 }}>
+                    <div className="text-xs font-bold" style={{ color: unlocked ? '#10b981' : 'var(--ept-text-secondary)' }}>{tier.count} referrals</div>
+                    <div className="text-[10px]" style={{ color: unlocked ? '#10b981' : 'var(--ept-text-muted)' }}>{tier.reward}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Subscribed Services */}
       <div data-tutorial="dashboard-services">
         {subscribedServices.length > 0 ? (
@@ -266,7 +397,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="mb-10 p-10 rounded-2xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-            <div className="text-4xl mb-4">🚀</div>
+            <div className="text-4xl mb-4">&#x1F680;</div>
             <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--ept-text)' }}>No active services yet</h2>
             <p className="text-sm mb-6" style={{ color: 'var(--ept-text-muted)' }}>Choose the services you want to activate to get started.</p>
             <Link href="/services" className="inline-flex px-6 py-3 rounded-lg font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Browse Services</Link>
