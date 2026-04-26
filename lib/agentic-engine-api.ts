@@ -1,9 +1,10 @@
+import { getApiBase, getWsBase } from './api-base';
 // ═══════════════════════════════════════════════════════════════
 // ECHO PRIME — Agentic Engine API Client
 // Connects to echo-agentic-engine Cloudflare Worker
 // ═══════════════════════════════════════════════════════════════
 
-const AGENTIC_BASE = 'https://echo-agentic-engine.bmcii1976.workers.dev';
+const AGENTIC_BASE = getApiBase('echo-agentic-engine');
 
 // ─── Types ───────────────────────────────────────────────────
 

@@ -1,4 +1,5 @@
-const API_URL = 'https://ept-api.bmcii1976.workers.dev';
+import { getApiBase, getWsBase } from './api-base';
+const API_URL = getApiBase('ept-api');
 
 async function getToken(): Promise<string | null> {
   try {

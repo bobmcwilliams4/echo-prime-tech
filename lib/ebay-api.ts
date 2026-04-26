@@ -1,9 +1,10 @@
+import { getApiBase, getWsBase } from './api-base';
 /**
  * eBay Listing API Client — Echo Prime Technologies
  * Worker: echo-ebay.bmcii1976.workers.dev
  */
 
-const EBAY_API_URL = 'https://echo-ebay.bmcii1976.workers.dev';
+const EBAY_API_URL = getApiBase('echo-ebay');
 const ECHO_API_KEY = process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-forge-x-2026';
 
 async function ebayFetch<T = unknown>(path: string, options: RequestInit = {}): Promise<T> {

@@ -1,3 +1,4 @@
+import { getApiBase, getWsBase } from './api-base';
 /**
  * Sentinel Cloud API — Unified client for Memory, Swarm, and Echo Talk systems
  *
@@ -8,9 +9,9 @@
  *  - Echo Talk personality engine (18 profiles, 6 cognitive engines)
  */
 
-const SHARED_BRAIN_URL = 'https://echo-shared-brain.bmcii1976.workers.dev';
-const SENTINEL_MEMORY_URL = 'https://echo-sentinel-memory.bmcii1976.workers.dev';
-const SWARM_BRAIN_URL = 'https://echo-swarm-brain.bmcii1976.workers.dev';
+const SHARED_BRAIN_URL = getApiBase('echo-shared-brain');
+const SENTINEL_MEMORY_URL = getApiBase('echo-sentinel-memory');
+const SWARM_BRAIN_URL = getApiBase('echo-swarm-brain');
 
 // ── Types: Shared Brain ──
 

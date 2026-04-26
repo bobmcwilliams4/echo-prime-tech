@@ -6,8 +6,10 @@
  * OpenClaw Bridge: https://openclaw-bridge.bmcii1976.workers.dev
  */
 
-const SDK_URL = 'https://echo-sdk-gateway.bmcii1976.workers.dev';
-const OPENCLAW_URL = 'https://openclaw-bridge.bmcii1976.workers.dev';
+import { getApiBase } from './api-base';
+
+const SDK_URL = getApiBase('echo-sdk-gateway', 'sdk');
+const OPENCLAW_URL = getApiBase('openclaw-bridge', 'sdk');
 const SDK_KEY = 'echo-omega-prime-forge-x-2026';
 
 // ── Types ──

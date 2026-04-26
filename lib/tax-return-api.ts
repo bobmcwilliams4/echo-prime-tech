@@ -1,8 +1,9 @@
+import { getApiBase, getWsBase } from './api-base';
 // Echo Tax Return — Frontend API Client v4.0
 // Connects to echo-tax-return.bmcii1976.workers.dev
 // Covers: core CRUD, v2.0 features, v3.1 advanced, v3.2 advanced, v4.0 tools/filing/audit
 
-const TAX_API = 'https://echo-tax-return.bmcii1976.workers.dev';
+const TAX_API = getApiBase('echo-tax-return');
 const API_KEY = process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-forge-x-2026';
 
 function headers(extra?: Record<string, string>): Record<string, string> {

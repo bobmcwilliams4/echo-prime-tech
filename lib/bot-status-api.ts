@@ -1,16 +1,17 @@
+import { getApiBase, getWsBase } from './api-base';
 // Bot Status API Client — Fetches live health + stats from bot Workers
 const API_KEY = 'echo-omega-prime-forge-x-2026';
 
 const BOT_WORKERS: Record<string, string> = {
-  'x-bot': 'https://echo-x-bot.bmcii1976.workers.dev',
-  linkedin: 'https://echo-linkedin.bmcii1976.workers.dev',
-  reddit: 'https://echo-reddit-bot.bmcii1976.workers.dev',
-  telegram: 'https://echo-telegram.bmcii1976.workers.dev',
-  discord: 'https://echo-prime-discord.bmcii1976.workers.dev',
-  slack: 'https://echo-slack.bmcii1976.workers.dev',
-  whatsapp: 'https://echo-whatsapp.bmcii1976.workers.dev',
-  messenger: 'https://echo-messenger.bmcii1976.workers.dev',
-  instagram: 'https://echo-instagram.bmcii1976.workers.dev',
+  'x-bot': getApiBase('echo-x-bot'),
+  linkedin: getApiBase('echo-linkedin'),
+  reddit: getApiBase('echo-reddit-bot'),
+  telegram: getApiBase('echo-telegram'),
+  discord: getApiBase('echo-prime-discord'),
+  slack: getApiBase('echo-slack'),
+  whatsapp: getApiBase('echo-whatsapp'),
+  messenger: getApiBase('echo-messenger'),
+  instagram: getApiBase('echo-instagram'),
 };
 
 async function botFetch(bot: string, path: string) {

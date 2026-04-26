@@ -17,6 +17,13 @@ import {
 } from '../../lib/sentinel-cloud-api';
 import MarkdownBlock from '../../components/MarkdownBlock';
 import TitleChainReport from '../../components/TitleChainReport';
+import {
+  fetchDoctrineGrounding,
+  generateDoctrineReport,
+  formatReportAsMarkdown,
+  getGroundingBadge,
+  type GroundingResult,
+} from '../../lib/doctrine-bridge-api';
 import ProductTutorialButton from '../../components/product-tutorial-button';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import FaqSchema from '../../components/FaqSchema';
@@ -87,6 +94,7 @@ interface Message {
   latency?: number;
   voicePlayed?: boolean;
   engineResult?: EngineQueryResult;
+  grounding?: GroundingResult;
 }
 
 interface PipelineEvent {
@@ -1002,40 +1010,31 @@ export default function SentinelPage() {
     }));
 
     const personality = PERSONALITY_PROFILES['EP'] || Object.values(PERSONALITY_PROFILES)[0];
-    const systemPrompt = buildPersonalityDirective(personality);
+    let systemPrompt = buildPersonalityDirective(personality);
+    // Zero-hallucination directive when doctrine grounding is available
+    systemPrompt += `\n[ZERO-HALLUCINATION PROTOCOL]:
+- When DOCTRINE AUTHORITY CONTEXT is provided below, ground ALL claims in those doctrines.
+- CITE specific engine IDs, section numbers, authority references, and confidence levels from the doctrine matches.
+- If a question falls OUTSIDE the provided doctrines, explicitly state: "This falls outside my verified doctrine coverage."
+- NEVER fabricate citations, case law, IRC sections, or authority references. Only cite what appears in the doctrine context.
+- Confidence stratification is MANDATORY for domain queries: DEFENSIBLE / AGGRESSIVE / DISCLOSURE / HIGH_RISK.`;
 
     let responseText = '';
     let provider = 'echo-chat';
     let latency = 0;
     const startTime = Date.now();
 
-    // ── Pre-fetch doctrines for ALL paths (fine-tuned, echo, brain) ──
+    // ── Pre-fetch doctrines via Doctrine Bridge (grounding layer) ──
     let doctrineBlock = '';
+    let groundingResult: GroundingResult | undefined;
     try {
-      const detectedDomain = detectQueryDomain(msg, selectedModel);
-      const preDocBody: Record<string, unknown> = { query: msg, limit: 8, mode: 'FAST' };
-      if (detectedDomain) preDocBody.domain = detectedDomain;
-      const preDocRes = await fetch(`${ENGINE_RUNTIME_URL}/query`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': 'echo-omega-prime-forge-x-2026' },
-        signal: AbortSignal.timeout(5000),
-        body: JSON.stringify(preDocBody),
+      groundingResult = await fetchDoctrineGrounding(msg, {
+        modelHint: selectedModel,
+        mode: responseMode as 'FAST' | 'DEFENSE' | 'MEMO',
+        limit: 8,
+        timeoutMs: 6000,
       });
-      if (preDocRes.ok) {
-        const preDocData = await preDocRes.json();
-        const preMatches = preDocData.matches || preDocData.results || [];
-        if (preMatches.length > 0) {
-          doctrineBlock = preMatches.slice(0, 6).map((m: { engine_id?: string; topic?: string; conclusion?: string; reasoning?: string; confidence?: number }, i: number) => {
-            const parts = [`[${i + 1}] ${m.engine_id || 'UNKNOWN'}: ${m.topic || 'Untitled'}`];
-            if (m.conclusion) parts.push(`Conclusion: ${m.conclusion}`);
-            if (m.reasoning) parts.push(`Reasoning: ${m.reasoning.substring(0, 500)}`);
-            if (m.confidence) parts.push(`Confidence: ${m.confidence}`);
-            return parts.join('\n');
-          }).join('\n\n');
-          const domainLabel = detectedDomain ? ` [domain: ${detectedDomain}]` : ' [cross-domain]';
-          doctrineBlock = `\n\n═══ DOCTRINE AUTHORITY CONTEXT (${preMatches.length} matches from ${preDocData.engines_searched || preDocData.sub_engines_searched || '5400+'} engines${domainLabel}) ═══\nGround your response in these authoritative doctrine matches. CITE specific sections, codes, and authorities. Include confidence stratification (DEFENSIBLE/AGGRESSIVE/DISCLOSURE/HIGH_RISK) where applicable.\n\n${doctrineBlock}\n═══ END DOCTRINE CONTEXT ═══`;
-        }
-      }
+      doctrineBlock = groundingResult.contextBlock;
     } catch { /* engine runtime down */ }
 
     // ── Resolve which adapter to use ──
@@ -1184,6 +1183,7 @@ export default function SentinelPage() {
       emotion,
       provider,
       latency,
+      grounding: groundingResult,
     };
 
     setMessages(prev => [...prev, assistantMsg]);
@@ -1927,6 +1927,59 @@ export default function SentinelPage() {
                       >
                         Copy
                       </button>
+                      {/* Grounding indicator badge */}
+                      {msg.grounding && msg.grounding.matches.length > 0 && (() => {
+                        const badge = getGroundingBadge(msg.grounding);
+                        return (
+                          <span
+                            className="text-xs flex items-center gap-1 px-2 py-0.5 rounded-full border"
+                            style={{ color: badge.color, borderColor: badge.color + '40', backgroundColor: badge.color + '15' }}
+                            title={badge.tooltip}
+                          >
+                            {badge.icon} {badge.label} ({msg.grounding.matches.length})
+                          </span>
+                        );
+                      })()}
+                      {msg.grounding && msg.grounding.matches.length === 0 && (
+                        <span
+                          className="text-xs flex items-center gap-1 opacity-40"
+                          style={{ color: '#64748b' }}
+                          title="No doctrine matches found — response is general-purpose AI output"
+                        >
+                          ✕ Ungrounded
+                        </span>
+                      )}
+                      {/* Generate Report button */}
+                      {msg.grounding && msg.grounding.matches.length > 0 && (
+                        <button
+                          onClick={() => {
+                            const report = generateDoctrineReport(
+                              messages.filter(m => m.timestamp < msg.timestamp && m.role === 'user').pop()?.content || 'Unknown query',
+                              msg.grounding!,
+                              msg.content,
+                            );
+                            const md = formatReportAsMarkdown(report);
+                            const blob = new Blob([md], { type: 'text/markdown' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `sentinel-report-${new Date().toISOString().slice(0, 10)}.md`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                          }}
+                          className="text-xs flex items-center gap-1 opacity-50 hover:opacity-100 transition-opacity"
+                          style={{ color: 'var(--ept-accent)' }}
+                          title="Download doctrine-grounded analysis report"
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                          </svg>
+                          Report
+                        </button>
+                      )}
                       <span className="text-xs opacity-40" style={{ color: '#64748b' }}>
                         {formatTime(msg.timestamp)}
                       </span>

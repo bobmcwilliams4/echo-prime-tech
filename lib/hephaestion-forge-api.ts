@@ -1,3 +1,4 @@
+import { getApiBase, getWsBase } from './api-base';
 /**
  * Hephaestion Forge API — AI Program Builder & Code Forge
  *
@@ -6,7 +7,7 @@
  * multi-LLM swarm, conversational code generation.
  */
 
-const API_BASE = 'https://hephaestion-forge.bmcii1976.workers.dev';
+const API_BASE = getApiBase('hephaestion-forge');
 
 // ── Types ──
 

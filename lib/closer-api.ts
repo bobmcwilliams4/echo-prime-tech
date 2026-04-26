@@ -1,8 +1,9 @@
 'use client';
 
 import { auth } from './firebase';
+import { getApiBase, getWsBase } from './api-base';
 
-const API_BASE = 'https://billymc-api.bmcii1976.workers.dev';
+const API_BASE = getApiBase('billymc-api');
 
 export async function closerFetch<T = any>(path: string, options: RequestInit = {}): Promise<T> {
   const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
@@ -103,4 +104,4 @@ export const submitBugReport = (message: string, ai_response: string) =>
   closerFetch('/bug-reports', { method: 'POST', body: JSON.stringify({ message, ai_response }) });
 
 // --- WebSocket URL ---
-export const VOICE_WS_URL = 'wss://billymc-voice.bmcii1976.workers.dev/voice/live';
+export const VOICE_WS_URL = `${getWsBase('billymc-voice')}/voice/live`;

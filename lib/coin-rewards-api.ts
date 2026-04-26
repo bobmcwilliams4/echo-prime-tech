@@ -1,4 +1,5 @@
-const API_BASE = 'https://echo-coin-rewards.bmcii1976.workers.dev';
+import { getApiBase, getWsBase } from './api-base';
+const API_BASE = getApiBase('echo-coin-rewards');
 
 async function apiFetch(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json', ...(options.headers as Record<string, string>) };

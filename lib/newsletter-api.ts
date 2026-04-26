@@ -1,5 +1,6 @@
+import { getApiBase, getWsBase } from './api-base';
 // Newsletter API client — calls echo-email-marketing Worker /subscribe (public, no auth needed)
-const API_BASE = 'https://echo-email-marketing.bmcii1976.workers.dev';
+const API_BASE = getApiBase('echo-email-marketing');
 const TENANT_ID = '3bac3a26-b564-49c1-973c-7f47a32861de';
 const LIST_ID = 'f2b2629d-37c2-4780-9890-59926b360433';
 

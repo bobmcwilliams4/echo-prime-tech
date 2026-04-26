@@ -1,3 +1,4 @@
+import { getApiBase, getWsBase } from './api-base';
 // ════════════════════════════════════════════════════════════════
 // Pipeline Manager API Client
 // Client-side pipeline configuration manager with a catalog of
@@ -60,7 +61,7 @@ export const DATA_SOURCE_TYPES: DataSourceType[] = [
       { key: 'grantor', label: 'Grantor Name', placeholder: 'Last name or company' },
       { key: 'grantee', label: 'Grantee Name', placeholder: 'Last name or company' },
     ],
-    workerUrl: 'https://encore-cloud-scraper.bmcii1976.workers.dev',
+    workerUrl: getApiBase('encore-cloud-scraper'),
   },
   {
     id: 'genealogy',
@@ -74,7 +75,7 @@ export const DATA_SOURCE_TYPES: DataSourceType[] = [
       { key: 'county', label: 'County', placeholder: 'e.g. Midland' },
       { key: 'state', label: 'State', placeholder: 'e.g. TX' },
     ],
-    workerUrl: 'https://echo-county-records.bmcii1976.workers.dev',
+    workerUrl: getApiBase('echo-county-records'),
   },
   {
     id: 'sec_filings',
@@ -87,7 +88,7 @@ export const DATA_SOURCE_TYPES: DataSourceType[] = [
       { key: 'filing_type', label: 'Filing Type', placeholder: 'e.g. 10-K, 10-Q, 8-K' },
       { key: 'date_from', label: 'Date From', placeholder: 'YYYY-MM-DD' },
     ],
-    workerUrl: 'https://echo-sec-edgar.bmcii1976.workers.dev',
+    workerUrl: getApiBase('echo-sec-edgar'),
   },
   {
     id: 'news',
@@ -100,7 +101,7 @@ export const DATA_SOURCE_TYPES: DataSourceType[] = [
       { key: 'sources', label: 'Sources', placeholder: 'Comma-separated (or leave blank for all)' },
       { key: 'language', label: 'Language', placeholder: 'en' },
     ],
-    workerUrl: 'https://echo-news-scraper.bmcii1976.workers.dev',
+    workerUrl: getApiBase('echo-news-scraper'),
   },
   {
     id: 'reddit',
@@ -113,7 +114,7 @@ export const DATA_SOURCE_TYPES: DataSourceType[] = [
       { key: 'keywords', label: 'Keywords', placeholder: 'Filter keywords' },
       { key: 'min_score', label: 'Min Score', placeholder: 'e.g. 10' },
     ],
-    workerUrl: 'https://echo-reddit-monitor.bmcii1976.workers.dev',
+    workerUrl: getApiBase('echo-reddit-monitor'),
   },
   {
     id: 'crypto',
@@ -126,7 +127,7 @@ export const DATA_SOURCE_TYPES: DataSourceType[] = [
       { key: 'interval', label: 'Candle Interval', placeholder: 'e.g. 1h, 4h, 1d' },
       { key: 'alert_price', label: 'Price Alert', placeholder: 'e.g. 50000' },
     ],
-    workerUrl: 'https://echo-price-alert.bmcii1976.workers.dev',
+    workerUrl: getApiBase('echo-price-alert'),
   },
   {
     id: 'dark_web',
@@ -139,7 +140,7 @@ export const DATA_SOURCE_TYPES: DataSourceType[] = [
       { key: 'keywords', label: 'Keywords', placeholder: 'Additional search terms' },
       { key: 'severity', label: 'Min Severity', placeholder: 'low, medium, high, critical' },
     ],
-    workerUrl: 'https://echo-darkweb-intelligence.bmcii1976.workers.dev',
+    workerUrl: getApiBase('echo-darkweb-intelligence'),
   },
   {
     id: 'web_scraper',

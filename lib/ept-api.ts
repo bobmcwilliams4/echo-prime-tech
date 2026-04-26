@@ -1,4 +1,5 @@
-const API_URL = 'https://ept-api.bmcii1976.workers.dev';
+import { getApiBase, getWsBase } from './api-base';
+const API_URL = getApiBase('ept-api');
 
 async function getToken(): Promise<string | null> {
   try {
@@ -142,7 +143,7 @@ export async function getStripeConfig(): Promise<{ publishable_key: string }> {
 
 // ─── Commander Vault API ───
 
-const VAULT_API_URL = 'https://echo-vault-api.bmcii1976.workers.dev';
+const VAULT_API_URL = getApiBase('echo-vault-api');
 
 async function fetchVault<T = unknown>(path: string, masterPassword?: string, options: RequestInit = {}): Promise<T> {
   const token = await getToken();

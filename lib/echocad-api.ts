@@ -1,3 +1,4 @@
+import { getApiBase, getWsBase } from './api-base';
 /**
  * EchoCAD API Client v2.0
  * Connects to https://echocad.bmcii1976.workers.dev
@@ -5,7 +6,7 @@
  * OpenSCAD/STL/DXF/G-code export, BOM generation, AI-powered design.
  */
 
-const API_URL = 'https://echocad.bmcii1976.workers.dev';
+const API_URL = getApiBase('echocad');
 
 // ── Types (matched to actual API response shapes) ──
 

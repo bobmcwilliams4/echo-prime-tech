@@ -1,9 +1,10 @@
+import { getApiBase, getWsBase } from './api-base';
 /**
  * PayPal Business API Client — Echo Prime Technologies
  * Worker: echo-paypal.bmcii1976.workers.dev
  */
 
-const PAYPAL_API_URL = 'https://echo-paypal.bmcii1976.workers.dev';
+const PAYPAL_API_URL = getApiBase('echo-paypal');
 
 async function getToken(): Promise<string | null> {
   try {

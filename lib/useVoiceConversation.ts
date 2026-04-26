@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { getApiBase, getWsBase } from './api-base';
 
 // ═══════════════════════════════════════════════════════════════
 // VOICE CONVERSATION HOOK — Real-time bidirectional voice via
@@ -8,8 +9,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 // Echo Prime Technologies | Echo Speak Voice Provider
 // ═══════════════════════════════════════════════════════════════
 
-const SPEAK_CLOUD_URL = 'https://echo-speak-cloud.bmcii1976.workers.dev';
-const SPEAK_CLOUD_WS = 'wss://echo-speak-cloud.bmcii1976.workers.dev';
+const SPEAK_CLOUD_URL = getApiBase('echo-speak-cloud');
+const SPEAK_CLOUD_WS = getWsBase('echo-speak-cloud');
 
 export type ConversationState =
   | 'idle'

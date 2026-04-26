@@ -1,4 +1,5 @@
-const ZOHO_API = 'https://echo-zoho-integration.bmcii1976.workers.dev';
+import { getApiBase, getWsBase } from './api-base';
+const ZOHO_API = getApiBase('echo-zoho-integration');
 
 async function zohoFetch(path: string, options: RequestInit = {}) {
   const { auth } = await import('./firebase');

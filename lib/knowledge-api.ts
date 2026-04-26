@@ -1,10 +1,11 @@
+import { getApiBase, getWsBase } from './api-base';
 // ════════════════════════════════════════════════════════════════
 // Knowledge Forge API Client
 // Connects to echo-knowledge-forge Worker for document search,
 // category browsing, and knowledge base statistics.
 // ════════════════════════════════════════════════════════════════
 
-const KNOWLEDGE_FORGE = 'https://echo-knowledge-forge.bmcii1976.workers.dev';
+const KNOWLEDGE_FORGE = getApiBase('echo-knowledge-forge');
 const API_KEY = 'echo-omega-prime-forge-x-2026';
 
 async function kfFetch<T>(path: string, options: RequestInit = {}): Promise<T> {

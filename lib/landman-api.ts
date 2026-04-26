@@ -1,10 +1,11 @@
+import { getApiBase, getWsBase } from './api-base';
 /**
  * Landman Pipeline API Client
  * Connects echo-ept.com/sentinel to echo-landman-pipeline Worker
  * Investigation engine: Title Graph, Clue Loop, Budget Governor, 4 No-Gaps Gates
  */
 
-const LANDMAN_API = 'https://echo-landman-pipeline.bmcii1976.workers.dev';
+const LANDMAN_API = getApiBase('echo-landman-pipeline');
 
 // ── Types ──
 

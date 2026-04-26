@@ -10,10 +10,12 @@
  *   → loadBrainContext() → injectAll into Echo Chat → storeInBrain()
  */
 
-const SDK_URL = 'https://echo-sdk-gateway.bmcii1976.workers.dev';
-const BRAIN_URL = 'https://echo-shared-brain.bmcii1976.workers.dev';
-const CHAT_URL = 'https://echo-chat.bmcii1976.workers.dev';
-const SPEAK_URL = 'https://echo-speak-cloud.bmcii1976.workers.dev';
+import { getApiBase } from './api-base';
+
+const SDK_URL = getApiBase('echo-sdk-gateway', 'sdk');
+const BRAIN_URL = getApiBase('echo-shared-brain');
+const CHAT_URL = getApiBase('echo-chat');
+const SPEAK_URL = getApiBase('echo-speak-cloud');
 const API_KEY = process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-forge-x-2026';
 
 const headers = (): Record<string, string> => ({

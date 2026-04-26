@@ -1,0 +1,193 @@
+v10-D33.4 — Frontend client refactor to new API origins
+========================================================
+Date:        2026-04-26
+Builder:     cc-builder-tick-hammer-225603
+Repo:        WEBSITES/echo-prime-tech (echo-ept.com / echo-prime-tech.com)
+Parent:      v10-D33 (Cloudflare → Echo Personal Cloud migration)
+Depends on:  v10-D33.3 (caps), v10-D33.5 (named cloudflared tunnel)
+
+STATUS: Code-prep complete. Production cutover BLOCKED on D33.5.
+
+What landed
+-----------
+1. NEW: lib/api-base.ts
+   * getApiBase(worker, channel?)  — resolves https://<worker>.bmcii1976.workers.dev
+     unless NEXT_PUBLIC_API_ORIGIN / NEXT_PUBLIC_FORGE_ORIGIN /
+     NEXT_PUBLIC_SDK_ORIGIN / NEXT_PUBLIC_<WORKER>_BASE is set, in which
+     case the env-supplied origin wins and the worker subdomain becomes
+     a path prefix.
+   * getWsBase(worker, channel?)   — same, but emits ws:// or wss://.
+
+2. REFACTOR: 30 files under lib/ — every hardcoded
+     'https://<worker>.bmcii1976.workers.dev' replaced with getApiBase('<worker>')
+   Files touched (47 URL substitutions total):
+     agentic-engine-api.ts (1)   bot-status-api.ts     (9)
+     business-api.ts       (2)   closer-api.ts         (2; incl. wss VOICE_WS_URL)
+     coin-rewards-api.ts   (1)   county-records-api.ts (2)
+     daedalus-forge-api.ts (1)   doctrine-bridge-api.ts (2)
+     ebay-api.ts           (1)   echocad-api.ts        (1)
+     echo-sdk-client.ts    (2; channel=sdk)
+     engine-cloud-api.ts   (1)   engine-runtime-api.ts (1)
+     ept-api.ts            (2)   hephaestion-forge-api.ts (1)
+     knowledge-api.ts      (1)   landman-api.ts        (1)
+     newsletter-api.ts     (1)   office-intelligence.ts (4; sdk channel for sdk-gateway)
+     paypal-api.ts         (1)   pipeline-api.ts       (7)
+     referral-api.ts       (1)   scanner-api.ts        (1)
+     sdk-api.ts            (2)   sentinel-cloud-api.ts (3)
+     stripe-api.ts         (1)   tax-return-api.ts     (1)
+     trial-api.ts          (1)   use-tts.ts            (1)
+     useVoiceConversation.ts (2; incl. wss SPEAK_CLOUD_WS)
+     zoho-api.ts           (1)
+   SKIPPED: sentinel-brain-api.ts — already on echo-op.com origins (sentinel-brain.echo-op.com / agentic.echo-op.com).
+
+3. UPDATED: vercel.json
+   * connect-src CSP: + https://forge.echo-op.com  https://sdk.echo-op.com  https://*.echo-op.com
+   * media-src   CSP: + https://forge.echo-op.com  https://sdk.echo-op.com
+   * Old https://*.bmcii1976.workers.dev RETAINED per OFF-LIMITS (soak until P7).
+
+4. NEW: .env.production
+   * Scaffolded with NEXT_PUBLIC_API_ORIGIN / NEXT_PUBLIC_FORGE_ORIGIN /
+     NEXT_PUBLIC_SDK_ORIGIN entries — ALL COMMENTED OUT.
+   * Defaults thus preserve current prod behaviour (workers.dev) until
+     D33.5 verification permits the flip.
+
+Why the cutover did not happen this tick
+----------------------------------------
+The prompt body specifies "API_BASE reads from env var defaulting to
+https://forge.echo-op.com or https://sdk.echo-op.com" and "Vercel
+network tab shows new origin only." Both require forge.echo-op.com /
+sdk.echo-op.com to resolve to a real origin. Per memory id 1186 and
+queue state at claim time, v10-D33.5 (named cloudflared tunnel) is
+still PENDING (unclaimed, zero work). Defaulting the code to the new
+origin or uncommenting .env.production right now would break every
+production fetch on echo-prime-tech.com.
+
+The plumbing is in place: when D33.5 ships, flipping prod is a
+3-line .env.production edit + Vercel redeploy — no further code change.
+
+Out-of-scope this tick (need separate clones / inventory)
+---------------------------------------------------------
+Other repos named in prompt body but NOT present on HAMMER disk:
+  * echo-op.com         — not at WEBSITES/echo-op*; needs git clone
+  * buildershall        — not at WEBSITES/; needs git clone
+  * daedalus-forge UI   — partial under WEBSITES/echo-prime-tech/app/daedalus-forge,
+                          but no standalone repo on disk
+  * echo-runway UI      — not on disk
+  * billymc storefront  — not on disk
+Recommend queueing one builder-tick per missing repo
+(slug pattern: v10-D33-4-<repo>-frontend-refactor).
+
+Smokes (deferred — depends on D33.5 + Vercel deploy)
+----------------------------------------------------
+  [ ] Per project, open production URL → DevTools → Network tab
+  [ ] 0 calls to *.bmcii1976.workers.dev after .env.production flip
+  [ ] 5 golden paths per app click-through, no console errors
+  [ ] No CSP violations (Reporting-Endpoints / report-only)
+
+Files changed (relative to WEBSITES/echo-prime-tech)
+----------------------------------------------------
+  A  lib/api-base.ts
+  M  lib/agentic-engine-api.ts
+  M  lib/bot-status-api.ts
+  M  lib/business-api.ts
+  M  lib/closer-api.ts
+  M  lib/coin-rewards-api.ts
+  M  lib/county-records-api.ts
+  M  lib/daedalus-forge-api.ts
+  M  lib/doctrine-bridge-api.ts
+  M  lib/ebay-api.ts
+  M  lib/echocad-api.ts
+  M  lib/echo-sdk-client.ts
+  M  lib/engine-cloud-api.ts
+  M  lib/engine-runtime-api.ts
+  M  lib/ept-api.ts
+  M  lib/hephaestion-forge-api.ts
+  M  lib/knowledge-api.ts
+  M  lib/landman-api.ts
+  M  lib/newsletter-api.ts
+  M  lib/office-intelligence.ts
+  M  lib/paypal-api.ts
+  M  lib/pipeline-api.ts
+  M  lib/referral-api.ts
+  M  lib/scanner-api.ts
+  M  lib/sdk-api.ts
+  M  lib/sentinel-cloud-api.ts
+  M  lib/stripe-api.ts
+  M  lib/tax-return-api.ts
+  M  lib/trial-api.ts
+  M  lib/use-tts.ts
+  M  lib/useVoiceConversation.ts
+  M  lib/zoho-api.ts
+  M  vercel.json
+  A  .env.production
+  A  migration/d33_4_frontend_refactor.log
+
+================================================================
+v10-D33.4b — Cutover attempt 2026-04-26T19:46Z (BLOCKED, no flip)
+================================================================
+Builder:     cc-builder-loop-hammer-432401
+Slug:        v10-D33-4b-frontend-origin-cutover-post-tunnel (id 181, prio 5)
+Result:      BLOCKED — pre-check #3 failed; .env.production NOT modified.
+
+Pre-checks performed
+--------------------
+  [OK]   dig forge.echo-op.com -> 99.98.78.113 (real IP, not trycloudflare CNAME)
+  [OK]   curl https://forge.echo-op.com/sdk/health -> 200, gate ENFORCING, 151 caps
+  [FAIL] D33.5 path-mapping convention (worker subdomain == path prefix?)
+
+Diagnostic — what is wired vs. what api-base.ts requires
+--------------------------------------------------------
+api-base.ts line 36-46 builds URLs as:
+    `${origin}/${worker}` when NEXT_PUBLIC_API_ORIGIN is set
+i.e. https://forge.echo-op.com/ept-api/...
+     https://forge.echo-op.com/daedalus-forge/...
+     etc., for ~30 workers referenced across lib/.
+
+D33.5 actually ships only:
+  forge.echo-op.com/sdk/*  -> echo-workers.service SDK gate (151 caps, OK)
+  forge.echo-op.com/health -> health endpoint (OK)
+Everything else returns 404 or hangs (curl timeout):
+  /ept-api/         -> 404 in 36ms
+  /daedalus-forge/  -> connection timeout 6s
+  /sentinel-cloud/  -> connection timeout 6s
+  /knowledge-api/   -> 404
+  /pipeline-api/    -> connection timeout 6s
+  /stripe-api/      -> connection timeout 6s
+
+Per-worker subdomain alternative also unavailable:
+  ept-api.echo-op.com         -> NXDOMAIN (no A record)
+  daedalus-forge.echo-op.com  -> NXDOMAIN
+  sentinel-cloud.echo-op.com  -> NXDOMAIN
+
+Why this is a real blocker, not a defect on D33.5
+-------------------------------------------------
+D33.5 was scoped to "named cloudflared tunnel" + SDK gate publication, and
+that shipped correctly. D33.4b assumed "tunnel = full worker mesh on
+forge.echo-op.com" but the worker reverse-proxy directives in Caddy were
+never written (or the workers themselves still live on Cloudflare and
+were not ported to FORGE). Either way the path-prefix routing convention
+named in api-base.ts is unimplemented.
+
+Flipping NEXT_PUBLIC_API_ORIGIN=https://forge.echo-op.com right now would
+break every non-SDK fetch on echo-prime-tech.com production. Code-prep
+from D33.4 is correct and stays in place; the env override stays
+commented out.
+
+Action taken instead of cutover
+-------------------------------
+  1. .env.production untouched (still all-comments — prod stays on
+     workers.dev, which is the documented safe default).
+  2. Filed follow-up queue prompt: v10-D33-5b-worker-path-routing-on-forge
+     (slug includes deps + Caddy directive sketch + smoke list).
+  3. Updated this log with the cutover attempt + diagnostic.
+  4. Brain-ingested at importance 8 (kind=blocker_finding, tags=v10-D33,
+     d33-5-gap, frontend-cutover).
+  5. Signal-line appended to cc_signals.md.
+  6. Builder claim released so a successor can pick up D33.4b once
+     D33.5b lands.
+
+Repos out of D33.4 scope (confirmed not in inventory)
+-----------------------------------------------------
+  WEBSITES/cartman-mobile/    -> static HTML, no fetches to migrate
+  WEBSITES/right-at-home-bnb/ -> separate stack (.env, not .env.production),
+                                  not in original D33.4 file inventory.

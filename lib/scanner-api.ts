@@ -1,6 +1,8 @@
 'use client';
 
-const SDK_GATEWAY = 'https://echo-sdk-gateway.bmcii1976.workers.dev';
+import { getApiBase } from './api-base';
+
+const SDK_GATEWAY = getApiBase('echo-sdk-gateway');
 
 async function getHeaders(): Promise<Record<string, string>> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };

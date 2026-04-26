@@ -1,10 +1,11 @@
+import { getApiBase, getWsBase } from './api-base';
 // ════════════════════════════════════════════════════════════════
 // County Records API Client
 // Connects to echo-county-records (genealogy) + encore-cloud-scraper (deeds)
 // ════════════════════════════════════════════════════════════════
 
-const GENEALOGY_API = 'https://echo-county-records.bmcii1976.workers.dev';
-const DEEDS_API = 'https://encore-cloud-scraper.bmcii1976.workers.dev';
+const GENEALOGY_API = getApiBase('echo-county-records');
+const DEEDS_API = getApiBase('encore-cloud-scraper');
 const API_KEY = 'echo-omega-prime-forge-x-2026';
 
 async function apiFetch(base: string, path: string, options: RequestInit = {}) {

@@ -1,3 +1,4 @@
+import { getApiBase, getWsBase } from './api-base';
 /**
  * Echo Engine Cloud API — Customer-Facing Engine Intelligence
  *
@@ -8,7 +9,7 @@
  * Responses are sanitized — no internal metadata exposed.
  */
 
-const API_URL = 'https://echo-engine-cloud.bmcii1976.workers.dev';
+const API_URL = getApiBase('echo-engine-cloud');
 
 // ── Types ──
 

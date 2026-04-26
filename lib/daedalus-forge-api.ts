@@ -1,3 +1,4 @@
+import { getApiBase, getWsBase } from './api-base';
 /**
  * Daedalus Forge API — AI Manufacturing Intelligence Platform
  *
@@ -6,7 +7,7 @@
  * 8 engineering domains, Trinity Council (SAGE/NYX/THORNE).
  */
 
-const API_BASE = 'https://daedalus-forge.bmcii1976.workers.dev';
+const API_BASE = getApiBase('daedalus-forge');
 
 // ── Types ──
 

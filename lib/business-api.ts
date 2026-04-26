@@ -1,5 +1,6 @@
+import { getApiBase, getWsBase } from './api-base';
 /* ─── Business Manager API Client ─── */
-const API_URL = 'https://echo-business-api.bmcii1976.workers.dev';
+const API_URL = getApiBase('echo-business-api');
 
 async function getToken(): Promise<string | null> {
   try {
@@ -375,7 +376,7 @@ export const deleteReview = (id: string) =>
   apiFetch<{ success: boolean }>(`/reviews/${id}?tenant=public`, { method: 'DELETE' });
 
 /* ─── Reviews (public — no auth, via ept-api for seed data + submissions) ─── */
-const EPT_API_URL = 'https://ept-api.bmcii1976.workers.dev';
+const EPT_API_URL = getApiBase('ept-api');
 
 export const getPublicReviews = async (): Promise<{ reviews: Review[] }> => {
   const res = await fetch(`${EPT_API_URL}/public/reviews`);

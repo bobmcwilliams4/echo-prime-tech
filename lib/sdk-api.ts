@@ -1,11 +1,12 @@
+import { getApiBase, getWsBase } from './api-base';
 /**
  * Echo SDK Gateway API Client
  * Endpoint: https://echo-sdk-gateway.bmcii1976.workers.dev
  * 17 endpoints — engines, brain, knowledge, vault, worker proxy
  */
 
-const SDK_GATEWAY = 'https://echo-sdk-gateway.bmcii1976.workers.dev';
-const EPT_API = 'https://ept-api.bmcii1976.workers.dev';
+const SDK_GATEWAY = getApiBase('echo-sdk-gateway');
+const EPT_API = getApiBase('ept-api');
 
 // ── Types ──
 

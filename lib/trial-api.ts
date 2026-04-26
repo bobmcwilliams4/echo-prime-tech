@@ -1,5 +1,6 @@
+import { getApiBase, getWsBase } from './api-base';
 // Trial API client — calls echo-subscription Worker
-const API_BASE = 'https://echo-subscription.bmcii1976.workers.dev';
+const API_BASE = getApiBase('echo-subscription');
 
 export interface TrialRequest {
   email: string;

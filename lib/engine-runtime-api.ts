@@ -1,3 +1,4 @@
+import { getApiBase, getWsBase } from './api-base';
 /**
  * Engine Runtime API — Direct access to 6,500+ intelligence engines
  *
@@ -8,7 +9,7 @@
  * For customer billing/Stripe, see engine-cloud-api.ts instead.
  */
 
-const RUNTIME_URL = 'https://echo-engine-runtime.bmcii1976.workers.dev';
+const RUNTIME_URL = getApiBase('echo-engine-runtime');
 
 // ── Types ──
 

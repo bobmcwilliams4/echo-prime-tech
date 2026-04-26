@@ -1,8 +1,9 @@
 'use client';
 
 import { useRef, useState, useCallback } from 'react';
+import { getApiBase } from './api-base';
 
-const TTS_API = 'https://echo-speak-cloud.bmcii1976.workers.dev';
+const TTS_API = getApiBase('echo-speak-cloud');
 const ECHO_API_KEY = process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-forge-x-2026';
 
 interface UseTTSOptions {
