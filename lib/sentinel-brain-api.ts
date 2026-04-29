@@ -16,9 +16,14 @@
  *   - Compact system prompt injection
  */
 
+// Updated 2026-04-29 cc2-hammer: dead Claude-Opus bridge replaced by
+// FORGE-Raistlin proxy. Routes through existing SDK-gate trycloudflare tunnel
+// (no separate cloudflared mapping needed). Named tunnel at sentinel-brain.echo-op.com
+// kept as fallback — points at legacy bridge that's currently down but may revive.
 const BRAIN_URLS = [
-  'https://sentinel-brain.echo-op.com',  // gateway v2.0 (preferred — has file/drive access)
-  'https://agentic.echo-op.com',         // bridge v2.0 (fallback — always accessible)
+  'https://theories-equity-expect-population.trycloudflare.com/sentinel/brain',  // primary: FORGE/Raistlin via SDK gate proxy ($0)
+  'https://sentinel-brain.echo-op.com',                                          // fallback: legacy Claude Opus bridge (may be dead)
+  'https://agentic.echo-op.com',                                                 // 2nd fallback: agentic bridge
 ];
 
 const POLL_INTERVAL_MS = 1500;  // 1.5s — faster polling

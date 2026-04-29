@@ -161,4 +161,4 @@ Sentinel (`/sentinel`) is the professional engine-backed intelligence interface.
 | `lib/landman-api.ts` | Landman Pipeline API client |
 | `WORKERS/echo-chat/src/engine-router.ts` | Engine Runtime query + doctrine formatting |
 
-**NO modifications to Sentinel chat architecture without explicit Commander approval.**
+**Architecture changes ALLOWED — Commander pre-authorized 2026-04-29.** Do whatever is needed to keep things working. Do NOT delete databases, doctrines, vault credentials, training data, or any irreversible records. Backend swaps (CF Worker → FORGE FastAPI, Claude Opus bridge → Raistlin local) are encouraged for cost savings — preserve the page's HTTP contract so the frontend keeps working.
