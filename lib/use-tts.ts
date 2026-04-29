@@ -3,7 +3,11 @@
 import { useRef, useState, useCallback } from 'react';
 import { getApiBase } from './api-base';
 
-const TTS_API = getApiBase('echo-speak-cloud');
+// 2026-04-29 cc2-hammer: echo-speak-cloud CF worker is 1010-blocked.
+// Route to FORGE Echo voice (XTTS-v2 GPU :7800) via SDK-gate proxy at /sentinel/tts.
+// getApiBase fallback kept for pages that override NEXT_PUBLIC_ECHO_SPEAK_BASE.
+const TTS_API = process.env.NEXT_PUBLIC_ECHO_SPEAK_BASE
+  || 'https://theories-equity-expect-population.trycloudflare.com/sentinel';
 const ECHO_API_KEY = process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-forge-x-2026';
 
 interface UseTTSOptions {
