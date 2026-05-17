@@ -161,4 +161,29 @@ Sentinel (`/sentinel`) is the professional engine-backed intelligence interface.
 | `lib/landman-api.ts` | Landman Pipeline API client |
 | `WORKERS/echo-chat/src/engine-router.ts` | Engine Runtime query + doctrine formatting |
 
-**Architecture changes ALLOWED — Commander pre-authorized 2026-04-29.** Do whatever is needed to keep things working. Do NOT delete databases, doctrines, vault credentials, training data, or any irreversible records. Backend swaps (CF Worker → FORGE FastAPI, Claude Opus bridge → Raistlin local) are encouraged for cost savings — preserve the page's HTTP contract so the frontend keeps working.
+**NO modifications to Sentinel chat architecture without explicit Commander approval.**
+
+
+## Library-First Protocol (MANDATORY)
+<!-- echo-library-first-v1 -->
+
+Before writing ANY function in this repo, call:
+
+  echo.functions.search(q="<intent>")
+
+against the 1M-function corpus in `arcanum_sdk.functions` (FORGE).
+
+If a result ranks > 0.05, READ that source via `echo.functions.source(id=...)` and reuse, extend, or import — do **NOT** rewrite.
+
+**Enforcement:**
+- `fs_write` of `.py` without a prior `search` call in this `run_id` will be rejected
+- Duplicate-rate audited nightly; flagged builders lose autonomy
+- All new functions auto-ingest to the corpus on save (inotify watcher)
+
+**Search examples:**
+
+  echo.functions.search(q="parse pdf", has_docstring=true, limit=10)
+  echo.functions.search(q="twilio sms", async_only=true)
+  echo.functions.source(id=12345, lines=80)
+
+Full doctrine: `feedback_library_first_protocol.md` in MEMORY.md.
