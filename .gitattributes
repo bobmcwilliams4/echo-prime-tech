@@ -1,0 +1,6 @@
+# Workflow / YAML files MUST be LF — CRLF causes GitHub Actions startup_failure
+# ("invalid workflow file"). core.autocrlf=true on the Windows dev box was
+# silently rewriting these to CRLF and breaking every deploy.
+*.yml   text eol=lf
+*.yaml  text eol=lf
+.github/** text eol=lf
