@@ -117,7 +117,7 @@ const MODEL_HOST_URL = 'https://echo-model-host.bmcii1976.workers.dev';
 // SDK-gated runtime: every /query routes through Forge SDK gate (ARCS → engine →
 // DOCTRINE_CACHE) and returns audit metadata (run_id, why_link). Replaces the
 // legacy bmcii1976 worker that was 500'ing on KV exhaustion.
-const ENGINE_RUNTIME_URL = 'https://echo-sentinel.echo-prime.workers.dev';
+const ENGINE_RUNTIME_URL = 'https://sentinel.echo-op.com';
 const STORAGE_KEY = 'sentinel_chat_v2';
 const MAX_STORED = 100;
 
