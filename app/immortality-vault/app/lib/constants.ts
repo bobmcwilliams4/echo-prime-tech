@@ -1,6 +1,6 @@
 /* Immortality Vault — Shared Constants */
 
-export const API = 'https://echo-immortality-vault.bmcii1976.workers.dev';
+export const API = 'https://vault-api.echo-op.com';
 export const ACCENT = '#c084fc';
 export const GOLD = '#fbbf24';
 export const BG_DARK = '#0a0a0f';
