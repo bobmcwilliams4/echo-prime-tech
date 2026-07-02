@@ -101,10 +101,12 @@ export default function OfficeAiPage() {
             <div className="flex items-center justify-center gap-8 mb-8 text-sm" style={{ color: 'var(--ept-text-muted)' }}>
               <span>22 Modules</span><span>|</span><span>AI-Powered</span><span>|</span><span>From $49/mo</span>
             </div>
-            <div className="flex gap-4 justify-center">
-              <Link href="/pricing" className="px-8 py-3 rounded-xl font-semibold text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>Start Free Trial</Link>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <a href="/builder" className="px-8 py-3 rounded-xl font-semibold text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>Build My Business Site</a>
+              <Link href="/pricing" className="px-8 py-3 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)' }}>Start Free Trial</Link>
               <Link href="/docs" className="px-8 py-3 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>See All Modules</Link>
             </div>
+            <p className="mt-4 text-sm" style={{ color: 'var(--ept-text-muted)' }}>Describe your business, pick your services &mdash; the AI builds and stages your site in minutes.</p>
           </div>
         </section>
 
