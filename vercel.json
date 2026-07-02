@@ -31,6 +31,16 @@
       "source": "/favicon.ico",
       "destination": "/icon.png",
       "permanent": false
+    },
+    {
+      "source": "/builder",
+      "destination": "https://app.echo-ept.com/",
+      "permanent": false
+    },
+    {
+      "source": "/build",
+      "destination": "https://app.echo-ept.com/",
+      "permanent": false
     }
   ]
 }
