@@ -22,10 +22,6 @@
   ],
   "rewrites": [
     {
-      "source": "/settings",
-      "destination": "https://app.echo-ept.com/settings"
-    },
-    {
       "source": "/api/sg/:path*",
       "destination": "https://shadowglass-v8-warpspeed.bmcii1976.workers.dev/:path*"
     }
