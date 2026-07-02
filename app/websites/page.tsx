@@ -137,7 +137,7 @@ export default function WebsiteBuilderPage() {
       <section className="px-6 py-20 text-center max-w-4xl mx-auto">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 border"
           style={{ borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)', backgroundColor: 'var(--ept-surface)' }}>
-          v1.2.0 — echo-website-builder-ai.bmcii1976.workers.dev
+          Echo Office AI — live at app.echo-ept.com
         </div>
         <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
           <span className="gradient-text">Website Builder AI</span>
@@ -149,10 +149,10 @@ export default function WebsiteBuilderPage() {
           production-ready, deployed website — in minutes.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/checkout?service=websites&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-white text-center"
+          <a href="https://app.echo-ept.com" className="px-8 py-3 rounded-xl font-semibold text-white text-center"
             style={{ backgroundColor: 'var(--ept-accent)' }}>
             Build Your Site Free
-          </Link>
+          </a>
           <Link href="#features" className="px-8 py-3 rounded-xl font-semibold text-center border"
             style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
             See All Features
@@ -331,10 +331,10 @@ export default function WebsiteBuilderPage() {
           Stop dragging blocks. Stop hiring devs for simple sites. Describe what you want and go live today.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/checkout?service=websites&tier=starter" className="px-8 py-3 rounded-xl font-semibold text-white"
+          <a href="https://app.echo-ept.com" className="px-8 py-3 rounded-xl font-semibold text-white"
             style={{ backgroundColor: 'var(--ept-accent)' }}>
             Build Your Site Free
-          </Link>
+          </a>
           <Link href="/support" className="px-8 py-3 rounded-xl font-semibold border"
             style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>
             Talk to Sales
