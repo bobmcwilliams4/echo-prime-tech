@@ -523,3 +523,18 @@ export async function getTypedMemories(
 export async function consolidateMemories(userId: string): Promise<ConsolidationResult> {
   return vaultFetch(`/memories/consolidate/${userId}`, { method: 'POST' });
 }
+
+/* ─── Daily Briefing + Nudges (sovereign backend) ───────────────────── */
+
+export interface DailyBriefing {
+  greeting: string;
+  streak_days: number;
+  questions: InterviewQuestion[];
+  follow_up: { question: string; about: string } | null;
+  memory_of_the_day: Memory | null;
+  care_note: string;
+}
+
+export async function getDailyBriefing(userId: string): Promise<DailyBriefing> {
+  return vaultFetch(`/briefing/daily/${userId}`);
+}
