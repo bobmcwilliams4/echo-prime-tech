@@ -770,7 +770,7 @@ export default function SentinelPage() {
       const cleanText = text.replace(/```[\s\S]*?```/g, '').replace(/\[.*?\]/g, '').replace(/[#*_~`>|]/g, '').slice(0, 2000);
       // 2026-04-29 cc2-hammer: dead echo-speak-cloud worker (CF 1010 blocked) ->
       // FORGE Echo voice (XTTS-v2 GPU :7800) via SDK gate proxy.
-      const res = await fetch('https://theories-equity-expect-population.trycloudflare.com/sentinel/tts', {
+      const res = await fetch('https://sdk1.echo-op.com/sentinel/tts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

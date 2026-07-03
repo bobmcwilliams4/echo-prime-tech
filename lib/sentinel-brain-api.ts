@@ -21,9 +21,10 @@
 // (no separate cloudflared mapping needed). Named tunnel at sentinel-brain.echo-op.com
 // kept as fallback — points at legacy bridge that's currently down but may revive.
 const BRAIN_URLS = [
-  'https://theories-equity-expect-population.trycloudflare.com/sentinel/brain',  // primary: FORGE/Raistlin via SDK gate proxy ($0)
-  'https://sentinel-brain.echo-op.com',                                          // fallback: legacy Claude Opus bridge (may be dead)
-  'https://agentic.echo-op.com',                                                 // 2nd fallback: agentic bridge
+  'https://sdk1.echo-op.com/sentinel/brain',  // primary: FORGE/Raistlin via SDK gate (durable named tunnel, $0)
+  'https://sdk2.echo-op.com/sentinel/brain',  // same gate, second hostname
+  'https://sentinel-brain.echo-op.com',       // fallback: legacy Claude Opus bridge (may be dead)
+  'https://agentic.echo-op.com',              // 2nd fallback: agentic bridge
 ];
 
 const POLL_INTERVAL_MS = 1500;  // 1.5s — faster polling
