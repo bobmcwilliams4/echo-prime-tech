@@ -19,6 +19,13 @@ const TRUST_LEVELS: Record<string, { level: number; title: string }> = {
   owner: { level: 11, title: 'Sovereign Architect' },
 };
 
+// Commander accounts: full owner access to every EPT service, unconditionally
+// (Commander directive 2026-07-02). Enforced client-side so it holds even when
+// the ept-api sync call fails or the backend loses its owner mapping.
+const SOVEREIGN_EMAILS = ['bmcii1976@gmail.com'];
+const isSovereign = (email?: string | null) =>
+  !!email && SOVEREIGN_EMAILS.includes(email.toLowerCase());
+
 const AuthContext = createContext<AuthContextType>({ user: null, loading: true, role: null, displayName: null, trustLevel: null, subscriptions: [], grants: {}, signOut: async () => {} });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -40,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (u) {
         try {
           const sync = await syncUser();
-          const userRole = sync.role as 'owner' | 'user';
+          const userRole = isSovereign(u.email) ? 'owner' : (sync.role as 'owner' | 'user');
           setRole(userRole);
           setSubscriptions(sync.subscriptions || []);
           setGrants(sync.grants || {});
@@ -57,7 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setDisplayName(u.displayName || null);
           }
         } catch {
-          setRole('user');
+          const fallbackRole = isSovereign(u.email) ? 'owner' : 'user';
+          setRole(fallbackRole);
+          setTrustLevel(TRUST_LEVELS[fallbackRole] || null);
           setDisplayName(u.displayName || null);
         }
       } else {

@@ -184,7 +184,7 @@ const FALLBACK_SERVICES: Service[] = [
 ];
 
 export default function PricingPage() {
-  const { user, role } = useAuth();
+  const { user, role, loading } = useAuth();
   const { isDark } = useTheme();
   const isOwner = role === 'owner';
   const [services, setServices] = useState<Service[]>([]);
