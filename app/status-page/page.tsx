@@ -82,7 +82,7 @@ export default function StatusPagePage() {
         <div className="p-8 rounded-xl border text-center" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-accent)', borderWidth: 2 }}>
           <h3 className="text-2xl font-bold mb-3" style={{ color: 'var(--ept-text)' }}>See It Live</h3>
           <p className="mb-4" style={{ color: 'var(--ept-text-secondary)' }}>Our own status page is built with Echo Status Page</p>
-          <a href="https://echo-status-page.bmcii1976.workers.dev" target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>View Live Status Page</a>
+          <a href="https://fleet.echo-op.com" target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-3 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>View Live Status Page</a>
         </div>
       </section>
 
