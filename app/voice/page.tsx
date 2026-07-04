@@ -1241,7 +1241,7 @@ function VoiceCloning({ voices, setVoices, setVoiceId }: { voices: Voice[]; setV
       const data = await res.json();
       setCloneResult(`Voice "${data.name}" created from ${data.source_files} file(s)! Duration: ${data.ref_duration_s}s`);
       setVoiceId(data.id);
-      fetch(`${TTS_API}/voices`).then(r => r.json()).then(setVoices).catch(() => {});
+      fetch(`${TTS_API}/voices`).then(r => r.json()).then(v => setVoices(Array.isArray(v) ? v : [])).catch(() => {});
       setCloneName(''); setCloneDesc(''); setCloneFiles([]); setRecordedBlob(null);
     } catch (e: unknown) { setCloneResult(`Error: ${e instanceof Error ? e.message : 'Clone failed'}`); } finally { setCloning(false); }
   };
@@ -1249,7 +1249,7 @@ function VoiceCloning({ voices, setVoices, setVoiceId }: { voices: Voice[]; setV
   const deleteVoice = async (id: string) => {
     if (id === 'default') return;
     await fetch(`${TTS_API}/voices/${id}`, { method: 'DELETE' }).catch(() => {});
-    fetch(`${TTS_API}/voices`).then(r => r.json()).then(setVoices).catch(() => {});
+    fetch(`${TTS_API}/voices`).then(r => r.json()).then(v => setVoices(Array.isArray(v) ? v : [])).catch(() => {});
   };
 
   return (
@@ -1614,7 +1614,7 @@ function VoiceDesign({ setVoices }: { setVoices: (v: Voice[]) => void }) {
       // Refresh voice list
       try {
         const vRes = await fetch(`${TTS_API}/voices`);
-        if (vRes.ok) setVoices(await vRes.json());
+        if (vRes.ok) { const v = await vRes.json(); setVoices(Array.isArray(v) ? v : []); }
       } catch { /* non-critical */ }
     } catch (e: unknown) { setError(e instanceof Error ? e.message : 'Voice creation failed'); } finally { setSaving(false); }
   };
@@ -2650,13 +2650,19 @@ export default function VoicePage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
-    // Load voices from cloud (includes ElevenLabs v3 mapped voices), fall back to local
-    fetch(`${TTS_CLOUD_API}/voices`).then(r => r.json()).then((v: Voice[]) => {
+    // Load voices from the sovereign gate, fall back to local. Guard the shape:
+    // an error JSON object fed into setVoices crashes every .map on the page.
+    const asVoiceList = (v: unknown): Voice[] =>
+      Array.isArray(v) ? v : (v && typeof v === 'object' && Array.isArray((v as { voices?: Voice[] }).voices) ? (v as { voices: Voice[] }).voices : []);
+    fetch(`${TTS_CLOUD_API}/voices`).then(r => r.json()).then((raw: unknown) => {
+      const v = asVoiceList(raw);
+      if (v.length === 0) throw new Error('no voices');
       setVoices(v);
-      if (v.length > 0) setVoiceId(v[0].name || v[0].id);
+      setVoiceId(v[0].name || v[0].id);
       setServerOffline(false);
     }).catch(() => {
-      fetch(`${TTS_API}/voices`).then(r => r.json()).then((v: Voice[]) => {
+      fetch(`${TTS_API}/voices`).then(r => r.json()).then((raw: unknown) => {
+        const v = asVoiceList(raw);
         setVoices(v);
         if (v.length > 0) setVoiceId(v[0].id);
         setServerOffline(false);
