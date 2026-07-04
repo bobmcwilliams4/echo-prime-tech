@@ -11,9 +11,12 @@ import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import TrialCTA from '@/components/TrialCTA';
 
 // ─── Constants ───
+// 2026-07-03 prod sweep: echo-speak-cloud worker is dead (locked CF account).
+// Basic synthesis rides the sovereign FORGE voice via the auth-less SDK-gate
+// proxy; advanced studio features (clone/design/isolation) still target the
+// legacy tts.echo-op.com server and degrade gracefully where routes are gone.
 const TTS_API = 'https://tts.echo-op.com';
-const TTS_CLOUD_API = 'https://echo-speak-cloud.bmcii1976.workers.dev';
-const ECHO_API_KEY = process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-forge-x-2026';
+const TTS_CLOUD_API = 'https://forge.echo-op.com/sentinel';
 const MAX_CLONE_SIZE = 50 * 1024 * 1024;
 const MAX_TEXT_LENGTH = 50_000;
 const ENGINE_VERSION = '3.0.0';
@@ -36,7 +39,7 @@ async function ttsGenerate(text: string, voiceId: string, opts: Record<string, u
   try {
     const res = await fetch(`${TTS_CLOUD_API}/tts`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': ECHO_API_KEY },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text,
         voice: voiceId,
@@ -59,7 +62,7 @@ async function ttsGenerate(text: string, voiceId: string, opts: Record<string, u
   try {
     const res = await fetch(`${TTS_CLOUD_API}/tts`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': ECHO_API_KEY },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text,
         voice: voiceId,
@@ -562,7 +565,7 @@ function Projects({ voices, voiceId }: { voices: Voice[]; voiceId: string }) {
     try {
       const body: Record<string, unknown> = { text: p.text.trim(), voice: p.voiceId };
       const res = await fetch(`${TTS_CLOUD_API}/tts`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': ECHO_API_KEY },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(`Failed: ${res.status}`);
@@ -1085,7 +1088,7 @@ function SampleVoiceCards({ voices, setVoiceId, deleteVoice }: { voices: Voice[]
     try {
       const text = `Hi, I'm ${voiceName}. This is what I sound like when I speak.`;
       const res = await fetch(`${TTS_CLOUD_API}/tts`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': ECHO_API_KEY },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, voice: voiceId }),
         signal: ctrl.signal,
       });
@@ -1375,7 +1378,7 @@ function VoiceLibrary({ voices, voiceId, setVoiceId, onNavigate }: { voices: Voi
 
     try {
       const res = await fetch(`${TTS_CLOUD_API}/tts`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': ECHO_API_KEY },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: 'Hello, this is a preview of my voice. I can speak naturally and clearly.', voice: vid }),
         signal: controller.signal,
       });
@@ -1476,7 +1479,7 @@ function SoundEffects() {
     setGenerating(true); setError(null);
     try {
       const res = await fetch(`${TTS_CLOUD_API}/tts`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': ECHO_API_KEY },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: prompt.trim(), voice: 'echo' }),
       });
       if (!res.ok) throw new Error(`Failed (${res.status})`);

@@ -165,8 +165,8 @@ export default function BenchmarksPage() {
 
   return (
     <div className="min-h-screen transition-colors" style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
-      <BreadcrumbSchema items={[{ name: 'Home', url: 'https://echo-ept.com' }, { name: 'Benchmarks', url: 'https://echo-ept.com/benchmarks' }]} />
-      <FaqSchema faqs={BENCHMARK_FAQS.map(f => ({ question: f.q, answer: f.a }))} />
+      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Benchmarks', href: '/benchmarks' }]} />
+      <FaqSchema faqs={BENCHMARK_FAQS} />
 
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between sticky top-0 z-50 backdrop-blur-md" style={{ borderColor: 'var(--ept-border)', backgroundColor: isDark ? 'rgba(5,5,8,0.85)' : 'rgba(255,255,255,0.85)' }}>
