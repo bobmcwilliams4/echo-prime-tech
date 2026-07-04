@@ -768,14 +768,11 @@ export default function SentinelPage() {
     setVoicePlaying(true);
     try {
       const cleanText = text.replace(/```[\s\S]*?```/g, '').replace(/\[.*?\]/g, '').replace(/[#*_~`>|]/g, '').slice(0, 2000);
-      // 2026-04-29 cc2-hammer: dead echo-speak-cloud worker (CF 1010 blocked) ->
-      // FORGE Echo voice (XTTS-v2 GPU :7800) via SDK gate proxy.
-      const res = await fetch('https://theories-equity-expect-population.trycloudflare.com/sentinel/tts', {
+      // 2026-07-03: sdk1.echo-op.com is the key-gated GPT-connector gateway —
+      // the auth-less /sentinel/tts proxy is the SDK gate at forge.echo-op.com.
+      const res = await fetch('https://forge.echo-op.com/sentinel/tts', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Echo-API-Key': process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-forge-x-2026',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: cleanText,
           voice: 'echo',

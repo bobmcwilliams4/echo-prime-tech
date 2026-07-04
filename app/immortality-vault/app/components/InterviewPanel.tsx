@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { ACCENT, BG_CARD, BORDER, CATEGORIES } from '../lib/constants';
-import { selectQuestion, answerQuestion, extractTraits, type InterviewQuestion } from '../lib/vault-api';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ACCENT, BG_CARD, BORDER, CATEGORIES, GOLD } from '../lib/constants';
+import { selectQuestion, answerQuestion, extractTraits, synthesizeSpeech, type InterviewQuestion } from '../lib/vault-api';
+import { playAudioBlob } from '../lib/media';
 
 interface Props {
   userId: string;
@@ -14,6 +15,27 @@ export default function InterviewPanel({ userId }: Props) {
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const [voiceOn, setVoiceOn] = useState(true);
+  const spokenFor = useRef<string | null>(null);
+
+  const speakQuestion = useCallback(async (q: InterviewQuestion) => {
+    setSpeaking(true);
+    try {
+      const blob = await synthesizeSpeech(q.question, 'warmth');
+      await playAudioBlob(blob);
+    } catch { /* voice is a bonus — never block the interview */ }
+    setSpeaking(false);
+  }, []);
+
+  // Read each new question aloud (free sovereign TTS) — Commander directive
+  // 2026-07-03: the interviewer speaks, the user just answers.
+  useEffect(() => {
+    if (voiceOn && question && spokenFor.current !== question.question_id) {
+      spokenFor.current = question.question_id;
+      speakQuestion(question);
+    }
+  }, [question, voiceOn, speakQuestion]);
 
   const startInterview = async (category: string) => {
     setLoading(true);
@@ -47,18 +69,45 @@ export default function InterviewPanel({ userId }: Props) {
   };
 
   if (selectedCategory && question) {
+    const generated = question.question_id.startsWith('gen_');
     return (
       <div className="space-y-6">
-        <button onClick={() => { setSelectedCategory(null); setQuestion(null); }} className="text-sm" style={{ color: ACCENT }}>
-          &larr; Back to Categories
-        </button>
+        <div className="flex items-center justify-between">
+          <button onClick={() => { setSelectedCategory(null); setQuestion(null); }} className="text-sm" style={{ color: ACCENT }}>
+            &larr; Back to Categories
+          </button>
+          <button
+            onClick={() => setVoiceOn(v => !v)}
+            className="px-3 py-1.5 rounded-full text-xs font-semibold"
+            style={{ border: `1px solid ${BORDER}`, color: voiceOn ? GOLD : '#71717a' }}
+            title="Read questions aloud"
+          >
+            {voiceOn ? '\u{1F50A} Voice On' : '\u{1F507} Voice Off'}
+          </button>
+        </div>
         <div className="p-6 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${ACCENT}` }}>
-          <div className="text-xs font-mono mb-3" style={{ color: ACCENT, letterSpacing: 2 }}>
-            {CATEGORIES.find(c => c.id === selectedCategory)?.icon} {selectedCategory.toUpperCase().replace('_', ' ')}
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-xs font-mono" style={{ color: ACCENT, letterSpacing: 2 }}>
+              {CATEGORIES.find(c => c.id === selectedCategory)?.icon} {selectedCategory.toUpperCase().replace('_', ' ')}
+            </div>
+            {generated && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                    style={{ background: '#1e1033', color: GOLD, border: `1px solid ${BORDER}` }}>
+                {'\u{2728}'} written just for you
+              </span>
+            )}
           </div>
-          <p className="text-xl text-white font-light italic leading-relaxed mb-6">
+          <p className="text-xl text-white font-light italic leading-relaxed mb-3">
             &ldquo;{question.question}&rdquo;
           </p>
+          <button
+            onClick={() => question && speakQuestion(question)}
+            disabled={speaking}
+            className="text-xs mb-4 px-3 py-1.5 rounded-full font-semibold disabled:opacity-40"
+            style={{ border: `1px solid ${BORDER}`, color: '#d4d4d8' }}
+          >
+            {speaking ? '\u{1F50A} Speaking...' : '\u{1F50A} Hear it again'}
+          </button>
           {question.video_instructions && (
             <div className="text-xs text-gray-500 mb-4 p-3 rounded-lg" style={{ background: '#0a0a0f' }}>
               {'\u{1F4F9}'} {question.video_instructions}
@@ -99,7 +148,7 @@ export default function InterviewPanel({ userId }: Props) {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-white">Biography Interview</h2>
-      <p className="text-sm text-gray-400">Choose a life category to begin recording your story.</p>
+      <p className="text-sm text-gray-400">Choose a life category to begin recording your story. The interviewer reads each question aloud — just talk.</p>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {CATEGORIES.map(cat => (
           <button
