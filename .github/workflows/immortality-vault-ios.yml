@@ -1,0 +1,61 @@
+name: Immortality Vault iOS (Capacitor → TestFlight)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'app/immortality-vault/**'
+      - 'capacitor.config.ts'
+      - 'scripts/build-capacitor-ios.sh'
+      - 'scripts/prepare-capacitor-export.js'
+      - '.github/workflows/immortality-vault-ios.yml'
+
+jobs:
+  build-testflight:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+      NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
+      BUILD_NUMBER: ${{ github.run_number }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Static export + Capacitor sync
+        run: bash scripts/build-capacitor-ios.sh
+
+      - name: Install CocoaPods
+        run: |
+          cd ios/App
+          pod install
+
+      - name: Install Fastlane
+        run: gem install fastlane
+
+      - name: Import ASC API key
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          if [ -n "$ASC_KEY_CONTENT" ]; then
+            echo "$ASC_KEY_CONTENT" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8
+            export ASC_KEY_PATH=~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8
+            export ASC_KEY_BASE64=false
+          fi
+
+      - name: Build & upload TestFlight
+        run: fastlane beta
+        env:
+          ASC_KEY_PATH: ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.ASC_KEY_ID }}.p8
+          ASC_KEY_BASE64: false

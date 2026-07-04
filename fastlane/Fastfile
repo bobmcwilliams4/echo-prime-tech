@@ -1,0 +1,66 @@
+# Immortality Vault — TestFlight submit via App Store Connect API key (no 2FA).
+# ASC App ID 6757110323 | Bundle com.echoomegaprime.immortalityvault
+#
+# Required env (from vault service=apple_developer):
+#   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_CONTENT (base64 .p8) or ASC_KEY_PATH
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    api_key = app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_content: ENV["ASC_KEY_CONTENT"],
+      key_filepath: ENV["ASC_KEY_PATH"],
+      is_key_content_base64: ENV.fetch("ASC_KEY_BASE64", "true") == "true",
+      duration: 1200,
+      in_house: false
+    )
+
+    increment_build_number(
+      xcodeproj: "ios/App/App.xcodeproj",
+      build_number: ENV.fetch("BUILD_NUMBER", Time.now.to_i.to_s)
+    )
+
+    build_app(
+      workspace: "ios/App/App.xcworkspace",
+      scheme: "App",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "ImmortalityVault.ipa",
+      clean: true,
+      include_bitcode: false,
+      xcargs: "DEVELOPMENT_TEAM=W54TFAVXS2 CODE_SIGN_STYLE=Automatic"
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      app_identifier: "com.echoomegaprime.immortalityvault",
+      apple_id: "6757110323",
+      skip_waiting_for_build_processing: true,
+      distribute_external: false,
+      changelog: ENV.fetch("CHANGELOG", "Immortality Vault — new web version wrapped in Capacitor native shell with 13 panels, camera/mic capture, and push nudges.")
+    )
+  end
+
+  desc "Upload pre-built IPA to TestFlight"
+  lane :upload_only do
+    api_key = app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_content: ENV["ASC_KEY_CONTENT"],
+      key_filepath: ENV["ASC_KEY_PATH"],
+      is_key_content_base64: ENV.fetch("ASC_KEY_BASE64", "true") == "true"
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      app_identifier: "com.echoomegaprime.immortalityvault",
+      apple_id: "6757110323",
+      ipa: ENV["IPA_PATH"],
+      skip_waiting_for_build_processing: true
+    )
+  end
+end

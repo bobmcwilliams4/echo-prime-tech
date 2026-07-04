@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useTheme } from '../../../lib/theme-context';
 import { useAuth } from '../../../lib/auth-context';
 import { API, BG_DARK, BG_CARD, BORDER, NAV_ITEMS } from './lib/constants';
+import { initNativeShell } from './lib/capacitor-native';
 import { createUser, getStats, type VaultStats } from './lib/vault-api';
 import DashboardPanel from './components/DashboardPanel';
 import InterviewPanel from './components/InterviewPanel';
@@ -77,7 +78,7 @@ export default function VaultAppPage() {
     }
   }, [user, authLoading, router]);
 
-  // Create or get vault user + load stats
+  // Create or get vault user + load stats + native shell (push, status bar)
   useEffect(() => {
     if (!user) return;
     const userId = user.uid;
@@ -85,12 +86,23 @@ export default function VaultAppPage() {
 
     createUser(userId, user.displayName || user.email || 'User', user.email || '').catch(() => {});
     getStats().then(setStats).catch(() => {});
+    initNativeShell(userId).catch(() => {});
 
     // Check onboarding
     if (typeof window !== 'undefined' && !localStorage.getItem('vault_onboarded')) {
       setShowOnboarding(true);
     }
   }, [user]);
+
+  // Push notification deep-link → panel navigation
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const panel = (e as CustomEvent<string>).detail;
+      if (panel) setActivePanel(panel);
+    };
+    window.addEventListener('vault-navigate', handler);
+    return () => window.removeEventListener('vault-navigate', handler);
+  }, []);
 
   const handleNavigate = (panel: string) => {
     setActivePanel(panel);

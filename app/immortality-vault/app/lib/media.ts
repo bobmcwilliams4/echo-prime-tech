@@ -1,5 +1,7 @@
 /* Immortality Vault — Camera / Audio / Waveform Helpers */
 
+import { isNativeApp } from './capacitor-native';
+
 /* ─── Camera ─────────────────────────────────────────────────────────── */
 
 export async function startCamera(
@@ -7,11 +9,27 @@ export async function startCamera(
   facingMode: 'user' | 'environment' = 'user',
   withAudio = true,
 ): Promise<MediaStream> {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
-    audio: withAudio,
-  });
+  // WKWebView on iOS requires secure context; Capacitor serves over capacitor://https
+  const constraints: MediaStreamConstraints = {
+    video: {
+      facingMode,
+      width: { ideal: 1280 },
+      height: { ideal: 720 },
+      ...(isNativeApp() ? { deviceId: undefined } : {}),
+    },
+    audio: withAudio ? { echoCancellation: true, noiseSuppression: true } : false,
+  };
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    throw new Error(isNativeApp()
+      ? 'Camera unavailable — check Settings → Immortality Vault → Camera & Microphone'
+      : 'Camera not supported in this browser');
+  }
+
+  const stream = await navigator.mediaDevices.getUserMedia(constraints);
   videoEl.srcObject = stream;
+  videoEl.setAttribute('playsinline', 'true');
+  videoEl.muted = true;
   await videoEl.play();
   return stream;
 }
