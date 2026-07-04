@@ -35,7 +35,7 @@ export default function SupportPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetch('https://ept-api.bmcii1976.workers.dev/support/ticket', {
+      await fetch('https://ept-api.echo-op.com/support/ticket', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, subject, message }),

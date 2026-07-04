@@ -499,7 +499,7 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-wider block mb-1" style={{ color: 'var(--ept-text-muted)' }}>API Endpoint</label>
-                  <p className="text-sm font-mono" style={{ color: 'var(--ept-text)' }}>https://ept-api.bmcii1976.workers.dev</p>
+                  <p className="text-sm font-mono" style={{ color: 'var(--ept-text)' }}>https://ept-api.echo-op.com</p>
                 </div>
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-wider block mb-1" style={{ color: 'var(--ept-text-muted)' }}>Support Emails</label>

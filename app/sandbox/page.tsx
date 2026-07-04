@@ -468,7 +468,7 @@ export default function SandboxPage() {
                 { label: 'Shared Brain', url: 'https://echo-shared-brain.bmcii1976.workers.dev', domain: 'echo-shared-brain.bmcii1976.workers.dev' },
                 { label: 'ShadowGlass', url: 'https://shadowglass-v8-warpspeed.bmcii1976.workers.dev', domain: 'shadowglass-v8-warpspeed.bmcii1976.workers.dev' },
                 { label: 'Forge-X', url: 'https://forge-x-cloud.bmcii1976.workers.dev', domain: 'forge-x-cloud.bmcii1976.workers.dev' },
-                { label: 'EPT API', url: 'https://ept-api.bmcii1976.workers.dev', domain: 'ept-api.bmcii1976.workers.dev' },
+                { label: 'EPT API', url: 'https://ept-api.echo-op.com', domain: 'ept-api.echo-op.com' },
               ].map(target => (
                 <button key={target.label} onClick={() => { setDefenseUrl(target.url); setDefenseDomain(target.domain); }} style={{
                   background: '#0f172a', border: '1px solid #1e3a5f', color: '#38bdf8', padding: '6px 12px',

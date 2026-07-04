@@ -20,7 +20,7 @@ interface ChatMessage {
 const SENTINEL_CHAT_API = 'https://sentinel.echo-op.com';
 const SENTINEL_PERSONA = 'echo_ept';
 const TTS_API = 'https://forge.echo-op.com/sentinel/tts';
-const EPT_API = 'https://ept-api.bmcii1976.workers.dev';
+const EPT_API = 'https://ept-api.echo-op.com';
 const CHAT_STORAGE_KEY = 'ept_chat_history';
 const TRIAL_STORAGE_KEY = 'ept_trial_grants';
 const LEAD_STORAGE_KEY = 'ept_lead_info';
