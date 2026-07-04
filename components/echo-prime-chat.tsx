@@ -13,8 +13,13 @@ interface ChatMessage {
   emotion?: string;
 }
 
-const ECHO_CHAT_API = 'https://echo-chat.bmcii1976.workers.dev';
-const SPEAK_CLOUD_API = 'https://echo-speak-cloud.bmcii1976.workers.dev';
+// 2026-07-03 prod sweep: echo-chat worker /chat 500s and echo-speak-cloud is
+// dead (locked CF account). Chat now rides the canonical Echo Sentinel Chat
+// runtime (Commander directive 2026-07-02: ONE chat runtime, N personas) and
+// TTS rides the sovereign FORGE voice via the auth-less SDK-gate proxy.
+const SENTINEL_CHAT_API = 'https://sentinel.echo-op.com';
+const SENTINEL_PERSONA = 'echo_ept';
+const TTS_API = 'https://forge.echo-op.com/sentinel/tts';
 const EPT_API = 'https://ept-api.bmcii1976.workers.dev';
 const CHAT_STORAGE_KEY = 'ept_chat_history';
 const TRIAL_STORAGE_KEY = 'ept_trial_grants';
@@ -175,7 +180,7 @@ const EMOTION_COLORS: Record<string, string> = {
 };
 
 export default function EchoPrimeChat() {
-  const { user, subscriptions } = useAuth();
+  const { user } = useAuth();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -268,48 +273,13 @@ export default function EchoPrimeChat() {
     if (!ttsEnabled || !audioRef.current) return;
 
     try {
-      const token = await getToken();
-      // Echo Chat Worker — ElevenLabs v3 with full emotion range + ConvoAI fallback
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-        'X-Echo-API-Key': 'echo-omega-prime-forge-x-2026',
-      };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const res = await fetch(`${ECHO_CHAT_API}/tts`, {
+      // Sovereign FORGE voice (echo-tts-v2 GPU) via the auth-less SDK-gate proxy.
+      const res = await fetch(TTS_API, {
         method: 'POST',
-        headers,
-        body: JSON.stringify({
-          text,
-          personality: 'EP',
-          emotion: em,
-          provider: 'elevenlabs',
-          voice_id: 'keDMh3sQlEXKM4EQxvvi',
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text.slice(0, 2000), voice: 'echo', emotion: em }),
       });
-
-      if (!res.ok) {
-        // Fallback to echo-speak-cloud if echo-chat TTS fails
-        const fallbackRes = await fetch(`${SPEAK_CLOUD_API}/tts`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Echo-API-Key': 'echo-omega-prime-forge-x-2026',
-          },
-          body: JSON.stringify({ text, voice: 'echo', emotion: em }),
-        });
-        if (!fallbackRes.ok) return;
-        const fallbackBlob = await fallbackRes.blob();
-        if (fallbackBlob.size < 100) return;
-        const fallbackUrl = URL.createObjectURL(fallbackBlob);
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-        audioRef.current.src = fallbackUrl;
-        setTtsPlaying(true);
-        await audioRef.current.play();
-        audioRef.current.addEventListener('ended', () => URL.revokeObjectURL(fallbackUrl), { once: true });
-        return;
-      }
+      if (!res.ok) return;
 
       const blob = await res.blob();
       if (blob.size < 100) return;
@@ -325,7 +295,7 @@ export default function EchoPrimeChat() {
     } catch {
       setTtsPlaying(false);
     }
-  }, [ttsEnabled, getToken]);
+  }, [ttsEnabled]);
 
   const stopTTS = useCallback(() => {
     if (audioRef.current) {
@@ -368,13 +338,7 @@ export default function EchoPrimeChat() {
     setLoading(true);
 
     try {
-      const token = await getToken();
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const userId = user?.uid || user?.email || leadInfo?.email || `anon_${Date.now()}`;
       const displayName = user?.displayName || leadInfo?.name || undefined;
-      const trialGrants = getTrialGrants();
 
       // OpenClaw enrichment — fetch brain/engine/knowledge context in parallel
       const conciergePrompt = CONCIERGE_CAPABILITIES[pathname] || CONCIERGE_CAPABILITIES[`/${pathname.split('/')[1]}`] || '';
@@ -386,39 +350,38 @@ export default function EchoPrimeChat() {
         enrichment = { brainContext: oc.brainContext, engineDoctrines: oc.engineDoctrines, knowledgeChunks: oc.knowledgeChunks };
       } catch { /* enrichment is optional — degrade gracefully */ }
 
-      const body: Record<string, unknown> = {
-        message: text,
-        user_id: userId,
-        site_id: ctx.siteId,
-        session_id: sessionId,
-        email: user?.email || leadInfo?.email || undefined,
-        context: {
-          current_page: ctx.page,
-          page_label: ctx.label,
-          user_name: displayName,
-          subscriptions: subscriptions || [],
-          trial_history: Object.keys(trialGrants),
-          service: ctx.service,
-          lead_source: !user && leadInfo ? 'chat_widget' : undefined,
-          // OpenClaw enrichment context
-          concierge_system_prompt: conciergePrompt || undefined,
-          brain_context: enrichment.brainContext.length > 0 ? enrichment.brainContext : undefined,
-          engine_doctrines: enrichment.engineDoctrines.length > 0 ? enrichment.engineDoctrines : undefined,
-          knowledge_chunks: enrichment.knowledgeChunks.length > 0 ? enrichment.knowledgeChunks : undefined,
-        },
-      };
+      // Tenant-side context rides as context_tools (Sentinel cites them first).
+      const contextTools: { name: string; summary: string }[] = [{
+        name: 'page_context',
+        summary: `Visitor is on "${ctx.label}" (${ctx.page}) of echo-ept.com.${displayName ? ` Their name is ${displayName}.` : ''}${conciergePrompt ? ` ${conciergePrompt}` : ''}`,
+      }];
+      if (enrichment.knowledgeChunks.length > 0) {
+        contextTools.push({ name: 'knowledge', summary: enrichment.knowledgeChunks.slice(0, 4).join('\n') });
+      }
+      if (enrichment.engineDoctrines.length > 0) {
+        contextTools.push({ name: 'engine_doctrines', summary: enrichment.engineDoctrines.slice(0, 3).join('\n') });
+      }
 
-      const res = await fetch(`${ECHO_CHAT_API}/chat`, {
+      const res = await fetch(`${SENTINEL_CHAT_API}/answer`, {
         method: 'POST',
-        headers,
-        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: text,
+          persona: SENTINEL_PERSONA,
+          engine_id: 'NONE',
+          chat_fallback: true,
+          session_id: sessionId,
+          domain: 'echo-ept.com',
+          history: messages.slice(-6).map(m => ({ role: m.role, content: m.content })),
+          context_tools: contextTools,
+        }),
       });
 
       if (!res.ok) throw new Error(`API ${res.status}`);
 
       const data = await res.json();
-      let reply = data.response || data.reply || data.message || 'No response.';
-      const em = data.emotion || detectEmotion(reply);
+      let reply = data.answer || data.response || data.reply || 'No response.';
+      const em = detectEmotion(reply);
       setEmotion(em);
 
       // Handle trial grants embedded in response
@@ -448,7 +411,7 @@ export default function EchoPrimeChat() {
     } finally {
       setLoading(false);
     }
-  }, [input, loading, ctx, pathname, user, leadInfo, subscriptions, sessionId, getToken, playTTS, handleTrialGrant]);
+  }, [input, loading, ctx, pathname, user, leadInfo, sessionId, messages, playTTS, handleTrialGrant]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

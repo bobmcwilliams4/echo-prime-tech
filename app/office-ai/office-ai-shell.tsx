@@ -51,7 +51,7 @@ function useServiceStatus(interval = 60000) {
 
     try {
       const t0 = Date.now();
-      const res = await fetch('https://echo-speak-cloud.bmcii1976.workers.dev/health', { signal: AbortSignal.timeout(8000) });
+      const res = await fetch('https://forge.echo-op.com/sentinel/tts/health', { signal: AbortSignal.timeout(8000) });
       results.push({ name: 'Voice AI', status: res.ok ? 'online' : 'offline', latency: Date.now() - t0 });
     } catch {
       results.push({ name: 'Voice AI', status: 'offline' });
