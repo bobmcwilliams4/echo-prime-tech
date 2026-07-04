@@ -1,0 +1,32 @@
+{
+  "name": "Immortality Vault",
+  "short_name": "Vault",
+  "description": "Preserve your memories, voice, and wisdom for future generations.",
+  "id": "/immortality-vault/app",
+  "start_url": "/immortality-vault/app",
+  "scope": "/immortality-vault/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0e17",
+  "icons": [
+    {
+      "src": "/immortality-vault/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/immortality-vault/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/immortality-vault/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
