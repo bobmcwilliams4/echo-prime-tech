@@ -2,10 +2,12 @@ name: Deploy to Vercel
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  # echo-ept.com / SITE_IDENTITY.json — not secret; survives empty GitHub secrets.
+  VERCEL_ORG_ID: team_zltGa4jWp6vVNl2t98Z35wu3
+  VERCEL_PROJECT_ID: prj_2TXVE8qVUP31WES235nOiz9SNpqA
 
 jobs:
   deploy:
