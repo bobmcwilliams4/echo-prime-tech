@@ -1,6 +1,7 @@
-import { getApiBase, getWsBase } from './api-base';
-// Stripe Checkout API client — calls echo-subscription Worker
-const API_BASE = getApiBase('echo-subscription');
+// Stripe Checkout API client.
+// 2026-07-03 sweep: dead echo-subscription CF worker -> sovereign FORGE service
+// (subs.echo-op.com, echo-subscription.service :8180). Live Stripe checkout.
+const API_BASE = 'https://subs.echo-op.com';
 
 export interface CheckoutSessionRequest {
   plan_name: string;
