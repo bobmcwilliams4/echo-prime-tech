@@ -62,7 +62,9 @@ const SAMPLE_ENGINES: Engine[] = [
   { id: 'LOG01', name: 'Supply Chain Optimizer', domain: 'logistics', domainLabel: 'Supply Chain', description: 'Route optimization, inventory forecasting, demand planning, and supplier risk assessment for complex supply networks.', doctrineCount: 267, status: 'active' },
 ];
 
-const SDK_GATEWAY = 'https://echo-sdk-gateway.bmcii1976.workers.dev';
+// 2026-07-03 sweep: echo-sdk-gateway worker 500s (broken bindings on the locked
+// CF account) — live engine queries ride the sovereign Sentinel runtime instead.
+const SENTINEL_API = 'https://sentinel.echo-op.com';
 
 // ── Inline SVG Icon Component ──
 
@@ -88,15 +90,28 @@ function TryEngineModal({ engine, onClose }: { engine: Engine; onClose: () => vo
     setError('');
     setResponse(null);
     try {
-      const res = await fetch(`${SDK_GATEWAY}/engine/query?q=${encodeURIComponent(query)}&domain=${engine.domain}`, {
-        headers: { 'X-Echo-API-Key': 'demo' },
+      const res = await fetch(`${SENTINEL_API}/answer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: query,
+          engine_id: 'NONE',
+          chat_fallback: true,
+          persona: {
+            name: engine.name,
+            role: `${engine.domainLabel} intelligence engine for Echo Prime Tech`,
+            tone: 'professional, precise, cites relevant authority when applicable',
+            greeting: '',
+          },
+          session_id: `marketplace-${engine.id}`,
+        }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setResponse({
-        answer: data.response || data.answer || data.result || JSON.stringify(data, null, 2),
+        answer: data.answer || data.response || data.result || JSON.stringify(data, null, 2),
         confidence: data.confidence ?? data.confidence_score ?? 0.87,
-        doctrines_used: data.doctrines_used ?? data.doctrine_count ?? 3,
+        doctrines_used: data.doctrines_used ?? data.sources?.length ?? 3,
       });
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Query failed. The engine may require authentication.');
