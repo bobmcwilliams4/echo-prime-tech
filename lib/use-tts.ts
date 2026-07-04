@@ -3,12 +3,12 @@
 import { useRef, useState, useCallback } from 'react';
 import { getApiBase } from './api-base';
 
-// 2026-04-29 cc2-hammer: echo-speak-cloud CF worker is 1010-blocked.
-// Route to FORGE Echo voice (XTTS-v2 GPU :7800) via SDK-gate proxy at /sentinel/tts.
-// getApiBase fallback kept for pages that override NEXT_PUBLIC_ECHO_SPEAK_BASE.
+// 2026-07-03: sdk1.echo-op.com is the key-gated GPT-connector gateway — the
+// auth-less /sentinel/tts proxy is the SDK gate at forge.echo-op.com (verified
+// live, returns RIFF WAV). getApiBase fallback kept for pages that override
+// NEXT_PUBLIC_ECHO_SPEAK_BASE.
 const TTS_API = process.env.NEXT_PUBLIC_ECHO_SPEAK_BASE
-  || 'https://sdk1.echo-op.com/sentinel';
-const ECHO_API_KEY = process.env.NEXT_PUBLIC_ECHO_API_KEY || 'echo-omega-prime-forge-x-2026';
+  || 'https://forge.echo-op.com/sentinel';
 
 interface UseTTSOptions {
   voice?: string;
@@ -57,10 +57,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
       try {
         const res = await fetch(`${TTS_API}/tts`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Echo-API-Key': ECHO_API_KEY,
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text, voice }),
           signal: ctrl.signal,
         });
@@ -70,7 +67,7 @@ export function useTTS(options: UseTTSOptions = {}): UseTTSReturn {
         const audioData = await res.arrayBuffer();
         if (audioData.byteLength < 100) { setIsReading(false); return; }
 
-        const blob = new Blob([audioData], { type: 'audio/mpeg' });
+        const blob = new Blob([audioData], { type: res.headers.get('content-type') || 'audio/wav' });
         const url = URL.createObjectURL(blob);
         const audio = new Audio(url);
         currentAudioRef.current = audio;
