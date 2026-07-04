@@ -821,7 +821,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="alternate" type="application/rss+xml" title="Echo Prime Technologies Changelog" href="/feed.xml" />
       </head>
       <body className="antialiased">
-        <Script src="https://echo-web-analytics.bmcii1976.workers.dev/script.js?id=71d45bf104094a69" strategy="afterInteractive" />
+        <Script src="https://web-analytics.echo-op.com/script.js?id=71d45bf104094a69" strategy="afterInteractive" />
         <AuthProvider>
           <ThemeProvider>
             <ParticleBackground />

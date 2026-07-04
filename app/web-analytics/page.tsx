@@ -88,7 +88,7 @@ export default function WebAnalyticsPage() {
         <div className="p-6 rounded-xl border" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-card-border)' }}>
           <h3 className="text-lg font-bold mb-3" style={{ color: 'var(--ept-text)' }}>One Script Tag. That&apos;s It.</h3>
           <div className="p-4 rounded-lg font-mono text-sm overflow-x-auto" style={{ backgroundColor: 'var(--ept-card-bg)', color: 'var(--ept-accent)' }}>
-            {'<script defer src="https://echo-web-analytics.bmcii1976.workers.dev/script.js?id=YOUR_SITE_ID"></script>'}
+            {'<script defer src="https://web-analytics.echo-op.com/script.js?id=YOUR_SITE_ID"></script>'}
           </div>
           <p className="text-sm mt-3" style={{ color: 'var(--ept-text-muted)' }}>Under 1KB. Async loading. No impact on page speed. Handles SPAs with pushState tracking automatically.</p>
         </div>

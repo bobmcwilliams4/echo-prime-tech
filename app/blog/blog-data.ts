@@ -21035,7 +21035,7 @@ GDPR and CCPA don't just require consent banners — they require legitimate pur
 3. No data leaves your infrastructure
 4. No consent required under most interpretations of GDPR Article 6(1)(f)
 
-The Worker runs at \`echo-web-analytics.bmcii1976.workers.dev\` with cookie-free tracking, SPA support, custom goals, and public dashboards.`,
+The Worker runs at \`web-analytics.echo-op.com\` with cookie-free tracking, SPA support, custom goals, and public dashboards.`,
   },
   {
     slug: 'autonomous-ai-systems-self-healing-infrastructure-2026',

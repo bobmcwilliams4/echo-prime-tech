@@ -9,7 +9,7 @@ const data = {
   tagline: 'Privacy-first, cookie-free analytics with a <1KB tracking script and real-time dashboards',
   accent: '#10b981',
   productUrl: '/web-analytics',
-  workerUrl: 'https://echo-web-analytics.bmcii1976.workers.dev',
+  workerUrl: 'https://web-analytics.echo-op.com',
   version: '1.0.0',
   overview: [
     'Echo Web Analytics delivers actionable traffic insights without cookies, consent banners, or GDPR compliance risk. The tracking script weighs less than 1KB and collects visitor data using localStorage for visitor ID persistence, sendBeacon for non-blocking hit delivery, and Cloudflare\'s CF-IPCountry and CF-Connecting-IP headers for geo resolution — all without ever writing a cookie to the browser.',
@@ -18,7 +18,7 @@ const data = {
   ],
   gettingStarted: [
     { step: 1, title: 'Create a Site', desc: 'Sign up at echo-ept.com/web-analytics and click "Add Site". Enter your domain (e.g., yoursite.com). The system generates a unique Site ID (e.g., ept_abc123) used to scope all tracking data to your domain.' },
-    { step: 2, title: 'Install the Tracking Script', desc: 'Add one line to the <head> of every page: <script async src="https://echo-web-analytics.bmcii1976.workers.dev/script.js?id=YOUR_SITE_ID"></script>. No configuration required. The script auto-detects the page URL, referrer, UTM params, and device details.' },
+    { step: 2, title: 'Install the Tracking Script', desc: 'Add one line to the <head> of every page: <script async src="https://web-analytics.echo-op.com/script.js?id=YOUR_SITE_ID"></script>. No configuration required. The script auto-detects the page URL, referrer, UTM params, and device details.' },
     { step: 3, title: 'Verify Data is Flowing', desc: 'Open your site in a browser tab (not incognito — localStorage is disabled in private browsing on some browsers). Within 30 seconds, the Realtime panel in your dashboard should show 1 active visitor. Check the Events log to confirm hits are arriving.' },
     { step: 4, title: 'Configure Goals', desc: 'Define conversion goals in the Goals section: URL match (visitor reaches a specific path), custom event (your code fires echo("goal", "signup")), or element click (CSS selector). Goals appear as a separate metric column in all reports.' },
     { step: 5, title: 'Share the Dashboard', desc: 'Enable Public Dashboard in Site Settings to generate a shareable URL. Public dashboards show all traffic metrics but do not expose raw event data or goal details. Share with clients, stakeholders, or embed in your status page.' },
@@ -105,7 +105,7 @@ const data = {
     { capability: 'SEO Opportunity Identification', desc: 'Analyzes organic search traffic by landing page and identifies pages that receive high organic traffic but have high bounce rates — indicating keyword-intent mismatch. Surfaces pages losing organic traffic month-over-month as early signals for content freshness issues.' },
   ],
   troubleshooting: [
-    { issue: 'No data appearing after installing the script', solution: 'Open the browser console and check for JavaScript errors. The most common cause is a Content Security Policy (CSP) blocking the script from loading or the sendBeacon from firing to the collection endpoint. Add echo-web-analytics.bmcii1976.workers.dev to both script-src and connect-src in your CSP header.' },
+    { issue: 'No data appearing after installing the script', solution: 'Open the browser console and check for JavaScript errors. The most common cause is a Content Security Policy (CSP) blocking the script from loading or the sendBeacon from firing to the collection endpoint. Add web-analytics.echo-op.com to both script-src and connect-src in your CSP header.' },
     { issue: 'SPA page changes are not being tracked', solution: 'Verify the script loads before your SPA framework\'s router initializes. If the script loads after the first navigation event, it will miss that event. In Next.js App Router, placing the script in the root layout with strategy="afterInteractive" is correct. For hash routing, ensure hash changes are not silently swallowed by a router wrapper.' },
     { issue: 'Visitor count seems too low — I know more people visited', solution: 'localStorage-based visitor IDs are not set when users browse in private/incognito mode. Those sessions are counted as new visitors each time. Additionally, if your site is served over HTTP (not HTTPS), some browsers restrict localStorage access. Ensure your site is HTTPS.' },
     { issue: 'Realtime panel shows zero visitors despite active traffic', solution: 'The realtime panel uses a 5-minute active window. If traffic was more than 5 minutes ago, it will show zero. For testing, load your site in a browser tab and wait up to 30 seconds — the hit is batched and sent via sendBeacon on the next flush interval (every 5 seconds).' },
