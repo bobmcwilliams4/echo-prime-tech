@@ -3,20 +3,47 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(self), geolocation=()" },
-        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
-        { "key": "X-DNS-Prefetch-Control", "value": "on" },
-        { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://static.cloudflareinsights.com https://echo-web-analytics.bmcii1976.workers.dev; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.bmcii1976.workers.dev https://forge.echo-op.com https://sdk.echo-op.com https://*.echo-op.com https://*.firebaseio.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://tts.echo-op.com https://cloudflareinsights.com wss:; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com; media-src 'self' blob: data: https://tts.echo-op.com https://*.bmcii1976.workers.dev https://forge.echo-op.com https://sdk.echo-op.com; object-src 'none'; base-uri 'self'" }
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(self), geolocation=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-DNS-Prefetch-Control",
+          "value": "on"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://static.cloudflareinsights.com https://echo-web-analytics.bmcii1976.workers.dev; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://brees.echo-lge.com https://r.jina.ai https://*.bmcii1976.workers.dev https://forge.echo-op.com https://sdk.echo-op.com https://*.echo-op.com https://*.firebaseio.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://tts.echo-op.com https://cloudflareinsights.com wss:; frame-src 'self' https://accounts.google.com https://*.firebaseapp.com; media-src 'self' blob: data: https://tts.echo-op.com https://*.bmcii1976.workers.dev https://forge.echo-op.com https://sdk.echo-op.com; object-src 'none'; base-uri 'self'"
+        }
       ]
     },
     {
       "source": "/(.*)\\.(js|css|png|jpg|ico|svg|woff2)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     }
   ],
