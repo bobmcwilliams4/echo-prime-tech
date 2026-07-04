@@ -45,11 +45,11 @@ export default function PolymarketIntelPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--ept-bg)' }}>
       <BreadcrumbSchema items={[
-        { name: 'Home', url: 'https://echo-ept.com' },
-        { name: 'Products', url: 'https://echo-ept.com/pricing' },
-        { name: 'Polymarket Intel', url: 'https://echo-ept.com/polymarket-intel' },
+        { name: 'Home', href: '/' },
+        { name: 'Products', href: '/pricing' },
+        { name: 'Polymarket Intel', href: '/polymarket-intel' },
       ]} />
-      <FaqSchema faqs={FAQS.map(f => ({ question: f.q, answer: f.a }))} />
+      <FaqSchema faqs={FAQS} />
 
       {/* Nav */}
       <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
@@ -209,7 +209,7 @@ export default function PolymarketIntelPage() {
           </Link>
         </section>
 
-        <TrialCTA />
+        <TrialCTA serviceId="polymarket-intel" productName="Polymarket Intel" />
       </main>
     </div>
   );

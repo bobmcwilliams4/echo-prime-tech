@@ -929,15 +929,13 @@ async function playBreeVoice(text: string, emotion: string): Promise<void> {
     audio.play();
     return;
   } catch { /* Bree TTS failed, try Echo Speak Cloud */ }
-  // Try Echo Speak Cloud (3-tier TTS router with ElevenLabs + Cartesia + browser)
+  // Try the sovereign FORGE voice (echo-speak-cloud worker is dead — locked CF account)
   try {
-    const res = await fetch('https://echo-speak-cloud.bmcii1976.workers.dev/tts', {
+    const res = await fetch('https://forge.echo-op.com/sentinel/tts', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text: text.slice(0, 500),
-        voice_id: 'pzKXffibtCDxnrVO8d1U', // Bree's ElevenLabs voice
-        model: 'eleven_multilingual_v2',
-        stability: 0.3, similarity_boost: 0.8, style: 0.7,
+        voice: 'af_bella', // warm female — closest sovereign match to Bree
       }),
     });
     if (res.ok) {

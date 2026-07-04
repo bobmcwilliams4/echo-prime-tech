@@ -83,18 +83,20 @@ const TIMEZONES = [
   'America/Phoenix', 'America/Anchorage', 'Pacific/Honolulu', 'Europe/London', 'Europe/Berlin', 'Asia/Tokyo',
 ];
 
-const SPEAK_CLOUD_URL = 'https://echo-speak-cloud.bmcii1976.workers.dev';
+// 2026-07-03 prod sweep: echo-speak-cloud worker is dead (locked CF account) —
+// previews ride the sovereign FORGE voice via the auth-less SDK-gate proxy.
+const SPEAK_CLOUD_URL = 'https://forge.echo-op.com/sentinel';
 
 const VOICE_ID_MAP: Record<string, string> = {
-  bree: 'pzKXffibtCDxnrVO8d1U',             // Bree - humor & charm sales agent
-  prof_male: 'keDMh3sQlEXKM4EQxvvi',      // Echo - sovereign AI commander
-  prof_female: 'Xb7hH8MSUJpSbSDYk0k2',     // Alice - clear British educator
-  warm_male: 'B5SCR8VDENzUF0L4eZY8',        // Bobby - Commander voice clone
-  warm_female: 'cgSgspJ2msm6clMCkdW9',      // Jessica - playful, bright, warm
-  energy_male: 'WSd8ZDUcldL8KQKxz1KN',      // Prometheus - security specialist
-  energy_female: 'FGY2WhTYpPnrIDTdsKH5',    // Laura - enthusiast, quirky
-  calm_male: 'keDMh3sQlEXKM4EQxvvi',        // Echo - measured, reassuring
-  calm_female: 'MbmnAUd2tPCEOBK6D9Qd',      // Catherine - CZJ Welsh clone
+  bree: 'af_bella',        // warm female — closest sovereign match to Bree
+  prof_male: 'echo',       // Echo - sovereign AI commander
+  prof_female: 'af_bella',
+  warm_male: 'commander',  // Bobby - Commander voice clone
+  warm_female: 'af_bella',
+  energy_male: 'echo_active',
+  energy_female: 'af_bella',
+  calm_male: 'echo_norm',  // Echo - measured, reassuring
+  calm_female: 'af_bella',
 };
 
 const DEFAULT_HOURS: Record<string, DaySchedule> = Object.fromEntries(
@@ -328,8 +330,8 @@ export default function CloserSettingsPage() {
       try {
         const res = await fetch(`${SPEAK_CLOUD_URL}/tts`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Echo-API-Key': 'echo-omega-prime-forge-x-2026' },
-          body: JSON.stringify({ text, voice_id: voiceId, provider: 'elevenlabs', speed: v.speed }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, voice: voiceId }),
         });
         if (res.ok && res.headers.get('content-type')?.includes('audio')) {
           const blob = await res.blob();
