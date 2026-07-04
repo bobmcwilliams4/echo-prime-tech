@@ -1,6 +1,8 @@
-import { getApiBase, getWsBase } from './api-base';
-// Trial API client — calls echo-subscription Worker
-const API_BASE = getApiBase('echo-subscription');
+// Trial API client.
+// 2026-07-03 sweep: the echo-subscription CF worker is dead (500, locked
+// account). Points at the sovereign FORGE service (subs.echo-op.com,
+// echo-subscription.service :8180) — contract-preserving drop-in.
+const API_BASE = 'https://subs.echo-op.com';
 
 export interface TrialRequest {
   email: string;
