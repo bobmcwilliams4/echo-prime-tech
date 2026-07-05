@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "prebuild": "node scripts/verify-site.js",
+    "prebuild": "node scripts/verify-site.js && node scripts/write-build-info.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "deploy": "npm run build && node scripts/deploy.mjs",
+    "deploy:check": "node scripts/check-deploy-drift.mjs",
+    "deploy:if-stale": "node scripts/deploy-if-stale.mjs",
     "build:ios": "bash scripts/build-capacitor-ios.sh",
     "cap:sync": "npx cap sync ios",
     "cap:open": "npx cap open ios"

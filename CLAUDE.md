@@ -8,7 +8,7 @@
 - **Output**: Static export (`output: 'export'` — NO server-side API routes)
 - **Auth**: Firebase (email/password + Google OAuth)
 - **Backend**: All logic in Cloudflare Workers
-- **Deployment**: Push to `main` on `github.com/bobmcwilliams4/echo-prime-tech` → Vercel auto-deploys
+- **Deployment**: **CLI only** — `npm run deploy` (gitless Vercel CLI; see `DEPLOYMENT.md`). Push to `main` does **not** auto-ship; use `npm run deploy:check` or the FORGE watchdog cron.
 
 ## Navigation
 

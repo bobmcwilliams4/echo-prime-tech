@@ -140,7 +140,8 @@ cd O:\ECHO_OMEGA_PRIME\WEBSITES\echo-prime-tech
 npm run build        # Must pass — static export generates all pages
 git add .
 git commit -m "Add your-feature page"
-git push origin main # Vercel auto-deploys in ~60s
+git push origin main
+npm run deploy       # REQUIRED — main push does not auto-ship (see DEPLOYMENT.md)
 ```
 
 ---
@@ -155,7 +156,7 @@ git push origin main # Vercel auto-deploys in ~60s
 | **Theme** | Auto day/night via CSS variables (`.dark` class on `<html>`) |
 | **Backend** | All logic in Cloudflare Workers — site is pure static HTML/JS |
 | **Navigation** | Top nav bar per page (no sidebar) |
-| **Deployment** | Push to `main` → Vercel auto-deploys |
+| **Deployment** | `npm run deploy` after merging to `main` (CLI gitless deploy; see `DEPLOYMENT.md`) |
 | **GitHub** | `github.com/bobmcwilliams4/echo-prime-tech` |
 
 ---
@@ -426,4 +427,4 @@ style={{ backgroundColor: 'var(--ept-card-bg)', color: 'var(--ept-text)' }}
 - [ ] Auth guard present (if protected page)
 - [ ] Loading spinner shown during auth check
 - [ ] `npm run build` passes
-- [ ] `git push origin main` (auto-deploys to echo-ept.com)
+- [ ] `git push origin main` then `npm run deploy` (ships to echo-ept.com)

@@ -174,7 +174,7 @@ Developer App → @echo-prime/sdk → echo-sdk-gateway.workers.dev → 187 backe
 - **Voice:** ElevenLabs v3 Alpha, 12 personality voices
 - **Memory:** 9-layer architecture (Shared Brain, Cortex, Prime, Crystal, OmniSync)
 - **Graph:** 312K+ node knowledge graph with cross-domain traversal
-- **Deploy:** Vercel (auto-deploy from GitHub push)
+- **Deploy:** Vercel via `npm run deploy` (CLI gitless — see `DEPLOYMENT.md`; GitHub push does not auto-ship)
 
 ## Quick Start
 

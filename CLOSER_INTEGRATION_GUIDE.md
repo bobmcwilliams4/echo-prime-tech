@@ -14,7 +14,7 @@
 | **GitHub Repo** | `https://github.com/bobmcwilliams4/echo-prime-tech.git` |
 | **Local Source** | `O:\ECHO_OMEGA_PRIME\WEBSITES\echo-prime-tech\` |
 | **Branch** | `main` |
-| **Auto-Deploy** | Push to `main` → Vercel builds and deploys automatically |
+| **Deploy** | `npm run deploy` after push to `main` (CLI gitless — see `DEPLOYMENT.md`) |
 | **Backend API** | `https://ept-api.bmcii1976.workers.dev` (Cloudflare Worker) |
 | **Backend Source** | `O:\ECHO_OMEGA_PRIME\WORKERS\ept-api\` |
 
@@ -25,7 +25,7 @@ cd O:\ECHO_OMEGA_PRIME\WEBSITES\echo-prime-tech
 git add .
 git commit -m "description of changes"
 git push origin main
-# Vercel auto-deploys within ~60 seconds
+npm run deploy   # REQUIRED — see DEPLOYMENT.md
 ```
 
 ### How to Deploy Backend API Changes
@@ -359,7 +359,7 @@ All 10 secrets configured. Voice pipeline is fully operational.
 6. Call API: `fetch('https://billymc-api.bmcii1976.workers.dev/leads', { headers: { Authorization: 'Bearer ' + token } })`
 7. Style with CSS vars: `style={{ color: 'var(--ept-text)' }}`
 8. Test: `npm run dev`
-9. Deploy: `git push origin main` (Vercel auto-deploys)
+9. Deploy: `git push origin main` then `npm run deploy` (see `DEPLOYMENT.md`)
 
 ---
 

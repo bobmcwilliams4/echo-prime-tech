@@ -29,7 +29,7 @@ if (!token) {
 if (!token) {
   try {
     token = execSync(
-      "python3 -c \"import sqlite3; c=sqlite3.connect('/home/forge/master_vault.db'); r=c.execute(\\\"SELECT secret FROM credentials WHERE username IN ('vercel_api_token','VERCEL_TOKEN')\\\").fetchone(); print(r[0] if r else '', end='')\"",
+      "python3 -c \"import sqlite3; c=sqlite3.connect('/home/forge/master_vault.db'); r=c.execute(\\\"SELECT secret FROM credentials WHERE username IN ('vercel_api_token','VERCEL_TOKEN','Vercel_Deploy_Token_v2') ORDER BY CASE username WHEN 'Vercel_Deploy_Token_v2' THEN 0 WHEN 'vercel_api_token' THEN 1 ELSE 2 END\\\").fetchone(); print(r[0] if r else '', end='')\"",
       { encoding: 'utf8' },
     ).trim();
   } catch {}
