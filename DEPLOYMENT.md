@@ -8,6 +8,8 @@
 
 **Pushing to `main` does NOT auto-deploy to production.** Deploys are intentional CLI runs via `npm run deploy`.
 
+Verified 2026-07-05 via Vercel API (`npm run deploy:audit-git`): project `prj_2TXVE8qVUP31WES235nOiz9SNpqA` has **`link: null`** — no GitHub/GitLab/Bitbucket integration is attached. Recent production deploys show `source=cli`, not `source=github`.
+
 This is intentional — not a misconfiguration to fix in Vercel settings:
 
 | Blocker | Detail |

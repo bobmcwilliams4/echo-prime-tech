@@ -10,7 +10,9 @@
     "lint": "next lint",
     "deploy": "npm run build && node scripts/deploy.mjs",
     "deploy:check": "node scripts/check-deploy-drift.mjs",
+    "deploy:audit-git": "node scripts/audit-vercel-git-link.mjs",
     "deploy:if-stale": "node scripts/deploy-if-stale.mjs",
+    "test:deploy": "node scripts/test-deploy-drift.mjs",
     "build:ios": "bash scripts/build-capacitor-ios.sh",
     "cap:sync": "npx cap sync ios",
     "cap:open": "npx cap open ios"
