@@ -28,7 +28,7 @@ git pull origin main
 npm run deploy                   # builds + gitless vercel --prod
 ```
 
-Requires `VERCEL_TOKEN` in the environment, or a token in the Echo vault (`vercel_api_token` / `Vercel_Deploy_Token_v2` on HAMMER).
+Requires `VERCEL_TOKEN` in the environment, or a token in the Echo vault (`vercel_api_token` / `Vercel_Deploy_Token_v2` on HAMMER). **FORGE's local vault currently lacks a deploy token** — the watchdog cron will detect drift but cannot auto-deploy until `Vercel_Deploy_Token_v2` is mirrored to `/home/forge/master_vault.db` or `VERCEL_TOKEN` is set in the cron environment.
 
 ## Check if production is stale
 
