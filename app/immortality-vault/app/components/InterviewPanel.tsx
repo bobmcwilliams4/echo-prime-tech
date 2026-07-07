@@ -23,8 +23,10 @@ export default function InterviewPanel({ userId }: Props) {
   // ── STT: Echo hears the user (browser SpeechRecognition, free, on-device) ──
   const [listening, setListening] = useState(false);
   const [sttSupported, setSttSupported] = useState(true);
+  const [needsTap, setNeedsTap] = useState(false);
   const recognitionRef = useRef<any>(null);
   const audioPrimed = useRef(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -60,23 +62,42 @@ export default function InterviewPanel({ userId }: Props) {
     setListening(false);
   };
 
-  // Unlock audio autoplay on a user gesture so Echo's spoken question can play.
+  // One persistent, gesture-unlocked <audio> element. Unlocking it inside a click
+  // (even with a silent source) lets us set .src later and play — the reliable
+  // pattern across browsers, incl. iOS Safari where an async fetch before play()
+  // otherwise breaks the gesture requirement.
+  const getAudioEl = () => {
+    if (!audioRef.current && typeof Audio !== 'undefined') {
+      audioRef.current = new Audio();
+      audioRef.current.preload = 'auto';
+    }
+    return audioRef.current;
+  };
+
+  // Call inside a user gesture to unlock audio playback.
   const primeAudio = () => {
     if (audioPrimed.current) return;
-    audioPrimed.current = true;
-    try {
-      const a = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
-      a.volume = 0;
-      a.play().catch(() => { /* ignore */ });
-    } catch { /* ignore */ }
+    const a = getAudioEl();
+    if (!a) return;
+    a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+    a.volume = 0;
+    a.play().then(() => { audioPrimed.current = true; a.volume = 1; }).catch(() => { /* still locked */ });
   };
 
   const speakQuestion = useCallback(async (q: InterviewQuestion) => {
     setSpeaking(true);
     try {
       const blob = await synthesizeSpeech(q.question, 'warmth');
-      await playAudioBlob(blob);
-    } catch { /* voice is a bonus — never block the interview */ }
+      const a = getAudioEl();
+      if (!a) { await playAudioBlob(blob); setNeedsTap(false); return; }
+      a.volume = 1;
+      a.src = URL.createObjectURL(blob);
+      await a.play();
+      setNeedsTap(false); // audio works — hide any tap prompt
+    } catch (e: any) {
+      // Autoplay blocked → surface a one-tap "Hear Echo" instead of failing silently.
+      if (e && e.name === 'NotAllowedError') setNeedsTap(true);
+    }
     setSpeaking(false);
   }, []);
 
@@ -156,12 +177,14 @@ export default function InterviewPanel({ userId }: Props) {
             &ldquo;{question.question}&rdquo;
           </p>
           <button
-            onClick={() => question && speakQuestion(question)}
+            onClick={() => { primeAudio(); if (question) speakQuestion(question); }}
             disabled={speaking}
-            className="text-xs mb-4 px-3 py-1.5 rounded-full font-semibold disabled:opacity-40"
-            style={{ border: `1px solid ${BORDER}`, color: '#d4d4d8' }}
+            className="text-sm mb-4 px-4 py-2 rounded-full font-semibold disabled:opacity-40 transition hover:scale-[1.02]"
+            style={needsTap
+              ? { background: GOLD, color: '#0a0a0f', border: 'none', boxShadow: `0 0 20px ${GOLD}66` }
+              : { border: `1px solid ${BORDER}`, color: '#d4d4d8' }}
           >
-            {speaking ? '\u{1F50A} Speaking...' : '\u{1F50A} Hear it again'}
+            {speaking ? '\u{1F50A} Echo is speaking…' : needsTap ? '\u{1F50A} Tap to hear Echo' : '\u{1F50A} Hear it again'}
           </button>
           {question.video_instructions && (
             <div className="text-xs text-gray-500 mb-4 p-3 rounded-lg" style={{ background: '#0a0a0f' }}>
