@@ -55,6 +55,18 @@
   ],
   "redirects": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "immortalityvault.app" }],
+      "destination": "/immortality-vault",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.immortalityvault.app" }],
+      "destination": "/immortality-vault",
+      "permanent": false
+    },
+    {
       "source": "/favicon.ico",
       "destination": "/icon.png",
       "permanent": false
