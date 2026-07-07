@@ -20,6 +20,7 @@ import { useEffect, useRef, useState } from 'react';
 
 const SEEN_KEY = 'ivault_intro_seen_v1';
 const SRC = '/immortality-vault/intro.mp4';
+const POSTER = '/immortality-vault/intro-poster.jpg';
 const GOLD = '#d4b483';
 
 export default function IntroSplash() {
@@ -108,6 +109,7 @@ export default function IntroSplash() {
       <video
         ref={videoRef}
         src={SRC}
+        poster={POSTER}
         playsInline
         preload="auto"
         onEnded={dismiss}
