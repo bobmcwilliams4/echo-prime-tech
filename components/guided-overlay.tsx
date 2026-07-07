@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { useGuidedTutorial } from '../lib/guided-tutorial-context';
 
 /* ─────────────────────────────────────────────────────────
@@ -10,6 +11,13 @@ import { useGuidedTutorial } from '../lib/guided-tutorial-context';
 ───────────────────────────────────────────────────────── */
 
 export default function GuidedOverlay() {
+  const pathname = usePathname();
+  // Standalone Vault — no EPT tutorial overlay on its pages.
+  if (pathname?.startsWith('/immortality-vault')) return null;
+  return <GuidedOverlayInner />;
+}
+
+function GuidedOverlayInner() {
   const { active, currentStep, stepIndex, steps, targetRect, completeStep, prevStep, skipGuided } = useGuidedTutorial();
 
   if (!active || !currentStep) return null;

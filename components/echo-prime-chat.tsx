@@ -180,6 +180,14 @@ const EMOTION_COLORS: Record<string, string> = {
 };
 
 export default function EchoPrimeChat() {
+  const pathname = usePathname();
+  // The Immortality Vault is a standalone product — no EPT chrome (chat, branding)
+  // on its pages. Guard before the inner hooks run. See app/immortality-vault/SPEC.md.
+  if (pathname?.startsWith('/immortality-vault')) return null;
+  return <EchoPrimeChatInner />;
+}
+
+function EchoPrimeChatInner() {
   const { user } = useAuth();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);

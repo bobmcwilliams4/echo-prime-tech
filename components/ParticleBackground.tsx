@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 /* ═══════════════════════════════════════════════════════════════
    PARTICLE BACKGROUND — EPT site-wide ambient backdrop
@@ -58,6 +59,13 @@ function getStarColor(temp: number, opacity: number, isDark: boolean): string {
 }
 
 export function ParticleBackground() {
+  const pathname = usePathname();
+  // Standalone Vault — no EPT ambient backdrop on its pages.
+  if (pathname?.startsWith('/immortality-vault')) return null;
+  return <ParticleBackgroundInner />;
+}
+
+function ParticleBackgroundInner() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
