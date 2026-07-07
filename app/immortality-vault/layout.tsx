@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import IntroSplash from './IntroSplash';
 
 export const metadata: Metadata = {
   title: 'Immortality Vault | Preserve Your Legacy Forever — Echo Prime Technologies',
@@ -19,5 +20,10 @@ export const metadata: Metadata = {
 };
 
 export default function IVLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <IntroSplash />
+      {children}
+    </>
+  );
 }
