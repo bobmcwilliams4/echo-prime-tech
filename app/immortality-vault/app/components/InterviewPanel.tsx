@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ACCENT, BG_CARD, BORDER, CATEGORIES, GOLD } from '../lib/constants';
 import { selectQuestion, answerQuestion, extractTraits, synthesizeSpeech, type InterviewQuestion } from '../lib/vault-api';
 import { playAudioBlob } from '../lib/media';
+import CameraPiP from './CameraPiP';
 
 interface Props {
   userId: string;
@@ -18,6 +19,57 @@ export default function InterviewPanel({ userId }: Props) {
   const [speaking, setSpeaking] = useState(false);
   const [voiceOn, setVoiceOn] = useState(true);
   const spokenFor = useRef<string | null>(null);
+
+  // ── STT: Echo hears the user (browser SpeechRecognition, free, on-device) ──
+  const [listening, setListening] = useState(false);
+  const [sttSupported, setSttSupported] = useState(true);
+  const recognitionRef = useRef<any>(null);
+  const audioPrimed = useRef(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { setSttSupported(false); return; }
+    const rec = new SR();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = 'en-US';
+    rec.onresult = (e: any) => {
+      let finalText = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
+      }
+      if (finalText.trim()) setAnswer(prev => (prev ? prev.trimEnd() + ' ' : '') + finalText.trim());
+    };
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+    recognitionRef.current = rec;
+    return () => { try { rec.stop(); } catch { /* noop */ } };
+  }, []);
+
+  const toggleMic = () => {
+    const rec = recognitionRef.current;
+    if (!rec) return;
+    if (listening) { try { rec.stop(); } catch { /* noop */ } setListening(false); }
+    else { try { rec.start(); setListening(true); } catch { /* already started */ } }
+  };
+
+  const stopMic = () => {
+    const rec = recognitionRef.current;
+    if (rec && listening) { try { rec.stop(); } catch { /* noop */ } }
+    setListening(false);
+  };
+
+  // Unlock audio autoplay on a user gesture so Echo's spoken question can play.
+  const primeAudio = () => {
+    if (audioPrimed.current) return;
+    audioPrimed.current = true;
+    try {
+      const a = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
+      a.volume = 0;
+      a.play().catch(() => { /* ignore */ });
+    } catch { /* ignore */ }
+  };
 
   const speakQuestion = useCallback(async (q: InterviewQuestion) => {
     setSpeaking(true);
@@ -38,6 +90,7 @@ export default function InterviewPanel({ userId }: Props) {
   }, [question, voiceOn, speakQuestion]);
 
   const startInterview = async (category: string) => {
+    primeAudio(); // unlock TTS playback on this gesture
     setLoading(true);
     setSelectedCategory(category);
     try {
@@ -51,6 +104,7 @@ export default function InterviewPanel({ userId }: Props) {
 
   const submitAnswer = async () => {
     if (!answer.trim() || !question || !selectedCategory) return;
+    stopMic();
     setLoading(true);
     try {
       await answerQuestion(userId, question.question_id, answer.trim(), selectedCategory);
@@ -72,6 +126,7 @@ export default function InterviewPanel({ userId }: Props) {
     const generated = question.question_id.startsWith('gen_');
     return (
       <div className="space-y-6">
+        <CameraPiP />
         <div className="flex items-center justify-between">
           <button onClick={() => { setSelectedCategory(null); setQuestion(null); }} className="text-sm" style={{ color: ACCENT }}>
             &larr; Back to Categories
@@ -123,12 +178,22 @@ export default function InterviewPanel({ userId }: Props) {
               <textarea
                 value={answer}
                 onChange={e => setAnswer(e.target.value)}
-                placeholder="Share your story... Take your time, every detail matters."
+                placeholder="Speak or type your story... Take your time, every detail matters."
                 className="w-full p-4 rounded-lg text-sm text-white placeholder-gray-600 resize-none outline-none focus:ring-1 focus:ring-purple-500"
-                style={{ background: '#0a0a0f', border: `1px solid ${BORDER}`, minHeight: 180 }}
+                style={{ background: '#0a0a0f', border: `1px solid ${listening ? '#ef4444' : BORDER}`, minHeight: 180 }}
                 rows={8}
               />
-              <div className="flex gap-3 mt-4">
+              <div className="flex items-center gap-3 mt-4 flex-wrap">
+                {sttSupported && (
+                  <button
+                    onClick={toggleMic}
+                    className="px-5 py-2.5 rounded-full text-sm font-semibold transition hover:scale-[1.02]"
+                    style={{ border: `1px solid ${listening ? '#ef4444' : BORDER}`, color: listening ? '#ef4444' : GOLD, background: listening ? 'rgba(239,68,68,0.08)' : 'transparent' }}
+                    title="Answer out loud — Echo is listening"
+                  >
+                    {listening ? '\u{1F534} Listening… tap to stop' : '\u{1F3A4} Speak your answer'}
+                  </button>
+                )}
                 <button
                   onClick={submitAnswer}
                   disabled={!answer.trim() || loading}
@@ -138,6 +203,8 @@ export default function InterviewPanel({ userId }: Props) {
                   {loading ? 'Saving...' : 'Preserve Memory \u{2192}'}
                 </button>
               </div>
+              {listening && <p className="text-xs mt-2" style={{ color: '#ef4444' }}>Echo is listening &mdash; speak naturally; your words appear above.</p>}
+              {!sttSupported && <p className="text-xs mt-2 text-gray-500">Voice answering isn&rsquo;t supported in this browser &mdash; you can type your answer.</p>}
             </>
           )}
         </div>
