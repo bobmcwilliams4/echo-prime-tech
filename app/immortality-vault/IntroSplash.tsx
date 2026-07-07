@@ -30,20 +30,17 @@ export default function IntroSplash() {
   const [muted, setMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Decide on mount (client only).
+  // Decide on mount (client only). Play the intro on every startup (fresh page
+  // load), not just the first time — Commander directive. It does NOT replay during
+  // in-app SPA navigation (the vault layout stays mounted across child routes); it
+  // fires only on a real load/reload. Reduced-motion users are never ambushed.
   useEffect(() => {
-    let seen = false;
+    let skip = false;
     try {
-      seen = typeof window !== 'undefined' && window.localStorage.getItem(SEEN_KEY) === '1';
-      // Respect users who prefer reduced motion — don't ambush them with autoplay video.
-      const rm = typeof window !== 'undefined' && window.matchMedia
+      skip = typeof window !== 'undefined' && !!window.matchMedia
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (rm) seen = true;
-    } catch {
-      /* private mode / storage disabled → treat as seen, never block the app */
-      seen = true;
-    }
-    setShow(!seen);
+    } catch { /* ignore */ }
+    setShow(!skip);
   }, []);
 
   // Attempt playback once the overlay is showing.
@@ -67,12 +64,7 @@ export default function IntroSplash() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
 
-  function markSeen() {
-    try { window.localStorage.setItem(SEEN_KEY, '1'); } catch { /* ignore */ }
-  }
-
   function dismiss() {
-    markSeen();
     setLeaving(true);
     const v = videoRef.current;
     if (v) { try { v.pause(); } catch { /* ignore */ } }
