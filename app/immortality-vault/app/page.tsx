@@ -73,7 +73,7 @@ export default function VaultAppPage() {
   // Redirect if not logged in
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/login?redirect=/immortality-vault');
+      router.push('/immortality-vault/login?redirect=/immortality-vault/app');
     }
   }, [user, authLoading, router]);
 

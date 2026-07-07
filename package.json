@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "prebuild": "node scripts/verify-site.js",
+    "prebuild": "node scripts/verify-site.js && node scripts/verify-vault-separation.js",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

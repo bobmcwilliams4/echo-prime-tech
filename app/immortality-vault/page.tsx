@@ -1,210 +1,235 @@
 'use client';
-import FaqSchema from '../../components/FaqSchema';
-import BreadcrumbSchema from '../../components/BreadcrumbSchema';
+
+/* ==============================================================================
+   IMMORTALITY VAULT — landing page.
+   Standalone product. Gold-on-black identity of the intro film. COMPLETELY
+   separate from echo-ept.com: no page here ever links to an EPT route, uses no
+   EPT design tokens, and every CTA stays inside the Vault. See SPEC.md and the
+   build-time guard scripts/verify-vault-separation.js (do not defeat it).
+
+   Built by Bobby Don McWilliams II for his father, diagnosed with Alzheimer's —
+   to preserve him before the disease takes his memories. Keep it reverent.
+   ============================================================================== */
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { useTheme } from '../../lib/theme-context';
+import { Cormorant_Garamond } from 'next/font/google';
+import FaqSchema from '../../components/FaqSchema';
+import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 
-/* ==============================================================================
-   ECHO IMMORTALITY VAULT — Preserve Your Legacy Forever
-   Product page: hero, features, comparison, pricing, FAQ, footer CTA
-   Backend: echo-immortality-vault.bmcii1976.workers.dev (30+ endpoints, 30 D1 tables)
-   ============================================================================== */
+const serif = Cormorant_Garamond({ subsets: ['latin'], weight: ['400', '500', '600', '700'], display: 'swap' });
+
+/* Vault-owned routes only. */
+const R = {
+  app: '/immortality-vault/app',
+  login: '/immortality-vault/login',
+  home: '/immortality-vault',
+};
+const VAULT_API = 'https://vault-api.echo-op.com';
+
+/* ── palette (gold on warm black — the intro) ── */
+const C = {
+  bg: '#0a0807',
+  bg2: '#100d0b',
+  card: '#14100c',
+  gold: '#d4b483',
+  goldBright: '#ecd29a',
+  goldDeep: '#b8934f',
+  ivory: '#ece3d2',
+  muted: '#9c9081',
+  hair: 'rgba(212,180,131,0.16)',
+};
 
 const FEATURES = [
-  { title: 'Voice Cloning & Preservation', desc: 'Capture a loved one\'s voice with as little as 30 seconds of audio. ElevenLabs multilingual_v2 creates a permanent voice clone that sounds exactly like them.', icon: 'M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z' },
-  { title: 'Memory Capture Sessions', desc: 'Guided interview sessions covering childhood, career, relationships, life lessons, and wisdom. Audio-first with real-time transcription and emotion detection.', icon: 'M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z' },
-  { title: 'Personality Engine', desc: 'Big Five trait extraction from conversations builds a digital personality profile. Speech patterns, humor style, catchphrases, and emotional responses preserved.', icon: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z' },
-  { title: 'Life Story Timeline', desc: 'Chronological timeline of every memory, milestone, and story captured. Gap analysis identifies uncovered life periods and suggests questions to fill them.', icon: 'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' },
-  { title: 'Autonomous Interview Mode', desc: 'AI picks daily questions based on life coverage gaps. No human interviewer needed — the vault interviews itself on schedule, building the archive automatically.', icon: 'M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z' },
-  { title: 'Emotional Voice Synthesis', desc: 'Recreated voice speaks with real emotion — happiness, sadness, nostalgia, warmth. Not a flat text-to-speech robot, but a living voice with feeling.', icon: 'M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z' },
-  { title: 'FaceTime with the Departed', desc: 'The ultimate vision: video calls with preserved loved ones. Their voice, mannerisms, personality, and wisdom rendered in real-time conversation.', icon: 'M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v8.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z' },
-  { title: 'Photo & Video Archive', desc: 'Upload photos and videos with AI-powered tagging, face detection, and automatic timeline placement. Every visual memory organized and searchable.', icon: 'M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M2.25 18V6a2.25 2.25 0 012.25-2.25h15A2.25 2.25 0 0121.75 6v12A2.25 2.25 0 0119.5 20.25H4.5A2.25 2.25 0 012.25 18z' },
-  { title: 'Biometric Capture', desc: 'MediaPipe facial landmark tracking during video sessions captures micro-expressions, gestures, and mannerisms that make each person unique.', icon: 'M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z' },
-  { title: 'Family Tree Integration', desc: 'Map relationships between vault subjects. Cross-reference shared memories. Build a living family archive that grows across generations.', icon: 'M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z' },
-  { title: 'Funeral & Memorial Video', desc: 'Auto-generated memorial video from the vault archive — narrated in the subject\'s own voice, set to music, with their favorite photos and stories.', icon: 'M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h1.5C5.496 19.5 6 18.996 6 18.375m-3.75 0V5.625m0 0A1.125 1.125 0 013.375 4.5h17.25c.621 0 1.125.504 1.125 1.125m-20.625 0v.922c0 .407.262.763.644.888a39.414 39.414 0 019.428 3.583 2.093 2.093 0 002.106 0 39.414 39.414 0 019.428-3.583.901.901 0 00.644-.888V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 2.625V8.625m0 0A1.125 1.125 0 0020.625 7.5H3.375A1.125 1.125 0 002.25 8.625m18.375 0v.922c0 .407-.262.763-.644.888a39.414 39.414 0 00-9.428 3.583 2.093 2.093 0 01-2.106 0 39.414 39.414 0 00-9.428-3.583.901.901 0 01-.644-.888V8.625' },
-  { title: 'Privacy & Encryption', desc: 'End-to-end encryption for all audio, video, and personal data. Family-controlled access permissions. Your memories belong to your family, not us.', icon: 'M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z' },
-];
-
-const COMPARISON = [
-  { feature: 'AI voice cloning', echo: true, eternos: 'Basic', storyworth: false, hereafter: true },
-  { feature: 'Autonomous interviews', echo: true, eternos: false, storyworth: false, hereafter: false },
-  { feature: 'Personality extraction', echo: true, eternos: false, storyworth: false, hereafter: 'Basic' },
-  { feature: 'Emotional voice synthesis', echo: true, eternos: false, storyworth: false, hereafter: false },
-  { feature: 'Video FaceTime calls', echo: 'Roadmap', eternos: false, storyworth: false, hereafter: false },
-  { feature: 'Biometric capture', echo: true, eternos: false, storyworth: false, hereafter: false },
-  { feature: 'Life gap analysis', echo: true, eternos: false, storyworth: false, hereafter: false },
-  { feature: 'Family tree mapping', echo: true, eternos: false, storyworth: false, hereafter: false },
-  { feature: 'Memorial video generation', echo: true, eternos: false, storyworth: false, hereafter: false },
-  { feature: 'Photo/video archive', echo: true, eternos: 'Basic', storyworth: false, hereafter: false },
-  { feature: 'End-to-end encryption', echo: true, eternos: true, storyworth: false, hereafter: false },
-  { feature: 'Multi-generational archive', echo: true, eternos: false, storyworth: 'Basic', hereafter: false },
-  { feature: 'Cloudflare edge hosting', echo: true, eternos: false, storyworth: false, hereafter: false },
-  { feature: 'Starting price/month', echo: '$29', eternos: '$49', storyworth: '$99/yr', hereafter: '$29' },
+  { t: 'His Voice, Kept Forever', d: 'From even a short recording, we preserve and re-create a loved one’s real voice — so their words are always heard in the voice you know, not a machine.' },
+  { t: 'Guided Memory Sessions', d: 'Echo gently walks through a whole life — childhood, family, love, work, hardship, faith, the lessons only they can tell. Every answer becomes part of who they are.' },
+  { t: 'Their Way of Being', d: 'From their stories we learn how they think, their humor, their phrases, the way they’d answer — building a personality that feels unmistakably them.' },
+  { t: 'Answer on Camera', d: 'Record on video and we also keep their face, expressions, and the small mannerisms that make them who they are.' },
+  { t: 'A Life’s Timeline', d: 'Every memory and milestone, in order. Echo notices the years still untold and gently asks the questions that fill them in.' },
+  { t: 'Echo Interviews for You', d: 'A couple of gentle questions arrive each day. No interviewer needed — the vault fills itself, one memory at a time, without pressure.' },
+  { t: 'Talk With Them Again', d: 'Family can speak with the preserved person — in words and in their own voice — and, in time, face to face. The ultimate promise of the Vault.' },
+  { t: 'A Memorial in Their Voice', d: 'When the time comes, the Vault can create a memorial — narrated in their own voice, set to their photos and their stories.' },
+  { t: 'Yours Alone, Protected', d: 'Every recording and memory is encrypted and family-controlled. These belong to your family — never sold, never used to train anything, never shared.' },
 ];
 
 const PRICING = [
-  { name: 'Keeper', price: 29, desc: 'Preserve one loved one\'s voice and memories', features: ['1 vault subject', 'Voice cloning (30s sample)', '50 interview sessions', '10GB photo/video storage', 'Life timeline', 'Basic personality profile', 'Memorial video', 'Email support'] },
-  { name: 'Legacy', price: 79, desc: 'Complete family preservation with autonomous interviews', features: ['5 vault subjects', 'Voice cloning (unlimited samples)', 'Unlimited interview sessions', 'Autonomous Interview Mode', '100GB storage', 'Full personality engine', 'Family tree mapping', 'Emotional voice synthesis', 'Biometric capture', 'Priority support'], popular: true },
-  { name: 'Dynasty', price: 199, desc: 'Multi-generational archive for entire families', features: ['Unlimited vault subjects', 'Everything in Legacy', '1TB storage', 'FaceTime calls (when available)', 'Custom memorial videos', 'Cross-generation story linking', 'White-label family portal', 'Dedicated account manager', 'API access'] },
+  { slug: 'keeper', name: 'Keeper', price: 29, desc: 'Preserve one person you love.', features: ['One vault', 'Voice preserved & re-created', 'Guided memory sessions', 'Life timeline', 'Photo & video archive', 'A memorial in their voice'] },
+  { slug: 'legacy', name: 'Legacy', price: 79, popular: true, desc: 'For the whole family, capturing every day.', features: ['Up to 5 vaults', 'Everything in Keeper', 'Echo interviews daily — automatically', 'Full personality & mannerisms', 'On-camera biometric capture', 'Talk-with-them playback', 'Priority care'] },
+  { slug: 'dynasty', name: 'Dynasty', price: 199, desc: 'A living archive across generations.', features: ['Unlimited vaults', 'Everything in Legacy', 'Face-to-face calls (as released)', 'Custom memorial films', 'Cross-generation story linking', 'A private family portal', 'A dedicated guide'] },
 ];
 
 const FAQS = [
-  { q: 'How much audio do you need to clone a voice?', a: 'As little as 30 seconds of clear audio creates a recognizable clone. For the best results with emotional range and natural speech patterns, we recommend 5-10 minutes of varied conversation. The more samples you provide, the more natural the voice becomes.' },
-  { q: 'Can I preserve someone who has already passed away?', a: 'Yes, if you have recordings of their voice — phone messages, home videos, interviews, or any audio/video. We can clone their voice from existing recordings. The more audio available, the better the result. Even a single voicemail can create a meaningful preservation.' },
-  { q: 'How does the Autonomous Interview Mode work?', a: 'The AI analyzes what life periods and topics have been covered, identifies gaps, and generates contextually appropriate questions. It can conduct daily interviews via text or voice without any human interviewer needed. The system gets smarter over time, asking deeper follow-up questions based on previous answers.' },
-  { q: 'Is my family\'s data safe and private?', a: 'All audio, video, and personal data is encrypted end-to-end. Family members control access permissions. We never use your data for training or share it with third parties. Data is stored on Cloudflare\'s global edge network with enterprise-grade security.' },
-  { q: 'What is the FaceTime feature?', a: 'FaceTime with the Departed is our roadmap feature that combines voice cloning, personality engine, and video synthesis to enable real-time video conversations with preserved loved ones. The voice, mannerisms, and personality are rendered live. Currently in development — Dynasty tier members get early access.' },
-  { q: 'Can multiple family members contribute memories?', a: 'Absolutely. Family members can add their own stories, photos, and perspectives about a vault subject. This creates a richer, more complete picture from multiple viewpoints. The Family Tree feature links related stories and memories across generations.' },
+  { q: 'Can you preserve someone who is already gone — or losing their memory?', a: 'Yes. If you have any recordings — voicemails, home videos, interviews — we can re-create their voice from them. And if a loved one is living with Alzheimer’s or illness, this is exactly why the Vault exists: to hold onto them now, gently, while there is still time. Even a few minutes a day preserves what matters.' },
+  { q: 'How much audio do you need to keep a voice?', a: 'As little as 30 seconds creates a recognizable voice. A few minutes of natural conversation makes it warmer and more true. The more they speak, the more themselves it becomes.' },
+  { q: 'Does Echo really talk with them — out loud?', a: 'Yes. Echo speaks each question aloud, listens to the answer, and can talk with you — answer your questions, follow what moves you, and take its time. It’s a conversation, not a form.' },
+  { q: 'Is my family’s data private?', a: 'Completely. Everything is encrypted and controlled by your family. We never sell it, never share it, and never use it to train anything. These memories are yours.' },
+  { q: 'Who made the Immortality Vault?', a: 'It was built by Bobby Don McWilliams II, founder of Echo Prime, for his own father after an Alzheimer’s diagnosis — to keep him before the disease could take his memories. It was made by a son, for his dad, so that no one has to lose the sound of the person who shaped them.' },
 ];
+
+function Check() {
+  return <span style={{ color: C.gold, marginTop: 2 }} aria-hidden>&#10003;</span>;
+}
 
 export default function ImmortalityVaultPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const { isDark } = useTheme();
+  const [busyPlan, setBusyPlan] = useState<string | null>(null);
+
+  /* Vault checkout via ECHO's payment cap (vault backend → Stripe). Falls back
+     to beginning the vault if checkout isn't provisioned yet. Never touches EPT. */
+  async function choosePlan(slug: string) {
+    setBusyPlan(slug);
+    try {
+      const res = await fetch(`${VAULT_API}/billing/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: slug, success_url: `${R.app}?welcome=1`, cancel_url: `${R.home}#pricing` }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.url) { window.location.href = data.url; return; }
+      }
+    } catch { /* fall through */ }
+    // Not provisioned yet → begin the vault (free) with the plan remembered.
+    window.location.href = `${R.app}?plan=${slug}`;
+  }
 
   return (
-    <>
-      <noscript>
-        <div style={{padding: '2rem', maxWidth: '800px', margin: '0 auto'}}>
-          <h1>Immortality Vault - Echo Prime Technologies</h1>
-          <p>Preserve your loved ones forever with AI voice cloning, memory capture sessions, personality engine, and life story timeline. Capture voice, memories, and wisdom so you can talk to them anytime. Visit echo-ept.com for the full interactive experience.</p>
-        </div>
-      </noscript>
+    <div style={{ background: C.bg, color: C.ivory, minHeight: '100vh' }}>
       <FaqSchema faqs={FAQS} />
-      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Immortality Vault', href: '/immortality-vault' }]} />
+      <BreadcrumbSchema items={[{ name: 'Immortality Vault', href: R.home }]} />
 
-      {/* ── Nav ── */}
-      <nav className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--ept-border)', backgroundColor: 'var(--ept-card-bg)' }}>
-        <Link href="/"><Image src={isDark ? '/logo-night.png' : '/logo-day.png'} alt="Echo Prime" width={140} height={36} style={{ mixBlendMode: isDark ? 'screen' : 'multiply' }} /></Link>
-        <div className="flex items-center gap-6 text-sm font-medium" style={{ color: 'var(--ept-text-secondary)' }}>
-          <Link href="/engines" className="hover:opacity-80">Engines</Link>
-          <Link href="/pricing" className="hover:opacity-80">Pricing</Link>
-          <Link href="/login" className="px-4 py-2 rounded-lg text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>Sign In</Link>
+      {/* ── Nav (Vault-only) ── */}
+      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: `1px solid ${C.hair}`, position: 'sticky', top: 0, zIndex: 40, background: 'rgba(10,8,7,0.82)', backdropFilter: 'blur(10px)' }}>
+        <Link href={R.home} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <span aria-hidden style={{ fontSize: 20 }}>&#9670;</span>
+          <span style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, letterSpacing: '0.06em', color: C.ivory }}>Immortality Vault</span>
+        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 26, fontSize: 14 }}>
+          <a href="#how" style={{ color: C.muted, textDecoration: 'none' }} className="iv-navlink">How it works</a>
+          <a href="#pricing" style={{ color: C.muted, textDecoration: 'none' }} className="iv-navlink">Plans</a>
+          <Link href={R.login} style={{ color: C.bg, background: C.gold, padding: '9px 18px', borderRadius: 999, fontWeight: 600, textDecoration: 'none' }}>Sign in</Link>
         </div>
       </nav>
 
-      <div style={{ backgroundColor: 'var(--ept-bg)', color: 'var(--ept-text)' }}>
-        {/* ── Hero ── */}
-        <section className="relative py-24 px-4 overflow-hidden text-center">
-          <div className="absolute inset-0 opacity-10" style={{ background: 'radial-gradient(ellipse at center, var(--ept-accent), transparent 70%)' }} />
-          <div className="max-w-4xl mx-auto relative z-10">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <span className="px-3 py-1 rounded-full text-xs font-semibold border" style={{ borderColor: 'var(--ept-accent)', color: 'var(--ept-accent)' }}>DIGITAL LEGACY</span>
-              <span className="px-3 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>VOICE CLONING</span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 gradient-text">Immortality Vault</h1>
-            <p className="text-lg md:text-xl mb-4" style={{ color: 'var(--ept-text-secondary)' }}>Your loved ones never truly leave. Capture their voice, memories, personality, and wisdom — then talk to them anytime.</p>
-            <div className="flex items-center justify-center gap-8 mb-8 text-sm" style={{ color: 'var(--ept-text-muted)' }}>
-              <span>30 D1 Tables</span><span>|</span><span>4 R2 Buckets</span><span>|</span><span>ElevenLabs Voice AI</span>
-            </div>
-            <div className="flex gap-4 justify-center">
-              <Link href="/pricing" className="px-8 py-3 rounded-xl font-semibold text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>Start Preserving</Link>
-              <Link href="/docs" className="px-8 py-3 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>How It Works</Link>
-            </div>
+      {/* ── Hero ── */}
+      <section style={{ position: 'relative', textAlign: 'center', padding: '120px 20px 96px', overflow: 'hidden' }}>
+        <div aria-hidden style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: 900, height: 620, background: `radial-gradient(ellipse at center, ${C.goldDeep}33, transparent 68%)`, pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 820, margin: '0 auto' }}>
+          <div style={{ fontSize: 12, letterSpacing: '0.32em', textTransform: 'uppercase', color: C.gold, marginBottom: 26 }}>Preserve a life, forever</div>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'clamp(44px, 8vw, 88px)', lineHeight: 1.02, letterSpacing: '0.01em', margin: '0 0 26px', color: C.ivory, textWrap: 'balance' as const }}>
+            Never lose the sound<br />of the ones who<br /><span style={{ color: C.gold, fontStyle: 'italic' }}>shaped you.</span>
+          </h1>
+          <p style={{ fontSize: 'clamp(17px, 2.4vw, 21px)', lineHeight: 1.6, color: C.muted, maxWidth: 620, margin: '0 auto 40px' }}>
+            Capture their voice, their memories, their way of being &mdash; guided gently, in conversation. So your family can talk with them for generations.
+          </p>
+          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href={R.app} style={{ background: C.gold, color: C.bg, padding: '15px 34px', borderRadius: 999, fontSize: 16, fontWeight: 700, textDecoration: 'none', boxShadow: `0 0 40px ${C.goldDeep}44` }} className="iv-cta">Begin their vault</Link>
+            <a href="#how" style={{ border: `1px solid ${C.hair}`, color: C.ivory, padding: '15px 30px', borderRadius: 999, fontSize: 16, fontWeight: 600, textDecoration: 'none' }} className="iv-ghost">How it works</a>
           </div>
-        </section>
-
-        {/* ── Features ── */}
-        <section className="py-20 px-4">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-4">Preserve Every Dimension of a Life</h2>
-            <p className="text-center mb-12" style={{ color: 'var(--ept-text-secondary)' }}>12 capabilities that capture what makes someone irreplaceable</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {FEATURES.map((f, i) => (
-                <div key={i} className="p-6 rounded-xl border card-hover" style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: 'var(--ept-card-border)' }}>
-                  <svg className="w-8 h-8 mb-4" style={{ color: 'var(--ept-accent)' }} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d={f.icon} /></svg>
-                  <h3 className="text-lg font-semibold mb-2">{f.title}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>{f.desc}</p>
-                </div>
-              ))}
-            </div>
+          <div style={{ marginTop: 30, fontSize: 13.5, color: C.muted, display: 'flex', gap: 18, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <span>Voice</span><span style={{ color: C.hair }}>&middot;</span><span>Memory</span><span style={{ color: C.hair }}>&middot;</span><span>Personality</span><span style={{ color: C.hair }}>&middot;</span><span>Presence</span>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── Comparison ── */}
-        <section className="py-20 px-4" style={{ backgroundColor: 'var(--ept-surface)' }}>
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-12">Echo Immortality Vault vs Alternatives</h2>
-            <div className="overflow-x-auto rounded-xl border" style={{ borderColor: 'var(--ept-card-border)' }}>
-              <table className="w-full text-sm">
-                <thead><tr style={{ backgroundColor: 'var(--ept-card-bg)' }}>
-                  <th className="text-left p-4 font-semibold" style={{ color: 'var(--ept-text)' }}>Feature</th>
-                  <th className="p-4 font-semibold" style={{ color: 'var(--ept-accent)' }}>Echo</th>
-                  <th className="p-4 font-semibold" style={{ color: 'var(--ept-text-muted)' }}>Eternos</th>
-                  <th className="p-4 font-semibold" style={{ color: 'var(--ept-text-muted)' }}>StoryWorth</th>
-                  <th className="p-4 font-semibold" style={{ color: 'var(--ept-text-muted)' }}>HereAfter</th>
-                </tr></thead>
-                <tbody>
-                  {COMPARISON.map((row, i) => (
-                    <tr key={i} className="border-t" style={{ borderColor: 'var(--ept-card-border)' }}>
-                      <td className="p-4 font-medium">{row.feature}</td>
-                      {[row.echo, row.eternos, row.storyworth, row.hereafter].map((v, j) => (
-                        <td key={j} className="p-4 text-center">{v === true ? <span style={{ color: 'var(--ept-accent)' }}>&#10003;</span> : v === false ? <span style={{ color: 'var(--ept-text-muted)' }}>&#10007;</span> : <span style={{ color: 'var(--ept-text-secondary)' }}>{v}</span>}</td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+      {/* ── Why it exists (the heart) ── */}
+      <section style={{ padding: '20px 20px 80px' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center', borderTop: `1px solid ${C.hair}`, borderBottom: `1px solid ${C.hair}`, padding: '48px 24px' }}>
+          <p style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 'clamp(22px, 3.6vw, 30px)', lineHeight: 1.5, color: C.ivory, margin: 0 }}>
+            &ldquo;Built by a son for his father, after an Alzheimer&rsquo;s diagnosis &mdash; to keep him before the disease could take his memories.&rdquo;
+          </p>
+          <div style={{ marginTop: 18, fontSize: 13, letterSpacing: '0.2em', textTransform: 'uppercase', color: C.gold }}>Why the Vault exists</div>
+        </div>
+      </section>
+
+      {/* ── Features / how it works ── */}
+      <section id="how" style={{ padding: '70px 20px', background: C.bg2 }}>
+        <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'clamp(30px,5vw,46px)', textAlign: 'center', margin: '0 0 12px', color: C.ivory }}>Preserve every part of a person</h2>
+          <p style={{ textAlign: 'center', color: C.muted, margin: '0 auto 52px', maxWidth: 560, fontSize: 17 }}>Not a questionnaire &mdash; a conversation that keeps what makes someone irreplaceable.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
+            {FEATURES.map((f, i) => (
+              <div key={i} className="iv-card" style={{ background: C.card, border: `1px solid ${C.hair}`, borderRadius: 16, padding: '28px 26px' }}>
+                <div aria-hidden style={{ color: C.gold, fontSize: 20, marginBottom: 14 }}>&#9670;</div>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, margin: '0 0 10px', color: C.ivory }}>{f.t}</h3>
+                <p style={{ fontSize: 15, lineHeight: 1.65, color: C.muted, margin: 0 }}>{f.d}</p>
+              </div>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── Pricing ── */}
-        <section className="py-20 px-4">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-4">Preserve What Matters Most</h2>
-            <p className="text-center mb-12" style={{ color: 'var(--ept-text-secondary)' }}>Every plan includes voice cloning, memory capture, and a living timeline</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {PRICING.map((p, i) => (
-                <div key={i} className={`p-8 rounded-2xl border ${p.popular ? 'ring-2' : ''}`} style={{ backgroundColor: 'var(--ept-card-bg)', borderColor: p.popular ? 'var(--ept-accent)' : 'var(--ept-card-border)', ...(p.popular ? { ringColor: 'var(--ept-accent)' } : {}) }}>
-                  {p.popular && <div className="text-xs font-bold uppercase mb-4 text-center" style={{ color: 'var(--ept-accent)' }}>Most Popular</div>}
-                  <h3 className="text-xl font-bold mb-1">{p.name}</h3>
-                  <p className="text-sm mb-4" style={{ color: 'var(--ept-text-secondary)' }}>{p.desc}</p>
-                  <div className="text-4xl font-extrabold mb-6">${p.price}<span className="text-base font-normal" style={{ color: 'var(--ept-text-muted)' }}>/mo</span></div>
-                  <ul className="space-y-3 mb-8">
-                    {p.features.map((f, j) => <li key={j} className="flex items-start gap-2 text-sm"><span style={{ color: 'var(--ept-accent)' }}>&#10003;</span><span>{f}</span></li>)}
-                  </ul>
-                  <Link href="/pricing" className="block text-center px-6 py-3 rounded-xl font-semibold text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>Get Started</Link>
-                </div>
-              ))}
-            </div>
+      {/* ── Pricing (Vault checkout, never EPT) ── */}
+      <section id="pricing" style={{ padding: '80px 20px' }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'clamp(30px,5vw,46px)', textAlign: 'center', margin: '0 0 12px', color: C.ivory }}>Begin while there is time</h2>
+          <p style={{ textAlign: 'center', color: C.muted, margin: '0 auto 52px', maxWidth: 560, fontSize: 17 }}>Every plan preserves voice, memories, and a living timeline. Start free &mdash; keep them today.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, alignItems: 'start' }}>
+            {PRICING.map((p) => (
+              <div key={p.slug} style={{ background: C.card, border: `1px solid ${p.popular ? C.gold : C.hair}`, borderRadius: 20, padding: '34px 30px', position: 'relative', boxShadow: p.popular ? `0 0 50px ${C.goldDeep}22` : 'none' }}>
+                {p.popular && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: C.gold, color: C.bg, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '5px 14px', borderRadius: 999 }}>Most chosen</div>}
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 600, margin: '0 0 6px', color: C.ivory }}>{p.name}</h3>
+                <p style={{ fontSize: 14.5, color: C.muted, margin: '0 0 20px', minHeight: 42 }}>{p.desc}</p>
+                <div style={{ marginBottom: 24 }}><span style={{ fontFamily: 'var(--font-serif)', fontSize: 46, fontWeight: 600, color: C.ivory }}>${p.price}</span><span style={{ color: C.muted, fontSize: 15 }}>/mo</span></div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {p.features.map((f, j) => <li key={j} style={{ display: 'flex', gap: 10, fontSize: 14.5, color: C.ivory, lineHeight: 1.4 }}><Check />{f}</li>)}
+                </ul>
+                <button onClick={() => choosePlan(p.slug)} disabled={busyPlan === p.slug}
+                  style={{ width: '100%', padding: '13px', borderRadius: 999, fontSize: 15, fontWeight: 700, cursor: 'pointer', border: p.popular ? 'none' : `1px solid ${C.gold}`, background: p.popular ? C.gold : 'transparent', color: p.popular ? C.bg : C.gold, opacity: busyPlan === p.slug ? 0.6 : 1 }} className="iv-plan">
+                  {busyPlan === p.slug ? 'One moment…' : `Choose ${p.name}`}
+                </button>
+              </div>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── FAQ ── */}
-        <section className="py-20 px-4" style={{ backgroundColor: 'var(--ept-surface)' }}>
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
-            <div className="space-y-4">
-              {FAQS.map((faq, i) => (
-                <div key={i} className="border rounded-xl overflow-hidden" style={{ borderColor: 'var(--ept-card-border)', backgroundColor: 'var(--ept-card-bg)' }}>
-                  <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between p-5 text-left font-semibold">
-                    <span>{faq.q}</span>
-                    <span className="ml-4 text-xl" style={{ color: 'var(--ept-accent)' }}>{openFaq === i ? '−' : '+'}</span>
-                  </button>
-                  {openFaq === i && <div className="px-5 pb-5 text-sm leading-relaxed" style={{ color: 'var(--ept-text-secondary)' }}>{faq.a}</div>}
-                </div>
-              ))}
-            </div>
+      {/* ── FAQ ── */}
+      <section style={{ padding: '70px 20px', background: C.bg2 }}>
+        <div style={{ maxWidth: 760, margin: '0 auto' }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'clamp(30px,5vw,46px)', textAlign: 'center', margin: '0 0 44px', color: C.ivory }}>Questions, answered gently</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {FAQS.map((faq, i) => (
+              <div key={i} style={{ border: `1px solid ${C.hair}`, borderRadius: 14, background: C.card, overflow: 'hidden' }}>
+                <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '20px 22px', background: 'transparent', border: 'none', color: C.ivory, fontSize: 16.5, fontWeight: 500, textAlign: 'left', cursor: 'pointer', fontFamily: 'var(--font-serif)' }}>
+                  <span>{faq.q}</span>
+                  <span style={{ color: C.gold, fontSize: 22, flexShrink: 0 }}>{openFaq === i ? '−' : '+'}</span>
+                </button>
+                {openFaq === i && <div style={{ padding: '0 22px 22px', fontSize: 15, lineHeight: 1.7, color: C.muted }}>{faq.a}</div>}
+              </div>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── CTA ── */}
-        <section className="py-20 px-4 text-center">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold mb-4">They Shaped Who You Are. Don&apos;t Let Their Voice Fade.</h2>
-            <p className="mb-8" style={{ color: 'var(--ept-text-secondary)' }}>Start preserving your family&apos;s legacy today. Every day without recording is a memory that could be lost forever.</p>
-            <Link href="/pricing" className="inline-block px-10 py-4 rounded-xl font-semibold text-lg text-white" style={{ backgroundColor: 'var(--ept-accent)' }}>Start Free Trial</Link>
-          </div>
-        </section>
+      {/* ── Closing CTA ── */}
+      <section style={{ padding: '100px 20px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div aria-hidden style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at center, ${C.goldDeep}22, transparent 70%)` }} />
+        <div style={{ position: 'relative', maxWidth: 640, margin: '0 auto' }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'clamp(30px,5.5vw,52px)', lineHeight: 1.1, margin: '0 0 20px', color: C.ivory, textWrap: 'balance' as const }}>Every day is a memory that could be lost.</h2>
+          <p style={{ color: C.muted, fontSize: 18, margin: '0 0 36px' }}>Begin their vault today. It only takes a few gentle minutes.</p>
+          <Link href={R.app} style={{ background: C.gold, color: C.bg, padding: '17px 44px', borderRadius: 999, fontSize: 17, fontWeight: 700, textDecoration: 'none', boxShadow: `0 0 44px ${C.goldDeep}55` }} className="iv-cta">Begin their vault</Link>
+        </div>
+      </section>
 
-        {/* ── Footer ── */}
-        <footer className="border-t py-8 px-4 text-center text-sm" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-muted)' }}>
-          &copy; {new Date().getFullYear()} Echo Prime Technologies. All rights reserved.
-        </footer>
-      </div>
-    </>
+      {/* ── Footer (quiet credit, no EPT link) ── */}
+      <footer style={{ borderTop: `1px solid ${C.hair}`, padding: '34px 20px', textAlign: 'center', color: C.muted, fontSize: 13.5 }}>
+        <div style={{ fontFamily: 'var(--font-serif)', fontSize: 17, color: C.ivory, marginBottom: 8 }}>Immortality Vault</div>
+        <div>Made for the ones who shaped us. &copy; {new Date().getFullYear()} &middot; An Echo Prime creation.</div>
+      </footer>
+
+      <style>{`
+        :root { --font-serif: ${serif.style.fontFamily}; }
+        html { scroll-behavior: smooth; }
+        .iv-navlink:hover { color: ${C.ivory} !important; }
+        .iv-cta { transition: transform .18s ease, box-shadow .18s ease; }
+        .iv-cta:hover { transform: translateY(-2px); box-shadow: 0 0 56px ${C.goldDeep}77 !important; }
+        .iv-ghost:hover { border-color: ${C.gold} !important; }
+        .iv-card { transition: border-color .2s ease, transform .2s ease; }
+        .iv-card:hover { border-color: ${C.hair}; transform: translateY(-3px); }
+        .iv-plan:hover:not(:disabled) { filter: brightness(1.06); }
+        @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .iv-cta, .iv-card { transition: none; } }
+      `}</style>
+    </div>
   );
 }

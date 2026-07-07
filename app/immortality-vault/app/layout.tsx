@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import InstallPrompt from './components/InstallPrompt';
 
 export const metadata: Metadata = {
-  title: 'Immortality Vault App — Echo Prime Technologies',
-  description: 'Preserve your memories, voice, and wisdom for future generations with the Immortality Vault. Record life interviews across 12 categories, clone your voice with AI, and create a living digital legacy.',
+  title: 'Immortality Vault',
+  description: 'Preserve the voice, memories, personality, and wisdom of the ones you love — guided gently, in conversation — so your family can talk with them for generations.',
   manifest: '/immortality-vault/manifest.json',
   appleWebApp: {
     capable: true,
@@ -14,16 +14,17 @@ export const metadata: Metadata = {
     apple: '/immortality-vault/apple-touch-icon.png',
   },
   openGraph: {
-    title: 'Immortality Vault App — Echo Prime Technologies',
-    description: 'Preserve your memories, clone your voice, and build a digital legacy for future generations.',
-    url: 'https://echo-ept.com/immortality-vault/app',
+    title: 'Immortality Vault',
+    description: 'Preserve their voice, memories, and presence — then talk with them anytime.',
+    url: 'https://immortalityvault.app/immortality-vault/app',
+    siteName: 'Immortality Vault',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Immortality Vault App — Echo Prime Technologies',
-    description: 'Preserve your memories, clone your voice, and build a digital legacy for future generations.',
+    title: 'Immortality Vault',
+    description: 'Preserve their voice, memories, and presence — then talk with them anytime.',
   },
-  alternates: { canonical: '/immortality-vault/app' },
+  alternates: { canonical: 'https://immortalityvault.app/immortality-vault/app' },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
