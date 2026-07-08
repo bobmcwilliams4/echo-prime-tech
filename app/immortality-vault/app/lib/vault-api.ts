@@ -305,6 +305,23 @@ export async function getChatSessions(userId: string) {
   return vaultFetch(`/sessions/${userId}`);
 }
 
+/* ─── Echo the Guide (converse) ──────────────────────────────────────── */
+
+export interface GuideReply {
+  answer: string;
+  session_id: string;
+}
+
+/** Ask Echo the guide a question about the Vault, the process, Echo Prime, or
+ *  why it was built. Distinct from sendChat (which talks to the preserved
+ *  person). Grounded in the vault_guide persona; reply is clean for speech. */
+export async function askGuide(question: string, history: ChatMessage[] = [], sessionId?: string): Promise<GuideReply> {
+  return vaultFetch('/guide/ask', {
+    method: 'POST',
+    body: JSON.stringify({ question, history, ...(sessionId && { session_id: sessionId }) }),
+  });
+}
+
 /* ─── Memories ───────────────────────────────────────────────────────── */
 
 export async function getMemories(userId: string, category?: string, limit = 50): Promise<{ memories: Memory[] }> {

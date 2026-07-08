@@ -5,6 +5,7 @@ import { ACCENT, BG_CARD, BORDER, CATEGORIES, GOLD } from '../lib/constants';
 import { selectQuestion, answerQuestion, extractTraits, synthesizeSpeech, type InterviewQuestion } from '../lib/vault-api';
 import { playAudioBlob } from '../lib/media';
 import CameraPiP from './CameraPiP';
+import AskEcho from './AskEcho';
 
 interface Props {
   userId: string;
@@ -269,6 +270,9 @@ export default function InterviewPanel({ userId }: Props) {
           <div className="w-6 h-6 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mx-auto" />
         </div>
       )}
+
+      {/* Echo converses — ask him anything about the Vault, the process, or who made it. */}
+      <AskEcho />
     </div>
   );
 }
