@@ -27,6 +27,7 @@ export default function InterviewPanel({ userId }: Props) {
   const recognitionRef = useRef<any>(null);
   const audioPrimed = useRef(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const lastUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -91,7 +92,10 @@ export default function InterviewPanel({ userId }: Props) {
       const a = getAudioEl();
       if (!a) { await playAudioBlob(blob); setNeedsTap(false); return; }
       a.volume = 1;
-      a.src = URL.createObjectURL(blob);
+      if (lastUrlRef.current) { try { URL.revokeObjectURL(lastUrlRef.current); } catch { /* noop */ } }
+      const url = URL.createObjectURL(blob);
+      lastUrlRef.current = url;
+      a.src = url;
       await a.play();
       setNeedsTap(false); // audio works — hide any tap prompt
     } catch (e: any) {
@@ -109,6 +113,13 @@ export default function InterviewPanel({ userId }: Props) {
       speakQuestion(question);
     }
   }, [question, voiceOn, speakQuestion]);
+
+  // Cleanup on unmount: stop audio, free the last blob URL, stop the mic.
+  useEffect(() => () => {
+    try { audioRef.current?.pause(); } catch { /* noop */ }
+    if (lastUrlRef.current) { try { URL.revokeObjectURL(lastUrlRef.current); } catch { /* noop */ } }
+    try { recognitionRef.current?.stop(); } catch { /* noop */ }
+  }, []);
 
   const startInterview = async (category: string) => {
     primeAudio(); // unlock TTS playback on this gesture
