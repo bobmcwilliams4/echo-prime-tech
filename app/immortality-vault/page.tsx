@@ -70,6 +70,47 @@ function Check() {
   return <span style={{ color: C.gold, marginTop: 2 }} aria-hidden>&#10003;</span>;
 }
 
+/* ── The Vault mark: an ember held within a diamond (echoes the intro film) ── */
+function VaultMark({ size = 26 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M12 2.4 21.6 12 12 21.6 2.4 12 12 2.4Z" stroke={C.gold} strokeWidth="1.2" strokeLinejoin="round" />
+      <circle cx="12" cy="12" r="6.2" stroke={C.goldDeep} strokeWidth="0.7" opacity="0.5" />
+      <circle cx="12" cy="12" r="3.2" fill={C.gold} opacity="0.92" />
+    </svg>
+  );
+}
+
+/* ── Feature marks: a distinct gold line-icon for each promise (not nine ◆) ── */
+function FeatureIcon({ i, size = 30 }: { i: number; size?: number }) {
+  const p = { fill: C.gold, stroke: 'none' } as const;
+  const inner = [
+    // 0 · voice, kept forever — microphone
+    <g key="0"><path d="M12 3a2.6 2.6 0 0 0-2.6 2.6v5.8a2.6 2.6 0 0 0 5.2 0V5.6A2.6 2.6 0 0 0 12 3Z" /><path d="M5.5 11a6.5 6.5 0 0 0 13 0" /><path d="M12 17.5V21" /></g>,
+    // 1 · guided memory sessions — conversation
+    <g key="1"><path d="M4 5h16v10H9l-4.5 3.5V5Z" /><circle cx="9" cy="10" r="0.95" {...p} /><circle cx="12" cy="10" r="0.95" {...p} /><circle cx="15" cy="10" r="0.95" {...p} /></g>,
+    // 2 · their way of being — a spark
+    <path key="2" d="M12 2.5l2 6.2 6.2 2-6.2 2-2 6.2-2-6.2-6.2-2 6.2-2 2-6.2Z" />,
+    // 3 · answer on camera
+    <g key="3"><rect x="3" y="6.5" width="13" height="11" rx="2" /><path d="M16 10.4l5-2.8v8.8l-5-2.8" /></g>,
+    // 4 · a life's timeline
+    <g key="4"><path d="M3 12h18" /><circle cx="7" cy="12" r="1.7" {...p} /><circle cx="12" cy="12" r="1.7" {...p} /><circle cx="17" cy="12" r="1.7" {...p} /></g>,
+    // 5 · Echo interviews for you — daily
+    <g key="5"><rect x="4" y="5" width="16" height="15" rx="2" /><path d="M4 9.5h16M9 3v4M15 3v4" /></g>,
+    // 6 · talk with them again — two voices
+    <g key="6"><path d="M3 5h11v7H7l-4 3V5Z" /><path d="M9.5 13.6V15a1.8 1.8 0 0 0 1.8 1.8H17l4 2.6v-8A1.8 1.8 0 0 0 19.2 11.6H17" /></g>,
+    // 7 · a memorial in their voice — flame
+    <path key="7" d="M12 3c2.8 3 4.3 5.4 4.3 7.9a4.3 4.3 0 0 1-8.6 0c0-1.3.5-2.5 1.4-3.6.7 1 1.6 1.3 2.3 1 .9-.4 1-1.7.6-3.3Z" />,
+    // 8 · yours alone, protected — shield
+    <g key="8"><path d="M12 3l7 3v5c0 4.4-3 7.4-7 8.9C8 17.4 5 14.4 5 11V6l7-3Z" /><path d="M9 11.5l2 2 4-4" /></g>,
+  ];
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      {inner[i] ?? inner[0]}
+    </svg>
+  );
+}
+
 export default function ImmortalityVaultPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [busyPlan, setBusyPlan] = useState<string | null>(null);
@@ -101,7 +142,7 @@ export default function ImmortalityVaultPage() {
       {/* ── Nav (Vault-only) ── */}
       <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: `1px solid ${C.hair}`, position: 'sticky', top: 0, zIndex: 40, background: 'rgba(10,8,7,0.82)', backdropFilter: 'blur(10px)' }}>
         <Link href={R.home} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <span aria-hidden style={{ fontSize: 20 }}>&#9670;</span>
+          <VaultMark size={24} />
           <span style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, letterSpacing: '0.06em', color: C.ivory }}>Immortality Vault</span>
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 26, fontSize: 14 }}>
@@ -112,8 +153,11 @@ export default function ImmortalityVaultPage() {
       </nav>
 
       {/* ── Hero ── */}
-      <section style={{ position: 'relative', textAlign: 'center', padding: '120px 20px 96px', overflow: 'hidden' }}>
-        <div aria-hidden style={{ position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: 900, height: 620, background: `radial-gradient(ellipse at center, ${C.goldDeep}33, transparent 68%)`, pointerEvents: 'none' }} />
+      <section style={{ position: 'relative', textAlign: 'center', padding: '150px 20px 116px', overflow: 'hidden' }}>
+        {/* cinematic ember backdrop — Grok Imagine, matching the intro film */}
+        <div aria-hidden style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/immortality-vault/hero-ember.jpg)', backgroundSize: 'cover', backgroundPosition: 'center 32%', opacity: 0.6, pointerEvents: 'none' }} />
+        <div aria-hidden style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, rgba(10,8,7,0.72) 0%, rgba(10,8,7,0.42) 40%, ${C.bg} 100%)`, pointerEvents: 'none' }} />
+        <div aria-hidden style={{ position: 'absolute', top: '-6%', left: '50%', transform: 'translateX(-50%)', width: 900, height: 620, background: `radial-gradient(ellipse at center, ${C.goldDeep}22, transparent 72%)`, pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 820, margin: '0 auto' }}>
           <div style={{ fontSize: 12, letterSpacing: '0.32em', textTransform: 'uppercase', color: C.gold, marginBottom: 26 }}>Preserve a life, forever</div>
           <h1 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'clamp(44px, 8vw, 88px)', lineHeight: 1.02, letterSpacing: '0.01em', margin: '0 0 26px', color: C.ivory, textWrap: 'balance' as const }}>
@@ -150,7 +194,7 @@ export default function ImmortalityVaultPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
             {FEATURES.map((f, i) => (
               <div key={i} className="iv-card" style={{ background: C.card, border: `1px solid ${C.hair}`, borderRadius: 16, padding: '28px 26px' }}>
-                <div aria-hidden style={{ color: C.gold, fontSize: 20, marginBottom: 14 }}>&#9670;</div>
+                <div aria-hidden style={{ marginBottom: 16, width: 54, height: 54, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(150deg, ${C.goldDeep}26, transparent 70%)`, border: `1px solid ${C.hair}` }}><FeatureIcon i={i} /></div>
                 <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, margin: '0 0 10px', color: C.ivory }}>{f.t}</h3>
                 <p style={{ fontSize: 15, lineHeight: 1.65, color: C.muted, margin: 0 }}>{f.d}</p>
               </div>
@@ -203,8 +247,9 @@ export default function ImmortalityVaultPage() {
       </section>
 
       {/* ── Closing CTA ── */}
-      <section style={{ padding: '100px 20px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-        <div aria-hidden style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at center, ${C.goldDeep}22, transparent 70%)` }} />
+      <section style={{ padding: '116px 20px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div aria-hidden style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/immortality-vault/hero-ember.jpg)', backgroundSize: 'cover', backgroundPosition: 'center 58%', opacity: 0.34, pointerEvents: 'none' }} />
+        <div aria-hidden style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at center, rgba(10,8,7,0.35), ${C.bg} 74%)` }} />
         <div style={{ position: 'relative', maxWidth: 640, margin: '0 auto' }}>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'clamp(30px,5.5vw,52px)', lineHeight: 1.1, margin: '0 0 20px', color: C.ivory, textWrap: 'balance' as const }}>Every day is a memory that could be lost.</h2>
           <p style={{ color: C.muted, fontSize: 18, margin: '0 0 36px' }}>Begin their vault today. It only takes a few gentle minutes.</p>
