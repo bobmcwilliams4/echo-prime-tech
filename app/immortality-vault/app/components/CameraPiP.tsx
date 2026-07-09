@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { startCamera, stopCamera } from '../lib/media';
 import { GOLD, BORDER } from '../lib/constants';
+import VaultIcon from './VaultIcon';
 
 export default function CameraPiP() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -39,7 +40,7 @@ export default function CameraPiP() {
         <video ref={videoRef} muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)', display: on && !error ? 'block' : 'none' }} />
         {(!on || error) && (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#8a8172', fontSize: 12, textAlign: 'center', padding: 10 }}>
-            <span style={{ fontSize: 22 }} aria-hidden>{error ? '\u{1F4F5}' : '\u{1F4F9}'}</span>
+            <span aria-hidden style={{ color: GOLD, display: 'flex' }}><VaultIcon name={error ? 'camera_off' : 'camera'} size={22} /></span>
             {error ? 'Camera unavailable' : 'Camera off'}
           </div>
         )}
@@ -54,7 +55,7 @@ export default function CameraPiP() {
           title={on ? 'Turn camera off' : 'Turn camera on'}
           style={{ position: 'absolute', bottom: 8, right: 8, width: 28, height: 28, borderRadius: '50%', border: `1px solid ${BORDER}`, background: 'rgba(0,0,0,0.55)', color: GOLD, cursor: 'pointer', fontSize: 13, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
-          {on ? '\u{2715}' : '\u{1F4F9}'}
+          {on ? '\u{2715}' : <VaultIcon name="camera" size={14} />}
         </button>
       </div>
       <style>{`@keyframes ivRec { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }`}</style>

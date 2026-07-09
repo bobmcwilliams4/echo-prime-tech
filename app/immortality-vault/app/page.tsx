@@ -7,7 +7,9 @@ import { useRouter } from 'next/navigation';
 import { useTheme } from '../../../lib/theme-context';
 import { useAuth } from '../../../lib/auth-context';
 import { API, BG_DARK, BG_CARD, BORDER, NAV_ITEMS } from './lib/constants';
-import { createUser, getStats, type VaultStats } from './lib/vault-api';
+import { createUser, getStats, startCheckout, type VaultStats } from './lib/vault-api';
+
+const PLAN_SLUGS = ['keeper', 'legacy', 'dynasty'];
 import DashboardPanel from './components/DashboardPanel';
 import InterviewPanel from './components/InterviewPanel';
 import ChatPanel from './components/ChatPanel';
@@ -69,13 +71,31 @@ export default function VaultAppPage() {
   const [stats, setStats] = useState<VaultStats | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
 
-  // Redirect if not logged in
+  // Redirect if not logged in — preserve a ?plan so checkout resumes after login.
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/immortality-vault/login?redirect=/immortality-vault/app');
+      const plan = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('plan') : null;
+      const back = '/immortality-vault/app' + (plan ? `?plan=${plan}` : '');
+      router.push(`/immortality-vault/login?redirect=${encodeURIComponent(back)}`);
     }
   }, [user, authLoading, router]);
+
+  // If we arrived with ?plan (from the landing pricing), open checkout for the
+  // logged-in buyer and redirect to the secure checkout URL.
+  useEffect(() => {
+    if (!user || typeof window === 'undefined') return;
+    const plan = new URLSearchParams(window.location.search).get('plan');
+    if (!plan || !PLAN_SLUGS.includes(plan)) return;
+    setCheckingOut(true);
+    const origin = window.location.origin;
+    startCheckout(plan, user.email || '',
+      `${origin}/immortality-vault/app?welcome=1`,
+      `${origin}/immortality-vault#pricing`)
+      .then(r => { if (r?.url) { window.location.href = r.url; } else { setCheckingOut(false); } })
+      .catch(() => setCheckingOut(false));
+  }, [user]);
 
   // Create or get vault user + load stats
   useEffect(() => {
@@ -104,10 +124,11 @@ export default function VaultAppPage() {
     setShowOnboarding(false);
   };
 
-  if (authLoading || !user) {
+  if (authLoading || !user || checkingOut) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: BG_DARK }}>
-        <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: BG_DARK }}>
+        <div className="w-8 h-8 rounded-full animate-spin" style={{ border: '2px solid #d4b48355', borderTopColor: '#d4b483' }} />
+        {checkingOut && <div style={{ color: '#d4b483', fontSize: 15, letterSpacing: '0.02em' }}>Taking you to secure checkout…</div>}
       </div>
     );
   }

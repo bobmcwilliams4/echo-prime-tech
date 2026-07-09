@@ -322,6 +322,19 @@ export async function askGuide(question: string, history: ChatMessage[] = [], se
   });
 }
 
+/* ─── Billing ────────────────────────────────────────────────────────── */
+
+/** Open a Vault subscription checkout for a plan. Returns the checkout URL to
+ *  redirect to. Email identifies the buyer (checkout is from a logged-in user). */
+export async function startCheckout(
+  plan: string, email: string, successUrl?: string, cancelUrl?: string,
+): Promise<{ url: string; mode: string; plan: string }> {
+  return vaultFetch('/billing/checkout', {
+    method: 'POST',
+    body: JSON.stringify({ plan, email, ...(successUrl && { success_url: successUrl }), ...(cancelUrl && { cancel_url: cancelUrl }) }),
+  });
+}
+
 /* ─── Memories ───────────────────────────────────────────────────────── */
 
 export async function getMemories(userId: string, category?: string, limit = 50): Promise<{ memories: Memory[] }> {

@@ -6,6 +6,9 @@ import { selectQuestion, answerQuestion, extractTraits, synthesizeSpeech, type I
 import { playAudioBlob } from '../lib/media';
 import CameraPiP from './CameraPiP';
 import AskEcho from './AskEcho';
+import VaultIcon, { CATEGORY_ICON } from './VaultIcon';
+
+const iconLabel = { display: 'inline-flex', alignItems: 'center', gap: 7 } as const;
 
 interface Props {
   userId: string;
@@ -170,7 +173,7 @@ export default function InterviewPanel({ userId }: Props) {
             style={{ border: `1px solid ${BORDER}`, color: voiceOn ? GOLD : '#71717a' }}
             title="Read questions aloud"
           >
-            {voiceOn ? '\u{1F50A} Voice On' : '\u{1F507} Voice Off'}
+            <span style={iconLabel}><VaultIcon name="speaker" size={14} />{voiceOn ? 'Voice On' : 'Voice Off'}</span>
           </button>
         </div>
         <div className="p-6 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${ACCENT}` }}>
@@ -196,7 +199,7 @@ export default function InterviewPanel({ userId }: Props) {
               ? { background: GOLD, color: '#0a0a0f', border: 'none', boxShadow: `0 0 20px ${GOLD}66` }
               : { border: `1px solid ${BORDER}`, color: '#d4d4d8' }}
           >
-            {speaking ? '\u{1F50A} Echo is speaking…' : needsTap ? '\u{1F50A} Tap to hear Echo' : '\u{1F50A} Hear it again'}
+            <span style={iconLabel}><VaultIcon name="speaker" size={16} />{speaking ? 'Echo is speaking…' : needsTap ? 'Tap to hear Echo' : 'Hear it again'}</span>
           </button>
           {question.video_instructions && (
             <div className="text-xs text-gray-500 mb-4 p-3 rounded-lg" style={{ background: '#0a0a0f' }}>
@@ -226,7 +229,7 @@ export default function InterviewPanel({ userId }: Props) {
                     style={{ border: `1px solid ${listening ? '#ef4444' : BORDER}`, color: listening ? '#ef4444' : GOLD, background: listening ? 'rgba(239,68,68,0.08)' : 'transparent' }}
                     title="Answer out loud — Echo is listening"
                   >
-                    {listening ? '\u{1F534} Listening… tap to stop' : '\u{1F3A4} Speak your answer'}
+                    <span style={iconLabel}><VaultIcon name="mic" size={16} />{listening ? 'Listening… tap to stop' : 'Speak your answer'}</span>
                   </button>
                 )}
                 <button
@@ -260,7 +263,7 @@ export default function InterviewPanel({ userId }: Props) {
             className="p-5 rounded-xl text-center transition hover:scale-[1.03] hover:border-purple-500"
             style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
           >
-            <div className="text-3xl mb-3">{cat.icon}</div>
+            <div className="mb-3 flex justify-center" style={{ color: GOLD }}><VaultIcon name={CATEGORY_ICON[cat.id] || 'spark'} size={30} /></div>
             <div className="text-sm font-semibold text-white">{cat.name}</div>
           </button>
         ))}

@@ -25,7 +25,6 @@ const R = {
   login: '/immortality-vault/login',
   home: '/immortality-vault',
 };
-const VAULT_API = 'https://vault-api.echo-op.com';
 
 /* ── palette (gold on warm black — the intro) ── */
 const C = {
@@ -115,22 +114,11 @@ export default function ImmortalityVaultPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [busyPlan, setBusyPlan] = useState<string | null>(null);
 
-  /* Vault checkout via ECHO's payment cap (vault backend → Stripe). Falls back
-     to beginning the vault if checkout isn't provisioned yet. Never touches EPT. */
-  async function choosePlan(slug: string) {
+  /* Vault checkout (never touches EPT). Checkout needs a known buyer, so we send
+     them into the Vault app carrying the chosen plan; once signed in, the app
+     opens the secure checkout for that plan (see app/page.tsx). */
+  function choosePlan(slug: string) {
     setBusyPlan(slug);
-    try {
-      const res = await fetch(`${VAULT_API}/billing/checkout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: slug, success_url: `${R.app}?welcome=1`, cancel_url: `${R.home}#pricing` }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.url) { window.location.href = data.url; return; }
-      }
-    } catch { /* fall through */ }
-    // Not provisioned yet → begin the vault (free) with the plan remembered.
     window.location.href = `${R.app}?plan=${slug}`;
   }
 
