@@ -301,8 +301,10 @@ export async function sendChat(userId: string, message: string, sessionId?: stri
   });
 }
 
-export async function getChatSessions(userId: string) {
-  return vaultFetch(`/sessions/${userId}`);
+export async function getChatSessions(userId: string): Promise<{ sessions: unknown[] }> {
+  const data = await vaultFetch<unknown[] | { sessions: unknown[] }>(`/sessions/${userId}`);
+  if (Array.isArray(data)) return { sessions: data };
+  return { sessions: (data as { sessions?: unknown[] }).sessions || [] };
 }
 
 /* ─── Echo the Guide (converse) ──────────────────────────────────────── */
@@ -418,6 +420,19 @@ export async function synthesizeSpeech(text: string, emotion?: string, voiceId?:
     body: JSON.stringify({ text, ...(emotion && { emotion }), ...(voiceId && { voice_id: voiceId }) }),
   });
   return res.blob();
+}
+
+/** Server-side speech-to-text. The browser Web Speech API (webkitSpeechRecognition)
+ *  is unreliable or absent on iOS Safari, so the interview mic records a short clip
+ *  and posts it here; the backend forwards to the Whisper ASR service. Returns the
+ *  transcript text (empty string if nothing was heard). */
+export async function transcribeAudio(audio: Blob, filename = 'answer.webm'): Promise<string> {
+  const formData = new FormData();
+  formData.append('audio', audio, filename);
+  const res = await fetch(`${API}/voice/transcribe`, { method: 'POST', body: formData });
+  if (!res.ok) throw new Error(`Transcription failed: ${res.status}`);
+  const data = (await res.json()) as { text?: string };
+  return (data.text || '').trim();
 }
 
 export async function getVoiceProfiles(userId: string): Promise<{ profiles: VoiceProfile[] }> {

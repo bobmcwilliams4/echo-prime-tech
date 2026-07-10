@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ACCENT, GOLD, BG_CARD, BORDER, LEVEL_THRESHOLDS } from '../lib/constants';
-import { getGamificationStats, checkAchievements, getConsciousnessState, setConsciousnessState, type GamificationStats, type ConsciousnessStateResponse, type ConsciousnessStateType } from '../lib/vault-api';
+import { getGamificationStats, checkAchievements, getConsciousnessState, setConsciousnessState, getFamilyMembers, getChatSessions, type GamificationStats, type ConsciousnessStateResponse, type ConsciousnessStateType } from '../lib/vault-api';
 
 interface Props {
   userId: string;
@@ -14,11 +14,20 @@ export default function DashboardPanel({ userId, stats, onNavigate }: Props) {
   const [gamification, setGamification] = useState<GamificationStats | null>(null);
   const [consciousness, setConsciousness] = useState<ConsciousnessStateResponse | null>(null);
   const [stateChanging, setStateChanging] = useState(false);
+  // User-scoped Family + Chat counts. The `stats` prop is the PLATFORM-WIDE
+  // /stats total (all users), so reading stats.family_members / stats.chat_sessions
+  // here leaked other accounts' data into a brand-new user's dashboard (they'd see
+  // e.g. "8 Family Members / 17 Chat Sessions" with none of their own). Fetch the
+  // caller's own counts instead so the dashboard only ever shows THEIR vault.
+  const [familyCount, setFamilyCount] = useState<number | null>(null);
+  const [chatCount, setChatCount] = useState<number | null>(null);
 
   useEffect(() => {
     getGamificationStats(userId).then(setGamification).catch(() => {});
     checkAchievements(userId).catch(() => {});
     getConsciousnessState(userId).then(setConsciousness).catch(() => {});
+    getFamilyMembers(userId).then(r => setFamilyCount(r.members.length)).catch(() => setFamilyCount(0));
+    getChatSessions(userId).then(r => setChatCount(r.sessions.length)).catch(() => setChatCount(0));
   }, [userId]);
 
   const handleStateChange = async (newState: ConsciousnessStateType) => {
@@ -40,8 +49,8 @@ export default function DashboardPanel({ userId, stats, onNavigate }: Props) {
   const statCards = [
     { label: 'Memories', value: gamification?.total_memories ?? stats?.memories ?? 0, icon: '\u{1F9E0}', color: ACCENT },
     { label: 'Interviews', value: gamification?.total_interviews ?? stats?.interviews ?? 0, icon: '\u{1F399}\u{FE0F}', color: '#60a5fa' },
-    { label: 'Family Members', value: stats?.family_members ?? 0, icon: '\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}', color: '#f472b6' },
-    { label: 'Chat Sessions', value: stats?.chat_sessions ?? 0, icon: '\u{1F4AC}', color: '#34d399' },
+    { label: 'Family Members', value: familyCount ?? 0, icon: '\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}', color: '#f472b6' },
+    { label: 'Chat Sessions', value: chatCount ?? 0, icon: '\u{1F4AC}', color: '#34d399' },
   ];
 
   const quickActions = [
