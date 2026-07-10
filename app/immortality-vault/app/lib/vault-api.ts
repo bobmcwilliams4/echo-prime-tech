@@ -399,11 +399,39 @@ export async function selectQuestion(userId: string, category: string): Promise<
   return data as InterviewQuestion;
 }
 
-export async function answerQuestion(userId: string, questionId: string, answer: string, category: string): Promise<void> {
+export async function answerQuestion(userId: string, questionId: string, answer: string, category?: string, videoId?: string): Promise<void> {
   await vaultFetch('/interview/questions/answer', {
     method: 'POST',
-    body: JSON.stringify({ user_id: userId, question_id: questionId, answer, category }),
+    body: JSON.stringify({ user_id: userId, question_id: questionId, answer, category, ...(videoId && { video_id: videoId }) }),
   });
+}
+
+/* ─── Family listening invites ───────────────────────────────────────── */
+
+export interface FamilyInvite {
+  token: string;
+  member: string;
+  link: string;
+}
+
+export async function createFamilyInvite(memberId: string): Promise<FamilyInvite> {
+  return vaultFetch(`/family/${memberId}/invite`, { method: 'POST' });
+}
+
+export interface ListenStory {
+  question: string;
+  answer: string;
+  category: string;
+  emotion?: string;
+  created_at: string;
+}
+
+export async function getListenStories(token: string): Promise<{ person: string; listener?: string; count: number; stories: ListenStory[] }> {
+  return vaultFetch(`/listen/${token}`);
+}
+
+export async function getTier(userId: string): Promise<{ tier: string; limits: Record<string, number | boolean>; usage: Record<string, number> }> {
+  return vaultFetch(`/tier/${userId}`);
 }
 
 export async function getCoverage(userId: string): Promise<{ categories: CoverageCategory[] }> {

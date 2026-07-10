@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ACCENT, BG_CARD, BORDER, CATEGORIES, GOLD } from '../lib/constants';
 import {
   selectNextQuestion, answerQuestion, extractTraits, synthesizeSpeech, transcribeAudio, getCoverage,
-  type InterviewQuestion, type CoverageCategory,
+  uploadVideo, type InterviewQuestion, type CoverageCategory,
 } from '../lib/vault-api';
 import { playAudioBlob, createMediaRecorder, stopCamera, type RecorderHandle } from '../lib/media';
 import CameraPiP from './CameraPiP';
@@ -16,6 +16,11 @@ const iconLabel = { display: 'inline-flex', alignItems: 'center', gap: 7 } as co
 /** Interview mode: null = welcome screen; 'auto' = Echo picks the subjects
  *  (the default — one Start button); a category id = the user jumped to it. */
 type Mode = null | 'auto' | string;
+
+/** Hands-free tuning: how long a pause ends the answer, and hard caps. */
+const SILENCE_MS = 3000;        // pause this long after speaking → answer is done
+const NEVER_SPOKE_MS = 60000;   // no speech at all for a minute → stop listening
+const MAX_CAPTURE_MS = 4 * 60_000; // longest single answer capture
 
 interface Props {
   userId: string;
@@ -43,16 +48,20 @@ export default function InterviewPanel({ userId }: Props) {
   const [submitted, setSubmitted] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [voiceOn, setVoiceOn] = useState(true);
+  const [handsFree, setHandsFree] = useState(true);
+  const [videoOn, setVideoOn] = useState(true);
   const spokenFor = useRef<string | null>(null);
+  const modeRef = useRef<Mode>(null);
+  const handsFreeRef = useRef(true);
+  const answerRef = useRef('');
 
   // ── STT: Echo hears the user ──────────────────────────────────────────────
-  // Two paths: (1) the browser Web Speech API (free, on-device) where it works
-  // reliably — desktop Chrome, Android; (2) a MediaRecorder → Whisper fallback
-  // for iOS Safari, where webkitSpeechRecognition exists but is unreliable/silent.
-  // We pick 'record' on iOS or when Web Speech is absent so a phone can always
-  // answer by voice. (Commander 2026-07-10: STT was dead on his iPhone.)
-  const [listening, setListening] = useState(false);      // speech-mode active
-  const [recording, setRecording] = useState(false);      // record-mode capturing
+  // (1) Web Speech API live transcription where reliable (desktop Chrome,
+  // Android); (2) MediaRecorder → Whisper everywhere else (iOS Safari). With
+  // video answers ON, ONE combined camera+mic stream feeds both the video
+  // memory and (in record mode) the transcription.
+  const [listening, setListening] = useState(false);
+  const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [sttSupported, setSttSupported] = useState(true);
   const [sttMode, setSttMode] = useState<'speech' | 'record'>('speech');
@@ -65,11 +74,43 @@ export default function InterviewPanel({ userId }: Props) {
   const audioCtxRef = useRef<any>(null);
   const lastUrlRef = useRef<string | null>(null);
 
+  // Hands-free machinery
+  const silenceTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const captureStartRef = useRef(0);
+  const lastSoundRef = useRef(0);
+  const spokeRef = useRef(false);
+  const capturingRef = useRef(false);
+  const analyserCleanupRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => { modeRef.current = mode; }, [mode]);
+  useEffect(() => { handsFreeRef.current = handsFree; }, [handsFree]);
+  useEffect(() => { answerRef.current = answer; }, [answer]);
+
   const loadCoverage = useCallback(() => {
     getCoverage(userId).then(d => setCoverage(d.categories || [])).catch(() => { /* non-fatal */ });
   }, [userId]);
 
   useEffect(() => { loadCoverage(); }, [loadCoverage]);
+
+  // ── Draft autosave: a half-told story must survive a reload ──────────────
+  useEffect(() => {
+    if (!question) return;
+    try {
+      const draft = localStorage.getItem(`vault_draft_${question.question_id}`);
+      if (draft && !answer) setAnswer(draft);
+    } catch { /* private mode */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question?.question_id]);
+
+  useEffect(() => {
+    if (!question) return;
+    const t = setTimeout(() => {
+      try {
+        if (answer.trim()) localStorage.setItem(`vault_draft_${question.question_id}`, answer);
+      } catch { /* full/private */ }
+    }, 400);
+    return () => clearTimeout(t);
+  }, [answer, question]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -85,6 +126,8 @@ export default function InterviewPanel({ userId }: Props) {
       rec.interimResults = true;
       rec.lang = 'en-US';
       rec.onresult = (e: any) => {
+        spokeRef.current = true;
+        lastSoundRef.current = Date.now();
         let finalText = '';
         for (let i = e.resultIndex; i < e.results.length; i++) {
           if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
@@ -94,7 +137,6 @@ export default function InterviewPanel({ userId }: Props) {
       rec.onend = () => setListening(false);
       rec.onerror = (ev: any) => {
         setListening(false);
-        // Browser blocked Web Speech → fall back to record→Whisper so voice still works.
         if (ev && ['not-allowed', 'service-not-allowed', 'language-not-supported'].includes(ev.error) && canRecord) {
           setSttMode('record');
         }
@@ -103,76 +145,20 @@ export default function InterviewPanel({ userId }: Props) {
       setSttMode('speech');
       setSttSupported(true);
     } else if (canRecord) {
-      setSttMode('record');   // iOS Safari + any browser without Web Speech
+      setSttMode('record');
       setSttSupported(true);
     } else {
       setSttSupported(false);
     }
+    if (!canRecord) setVideoOn(false);
     return () => { try { recognitionRef.current?.stop(); } catch { /* noop */ } };
   }, []);
 
-  // Record-mode: capture a clip, then transcribe server-side (Whisper).
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-      const handle = createMediaRecorder(stream, true);
-      recorderRef.current = handle;
-      handle.recorder.start();
-      setRecording(true);
-    } catch {
-      setRecording(false);   // mic permission denied — user can type instead
-    }
-  };
-
-  const stopRecordingAndTranscribe = async () => {
-    const handle = recorderRef.current;
-    if (!handle) return;
-    setRecording(false);
-    setTranscribing(true);
-    try {
-      const blob = await handle.stop();
-      stopCamera(streamRef.current); streamRef.current = null;
-      const ext = handle.mimeType.includes('mp4') ? 'm4a' : 'webm';
-      const text = await transcribeAudio(blob, `answer.${ext}`);
-      if (text) setAnswer(prev => (prev ? prev.trimEnd() + ' ' : '') + text);
-    } catch { /* transient — user can retry or type */ }
-    setTranscribing(false);
-  };
-
-  const toggleMic = () => {
-    if (transcribing) return;
-    if (sttMode === 'record') {
-      if (recording) stopRecordingAndTranscribe(); else startRecording();
-      return;
-    }
-    const rec = recognitionRef.current;
-    if (!rec) return;
-    if (listening) { try { rec.stop(); } catch { /* noop */ } setListening(false); }
-    else { try { rec.start(); setListening(true); } catch { /* already started */ } }
-  };
-
-  const stopMic = () => {
-    if (sttMode === 'record') {
-      if (recording) stopRecordingAndTranscribe();
-      return;
-    }
-    const rec = recognitionRef.current;
-    if (rec && listening) { try { rec.stop(); } catch { /* noop */ } }
-    setListening(false);
-  };
-
-  const micActive = listening || recording;
-
-  // One persistent, gesture-unlocked <audio> element. Unlocking it inside a click
-  // (even with a silent source) lets us set .src later and play — the reliable
-  // pattern across browsers, incl. iOS Safari where an async fetch before play()
-  // otherwise breaks the gesture requirement.
+  // ── Audio out: the interviewer's voice ────────────────────────────────────
   const getAudioEl = () => {
     if (!audioRef.current && typeof Audio !== 'undefined') {
       audioRef.current = new Audio();
       audioRef.current.preload = 'auto';
-      // iOS Safari: keep inline so a programmatic play() isn't blocked/hijacked.
       audioRef.current.setAttribute('playsinline', '');
       (audioRef.current as any).playsInline = true;
     }
@@ -184,92 +170,245 @@ export default function InterviewPanel({ userId }: Props) {
       try {
         const AC = (window as any).AudioContext || (window as any).webkitAudioContext;
         if (AC) audioCtxRef.current = new AC();
-      } catch { /* no WebAudio — HTMLAudio path still available */ }
+      } catch { /* no WebAudio */ }
     }
     return audioCtxRef.current;
   };
 
-  // Call inside a user gesture to unlock audio playback on mobile.
   const primeAudio = () => {
-    // Resume a WebAudio context too — iOS ties autoplay permission to it, and a
-    // resumed context can keep PLAYING through it after async fetches (the gap
-    // that otherwise re-locks <audio>.play() on iOS Safari).
     try { getAudioCtx()?.resume?.(); } catch { /* noop */ }
     if (audioPrimed.current) return;
     const a = getAudioEl();
     if (!a) return;
     a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
     a.volume = 0;
-    a.play().then(() => { audioPrimed.current = true; a.volume = 1; }).catch(() => { /* still locked → 'Tap to hear Echo' fallback shows */ });
+    a.play().then(() => { audioPrimed.current = true; a.volume = 1; }).catch(() => { /* locked */ });
   };
 
-  // Decode + play through the (gesture-resumed) AudioContext. On iOS Safari this
-  // is more reliable than <audio>.play() after an async fetch: a running context
-  // is allowed to keep producing sound without a fresh gesture.
+  // Plays a blob through the resumed AudioContext; resolves when PLAYBACK ENDS
+  // (hands-free needs the end, not the start — the mic opens after Echo finishes).
   const playViaWebAudio = async (blob: Blob) => {
     const ctx = getAudioCtx();
     if (!ctx) throw new Error('webaudio-unavailable');
     try { await ctx.resume?.(); } catch { /* noop */ }
     if (ctx.state !== 'running') throw new Error('webaudio-suspended');
     const raw = await blob.arrayBuffer();
-    // Safari's callback-style decodeAudioData — promisify defensively.
     const audioBuf: AudioBuffer = await new Promise((resolve, reject) => {
       const p = ctx.decodeAudioData(raw, resolve, reject);
       if (p && typeof p.then === 'function') p.then(resolve, reject);
     });
-    const src = ctx.createBufferSource();
-    src.buffer = audioBuf;
-    src.connect(ctx.destination);
-    src.start(0);
+    await new Promise<void>((resolve) => {
+      const src = ctx.createBufferSource();
+      src.buffer = audioBuf;
+      src.connect(ctx.destination);
+      src.onended = () => resolve();
+      src.start(0);
+    });
   };
 
-  const speakQuestion = useCallback(async (q: InterviewQuestion) => {
+  const playViaElement = async (blob: Blob) => {
+    const a = getAudioEl();
+    if (!a) { await playAudioBlob(blob); return; }
+    a.volume = 1;
+    if (lastUrlRef.current) { try { URL.revokeObjectURL(lastUrlRef.current); } catch { /* noop */ } }
+    const url = URL.createObjectURL(blob);
+    lastUrlRef.current = url;
+    a.src = url;
+    await a.play();
+    await new Promise<void>((resolve) => {
+      const done = () => { a.removeEventListener('ended', done); a.removeEventListener('error', done); resolve(); };
+      a.addEventListener('ended', done);
+      a.addEventListener('error', done);
+    });
+  };
+
+  const speakQuestion = useCallback(async (q: InterviewQuestion): Promise<boolean> => {
     setSpeaking(true);
+    let ok = false;
     try {
-      // Synthesize (retry once — the TTS service can hiccup on a cold start).
       let blob: Blob;
       try {
         blob = await synthesizeSpeech(q.question, 'warmth');
       } catch {
-        blob = await synthesizeSpeech(q.question, 'warmth');
+        blob = await synthesizeSpeech(q.question, 'warmth'); // one retry
       }
-      // Playback ladder: WebAudio (most reliable post-fetch on iOS) → the
-      // persistent unlocked <audio> element → one-tap fallback. Never silent
-      // without showing the gold "Tap to hear Echo" button.
       try {
         await playViaWebAudio(blob);
-        setNeedsTap(false);
       } catch {
-        const a = getAudioEl();
-        if (!a) { await playAudioBlob(blob); setNeedsTap(false); setSpeaking(false); return; }
-        a.volume = 1;
-        if (lastUrlRef.current) { try { URL.revokeObjectURL(lastUrlRef.current); } catch { /* noop */ } }
-        const url = URL.createObjectURL(blob);
-        lastUrlRef.current = url;
-        a.src = url;
-        await a.play();
-        setNeedsTap(false);
+        await playViaElement(blob);
       }
+      setNeedsTap(false);
+      ok = true;
     } catch {
-      // Autoplay blocked or synthesis failed twice → surface the one-tap
-      // "Hear Echo" button instead of failing silently.
-      setNeedsTap(true);
+      setNeedsTap(true); // never silently missing — the gold tap button shows
     }
     setSpeaking(false);
+    return ok;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Read each new question aloud (free sovereign TTS) — Commander directive
-  // 2026-07-03: the interviewer speaks, the user just answers.
-  useEffect(() => {
-    if (voiceOn && question && spokenFor.current !== question.question_id) {
-      spokenFor.current = question.question_id;
-      speakQuestion(question);
+  // ── Capture: Echo listens (and optionally films) ─────────────────────────
+  const stopSilenceWatch = () => {
+    if (silenceTimerRef.current) { clearInterval(silenceTimerRef.current); silenceTimerRef.current = null; }
+    analyserCleanupRef.current?.();
+    analyserCleanupRef.current = null;
+  };
+
+  const watchSilenceOnStream = (stream: MediaStream, onDone: () => void) => {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    let srcNode: any, analyser: any;
+    try {
+      srcNode = ctx.createMediaStreamSource(stream);
+      analyser = ctx.createAnalyser();
+      analyser.fftSize = 2048;
+      srcNode.connect(analyser);
+    } catch { return; }
+    const data = new Uint8Array(analyser.fftSize);
+    analyserCleanupRef.current = () => { try { srcNode.disconnect(); } catch { /* noop */ } };
+    silenceTimerRef.current = setInterval(() => {
+      analyser.getByteTimeDomainData(data);
+      let sum = 0;
+      for (let i = 0; i < data.length; i++) { const v = (data[i] - 128) / 128; sum += v * v; }
+      const rms = Math.sqrt(sum / data.length);
+      const now = Date.now();
+      if (rms > 0.035) { spokeRef.current = true; lastSoundRef.current = now; }
+      const quietFor = now - lastSoundRef.current;
+      if ((spokeRef.current && quietFor > SILENCE_MS)
+        || (!spokeRef.current && now - captureStartRef.current > NEVER_SPOKE_MS)
+        || (now - captureStartRef.current > MAX_CAPTURE_MS)) {
+        onDone();
+      }
+    }, 200);
+  };
+
+  // Timestamp-based silence for speech mode without a stream (video off).
+  const watchSilenceOnResults = (onDone: () => void) => {
+    silenceTimerRef.current = setInterval(() => {
+      const now = Date.now();
+      const quietFor = now - lastSoundRef.current;
+      if ((spokeRef.current && quietFor > SILENCE_MS)
+        || (!spokeRef.current && now - captureStartRef.current > NEVER_SPOKE_MS)
+        || (now - captureStartRef.current > MAX_CAPTURE_MS)) {
+        onDone();
+      }
+    }, 250);
+  };
+
+  /** Start listening/recording for the current question. In hands-free the
+   *  silence watcher auto-finishes; in manual mode the user taps to stop. */
+  const beginCapture = async (auto: boolean) => {
+    if (capturingRef.current || transcribing) return;
+    capturingRef.current = true;
+    spokeRef.current = false;
+    captureStartRef.current = Date.now();
+    lastSoundRef.current = Date.now();
+
+    const wantVideo = videoOn;
+    let stream: MediaStream | null = null;
+    if (wantVideo || sttMode === 'record') {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(
+          wantVideo
+            ? { video: { facingMode: 'user', width: { ideal: 960 }, height: { ideal: 540 } }, audio: true }
+            : { audio: true });
+      } catch {
+        if (wantVideo) {
+          // Camera refused — retry audio-only so the interview still flows.
+          try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch { /* mic refused too */ }
+        }
+      }
+      if (!stream && sttMode === 'record') { capturingRef.current = false; return; }
     }
+
+    if (stream) {
+      streamRef.current = stream;
+      const handle = createMediaRecorder(stream, !stream.getVideoTracks().length);
+      recorderRef.current = handle;
+      handle.recorder.start();
+      setRecording(true);
+      if (auto) watchSilenceOnStream(stream, () => { void finishCapture(true); });
+    }
+    if (sttMode === 'speech') {
+      const rec = recognitionRef.current;
+      try { rec?.start(); setListening(true); } catch { /* already started */ }
+      if (auto && !stream) watchSilenceOnResults(() => { void finishCapture(true); });
+    }
+  };
+
+  /** Stop capture; returns { text, videoBlob }. */
+  const finishCapture = async (auto: boolean): Promise<void> => {
+    if (!capturingRef.current) return;
+    capturingRef.current = false;
+    stopSilenceWatch();
+
+    let videoBlob: Blob | null = null;
+    let recordedBlob: Blob | null = null;
+    const handle = recorderRef.current;
+    recorderRef.current = null;
+
+    if (sttMode === 'speech') {
+      const rec = recognitionRef.current;
+      try { rec?.stop(); } catch { /* noop */ }
+      setListening(false);
+    }
+    if (handle) {
+      setRecording(false);
+      try {
+        recordedBlob = await handle.stop();
+        if (handle.mimeType.startsWith('video')) videoBlob = recordedBlob;
+      } catch { /* recorder died — text may still exist */ }
+    }
+    stopCamera(streamRef.current);
+    streamRef.current = null;
+
+    let text = answerRef.current.trim();
+    if (sttMode === 'record' && recordedBlob) {
+      setTranscribing(true);
+      try {
+        const ext = handle && handle.mimeType.includes('mp4') ? 'm4a' : 'webm';
+        const t = await transcribeAudio(recordedBlob, `answer.${ext}`);
+        if (t) text = (text ? text + ' ' : '') + t;
+        if (t) setAnswer(prev => (prev ? prev.trimEnd() + ' ' : '') + t);
+      } catch { /* they can type */ }
+      setTranscribing(false);
+    }
+
+    if (auto && handsFreeRef.current && modeRef.current && text) {
+      await submitWith(text, videoBlob);
+    } else if (videoBlob) {
+      pendingVideoRef.current = videoBlob; // manual flow — attach on Preserve
+    }
+  };
+
+  const pendingVideoRef = useRef<Blob | null>(null);
+
+  const toggleMic = () => {
+    if (transcribing) return;
+    if (capturingRef.current) { void finishCapture(false); }
+    else { void beginCapture(false); }
+  };
+
+  const micActive = listening || recording;
+
+  // ── The conversation loop ─────────────────────────────────────────────────
+  // Speak each new question aloud; in hands-free, open the mic when the voice
+  // finishes so answering takes zero taps.
+  useEffect(() => {
+    if (!question || spokenFor.current === question.question_id) return;
+    spokenFor.current = question.question_id;
+    (async () => {
+      if (voiceOn) await speakQuestion(question);
+      if (handsFreeRef.current && modeRef.current && sttSupported) {
+        void beginCapture(true);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question, voiceOn, speakQuestion]);
 
-  // Cleanup on unmount: stop audio, free the last blob URL, stop the mic.
+  // Cleanup on unmount.
   useEffect(() => () => {
+    stopSilenceWatch();
     try { audioRef.current?.pause(); } catch { /* noop */ }
     if (lastUrlRef.current) { try { URL.revokeObjectURL(lastUrlRef.current); } catch { /* noop */ } }
     try { recognitionRef.current?.stop(); } catch { /* noop */ }
@@ -277,8 +416,6 @@ export default function InterviewPanel({ userId }: Props) {
     try { audioCtxRef.current?.close?.(); } catch { /* noop */ }
   }, []);
 
-  /** Fetch the next question. mode 'auto' → Echo picks the subject and covers
-   *  it deeply (100+ answers) before moving on; a category id → user's jump. */
   const fetchNext = async (m: Exclude<Mode, null>) => {
     setLoading(true);
     try {
@@ -292,31 +429,54 @@ export default function InterviewPanel({ userId }: Props) {
   };
 
   const startInterview = async (m: Exclude<Mode, null>) => {
-    primeAudio(); // unlock TTS playback on this gesture
+    primeAudio();
     setMode(m);
+    modeRef.current = m;
     await fetchNext(m);
   };
 
-  const submitAnswer = async () => {
-    if (!answer.trim() || !question || !mode) return;
-    stopMic();
+  const pauseInterview = () => {
+    void finishCapture(false);
+    stopSilenceWatch();
+    setMode(null); setQuestion(null); setFocus(null);
+    loadCoverage();
+  };
+
+  /** Preserve one answer (text + optional video), then advance the interview. */
+  const submitWith = async (text: string, videoBlob?: Blob | null) => {
+    if (!text.trim() || !question) return;
+    const q = question;
     setLoading(true);
     try {
-      await answerQuestion(userId, question.question_id, answer.trim(), question.category || focus?.category);
-      // Fire-and-forget: extract personality traits from the answer via AI
-      extractTraits(userId, answer.trim(), 'interview').catch(() => {});
+      let videoId: string | undefined;
+      const vb = videoBlob ?? pendingVideoRef.current;
+      pendingVideoRef.current = null;
+      if (vb && vb.size > 20_000) {
+        try {
+          const meta = await uploadVideo(userId, vb, q.question_id);
+          videoId = (meta as any)?.id;
+        } catch { /* video is a bonus — never lose the words over it */ }
+      }
+      await answerQuestion(userId, q.question_id, text.trim(), q.category || focus?.category, videoId);
+      extractTraits(userId, text.trim(), 'interview').catch(() => {});
+      try { localStorage.removeItem(`vault_draft_${q.question_id}`); } catch { /* noop */ }
       setSubmitted(true);
       setAnswer('');
       setFocus(f => (f ? { ...f, answered: f.answered + 1 } : f));
       loadCoverage();
       setTimeout(() => {
         setSubmitted(false);
-        fetchNext(mode);
+        if (modeRef.current) fetchNext(modeRef.current);
       }, 1500);
     } catch (err) {
       console.error('Failed to submit:', err);
     }
     setLoading(false);
+  };
+
+  const submitAnswer = async () => {
+    await finishCapture(false);
+    await submitWith(answerRef.current);
   };
 
   if (mode && question) {
@@ -326,18 +486,36 @@ export default function InterviewPanel({ userId }: Props) {
     return (
       <div className="space-y-6">
         <CameraPiP />
-        <div className="flex items-center justify-between">
-          <button onClick={() => { setMode(null); setQuestion(null); setFocus(null); loadCoverage(); }} className="text-sm" style={{ color: ACCENT }}>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <button onClick={pauseInterview} className="text-sm" style={{ color: ACCENT }}>
             &larr; Pause Interview
           </button>
-          <button
-            onClick={() => setVoiceOn(v => !v)}
-            className="px-3 py-1.5 rounded-full text-xs font-semibold"
-            style={{ border: `1px solid ${BORDER}`, color: voiceOn ? GOLD : '#71717a' }}
-            title="Read questions aloud"
-          >
-            <span style={iconLabel}><VaultIcon name="speaker" size={14} />{voiceOn ? 'Voice On' : 'Voice Off'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setHandsFree(h => !h)}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold"
+              style={{ border: `1px solid ${BORDER}`, color: handsFree ? GOLD : '#71717a' }}
+              title="Echo listens automatically after each question — no taps needed"
+            >
+              <span style={iconLabel}><VaultIcon name="mic" size={13} />{handsFree ? 'Hands-free On' : 'Hands-free Off'}</span>
+            </button>
+            <button
+              onClick={() => setVideoOn(v => !v)}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold"
+              style={{ border: `1px solid ${BORDER}`, color: videoOn ? GOLD : '#71717a' }}
+              title="Also record video of your answers"
+            >
+              <span style={iconLabel}><VaultIcon name="camera" size={13} />{videoOn ? 'Video On' : 'Video Off'}</span>
+            </button>
+            <button
+              onClick={() => setVoiceOn(v => !v)}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold"
+              style={{ border: `1px solid ${BORDER}`, color: voiceOn ? GOLD : '#71717a' }}
+              title="Read questions aloud"
+            >
+              <span style={iconLabel}><VaultIcon name="speaker" size={13} />{voiceOn ? 'Voice On' : 'Voice Off'}</span>
+            </button>
+          </div>
         </div>
 
         {/* The subject Echo is exploring now, with deep-coverage progress. */}
@@ -375,7 +553,7 @@ export default function InterviewPanel({ userId }: Props) {
             &ldquo;{question.question}&rdquo;
           </p>
           <button
-            onClick={() => { primeAudio(); if (question) speakQuestion(question); }}
+            onClick={() => { primeAudio(); if (question) void speakQuestion(question); }}
             disabled={speaking}
             className="text-sm mb-4 px-4 py-2 rounded-full font-semibold disabled:opacity-40 transition hover:scale-[1.02]"
             style={needsTap
@@ -399,7 +577,9 @@ export default function InterviewPanel({ userId }: Props) {
               <textarea
                 value={answer}
                 onChange={e => setAnswer(e.target.value)}
-                placeholder="Speak or type your story... Take your time, every detail matters."
+                placeholder={handsFree
+                  ? 'Just talk — Echo is listening and writes your story here. Pause when you’re done and he’ll preserve it.'
+                  : 'Speak or type your story... Take your time, every detail matters.'}
                 className="w-full p-4 rounded-lg text-sm text-white placeholder-gray-600 resize-none outline-none focus:ring-1 focus:ring-purple-500"
                 style={{ background: '#0a0a0f', border: `1px solid ${micActive ? '#ef4444' : BORDER}`, minHeight: 180 }}
                 rows={8}
@@ -415,7 +595,7 @@ export default function InterviewPanel({ userId }: Props) {
                   >
                     <span style={iconLabel}>
                       <VaultIcon name="mic" size={16} />
-                      {transcribing ? 'Transcribing…' : recording ? 'Recording… tap to stop' : listening ? 'Listening… tap to stop' : 'Speak your answer'}
+                      {transcribing ? 'Transcribing…' : micActive ? 'Listening… tap to stop' : 'Speak your answer'}
                     </span>
                   </button>
                 )}
@@ -428,8 +608,8 @@ export default function InterviewPanel({ userId }: Props) {
                   {loading ? 'Saving...' : 'Preserve Memory \u{2192}'}
                 </button>
               </div>
-              {listening && <p className="text-xs mt-2" style={{ color: '#ef4444' }}>Echo is listening &mdash; speak naturally; your words appear above.</p>}
-              {recording && <p className="text-xs mt-2" style={{ color: '#ef4444' }}>Recording your answer &mdash; tap the mic again when you&rsquo;re done and Echo will write it down.</p>}
+              {micActive && handsFree && <p className="text-xs mt-2" style={{ color: GOLD }}>Echo is listening &mdash; when you finish speaking and pause, he preserves it and asks the next question.</p>}
+              {micActive && !handsFree && <p className="text-xs mt-2" style={{ color: '#ef4444' }}>Echo is listening &mdash; tap the mic when you&rsquo;re done.</p>}
               {transcribing && <p className="text-xs mt-2 text-gray-400">Writing down what you said&hellip;</p>}
               {!sttSupported && <p className="text-xs mt-2 text-gray-500">Voice answering isn&rsquo;t supported in this browser &mdash; you can type your answer.</p>}
             </>
@@ -446,7 +626,8 @@ export default function InterviewPanel({ userId }: Props) {
       <h2 className="text-2xl font-bold text-white">Biography Interview</h2>
       <p className="text-sm text-gray-400">
         Echo interviews you like a lifelong biographer &mdash; he asks every question out loud, chooses each
-        subject himself, and explores it deeply before moving on. Just press start and talk.
+        subject himself, and explores it deeply before moving on. Just press start and talk: he listens,
+        writes it down, preserves it, and asks the next question. No buttons needed.
       </p>
 
       <button

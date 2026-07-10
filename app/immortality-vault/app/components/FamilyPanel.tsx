@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ACCENT, BG_CARD, BORDER } from '../lib/constants';
-import { getFamilyMembers, addFamilyMember, updateFamilyMember, deleteFamilyMember, type FamilyMember } from '../lib/vault-api';
+import { getFamilyMembers, addFamilyMember, updateFamilyMember, deleteFamilyMember, createFamilyInvite, type FamilyMember } from '../lib/vault-api';
 
 interface Props {
   userId: string;
@@ -10,6 +10,18 @@ interface Props {
 
 export default function FamilyPanel({ userId }: Props) {
   const [members, setMembers] = useState<FamilyMember[]>([]);
+  const [invitedId, setInvitedId] = useState<string | null>(null);
+
+  // Listening invite: a private link this family member can open — no account
+  // needed — to read/hear the preserved stories.
+  const inviteMember = async (memberId: string) => {
+    try {
+      const inv = await createFamilyInvite(memberId);
+      await navigator.clipboard.writeText(inv.link);
+      setInvitedId(memberId);
+      setTimeout(() => setInvitedId(null), 2500);
+    } catch { /* clipboard denied — nothing broke */ }
+  };
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -286,6 +298,14 @@ export default function FamilyPanel({ userId }: Props) {
                   {m.death_date && <span>Passed: {m.death_date}</span>}
                 </div>
               )}
+              <button
+                onClick={e => { e.stopPropagation(); inviteMember(m.id); }}
+                className="mt-3 w-full py-1.5 rounded-full text-[11px] font-semibold transition hover:scale-[1.02]"
+                style={{ border: `1px solid ${BORDER}`, color: invitedId === m.id ? '#4ade80' : '#d4b483' }}
+                title="Copy a private link so they can listen to the preserved stories"
+              >
+                {invitedId === m.id ? 'Invite link copied' : 'Invite to listen'}
+              </button>
             </div>
           ))}
         </div>

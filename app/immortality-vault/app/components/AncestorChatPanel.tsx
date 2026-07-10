@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ACCENT, BG_CARD, BORDER, EMOTION_ICONS } from '../lib/constants';
-import { sendChat, synthesizeSpeech, getFamilyMembers, type ChatMessage, type FamilyMember } from '../lib/vault-api';
+import { sendChat, synthesizeSpeech, getFamilyMembers, getVoiceProfiles, type ChatMessage, type FamilyMember } from '../lib/vault-api';
 import { playAudioBlob } from '../lib/media';
 
 interface Props {
@@ -68,11 +68,24 @@ export default function AncestorChatPanel({ userId }: Props) {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages]);
 
+  // The ancestor speaks in the preserved person's OWN cloned voice when one
+  // exists (vault.voice_profiles → registered with the TTS engine); Echo's
+  // voice is only the fallback before a clone has been recorded.
+  const cloneVoiceRef = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    getVoiceProfiles(userId)
+      .then(d => {
+        const ready = (d.profiles || []).find(p => p.clone_status === 'ready' && p.voice_id);
+        cloneVoiceRef.current = ready?.voice_id;
+      })
+      .catch(() => { /* no clone yet — Echo's voice carries the words */ });
+  }, [userId]);
+
   const speakMessage = async (text: string, emotion: string | undefined, idx: number) => {
     if (playingIdx !== null) return;
     setPlayingIdx(idx);
     try {
-      const blob = await synthesizeSpeech(text, emotion);
+      const blob = await synthesizeSpeech(text, emotion, cloneVoiceRef.current);
       await playAudioBlob(blob);
     } catch { /* silent */ }
     setPlayingIdx(null);
