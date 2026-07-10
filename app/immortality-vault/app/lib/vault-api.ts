@@ -41,6 +41,18 @@ export interface InterviewQuestionSelect {
   questions: InterviewQuestion[];
   session_type: string;
   total_available: number;
+  focus_category?: string;
+  category_answered?: number;
+  category_target?: number;
+  auto?: boolean;
+}
+
+/** What the interviewer-driven flow needs to render progress alongside the question. */
+export interface NextQuestion {
+  question: InterviewQuestion;
+  focusCategory: string;
+  answered: number;
+  target: number;
 }
 
 export interface FamilyMember {
@@ -111,6 +123,11 @@ export interface CoverageCategory {
   answered: number;
   total: number;
   percentage: number;
+  /** Every answered question in the subject (bank + generated) — what the
+   *  interviewer's deep-coverage target counts. */
+  answered_total?: number;
+  target?: number;
+  coverage_pct?: number;
 }
 
 export interface GapQuestion {
@@ -353,6 +370,23 @@ export async function createMemory(userId: string, content: string, category: st
 }
 
 /* ─── Interview ──────────────────────────────────────────────────────── */
+
+/** Interviewer-driven selection: omit `category` (or pass 'auto') and Echo picks
+ *  the subject himself, covering each one deeply before moving on. Returns the
+ *  question plus the focus subject's coverage so the UI can show progress. */
+export async function selectNextQuestion(userId: string, category?: string | null): Promise<NextQuestion> {
+  const data = await vaultFetch<InterviewQuestionSelect>('/interview/questions/select', {
+    method: 'POST',
+    body: JSON.stringify({ user_id: userId, ...(category && category !== 'auto' ? { category } : {}) }),
+  });
+  const question = data.questions[0];
+  return {
+    question,
+    focusCategory: data.focus_category || question.category,
+    answered: data.category_answered ?? 0,
+    target: data.category_target ?? 100,
+  };
+}
 
 export async function selectQuestion(userId: string, category: string): Promise<InterviewQuestion> {
   const data = await vaultFetch<InterviewQuestionSelect | InterviewQuestion>('/interview/questions/select', {

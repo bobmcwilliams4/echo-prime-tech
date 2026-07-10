@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ACCENT, BG_CARD, BORDER, CATEGORIES, GOLD } from '../lib/constants';
-import { selectQuestion, answerQuestion, extractTraits, synthesizeSpeech, transcribeAudio, type InterviewQuestion } from '../lib/vault-api';
+import {
+  selectNextQuestion, answerQuestion, extractTraits, synthesizeSpeech, transcribeAudio, getCoverage,
+  type InterviewQuestion, type CoverageCategory,
+} from '../lib/vault-api';
 import { playAudioBlob, createMediaRecorder, stopCamera, type RecorderHandle } from '../lib/media';
 import CameraPiP from './CameraPiP';
 import AskEcho from './AskEcho';
@@ -10,13 +13,31 @@ import VaultIcon, { CATEGORY_ICON } from './VaultIcon';
 
 const iconLabel = { display: 'inline-flex', alignItems: 'center', gap: 7 } as const;
 
+/** Interview mode: null = welcome screen; 'auto' = Echo picks the subjects
+ *  (the default — one Start button); a category id = the user jumped to it. */
+type Mode = null | 'auto' | string;
+
 interface Props {
   userId: string;
 }
 
+/* Thin gold coverage bar used on subject tiles and above the question. */
+function CoverageBar({ pct, height = 4 }: { pct: number; height?: number }) {
+  return (
+    <div className="w-full rounded-full overflow-hidden" style={{ background: '#1c1c22', height }}>
+      <div
+        className="h-full rounded-full transition-all duration-700"
+        style={{ width: `${Math.min(100, Math.max(0, pct))}%`, background: `linear-gradient(90deg, ${GOLD}99, ${GOLD})` }}
+      />
+    </div>
+  );
+}
+
 export default function InterviewPanel({ userId }: Props) {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [mode, setMode] = useState<Mode>(null);
   const [question, setQuestion] = useState<InterviewQuestion | null>(null);
+  const [focus, setFocus] = useState<{ category: string; answered: number; target: number } | null>(null);
+  const [coverage, setCoverage] = useState<CoverageCategory[]>([]);
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -43,6 +64,12 @@ export default function InterviewPanel({ userId }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<any>(null);
   const lastUrlRef = useRef<string | null>(null);
+
+  const loadCoverage = useCallback(() => {
+    getCoverage(userId).then(d => setCoverage(d.categories || [])).catch(() => { /* non-fatal */ });
+  }, [userId]);
+
+  useEffect(() => { loadCoverage(); }, [loadCoverage]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -152,16 +179,22 @@ export default function InterviewPanel({ userId }: Props) {
     return audioRef.current;
   };
 
+  const getAudioCtx = () => {
+    if (!audioCtxRef.current) {
+      try {
+        const AC = (window as any).AudioContext || (window as any).webkitAudioContext;
+        if (AC) audioCtxRef.current = new AC();
+      } catch { /* no WebAudio — HTMLAudio path still available */ }
+    }
+    return audioCtxRef.current;
+  };
+
   // Call inside a user gesture to unlock audio playback on mobile.
   const primeAudio = () => {
-    // Resume a WebAudio context too — iOS ties autoplay permission to it, which
-    // keeps the <audio> element's later play() calls allowed after the async
-    // synthesize fetch (the gap that otherwise re-locks playback on iOS Safari).
-    try {
-      const AC = (window as any).AudioContext || (window as any).webkitAudioContext;
-      if (AC && !audioCtxRef.current) audioCtxRef.current = new AC();
-      audioCtxRef.current?.resume?.();
-    } catch { /* noop */ }
+    // Resume a WebAudio context too — iOS ties autoplay permission to it, and a
+    // resumed context can keep PLAYING through it after async fetches (the gap
+    // that otherwise re-locks <audio>.play() on iOS Safari).
+    try { getAudioCtx()?.resume?.(); } catch { /* noop */ }
     if (audioPrimed.current) return;
     const a = getAudioEl();
     if (!a) return;
@@ -170,24 +203,60 @@ export default function InterviewPanel({ userId }: Props) {
     a.play().then(() => { audioPrimed.current = true; a.volume = 1; }).catch(() => { /* still locked → 'Tap to hear Echo' fallback shows */ });
   };
 
+  // Decode + play through the (gesture-resumed) AudioContext. On iOS Safari this
+  // is more reliable than <audio>.play() after an async fetch: a running context
+  // is allowed to keep producing sound without a fresh gesture.
+  const playViaWebAudio = async (blob: Blob) => {
+    const ctx = getAudioCtx();
+    if (!ctx) throw new Error('webaudio-unavailable');
+    try { await ctx.resume?.(); } catch { /* noop */ }
+    if (ctx.state !== 'running') throw new Error('webaudio-suspended');
+    const raw = await blob.arrayBuffer();
+    // Safari's callback-style decodeAudioData — promisify defensively.
+    const audioBuf: AudioBuffer = await new Promise((resolve, reject) => {
+      const p = ctx.decodeAudioData(raw, resolve, reject);
+      if (p && typeof p.then === 'function') p.then(resolve, reject);
+    });
+    const src = ctx.createBufferSource();
+    src.buffer = audioBuf;
+    src.connect(ctx.destination);
+    src.start(0);
+  };
+
   const speakQuestion = useCallback(async (q: InterviewQuestion) => {
     setSpeaking(true);
     try {
-      const blob = await synthesizeSpeech(q.question, 'warmth');
-      const a = getAudioEl();
-      if (!a) { await playAudioBlob(blob); setNeedsTap(false); return; }
-      a.volume = 1;
-      if (lastUrlRef.current) { try { URL.revokeObjectURL(lastUrlRef.current); } catch { /* noop */ } }
-      const url = URL.createObjectURL(blob);
-      lastUrlRef.current = url;
-      a.src = url;
-      await a.play();
-      setNeedsTap(false); // audio works — hide any tap prompt
-    } catch (e: any) {
-      // Autoplay blocked → surface a one-tap "Hear Echo" instead of failing silently.
-      if (e && e.name === 'NotAllowedError') setNeedsTap(true);
+      // Synthesize (retry once — the TTS service can hiccup on a cold start).
+      let blob: Blob;
+      try {
+        blob = await synthesizeSpeech(q.question, 'warmth');
+      } catch {
+        blob = await synthesizeSpeech(q.question, 'warmth');
+      }
+      // Playback ladder: WebAudio (most reliable post-fetch on iOS) → the
+      // persistent unlocked <audio> element → one-tap fallback. Never silent
+      // without showing the gold "Tap to hear Echo" button.
+      try {
+        await playViaWebAudio(blob);
+        setNeedsTap(false);
+      } catch {
+        const a = getAudioEl();
+        if (!a) { await playAudioBlob(blob); setNeedsTap(false); setSpeaking(false); return; }
+        a.volume = 1;
+        if (lastUrlRef.current) { try { URL.revokeObjectURL(lastUrlRef.current); } catch { /* noop */ } }
+        const url = URL.createObjectURL(blob);
+        lastUrlRef.current = url;
+        a.src = url;
+        await a.play();
+        setNeedsTap(false);
+      }
+    } catch {
+      // Autoplay blocked or synthesis failed twice → surface the one-tap
+      // "Hear Echo" button instead of failing silently.
+      setNeedsTap(true);
     }
     setSpeaking(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Read each new question aloud (free sovereign TTS) — Commander directive
@@ -208,32 +277,41 @@ export default function InterviewPanel({ userId }: Props) {
     try { audioCtxRef.current?.close?.(); } catch { /* noop */ }
   }, []);
 
-  const startInterview = async (category: string) => {
-    primeAudio(); // unlock TTS playback on this gesture
+  /** Fetch the next question. mode 'auto' → Echo picks the subject and covers
+   *  it deeply (100+ answers) before moving on; a category id → user's jump. */
+  const fetchNext = async (m: Exclude<Mode, null>) => {
     setLoading(true);
-    setSelectedCategory(category);
     try {
-      const q = await selectQuestion(userId, category);
-      setQuestion(q);
+      const next = await selectNextQuestion(userId, m === 'auto' ? undefined : m);
+      setQuestion(next.question);
+      setFocus({ category: next.focusCategory, answered: next.answered, target: next.target });
     } catch (err) {
       console.error('Failed to load question:', err);
     }
     setLoading(false);
   };
 
+  const startInterview = async (m: Exclude<Mode, null>) => {
+    primeAudio(); // unlock TTS playback on this gesture
+    setMode(m);
+    await fetchNext(m);
+  };
+
   const submitAnswer = async () => {
-    if (!answer.trim() || !question || !selectedCategory) return;
+    if (!answer.trim() || !question || !mode) return;
     stopMic();
     setLoading(true);
     try {
-      await answerQuestion(userId, question.question_id, answer.trim(), selectedCategory);
+      await answerQuestion(userId, question.question_id, answer.trim(), question.category || focus?.category);
       // Fire-and-forget: extract personality traits from the answer via AI
       extractTraits(userId, answer.trim(), 'interview').catch(() => {});
       setSubmitted(true);
       setAnswer('');
+      setFocus(f => (f ? { ...f, answered: f.answered + 1 } : f));
+      loadCoverage();
       setTimeout(() => {
         setSubmitted(false);
-        startInterview(selectedCategory);
+        fetchNext(mode);
       }, 1500);
     } catch (err) {
       console.error('Failed to submit:', err);
@@ -241,14 +319,16 @@ export default function InterviewPanel({ userId }: Props) {
     setLoading(false);
   };
 
-  if (selectedCategory && question) {
+  if (mode && question) {
     const generated = question.question_id.startsWith('gen_');
+    const focusCat = CATEGORIES.find(c => c.id === (focus?.category || question.category));
+    const focusPct = focus ? Math.min(100, Math.round((100 * focus.answered) / Math.max(1, focus.target))) : 0;
     return (
       <div className="space-y-6">
         <CameraPiP />
         <div className="flex items-center justify-between">
-          <button onClick={() => { setSelectedCategory(null); setQuestion(null); }} className="text-sm" style={{ color: ACCENT }}>
-            &larr; Back to Categories
+          <button onClick={() => { setMode(null); setQuestion(null); setFocus(null); loadCoverage(); }} className="text-sm" style={{ color: ACCENT }}>
+            &larr; Pause Interview
           </button>
           <button
             onClick={() => setVoiceOn(v => !v)}
@@ -259,15 +339,35 @@ export default function InterviewPanel({ userId }: Props) {
             <span style={iconLabel}><VaultIcon name="speaker" size={14} />{voiceOn ? 'Voice On' : 'Voice Off'}</span>
           </button>
         </div>
+
+        {/* The subject Echo is exploring now, with deep-coverage progress. */}
+        <div className="p-4 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs font-mono flex items-center gap-2" style={{ color: GOLD, letterSpacing: 2 }}>
+              <VaultIcon name={CATEGORY_ICON[focus?.category || question.category] || 'spark'} size={16} />
+              {(focusCat?.name || question.category).toUpperCase()}
+            </div>
+            {focus && (
+              <div className="text-xs" style={{ color: '#a1a1aa' }}>
+                {focus.answered} of {focus.target} memories preserved
+              </div>
+            )}
+          </div>
+          <CoverageBar pct={focusPct} />
+          <p className="text-[11px] mt-2" style={{ color: '#71717a' }}>
+            Echo chooses each subject and explores it deeply before moving to the next chapter of your story.
+          </p>
+        </div>
+
         <div className="p-6 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${ACCENT}` }}>
           <div className="flex items-center justify-between mb-3">
             <div className="text-xs font-mono" style={{ color: ACCENT, letterSpacing: 2 }}>
-              {CATEGORIES.find(c => c.id === selectedCategory)?.icon} {selectedCategory.toUpperCase().replace('_', ' ')}
+              QUESTION {focus ? focus.answered + 1 : ''}
             </div>
             {generated && (
               <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
                     style={{ background: '#1e1033', color: GOLD, border: `1px solid ${BORDER}` }}>
-                {'\u{2728}'} written just for you
+                <span style={iconLabel}><VaultIcon name="spark" size={11} /> written just for you</span>
               </span>
             )}
           </div>
@@ -286,13 +386,13 @@ export default function InterviewPanel({ userId }: Props) {
           </button>
           {question.video_instructions && (
             <div className="text-xs text-gray-500 mb-4 p-3 rounded-lg" style={{ background: '#0a0a0f' }}>
-              {'\u{1F4F9}'} {question.video_instructions}
+              <span style={iconLabel}><VaultIcon name="camera" size={14} /> {question.video_instructions}</span>
             </div>
           )}
           {submitted ? (
             <div className="text-center py-8">
-              <div className="text-4xl mb-2">{'\u{2705}'}</div>
-              <div className="text-sm text-green-400">Memory preserved! Loading next question...</div>
+              <div className="mb-2 flex justify-center" style={{ color: GOLD }}><VaultIcon name="spark" size={34} /></div>
+              <div className="text-sm" style={{ color: GOLD }}>Memory preserved. Echo is choosing the next question&hellip;</div>
             </div>
           ) : (
             <>
@@ -339,24 +439,62 @@ export default function InterviewPanel({ userId }: Props) {
     );
   }
 
+  const coverageFor = (id: string) => coverage.find(c => c.category === id);
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-white">Biography Interview</h2>
-      <p className="text-sm text-gray-400">Choose a life category to begin recording your story. The interviewer reads each question aloud — just talk.</p>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {CATEGORIES.map(cat => (
-          <button
-            key={cat.id}
-            onClick={() => startInterview(cat.id)}
-            disabled={loading}
-            className="p-5 rounded-xl text-center transition hover:scale-[1.03] hover:border-purple-500"
-            style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
-          >
-            <div className="mb-3 flex justify-center" style={{ color: GOLD }}><VaultIcon name={CATEGORY_ICON[cat.id] || 'spark'} size={30} /></div>
-            <div className="text-sm font-semibold text-white">{cat.name}</div>
-          </button>
-        ))}
+      <p className="text-sm text-gray-400">
+        Echo interviews you like a lifelong biographer &mdash; he asks every question out loud, chooses each
+        subject himself, and explores it deeply before moving on. Just press start and talk.
+      </p>
+
+      <button
+        onClick={() => startInterview('auto')}
+        disabled={loading}
+        className="w-full py-5 rounded-2xl text-lg font-bold transition hover:scale-[1.01] disabled:opacity-50"
+        style={{ background: `linear-gradient(135deg, ${GOLD}, #b8935f)`, color: '#0a0a0f', boxShadow: `0 0 40px ${GOLD}33` }}
+      >
+        <span style={{ ...iconLabel, justifyContent: 'center' }}>
+          <VaultIcon name="mic" size={20} />
+          {loading ? 'Echo is preparing your first question…' : 'Start Interview'}
+        </span>
+      </button>
+
+      {/* Your story's chapters — Echo covers each toward its target; tap one to jump there. */}
+      <div>
+        <div className="text-xs font-mono mb-3" style={{ color: '#a1a1aa', letterSpacing: 2 }}>
+          YOUR STORY&rsquo;S COVERAGE
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {CATEGORIES.map(cat => {
+            const cov = coverageFor(cat.id);
+            const answered = cov?.answered_total ?? cov?.answered ?? 0;
+            const target = cov?.target ?? 100;
+            const pct = cov?.coverage_pct ?? Math.min(100, Math.round((100 * answered) / Math.max(1, target)));
+            return (
+              <button
+                key={cat.id}
+                onClick={() => startInterview(cat.id)}
+                disabled={loading}
+                className="p-4 rounded-xl text-left transition hover:scale-[1.03] hover:border-purple-500"
+                style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
+                title={`${answered} of ${target} preserved — tap to focus this subject`}
+              >
+                <div className="mb-2 flex items-center gap-2" style={{ color: GOLD }}>
+                  <VaultIcon name={CATEGORY_ICON[cat.id] || 'spark'} size={22} />
+                  <span className="text-sm font-semibold text-white">{cat.name}</span>
+                </div>
+                <CoverageBar pct={pct} height={5} />
+                <div className="text-[11px] mt-1.5" style={{ color: '#71717a' }}>
+                  {answered} of {target} &middot; {pct}%
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
+
       {loading && (
         <div className="text-center py-4">
           <div className="w-6 h-6 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mx-auto" />
