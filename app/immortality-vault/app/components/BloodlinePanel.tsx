@@ -99,10 +99,16 @@ export default function BloodlinePanel({ userId }: { userId: string | null }) {
   const recsByPerson = new Map<string, BloodlineRecord[]>();
   records.forEach(r => { if (r.person_key) recsByPerson.set(r.person_key, [...(recsByPerson.get(r.person_key) || []), r]); });
 
-  /* Walk the direct line UP from the root, grouped by generation. */
+  /* Walk the direct line UP from the root, grouped by generation — BLOOD parents only
+     (step/adoptive/foster links are family but never bloodline ancestors). */
   const parentsOf = new Map<string, string[]>();
-  tree.edges.filter((e: BloodlineEdge) => e.rel_type === 'parent').forEach(e => {
+  tree.edges.filter((e: BloodlineEdge) => e.rel_type === 'parent' && e.bio !== false).forEach(e => {
     parentsOf.set(e.to_person, [...(parentsOf.get(e.to_person) || []), e.from_person]);
+  });
+  /* Non-bloodline family (step/adoptive/foster/guardian) — the person + how they relate. */
+  const nonBioKeys = new Map<string, string>();  // person_key -> subtype
+  tree.edges.filter((e: BloodlineEdge) => e.bio === false).forEach(e => {
+    [e.from_person, e.to_person].forEach(k => { if (k !== tree.root) nonBioKeys.set(k, e.relation_subtype || 'step'); });
   });
   const generations: BloodlineNode[][] = [];
   const seen = new Set<string>();
@@ -116,7 +122,8 @@ export default function BloodlinePanel({ userId }: { userId: string | null }) {
     frontier = frontier.flatMap(k => parentsOf.get(k) || []);
   }
   /* Anyone in the tree not reached on the direct line (collateral kin, refuted legends). */
-  const offLine = tree.nodes.filter(n => !seen.has(n.person_key) && n.confidence !== 'REFUTED');
+  const offLine = tree.nodes.filter(n => !seen.has(n.person_key) && n.confidence !== 'REFUTED' && !nonBioKeys.has(n.person_key));
+  const stepFamily = tree.nodes.filter(n => nonBioKeys.has(n.person_key));
   const refuted = tree.nodes.filter(n => n.confidence === 'REFUTED');
 
   const S = tree.stats || { persons: 0, relationships: 0, refuted_legends: 0, living_redacted: 0 };
@@ -181,6 +188,27 @@ export default function BloodlinePanel({ userId }: { userId: string | null }) {
             {offLine.map(n => <PersonCard key={n.person_key} n={n} open={openKey === n.person_key}
               onToggle={() => setOpenKey(openKey === n.person_key ? null : n.person_key)}
               userId={userId} records={recsByPerson.get(n.person_key) || []} onUpload={handleUpload} uploading={uploading} />)}
+          </div>
+        </section>
+      )}
+
+      {/* step / adoptive / foster family — family, not bloodline */}
+      {stepFamily.length > 0 && (
+        <section style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '0 0 12px' }}>
+            <span style={{ fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase', color: ACCENT, fontWeight: 600 }}>Step &amp; adoptive family</span>
+            <span style={{ flex: 1, height: 1, background: BORDER }} />
+          </div>
+          <p style={{ color: '#94a3b8', fontSize: 13, margin: '0 0 12px', maxWidth: 620 }}>Family by love, not by blood — kept in your tree, never counted as bloodline ancestors.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+            {stepFamily.map(n => (
+              <div key={n.person_key} style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', top: 8, right: 10, zIndex: 1, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: ACCENT, background: '#1a1030', border: `1px solid ${ACCENT}55`, borderRadius: 999, padding: '2px 8px' }}>{nonBioKeys.get(n.person_key)}</span>
+                <PersonCard n={n} open={openKey === n.person_key}
+                  onToggle={() => setOpenKey(openKey === n.person_key ? null : n.person_key)}
+                  userId={userId} records={recsByPerson.get(n.person_key) || []} onUpload={handleUpload} uploading={uploading} />
+              </div>
+            ))}
           </div>
         </section>
       )}

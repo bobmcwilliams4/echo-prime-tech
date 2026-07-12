@@ -487,6 +487,8 @@ export interface BloodlineNode {
 }
 export interface BloodlineEdge {
   from_person: string; to_person: string; rel_type: string; confidence: string;
+  bio?: boolean;                 // false = step/adoptive/foster/guardian (family, not bloodline)
+  relation_subtype?: string;     // biological | step | adoptive | foster | guardian
 }
 export interface BloodlineTree {
   user: string; root: string; owner_view: boolean;
