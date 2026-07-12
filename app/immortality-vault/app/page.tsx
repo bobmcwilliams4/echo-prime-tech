@@ -20,6 +20,7 @@ import MemoriesPanel from './components/MemoriesPanel';
 import ProgressPanel from './components/ProgressPanel';
 import BriefingPanel from './components/BriefingPanel';
 import FamilyPanel from './components/FamilyPanel';
+import BloodlinePanel from './components/BloodlinePanel';
 import FaceTimePanel from './components/FaceTimePanel';
 import SettingsPanel from './components/SettingsPanel';
 import PersonalityPanel from './components/PersonalityPanel';
@@ -147,6 +148,7 @@ export default function VaultAppPage() {
       case 'personality': return <PersonalityPanel userId={vaultUserId} />;
       case 'briefing': return <BriefingPanel userId={vaultUserId} onNavigate={handleNavigate} />;
       case 'family': return <FamilyPanel userId={vaultUserId} />;
+      case 'bloodline': return <BloodlinePanel userId={vaultUserId} />;
       case 'facetime': return <FaceTimePanel userId={vaultUserId} onNavigate={handleNavigate} />;
       case 'settings': return <SettingsPanel userId={vaultUserId} userEmail={user.email || ''} />;
       default: return <DashboardPanel userId={vaultUserId} stats={stats} onNavigate={handleNavigate} />;

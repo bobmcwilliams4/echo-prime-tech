@@ -34,6 +34,7 @@ export const NAV_ITEMS = [
   { id: 'personality', label: 'Personality', icon: '\u{1F9EC}' },
   { id: 'briefing', label: 'Daily Briefing', icon: '\u{2600}\u{FE0F}' },
   { id: 'family', label: 'Family Vault', icon: '\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}' },
+  { id: 'bloodline', label: 'Bloodline', icon: '\u{1F333}' },
   { id: 'facetime', label: 'FaceTime', icon: '\u{1F4F1}' },
   { id: 'settings', label: 'Settings', icon: '\u{2699}\u{FE0F}' },
 ] as const;

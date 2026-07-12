@@ -473,6 +473,70 @@ export async function deleteFamilyMember(id: string): Promise<void> {
   await vaultFetch(`/family/${id}`, { method: 'DELETE' });
 }
 
+/* ── Bloodline — evidence-graded ancestry tree (P1) + grounded ancestor persona (P3) ── */
+export interface BloodlineSource {
+  fact?: string; citation?: string; url_or_id?: string; confidence?: string;
+}
+export interface BloodlineNode {
+  person_key: string; name: string;
+  birth_date: string | null; death_date: string | null;
+  birth_place: string | null; death_place: string | null;
+  buried: string | null; bio: string | null;
+  confidence: string; living: boolean; is_direct_line: boolean;
+  persona_status: string; sources: BloodlineSource[];
+}
+export interface BloodlineEdge {
+  from_person: string; to_person: string; rel_type: string; confidence: string;
+}
+export interface BloodlineTree {
+  user: string; root: string; owner_view: boolean;
+  nodes: BloodlineNode[]; edges: BloodlineEdge[];
+  stats: { persons: number; relationships: number; refuted_legends: number; living_redacted: number };
+  confidence_legend: Record<string, string>;
+}
+
+/** The owner's full tree (living relatives shown only to the owner — viewer==userId). */
+export async function getBloodlineTree(userId: string): Promise<BloodlineTree> {
+  return vaultFetch<BloodlineTree>(`/bloodline/${userId}/tree?viewer=${encodeURIComponent(userId)}`);
+}
+
+export interface BloodlineRecord {
+  id: string; person_key: string | null; record_type: string;
+  file_name: string; storage_key: string; created_at: string;
+}
+/** List the owner's held document records (metadata; images stay encrypted at rest). */
+export async function getBloodlineRecords(userId: string): Promise<{ records: BloodlineRecord[] }> {
+  return vaultFetch(`/bloodline/${userId}/records?viewer=${encodeURIComponent(userId)}`);
+}
+/** Owner-only URL that serves a stored document image, decrypted on the fly. */
+export function bloodlineRecordImageUrl(userId: string, recordId: string): string {
+  return `${API}/bloodline/${userId}/record/${recordId}/image?viewer=${encodeURIComponent(userId)}`;
+}
+/** Upload a document (birth/death cert, census…) → OCR + auto-match to family → encrypted store. */
+export async function uploadBloodlineRecord(
+  userId: string, file: File, opts: { person_key?: string; record_type?: string } = {}
+): Promise<{ ok: boolean; record_id: string; record_type: string; extracted: Record<string, unknown>;
+  matched: { role: string; extracted_name: string; matched_person: string | null; person_key: string | null }[];
+  proposals: { role: string; name: string }[] }> {
+  const fd = new FormData();
+  fd.append('file', file);
+  if (opts.person_key) fd.append('person_key', opts.person_key);
+  if (opts.record_type) fd.append('record_type', opts.record_type);
+  const res = await fetch(`${API}/bloodline/${userId}/record`, { method: 'POST', body: fd });
+  if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+  return res.json();
+}
+
+/** Talk with a deceased ancestor — grounded ONLY on the sourced record (honest refusals). */
+export async function chatWithAncestor(
+  userId: string, personKey: string, question: string, history: { role: string; content: string }[] = []
+): Promise<{ name: string; answer: string; grounded_on?: { facts: number; sources: string[] }; disclaimer?: string }> {
+  return vaultFetch(`/bloodline/${userId}/chat/${personKey}`, {
+    method: 'POST',
+    body: JSON.stringify({ question, history }),
+  });
+}
+
 /* ─── Voice ──────────────────────────────────────────────────────────── */
 
 export async function synthesizeSpeech(text: string, emotion?: string, voiceId?: string): Promise<Blob> {
