@@ -25,6 +25,7 @@ import BloodlinePanel from './components/BloodlinePanel';
 import FaceTimePanel from './components/FaceTimePanel';
 import SettingsPanel from './components/SettingsPanel';
 import PersonalityPanel from './components/PersonalityPanel';
+import FairySprite from './components/FairySprite';
 
 /* ─── Onboarding Modal ───────────────────────────────────────────────── */
 
@@ -162,6 +163,9 @@ export default function VaultAppPage() {
 
   return (
     <div className="min-h-screen flex" style={{ background: BG_DARK, color: IVORY }}>
+      {/* Golden sprite from the intro film, drifting across now and then */}
+      <FairySprite />
+
       {/* Onboarding */}
       {showOnboarding && <OnboardingModal onComplete={completeOnboarding} />}
 

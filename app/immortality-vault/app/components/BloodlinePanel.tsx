@@ -18,6 +18,12 @@ import {
 import VaultIcon from './VaultIcon';
 import BloodlineTreeGraph from './BloodlineTreeGraph';
 
+/* Atmospheric gold-on-black backdrop behind the tree. When a Grok-generated
+   image is present at public/immortality-vault/tree-bg.jpg, point this at it;
+   undefined → the tree's built-in gold radial-gradient fallback (in use now, as
+   the ShadowGlass Chrome was signed out of grok.com at build time). */
+const TREE_BG: string | undefined = undefined;
+
 /* confidence → label + colour (matches the API's confidence_legend ranking) */
 const CONF: Record<string, { label: string; color: string }> = {
   CONFIRMED_PRIMARY_SOURCE: { label: 'Primary source', color: '#34d399' },
@@ -137,27 +143,54 @@ export default function BloodlinePanel({ userId }: { userId: string | null }) {
   const recsByPerson = new Map<string, BloodlineRecord[]>();
   records.forEach(r => { if (r.person_key) recsByPerson.set(r.person_key, [...(recsByPerson.get(r.person_key) || []), r]); });
 
-  /* Walk the direct line UP from the root, grouped by generation — BLOOD parents only. */
-  const parentsOf = new Map<string, string[]>();
+  /* BLOOD parent edges, mapped both ways so we can walk UP (ancestors) and DOWN
+     (descendants) from the root. parentsOf (child → parents) also feeds the graph's
+     edge routine — a parent always sits one row above its child in either direction. */
+  const parentsOf = new Map<string, string[]>();   // child  → parents
+  const childrenOf = new Map<string, string[]>();  // parent → children
   tree.edges.filter((e: BloodlineEdge) => e.rel_type === 'parent' && e.bio !== false).forEach(e => {
     parentsOf.set(e.to_person, [...(parentsOf.get(e.to_person) || []), e.from_person]);
+    childrenOf.set(e.from_person, [...(childrenOf.get(e.from_person) || []), e.to_person]);
   });
   /* Non-bloodline family (step/adoptive/foster/guardian). */
   const nonBioKeys = new Map<string, string>();
   tree.edges.filter((e: BloodlineEdge) => e.bio === false).forEach(e => {
     [e.from_person, e.to_person].forEach(k => { if (k !== tree.root) nonBioKeys.set(k, e.relation_subtype || 'step'); });
   });
-  const generations: BloodlineNode[][] = [];
+
   const seen = new Set<string>();
-  let frontier = [tree.root].filter(k => byKey.has(k));
+
+  /* Ancestors UP from the root — generations[0] = You, [1] = Parents, … */
+  const generations: BloodlineNode[][] = [];
   const GEN_NAMES = ['You', 'Parents', 'Grandparents', 'Great-grandparents', '2× great-grandparents',
     '3× great-grandparents', '4× great-grandparents', '5× great-grandparents', '6× great-grandparents'];
-  while (frontier.length) {
-    const gen = frontier.map(k => byKey.get(k)!).filter(Boolean).filter(n => !seen.has(n.person_key));
+  let upFrontier = [tree.root].filter(k => byKey.has(k));
+  while (upFrontier.length) {
+    const gen = upFrontier.map(k => byKey.get(k)!).filter(Boolean).filter(n => !seen.has(n.person_key));
     gen.forEach(n => seen.add(n.person_key));
     if (gen.length) generations.push(gen);
-    frontier = frontier.flatMap(k => parentsOf.get(k) || []);
+    upFrontier = upFrontier.flatMap(k => parentsOf.get(k) || []);
   }
+
+  /* Descendants DOWN from the root — descendants[0] = Children, [1] = Grandchildren, … */
+  const descendants: BloodlineNode[][] = [];
+  const DESC_NAMES = ['Children', 'Grandchildren', 'Great-grandchildren', '2× great-grandchildren',
+    '3× great-grandchildren', '4× great-grandchildren', '5× great-grandchildren'];
+  let downFrontier = (childrenOf.get(tree.root) || []).filter(k => byKey.has(k) && !nonBioKeys.has(k));
+  while (downFrontier.length) {
+    const gen = downFrontier.map(k => byKey.get(k)!).filter(Boolean).filter(n => !seen.has(n.person_key));
+    gen.forEach(n => seen.add(n.person_key));
+    if (gen.length) descendants.push(gen);
+    downFrontier = downFrontier.flatMap(k => (childrenOf.get(k) || []).filter(c => !nonBioKeys.has(c)));
+  }
+
+  /* Rows TOP → BOTTOM for the centered tree: oldest ancestors … parents, You, children … */
+  const rows: BloodlineNode[][] = [
+    ...generations.slice(1).reverse(),  // ancestors above the root, oldest first
+    ...(generations[0] ? [generations[0]] : []),  // You
+    ...descendants,                     // descendants below the root
+  ];
+
   const offLine = tree.nodes.filter(n => !seen.has(n.person_key) && n.confidence !== 'REFUTED' && !nonBioKeys.has(n.person_key));
   const stepFamily = tree.nodes.filter(n => nonBioKeys.has(n.person_key));
   const refuted = tree.nodes.filter(n => n.confidence === 'REFUTED');
@@ -215,12 +248,14 @@ export default function BloodlinePanel({ userId }: { userId: string | null }) {
       {view === 'tree' && (
         <>
           <BloodlineTreeGraph
-            generations={generations}
+            rows={rows}
+            rootKey={tree.root}
             parentsOf={parentsOf}
             stepFamily={stepForGraph}
             userId={userId}
             photoUrl={(id) => userId ? bloodlineRecordImageUrl(userId, id) : ''}
             onSelect={(k) => setDetailKey(k)}
+            bgUrl={TREE_BG}
           />
           <div style={{ marginTop: 10, fontSize: 12, color: MUTED, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <span>Drag to pan · scroll to zoom · click a person for details.</span>
@@ -237,6 +272,17 @@ export default function BloodlinePanel({ userId }: { userId: string | null }) {
           {generations.map((gen, gi) => (
             <section key={gi} style={{ marginBottom: 20 }}>
               <GenHeading label={GEN_NAMES[gi] || `${gi}× great-grandparents`} />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
+                {gen.map(n => <PersonCard key={n.person_key} n={n} open={openKey === n.person_key}
+                  onToggle={() => setOpenKey(openKey === n.person_key ? null : n.person_key)}
+                  userId={userId} records={recsByPerson.get(n.person_key) || []} onUpload={handleUpload} onPhoto={handlePhoto} uploading={uploading} />)}
+              </div>
+            </section>
+          ))}
+
+          {descendants.map((gen, gi) => (
+            <section key={`desc-${gi}`} style={{ marginBottom: 20 }}>
+              <GenHeading label={DESC_NAMES[gi] || `${gi + 1}× great-grandchildren`} />
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
                 {gen.map(n => <PersonCard key={n.person_key} n={n} open={openKey === n.person_key}
                   onToggle={() => setOpenKey(openKey === n.person_key ? null : n.person_key)}

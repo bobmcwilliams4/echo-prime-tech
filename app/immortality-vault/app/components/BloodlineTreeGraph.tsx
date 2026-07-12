@@ -1,30 +1,38 @@
 'use client';
 
 /**
- * BloodlineTreeGraph - Immortality Vault pedigree chart.
+ * BloodlineTreeGraph - Immortality Vault family tree (centered pedigree).
  *
  * Layout math:
- *   - Cards are fixed 150x64. Generation g occupies one horizontal row.
- *   - Root (g = 0) sits at the BOTTOM; ancestors rise upward, so
- *     rowY(g) = PAD + (G - 1 - g) * (CARD_H + V_GAP).
- *   - Each row is centered against the widest row:
+ *   - Cards are fixed 150x64. Rows are laid out TOP → BOTTOM in the order given:
+ *     the oldest ancestors are the first rows, the root ("You") sits in the middle,
+ *     and DESCENDANTS (children, grandchildren, …) are the rows below it.
+ *   - rowY(g) = PAD + g * (CARD_H + V_GAP); every row is centered against the widest:
  *     rowX0 = PAD + (maxRowW - rowW) / 2, node i at rowX0 + i * (CARD_W + H_GAP).
- *   - Step/adoptive cards stack in a side column to the RIGHT of the root,
- *     vertically centered on it, joined by dashed connectors.
+ *   - Every `parent` edge connects a node to the one directly ABOVE it — this holds
+ *     uniformly for ancestor links (parent above child) AND descendant links (root
+ *     above its child), so one edge routine draws the whole tree in both directions.
+ *   - Step/adoptive (bio === false) kin stack in a side column to the RIGHT of the
+ *     root, joined by dashed connectors — family, never counted in the blood line.
+ *   - The root card is visually distinct (bright ring + "YOU" pill).
+ *   - An optional atmospheric backdrop (gold-on-black) sits behind the tree under a
+ *     scrim so the gold cards read clearly; a radial-gradient is the fallback.
  *   - Pan/zoom is a single <g transform="translate(x,y) scale(k)">, driven by
- *     pointer + wheel handlers (no libraries). Initial transform fits content.
+ *     pointer + wheel handlers (no libraries). Initial transform fits all rows.
  */
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { BloodlineNode } from '../lib/vault-api';
 
 interface Props {
-  generations: BloodlineNode[][];
-  parentsOf: Map<string, string[]>;
+  rows: BloodlineNode[][];              // top (oldest ancestors) → bottom (deepest descendants)
+  rootKey: string;                      // the "You" node
+  parentsOf: Map<string, string[]>;     // child → parents (covers ancestor + descendant edges)
   stepFamily: { node: BloodlineNode; subtype: string }[];
   userId: string | null;
   photoUrl: (photoRecordId: string) => string;
   onSelect: (personKey: string) => void;
+  bgUrl?: string;                       // optional atmospheric backdrop image
 }
 
 const PALETTE = {
@@ -73,7 +81,7 @@ function lifespan(n: BloodlineNode): string {
   const b = yearOf(n.birth_date);
   const d = yearOf(n.death_date);
   if (n.living) return b ? `b. ${b}` : 'living';
-  if (b && d) return `${b} \u2013 ${d}`;
+  if (b && d) return `${b} – ${d}`;
   if (b) return `b. ${b}`;
   if (d) return `d. ${d}`;
   return 'dates unknown';
@@ -90,7 +98,7 @@ function monogram(name: string): string {
 }
 
 function truncate(s: string, max = 14): string {
-  return s.length > max ? s.slice(0, max - 1).trimEnd() + '\u2026' : s;
+  return s.length > max ? s.slice(0, max - 1).trimEnd() + '…' : s;
 }
 
 interface Placed {
@@ -110,12 +118,14 @@ interface Transform {
 }
 
 export default function BloodlineTreeGraph({
-  generations,
+  rows,
+  rootKey,
   parentsOf,
   stepFamily,
   userId,
   photoUrl,
   onSelect,
+  bgUrl,
 }: Props) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [t, setT] = useState<Transform>({ x: 0, y: 0, k: 1 });
@@ -130,26 +140,28 @@ export default function BloodlineTreeGraph({
   const movedRef = useRef(0);
   const [dragging, setDragging] = useState(false);
 
-  const hasContent = generations.length > 0 && generations.some((row) => row.length > 0);
+  const hasContent = rows.length > 0 && rows.some((row) => row.length > 0);
 
   // ---- Layout: positions for every blood node, step cards, edges, bounds ----
   const layout = useMemo(() => {
     const pos = new Map<string, Placed>();
-    const G = generations.length;
-    const rowWidths = generations.map(
+    const G = rows.length;
+    const rowWidths = rows.map(
       (row) => row.length * CARD_W + Math.max(0, row.length - 1) * H_GAP
     );
     const maxRowW = Math.max(CARD_W, ...rowWidths);
 
-    generations.forEach((row, g) => {
+    rows.forEach((row, g) => {
       const x0 = PAD + (maxRowW - rowWidths[g]) / 2;
-      const y = PAD + (G - 1 - g) * (CARD_H + V_GAP);
+      const y = PAD + g * (CARD_H + V_GAP); // natural top → bottom
       row.forEach((node, i) => {
         pos.set(node.person_key, { node, x: x0 + i * (CARD_W + H_GAP), y });
       });
     });
 
-    // Blood edges: child top-center rises to each parent's bottom-center.
+    // Blood edges: every placed node rises from its top-center to each placed
+    // parent's bottom-center. Because a parent always sits one row above its
+    // child, this single routine draws BOTH ancestors-up and descendants-down.
     const edges: { d: string }[] = [];
     pos.forEach((child, key) => {
       (parentsOf.get(key) || []).forEach((pk) => {
@@ -165,8 +177,7 @@ export default function BloodlineTreeGraph({
     });
 
     // Step family: a side column to the right of the root, vertically centered.
-    const root = generations[0] && generations[0][0];
-    const rootPos = root ? pos.get(root.person_key) : undefined;
+    const rootPos = pos.get(rootKey);
     const steps: StepPlaced[] = [];
     if (rootPos && stepFamily.length > 0) {
       const stackH = stepFamily.length * CARD_H + (stepFamily.length - 1) * STEP_GAP_Y;
@@ -201,7 +212,7 @@ export default function BloodlineTreeGraph({
       maxY = Math.max(maxY, s.y + CARD_H);
     });
     return { pos, edges, steps, stepEdges, contentW: maxX + PAD, contentH: maxY + PAD };
-  }, [generations, parentsOf, stepFamily]);
+  }, [rows, rootKey, parentsOf, stepFamily]);
 
   const layoutRef = useRef(layout);
   layoutRef.current = layout;
@@ -290,6 +301,7 @@ export default function BloodlineTreeGraph({
 
   const renderCard = (placed: Placed, idKey: string, subtype?: string) => {
     const { node, x, y } = placed;
+    const isRoot = node.person_key === rootKey;
     const hovered = hoverKey === node.person_key;
     const dot = CONFIDENCE_COLOR[node.confidence] || '#a99e8b';
     const pillText = subtype ? subtype.toUpperCase() : null;
@@ -303,16 +315,30 @@ export default function BloodlineTreeGraph({
         onMouseLeave={() => setHoverKey(null)}
         style={{ cursor: 'pointer' }}
         role="button"
-        aria-label={node.name}
+        aria-label={isRoot ? `${node.name} (you)` : node.name}
       >
+        {isRoot && (
+          // a soft aura ring marking the root ("You")
+          <rect
+            x={-4}
+            y={-4}
+            width={CARD_W + 8}
+            height={CARD_H + 8}
+            rx={16}
+            fill="none"
+            stroke={PALETTE.goldBright}
+            strokeWidth={1}
+            strokeOpacity={0.5}
+          />
+        )}
         <rect
           width={CARD_W}
           height={CARD_H}
           rx={12}
-          fill={PALETTE.card}
-          stroke={hovered ? PALETTE.goldBright : PALETTE.hairline}
-          strokeWidth={1}
-          filter={hovered ? 'url(#bl-glow-strong)' : 'url(#bl-glow-soft)'}
+          fill={isRoot ? PALETTE.cardElevated : PALETTE.card}
+          stroke={isRoot ? PALETTE.goldBright : hovered ? PALETTE.goldBright : PALETTE.hairline}
+          strokeWidth={isRoot ? 1.75 : 1}
+          filter={isRoot || hovered ? 'url(#bl-glow-strong)' : 'url(#bl-glow-soft)'}
         />
         {node.photo_record_id ? (
           <>
@@ -331,7 +357,7 @@ export default function BloodlineTreeGraph({
           </>
         ) : (
           <>
-            <circle cx={28} cy={32} r={20} fill={PALETTE.cardElevated} />
+            <circle cx={28} cy={32} r={20} fill={isRoot ? PALETTE.card : PALETTE.cardElevated} />
             <text
               x={28}
               y={32.5}
@@ -351,8 +377,8 @@ export default function BloodlineTreeGraph({
           cy={32}
           r={21}
           fill="none"
-          stroke={hovered ? PALETTE.goldBright : PALETTE.goldDeep}
-          strokeWidth={1.25}
+          stroke={isRoot || hovered ? PALETTE.goldBright : PALETTE.goldDeep}
+          strokeWidth={isRoot ? 1.6 : 1.25}
         />
         <text x={56} y={30} fill={PALETTE.ivory} fontSize={13} fontFamily={SERIF} letterSpacing="0.2">
           {truncate(node.name)}
@@ -361,6 +387,25 @@ export default function BloodlineTreeGraph({
           {lifespan(node)}
         </text>
         <circle cx={CARD_W - 11} cy={11} r={3} fill={dot} />
+        {isRoot && (
+          // "YOU" pill on the root card, top-left
+          <g transform={`translate(-6,-9)`}>
+            <rect width={38} height={16} rx={8} fill={PALETTE.gold} />
+            <text
+              x={19}
+              y={8.5}
+              textAnchor="middle"
+              dominantBaseline="central"
+              fill="#20160a"
+              fontSize={8.5}
+              fontFamily={SANS}
+              fontWeight={700}
+              letterSpacing="1.4"
+            >
+              YOU
+            </text>
+          </g>
+        )}
         {pillText && (
           <g transform={`translate(${CARD_W - pillW - 8},${-8})`}>
             <rect width={pillW} height={15} rx={7.5} fill={PALETTE.cardElevated} stroke={PALETTE.goldDeep} strokeWidth={0.75} />
@@ -397,6 +442,20 @@ export default function BloodlineTreeGraph({
     userSelect: 'none',
   };
 
+  // Atmospheric backdrop: gold-on-black art under a scrim, or a radial-gradient
+  // fallback — either way the gold tree reads clearly over it.
+  const backdrop: React.CSSProperties = bgUrl
+    ? {
+        backgroundImage: `linear-gradient(rgba(10,8,7,0.70), rgba(10,8,7,0.86)), url(${bgUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundColor: PALETTE.bg,
+      }
+    : {
+        backgroundImage: `radial-gradient(130% 100% at 50% 38%, rgba(94,66,20,0.32), rgba(10,8,7,0) 62%)`,
+        backgroundColor: PALETTE.bg,
+      };
+
   return (
     <div
       ref={wrapRef}
@@ -407,7 +466,7 @@ export default function BloodlineTreeGraph({
         overflow: 'hidden',
         borderRadius: 16,
         border: `1px solid ${PALETTE.hairline}`,
-        background: PALETTE.bg,
+        ...backdrop,
       }}
     >
       {!hasContent ? (
@@ -483,7 +542,7 @@ export default function BloodlineTreeGraph({
                 />
               ))}
               {/* Blood cards */}
-              {generations.map((row, g) =>
+              {rows.map((row, g) =>
                 row.map((node, i) => {
                   const placed = layout.pos.get(node.person_key);
                   return placed ? renderCard(placed, `g${g}-${i}`) : null;
@@ -499,7 +558,7 @@ export default function BloodlineTreeGraph({
               +
             </button>
             <button type="button" style={btnStyle} onClick={() => zoomBy(0.8)} aria-label="Zoom out">
-              {'\u2212'}
+              {'−'}
             </button>
             <button
               type="button"
