@@ -101,9 +101,24 @@ export default function EchoCADPage() {
         <div className="flex items-center gap-4">
           <Link href="/engines" className="text-sm font-medium hidden sm:block" style={{ color: 'var(--ept-text-secondary)' }}>Engines</Link>
           <Link href="/pricing" className="text-sm font-medium hidden sm:block" style={{ color: 'var(--ept-text-secondary)' }}>Pricing</Link>
-          <Link href="/checkout?service=echocad&tier=personal" className="px-5 py-2.5 rounded-xl text-sm font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started</Link>
+          <Link href="/daedalus-forge" className="px-5 py-2.5 rounded-xl text-sm font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Get Started</Link>
         </div>
       </nav>
+
+      {/* ── Rebrand Banner ── */}
+      <div className="px-6 py-4 border-b" style={{ backgroundColor: 'var(--ept-surface)', borderColor: 'var(--ept-accent)' }}>
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-3 text-center">
+          <span className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--ept-text)' }}>
+            <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ color: 'var(--ept-accent)' }}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+            EchoCAD is now <span style={{ color: 'var(--ept-accent)' }}>Daedalus Design</span> — the drafting &amp; design tier of the Daedalus engineering platform.
+          </span>
+          <Link href="/daedalus-forge" className="px-4 py-2 rounded-lg text-sm font-semibold shrink-0" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>
+            Go to Daedalus
+          </Link>
+        </div>
+      </div>
 
       {/* ── Hero ── */}
       <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
@@ -114,7 +129,7 @@ export default function EchoCADPage() {
           Describe your part. EchoCAD drafts it. Validate, optimize, and export — without fighting legacy software.
         </p>
         <div className="flex flex-wrap justify-center gap-4 mt-10 animate-fade-up-delay-3">
-          <Link href="/checkout?service=echocad&tier=personal" className="px-8 py-4 rounded-xl text-base font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
+          <Link href="/daedalus-forge" className="px-8 py-4 rounded-xl text-base font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
           <Link href="#pricing" className="px-8 py-4 rounded-xl text-base font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>View Pricing</Link>
         </div>
         <div className="flex flex-wrap justify-center gap-8 mt-12" style={{ color: 'var(--ept-text-muted)' }}>
@@ -307,7 +322,7 @@ export default function EchoCADPage() {
             Free 14-day trial on Personal and Professional tiers. No credit card required. Import your existing files on day one.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/checkout?service=echocad&tier=personal" className="px-8 py-4 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
+            <Link href="/daedalus-forge" className="px-8 py-4 rounded-xl font-semibold" style={{ backgroundColor: 'var(--ept-accent)', color: '#fff' }}>Start Free Trial</Link>
             <a href="mailto:bob@echo-op.com" className="px-8 py-4 rounded-xl font-semibold border" style={{ borderColor: 'var(--ept-border)', color: 'var(--ept-text-secondary)' }}>Schedule a Demo</a>
           </div>
           <div className="flex flex-wrap justify-center gap-6 mt-8" style={{ color: 'var(--ept-text-muted)' }}>

@@ -140,9 +140,6 @@ const EXEMPT_PREFIXES = [
   '/tool-discovery',     // MCP Tool Search & Integration
   '/forge-marketplace',  // AI Engine Template Store
 
-  // ── Private command-center pages (served at echo-op.com) ──
-  '/family-tree',        // McWilliams Bloodline Archive (Commander-level)
-
   // ── Documentation pages ──
   '/docs',               // Documentation Hub + all sub-routes
 

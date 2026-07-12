@@ -62,6 +62,24 @@
     },
     {
       "source": "/",
+      "has": [{ "type": "host", "value": "hephaestion.echo-op.com" }],
+      "destination": "/hephaestion-forge",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "daedalus.echo-op.com" }],
+      "destination": "/daedalus-forge",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "echocad.echo-op.com" }],
+      "destination": "/daedalus-forge",
+      "permanent": false
+    },
+    {
+      "source": "/",
       "has": [{ "type": "host", "value": "www.immortalityvault.app" }],
       "destination": "/immortality-vault",
       "permanent": false

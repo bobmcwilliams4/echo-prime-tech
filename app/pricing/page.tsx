@@ -181,6 +181,17 @@ const FALLBACK_SERVICES: Service[] = [
     { tier: 'Pro', price: 49, interval: 'mo', features: ['25 courses', '500 students', 'AI course outlines', 'Custom branding', 'Full analytics'], popular: true },
     { tier: 'Business', price: 149, interval: 'mo', features: ['Unlimited courses', 'Unlimited students', 'Multi-tenant', 'API access', 'Priority support'], popular: false },
   ] },
+  { id: 'hephaestion-forge', name: 'Hephaestion Forge', tagline: 'AI code factory — describe a service, get a tested, security-scanned repo', description: 'A 13-stage build pipeline with 4 quality gates turns a plain-English spec into a production repo (Python, TypeScript, JavaScript, Rust, Go) with tests, lint, security scan, and code review. Priced per deliverable, metered in build credits.', pricing: [
+    { tier: 'Starter', price: 99, interval: 'mo', features: ['50 build credits/mo (~10–25 builds)', 'All 5 languages', '3 archetypes', 'Quality gates: lint + security + code review', 'Download full repo', 'Community support'], popular: false },
+    { tier: 'Pro', price: 299, interval: 'mo', features: ['250 build credits/mo (~50–150 builds)', 'All 6 project types + 8 design patterns', 'Priority pipeline', 'GitHub push', 'API access', 'Priority support'], popular: true },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited builds', 'Private forge deployment', 'Custom archetypes', 'On-prem option', 'SLA 99.9%', 'Dedicated engineer'], popular: false, custom: true },
+  ] },
+  { id: 'daedalus-forge', name: 'Daedalus', tagline: 'Conversational CAD → manufacturing — describe a part, get drawings, DFM, and an indicative quote', description: 'Daedalus Design turns plain English into dimensioned drawings, GD&T, FEA, tolerance optimization, BOM, and standards-compliant shop drawings. Daedalus Forge runs the full 50-stage pipeline to DFM, CNC toolpaths, compliance gates, and an indicative manufacturing quote. AI output requires review by a qualified engineer — not a PE-stamped deliverable.', pricing: [
+    { tier: 'Design', price: 149, interval: 'mo', features: ['40 design credits/mo', 'Plain-English → dimensioned 2D drawings', 'Parametric design + built-in FEA', 'Tolerance optimization + BOM', 'ASME Y14.5 / ISO 128 / DIN compliance', 'STEP/DXF export'], popular: false },
+    { tier: 'Pro', price: 449, interval: 'mo', features: ['120 design credits/mo', 'Full 50-stage design→manufacturing pipeline', 'All 12 materials + 6 CNC machines', 'DFM review + CNC toolpaths', 'Indicative manufacturing quotes', 'API access', 'Priority support'], popular: true },
+    { tier: 'Compliance', price: 1299, interval: 'mo', features: ['Everything in Pro', 'Oil & gas + aerospace domains', 'API 6A / NACE MR0175 compliance gates', 'Audit-trail exports', 'Supplier cross-reference', 'Priority engineering support'], popular: false },
+    { tier: 'Enterprise', price: null, interval: 'mo', features: ['Unlimited designs', 'Private / air-gapped deployment', 'Custom materials & machines', 'Supplier integration', 'SLA guarantees'], popular: false, custom: true },
+  ] },
 ];
 
 export default function PricingPage() {

@@ -41,35 +41,27 @@ const COMPARISON = [
 
 const PRICING = [
   {
-    tier: 'Developer',
-    price: '$49',
+    tier: 'Starter',
+    price: '$99',
     period: '/mo',
     popular: false,
-    features: ['5 full builds/month', '3 project types', '2 languages', 'Code review AI', 'Basic test gen', 'Community support'],
+    features: ['50 build credits/mo (~10–25 builds)', 'All 5 languages (Python, TypeScript, JavaScript, Rust, Go)', '3 archetypes', 'Quality gates: lint + security scan + code review', 'Download full repo', 'Community support'],
     cta: 'Start Building',
   },
   {
-    tier: 'Team',
-    price: '$149',
+    tier: 'Pro',
+    price: '$299',
     period: '/mo',
     popular: true,
-    features: ['25 full builds/month', '10 project types', '5 languages', 'All 8 design patterns', 'Security audit', 'CI/CD scaffolding', 'Priority support'],
+    features: ['250 build credits/mo (~50–150 builds)', 'All 6 project types + all 8 design patterns', 'Priority pipeline', 'GitHub push', 'API access', '13-stage pipeline', 'Priority support'],
     cta: 'Start Free Trial',
   },
   {
     tier: 'Enterprise',
-    price: '$499',
-    period: '/mo',
-    popular: false,
-    features: ['Unlimited builds', 'All 15 project types', 'All 5 languages', '13-stage pipeline', 'Custom quality gates', 'SLA 99.9%', 'Dedicated engineer'],
-    cta: 'Get Started',
-  },
-  {
-    tier: 'Custom',
     price: 'Contact',
     period: '',
     popular: false,
-    features: ['White-label license', 'On-prem deployment', 'Custom pipeline stages', 'SSO / SAML', 'Audit logging', 'Volume discounts'],
+    features: ['Unlimited builds', 'Private forge deployment', 'Custom archetypes', 'On-prem option', 'SLA 99.9%', 'Dedicated engineer'],
     cta: 'Contact Sales',
   },
 ];
@@ -238,10 +230,11 @@ export default function HephaestionForgePage() {
         <h2 className="text-3xl font-extrabold text-center mb-4" style={{ color: 'var(--ept-text)' }}>
           Pricing that scales with your team
         </h2>
-        <p className="text-center mb-12" style={{ color: 'var(--ept-text-secondary)' }}>
-          Start free. Ship faster. Pay only for what you build.
+        <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: 'var(--ept-text-secondary)' }}>
+          Priced per deliverable — a build is a scaffolded, tested, security-scanned repo you own outright.
+          Metered in build credits: a simple CLI scaffold costs 1–2 credits, a full CQRS microservice 5–8.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {PRICING.map(plan => (
             <div key={plan.tier}
               className="p-6 rounded-xl border flex flex-col"
@@ -268,7 +261,7 @@ export default function HephaestionForgePage() {
                   </li>
                 ))}
               </ul>
-              <Link href={plan.tier === 'Custom' ? '/support' : `/checkout?service=hephaestion-forge&tier=${plan.tier.toLowerCase()}`}
+              <Link href={plan.tier === 'Enterprise' ? '/support' : `/checkout?service=hephaestion-forge&tier=${plan.tier.toLowerCase()}`}
                 className="w-full py-2.5 rounded-lg font-semibold text-center text-sm block"
                 style={{
                   backgroundColor: plan.popular ? 'var(--ept-accent)' : 'var(--ept-surface)',
