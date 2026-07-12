@@ -49,12 +49,20 @@ const FEATURES = [
   { t: 'Talk With Them Again', d: 'Family can speak with the preserved person — in words and in their own voice — and, in time, face to face. The ultimate promise of the Vault.' },
   { t: 'A Memorial in Their Voice', d: 'When the time comes, the Vault can create a memorial — narrated in their own voice, set to their photos and their stories.' },
   { t: 'Yours Alone, Protected', d: 'Every recording and memory is encrypted and family-controlled. These belong to your family — never sold, never used to train anything, never shared.' },
+  { t: 'Their Whole Bloodline', d: 'Trace the family line back through the generations — every ancestor, every name, each fact carried with the record that proves it. And, in time, sit and talk with the ones who came long before.' },
 ];
 
 const PRICING = [
   { slug: 'keeper', name: 'Keeper', price: 29, desc: 'Preserve one person you love.', features: ['One vault', 'Voice preserved & re-created', 'Guided memory sessions', 'Life timeline', 'Photo & video archive', 'A memorial in their voice'] },
   { slug: 'legacy', name: 'Legacy', price: 79, popular: true, desc: 'For the whole family, capturing every day.', features: ['Up to 5 vaults', 'Everything in Keeper', 'Echo interviews daily — automatically', 'Full personality & mannerisms', 'On-camera biometric capture', 'Talk-with-them playback', 'Priority care'] },
   { slug: 'dynasty', name: 'Dynasty', price: 199, desc: 'A living archive across generations.', features: ['Unlimited vaults', 'Everything in Legacy', 'Face-to-face calls (as released)', 'Custom memorial films', 'Cross-generation story linking', 'A private family portal', 'A dedicated guide'] },
+];
+
+/* ── Bloodline add-on — three layers, priced to match the live paywall ── */
+const BLOODLINE = [
+  { k: 'The add-on', name: 'Bloodline', price: '$9–19', unit: '/mo', desc: 'Added to any Vault. Build your family tree with evidence — every relative, date and place kept with the record that proves it. No invented names, no guesswork.' },
+  { k: 'Done for you', name: 'Ancestry Report', price: 'from $499', unit: '', desc: 'Our researchers trace a line for you — birth, marriage, death and census records pulled and sourced. One branch, or the whole tree with DNA.' },
+  { k: 'The promise', name: 'Ancestor Persona', price: '$99–199', unit: '/ancestor', desc: 'Speak with an ancestor who lived long before recordings — reconstructed only from the documented record, and honest about what it cannot know.' },
 ];
 
 const FAQS = [
@@ -102,6 +110,8 @@ function FeatureIcon({ i, size = 30 }: { i: number; size?: number }) {
     <path key="7" d="M12 3c2.8 3 4.3 5.4 4.3 7.9a4.3 4.3 0 0 1-8.6 0c0-1.3.5-2.5 1.4-3.6.7 1 1.6 1.3 2.3 1 .9-.4 1-1.7.6-3.3Z" />,
     // 8 · yours alone, protected — shield
     <g key="8"><path d="M12 3l7 3v5c0 4.4-3 7.4-7 8.9C8 17.4 5 14.4 5 11V6l7-3Z" /><path d="M9 11.5l2 2 4-4" /></g>,
+    // 9 · their whole bloodline — a family tree (one line, three generations)
+    <g key="9"><circle cx="12" cy="4.4" r="1.9" /><circle cx="6.4" cy="16.4" r="1.9" /><circle cx="17.6" cy="16.4" r="1.9" /><path d="M12 6.3v3.2M6.4 14.5v-2.6a1 1 0 0 1 1-1h9.2a1 1 0 0 1 1 1v2.6M12 9.5v2.4" /></g>,
   ];
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -212,6 +222,32 @@ export default function ImmortalityVaultPage() {
                 </button>
               </div>
             ))}
+          </div>
+
+          {/* ── Bloodline add-on band ── */}
+          <div style={{ marginTop: 30, background: C.bg2, border: `1px solid ${C.hair}`, borderRadius: 22, padding: 'clamp(28px, 5vw, 46px)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 12 }}>
+              <span aria-hidden style={{ display: 'inline-flex' }}><FeatureIcon i={9} size={24} /></span>
+              <span style={{ fontSize: 12, letterSpacing: '0.28em', textTransform: 'uppercase', color: C.gold }}>New &middot; The Bloodline add-on</span>
+            </div>
+            <h3 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: 'clamp(24px,4vw,36px)', textAlign: 'center', margin: '0 0 10px', color: C.ivory }}>Go back further than a lifetime.</h3>
+            <p style={{ textAlign: 'center', color: C.muted, margin: '0 auto 32px', maxWidth: 620, fontSize: 16, lineHeight: 1.6 }}>
+              A Vault keeps the ones you knew. Bloodline keeps the ones who made them &mdash; an evidence-graded family tree where every fact carries its source, and, when a line runs deep enough, a grounded conversation with an ancestor who lived long before any recording.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 18 }}>
+              {BLOODLINE.map((b) => (
+                <div key={b.name} style={{ background: C.card, border: `1px solid ${C.hair}`, borderRadius: 16, padding: '24px 22px' }}>
+                  <div style={{ fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.goldDeep, marginBottom: 10 }}>{b.k}</div>
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: 21, fontWeight: 600, color: C.ivory, marginBottom: 4 }}>{b.name}</div>
+                  <div style={{ marginBottom: 14 }}><span style={{ fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 600, color: C.gold }}>{b.price}</span><span style={{ color: C.muted, fontSize: 13.5 }}>{b.unit}</span></div>
+                  <p style={{ fontSize: 14, lineHeight: 1.6, color: C.muted, margin: 0 }}>{b.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div style={{ textAlign: 'center', marginTop: 30 }}>
+              <Link href={`${R.app}?addon=bloodline`} style={{ display: 'inline-block', border: `1px solid ${C.gold}`, color: C.gold, padding: '13px 34px', borderRadius: 999, fontSize: 15, fontWeight: 700, textDecoration: 'none' }} className="iv-ghost">Add Bloodline to my Vault</Link>
+              <div style={{ marginTop: 14, fontSize: 12.5, color: C.muted }}>Every fact carries its source and confidence. Living relatives stay private &mdash; direct line only, never traced without consent.</div>
+            </div>
           </div>
         </div>
       </section>
