@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ACCENT, BG_CARD, BORDER } from '../lib/constants';
+import { ACCENT, GOLD, GOLD_BRIGHT, GOLD_DEEP, BG_CARD, BG_CARD2, BG_INSET, BORDER, HAIR, IVORY, MUTED } from '../lib/constants';
 import { getFamilyMembers, addFamilyMember, updateFamilyMember, deleteFamilyMember, createFamilyInvite, type FamilyMember } from '../lib/vault-api';
+import VaultIcon from './VaultIcon';
+
+const gm = (n: string) => n.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 
 interface Props {
   userId: string;
@@ -125,31 +128,31 @@ export default function FamilyPanel({ userId }: Props) {
             <h3 className="text-lg font-bold text-white mb-1">Edit Family Member</h3>
             <input value={editName} onChange={e => setEditName(e.target.value)} placeholder="Full name *"
               className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none"
-              style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }} disabled={saving} />
+              style={{ background: BG_INSET, border: `1px solid ${BORDER}` }} disabled={saving} />
             <input value={editRelation} onChange={e => setEditRelation(e.target.value)} placeholder="Relationship *"
               className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none"
-              style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }} disabled={saving} />
+              style={{ background: BG_INSET, border: `1px solid ${BORDER}` }} disabled={saving} />
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Birth Date</label>
                 <input type="date" value={editBirthDate} onChange={e => setEditBirthDate(e.target.value)}
                   className="w-full p-3 rounded-lg text-sm text-white outline-none"
-                  style={{ background: '#0a0a0f', border: `1px solid ${BORDER}`, colorScheme: 'dark' }} disabled={saving} />
+                  style={{ background: BG_INSET, border: `1px solid ${BORDER}`, colorScheme: 'dark' }} disabled={saving} />
               </div>
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Death Date</label>
                 <input type="date" value={editDeathDate} onChange={e => setEditDeathDate(e.target.value)}
                   className="w-full p-3 rounded-lg text-sm text-white outline-none"
-                  style={{ background: '#0a0a0f', border: `1px solid ${BORDER}`, colorScheme: 'dark' }} disabled={saving} />
+                  style={{ background: BG_INSET, border: `1px solid ${BORDER}`, colorScheme: 'dark' }} disabled={saving} />
               </div>
             </div>
             <textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder="Short biography"
               className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none resize-none"
-              style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }} rows={3} disabled={saving} />
+              style={{ background: BG_INSET, border: `1px solid ${BORDER}` }} rows={3} disabled={saving} />
             <div className="flex items-center gap-3 pt-1">
               <button onClick={saveEdit} disabled={saving || !editName.trim() || !editRelation.trim()}
-                className="px-5 py-2 rounded-full text-sm font-bold text-white transition disabled:opacity-40"
-                style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}>
+                className="px-5 py-2 rounded-full text-sm font-semibold transition disabled:opacity-40"
+                style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a' }}>
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
               <button onClick={() => setEditing(null)} disabled={saving}
@@ -162,11 +165,11 @@ export default function FamilyPanel({ userId }: Props) {
       )}
 
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Family Vault</h2>
+        <h2 className="text-2xl font-semibold" style={{ color: IVORY, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Family Vault</h2>
         <button
           onClick={() => setShowAdd(!showAdd)}
-          className="px-4 py-2 rounded-full text-sm font-semibold text-white transition hover:scale-[1.02]"
-          style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}
+          className="px-4 py-2 rounded-full text-sm font-semibold transition hover:brightness-110"
+          style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a' }}
         >
           + Add Member
         </button>
@@ -186,7 +189,7 @@ export default function FamilyPanel({ userId }: Props) {
             onChange={e => setNewName(e.target.value)}
             placeholder="Full name *"
             className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none"
-            style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }}
+            style={{ background: BG_INSET, border: `1px solid ${BORDER}` }}
             disabled={submitting}
           />
           <input
@@ -194,7 +197,7 @@ export default function FamilyPanel({ userId }: Props) {
             onChange={e => setNewRelation(e.target.value)}
             placeholder="Relationship (e.g., Grandfather, Mother, Son) *"
             className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none"
-            style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }}
+            style={{ background: BG_INSET, border: `1px solid ${BORDER}` }}
             disabled={submitting}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -205,7 +208,7 @@ export default function FamilyPanel({ userId }: Props) {
                 value={newBirthDate}
                 onChange={e => setNewBirthDate(e.target.value)}
                 className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none"
-                style={{ background: '#0a0a0f', border: `1px solid ${BORDER}`, colorScheme: 'dark' }}
+                style={{ background: BG_INSET, border: `1px solid ${BORDER}`, colorScheme: 'dark' }}
                 disabled={submitting}
               />
             </div>
@@ -216,7 +219,7 @@ export default function FamilyPanel({ userId }: Props) {
                 value={newDeathDate}
                 onChange={e => setNewDeathDate(e.target.value)}
                 className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none"
-                style={{ background: '#0a0a0f', border: `1px solid ${BORDER}`, colorScheme: 'dark' }}
+                style={{ background: BG_INSET, border: `1px solid ${BORDER}`, colorScheme: 'dark' }}
                 disabled={submitting}
               />
             </div>
@@ -226,7 +229,7 @@ export default function FamilyPanel({ userId }: Props) {
             onChange={e => setNewBio(e.target.value)}
             placeholder="Short biography (optional)"
             className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none resize-none"
-            style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }}
+            style={{ background: BG_INSET, border: `1px solid ${BORDER}` }}
             rows={3}
             disabled={submitting}
           />
@@ -234,8 +237,8 @@ export default function FamilyPanel({ userId }: Props) {
             <button
               onClick={addMember}
               disabled={submitting || !newName.trim() || !newRelation.trim()}
-              className="px-5 py-2 rounded-full text-sm font-bold text-white transition disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}
+              className="px-5 py-2 rounded-full text-sm font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a' }}
             >
               {submitting ? 'Saving...' : 'Save Member'}
             </button>
@@ -252,25 +255,25 @@ export default function FamilyPanel({ userId }: Props) {
 
       {loading ? (
         <div className="text-center py-8">
-          <div className="w-6 h-6 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mx-auto" />
+          <div className="w-6 h-6 rounded-full animate-spin mx-auto" style={{ border: `2px solid ${HAIR}`, borderTopColor: ACCENT }} />
         </div>
       ) : members.length === 0 ? (
-        <div className="text-center py-12 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-          <div className="text-4xl mb-3">{'\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}'}</div>
-          <div className="text-sm text-gray-400">No family members yet. Start building your family tree!</div>
+        <div className="text-center py-12 rounded-2xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+          <div className="mb-3 flex justify-center" style={{ color: GOLD_DEEP }}><VaultIcon name="family_vault" size={40} /></div>
+          <div className="text-sm" style={{ color: MUTED }}>No family members yet. Start building your family tree!</div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {members.map(m => (
-            <div key={m.id} className="p-5 rounded-xl group relative cursor-pointer transition hover:border-purple-500/40" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
+            <div key={m.id} className="p-5 rounded-xl group relative cursor-pointer transition hover:border-amber-400/40" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
               onClick={() => startEdit(m)}>
               <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
                 <button
                   onClick={e => { e.stopPropagation(); startEdit(m); }}
-                  className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-gray-500 hover:text-purple-400 hover:bg-purple-400/10"
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-gray-500 hover:text-amber-300 hover:bg-amber-400/10"
                   title="Edit"
                 >
-                  {'\u{270F}\u{FE0F}'}
+                  <VaultIcon name="settings" size={13} />
                 </button>
                 <button
                   onClick={e => { e.stopPropagation(); removeMember(m.id); }}
@@ -285,14 +288,14 @@ export default function FamilyPanel({ userId }: Props) {
                   )}
                 </button>
               </div>
-              <div className="w-12 h-12 rounded-full mb-3 flex items-center justify-center text-xl" style={{ background: '#1e1e2e', border: `2px solid ${BORDER}` }}>
-                {'\u{1F464}'}
+              <div className="w-12 h-12 rounded-full mb-3 flex items-center justify-center" style={{ background: BG_CARD2, border: `2px solid ${GOLD_DEEP}`, color: GOLD, fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: 16 }}>
+                {gm(m.name)}
               </div>
-              <div className="text-base font-bold text-white">{m.name}</div>
+              <div className="text-base font-semibold" style={{ color: IVORY }}>{m.name}</div>
               <div className="text-xs mb-2" style={{ color: ACCENT }}>{m.relationship}</div>
-              {m.bio && <div className="text-xs text-gray-400 line-clamp-2">{m.bio}</div>}
+              {m.bio && <div className="text-xs line-clamp-2" style={{ color: MUTED }}>{m.bio}</div>}
               {(m.birth_date || m.death_date) && (
-                <div className="mt-2 pt-2 text-[10px] text-gray-600" style={{ borderTop: `1px solid ${BORDER}` }}>
+                <div className="mt-2 pt-2 text-[10px]" style={{ borderTop: `1px solid ${HAIR}`, color: 'rgba(169,158,139,0.7)' }}>
                   {m.birth_date && <span>Born: {m.birth_date}</span>}
                   {m.birth_date && m.death_date && <span className="mx-1">&middot;</span>}
                   {m.death_date && <span>Passed: {m.death_date}</span>}

@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ACCENT, GOLD, BG_CARD, BORDER, LEVEL_THRESHOLDS } from '../lib/constants';
+import { ACCENT, GOLD, GOLD_BRIGHT, GOLD_DEEP, BG_CARD, BG_CARD2, BG_INSET, BORDER, HAIR, IVORY, MUTED, LEVEL_THRESHOLDS } from '../lib/constants';
 import { getGamificationStats, checkAchievements, getConsciousnessState, setConsciousnessState, getFamilyMembers, getChatSessions, type GamificationStats, type ConsciousnessStateResponse, type ConsciousnessStateType } from '../lib/vault-api';
+import VaultIcon from './VaultIcon';
+import MoreFromEcho from './MoreFromEcho';
 
 interface Props {
   userId: string;
@@ -14,11 +16,7 @@ export default function DashboardPanel({ userId, stats, onNavigate }: Props) {
   const [gamification, setGamification] = useState<GamificationStats | null>(null);
   const [consciousness, setConsciousness] = useState<ConsciousnessStateResponse | null>(null);
   const [stateChanging, setStateChanging] = useState(false);
-  // User-scoped Family + Chat counts. The `stats` prop is the PLATFORM-WIDE
-  // /stats total (all users), so reading stats.family_members / stats.chat_sessions
-  // here leaked other accounts' data into a brand-new user's dashboard (they'd see
-  // e.g. "8 Family Members / 17 Chat Sessions" with none of their own). Fetch the
-  // caller's own counts instead so the dashboard only ever shows THEIR vault.
+  // User-scoped Family + Chat counts (the `stats` prop is the platform-wide total).
   const [familyCount, setFamilyCount] = useState<number | null>(null);
   const [chatCount, setChatCount] = useState<number | null>(null);
 
@@ -43,118 +41,139 @@ export default function DashboardPanel({ userId, stats, onNavigate }: Props) {
 
   const score = consciousness?.score?.overall ?? gamification?.consciousness_score ?? Math.min(100, Math.round(((stats?.memories || 0) + (stats?.interviews || 0) * 3) / 2));
   const level = gamification?.level ?? LEVEL_THRESHOLDS.filter(l => score >= l.min).pop()?.label ?? 'Newcomer';
-  const levelColor = LEVEL_THRESHOLDS.filter(l => score >= l.min).pop()?.color ?? '#94a3b8';
+  const levelColor = LEVEL_THRESHOLDS.filter(l => score >= l.min).pop()?.color ?? MUTED;
   const points = gamification?.total_points ?? 0;
 
   const statCards = [
-    { label: 'Memories', value: gamification?.total_memories ?? stats?.memories ?? 0, icon: '\u{1F9E0}', color: ACCENT },
-    { label: 'Interviews', value: gamification?.total_interviews ?? stats?.interviews ?? 0, icon: '\u{1F399}\u{FE0F}', color: '#60a5fa' },
-    { label: 'Family Members', value: familyCount ?? 0, icon: '\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}', color: '#f472b6' },
-    { label: 'Chat Sessions', value: chatCount ?? 0, icon: '\u{1F4AC}', color: '#34d399' },
+    { label: 'Memories', value: gamification?.total_memories ?? stats?.memories ?? 0, icon: 'crystal' },
+    { label: 'Interviews', value: gamification?.total_interviews ?? stats?.interviews ?? 0, icon: 'interview' },
+    { label: 'Family Members', value: familyCount ?? 0, icon: 'family_vault' },
+    { label: 'Chat Sessions', value: chatCount ?? 0, icon: 'chat' },
   ];
 
   const quickActions = [
-    { panel: 'interview', icon: '\u{1F399}\u{FE0F}', title: 'Start Interview', desc: 'Answer questions to build your autobiography', gradient: 'linear-gradient(135deg, #7c3aed20, #a855f720)', border: '#7c3aed40' },
-    { panel: 'chat', icon: '\u{1F4AC}', title: 'Chat with Consciousness', desc: 'Talk to your preserved self', gradient: 'linear-gradient(135deg, #60a5fa20, #3b82f620)', border: '#60a5fa40' },
-    { panel: 'record', icon: '\u{1F4F9}', title: 'Record Video', desc: 'Capture selfie video for FaceTime', gradient: 'linear-gradient(135deg, #f472b620, #ec489920)', border: '#f472b640' },
-    { panel: 'voice', icon: '\u{1F3A4}', title: 'Clone Your Voice', desc: 'Record 10 prompts for voice synthesis', gradient: 'linear-gradient(135deg, #34d39920, #10b98120)', border: '#34d39940' },
-    { panel: 'briefing', icon: '\u{2600}\u{FE0F}', title: 'Daily Briefing', desc: 'Your personalized daily greeting', gradient: 'linear-gradient(135deg, #fbbf2420, #f59e0b20)', border: '#fbbf2440' },
-    { panel: 'ancestor', icon: '\u{1F54A}\u{FE0F}', title: 'Ancestor Chat', desc: 'Talk to a preserved family member', gradient: 'linear-gradient(135deg, #e879f920, #d946ef20)', border: '#e879f940' },
+    { panel: 'interview', icon: 'interview', title: 'Start Interview', desc: 'Answer questions to build your autobiography' },
+    { panel: 'chat', icon: 'chat', title: 'Chat with Consciousness', desc: 'Talk to your preserved self' },
+    { panel: 'record', icon: 'record', title: 'Record Video', desc: 'Capture selfie video for FaceTime' },
+    { panel: 'voice', icon: 'voice', title: 'Clone Your Voice', desc: 'Record prompts for voice synthesis' },
+    { panel: 'briefing', icon: 'briefing', title: 'Daily Briefing', desc: 'Your personalized daily greeting' },
+    { panel: 'ancestor', icon: 'ancestor', title: 'Ancestor Chat', desc: 'Talk to a preserved family member' },
   ];
 
-  // Consciousness score breakdown bars
   const interviewPct = Math.min(100, ((gamification?.total_interviews ?? stats?.interviews ?? 0) / 80) * 100);
   const memoryPct = Math.min(100, ((gamification?.total_memories ?? stats?.memories ?? 0) / 50) * 100);
   const voicePct = gamification?.voice_clone_status === 'active' ? 100 : 0;
   const achievePct = Math.min(100, (points / 500) * 100);
 
   const breakdownBars = [
-    { label: 'Personality Confidence (40%)', pct: consciousness?.score?.personality_confidence ?? interviewPct, color: '#60a5fa' },
-    { label: 'Trait Coverage (30%)', pct: consciousness?.score?.trait_coverage ?? memoryPct, color: ACCENT },
-    { label: 'Session Depth (20%)', pct: consciousness?.score?.session_depth ?? voicePct, color: '#34d399' },
-    { label: 'Memory Richness (10%)', pct: consciousness?.score?.memory_richness ?? achievePct, color: GOLD },
+    { label: 'Personality Confidence (40%)', pct: consciousness?.score?.personality_confidence ?? interviewPct },
+    { label: 'Trait Coverage (30%)', pct: consciousness?.score?.trait_coverage ?? memoryPct },
+    { label: 'Session Depth (20%)', pct: consciousness?.score?.session_depth ?? voicePct },
+    { label: 'Memory Richness (10%)', pct: consciousness?.score?.memory_richness ?? achievePct },
   ];
+
+  const card: React.CSSProperties = { background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: 16 };
 
   return (
     <div className="space-y-6">
-      {/* Level Badge + Score */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Your Immortality Vault</h2>
-        <div className="flex items-center gap-3">
-          <div className="px-3 py-1 rounded-full text-xs font-bold" style={{ background: `${levelColor}20`, color: levelColor, border: `1px solid ${levelColor}40` }}>
-            {level}
+      {/* ── Hero / atmosphere band (gold-on-black Grok art drops into the bg slot) ── */}
+      <section
+        className="relative overflow-hidden rounded-2xl"
+        style={{
+          border: `1px solid ${BORDER}`,
+          backgroundImage: `linear-gradient(105deg, ${BG_CARD} 8%, rgba(20,16,12,0.72) 46%, rgba(20,16,12,0.30) 100%), url('/immortality-vault/hero-ember.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="relative px-6 md:px-9 py-8 md:py-11" style={{ maxWidth: 640 }}>
+          <div className="flex items-center gap-2 mb-3 text-[11px] uppercase" style={{ letterSpacing: '0.24em', color: GOLD_DEEP }}>
+            <span style={{ width: 22, height: 1, background: GOLD_DEEP }} /> Immortality Vault
           </div>
-          {points > 0 && (
-            <div className="text-xs font-mono text-gray-400">{points} XP</div>
-          )}
+          <h2 className="text-2xl md:text-[34px] font-semibold leading-tight mb-2" style={{ color: IVORY, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+            Your legacy, kept in the light.
+          </h2>
+          <p className="text-sm mb-5" style={{ color: MUTED, lineHeight: 1.65, maxWidth: 470 }}>
+            Every memory, every word, and one day your very voice — preserved with care for the generations who come after you.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => onNavigate('interview')}
+              className="px-5 py-2.5 rounded-full text-sm font-semibold transition hover:brightness-110 inline-flex items-center gap-2"
+              style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a', boxShadow: `0 10px 30px -12px ${ACCENT}` }}
+            >
+              <VaultIcon name="interview" size={16} /> Continue Your Story
+            </button>
+            <div className="px-3.5 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-2" style={{ background: `${levelColor}1e`, color: levelColor, border: `1px solid ${levelColor}44` }}>
+              <VaultIcon name="values" size={13} /> {level}{points > 0 ? ` · ${points} XP` : ''}
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Stat Cards */}
+      {/* ── Stat Cards ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {statCards.map(s => (
-          <div key={s.label} className="p-4 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-            <div className="text-2xl mb-2">{s.icon}</div>
-            <div className="text-3xl font-black" style={{ color: s.color }}>{s.value}</div>
-            <div className="text-xs text-gray-400 mt-1">{s.label}</div>
+          <div key={s.label} className="p-4 rounded-2xl transition hover:brightness-110" style={card}>
+            <div className="mb-2" style={{ color: ACCENT }}><VaultIcon name={s.icon} size={22} /></div>
+            <div className="text-3xl font-bold" style={{ color: IVORY }}>{s.value}</div>
+            <div className="text-xs mt-1" style={{ color: MUTED }}>{s.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Quick Actions */}
+      {/* ── Quick Actions ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {quickActions.map(a => (
           <button
             key={a.panel}
             onClick={() => onNavigate(a.panel)}
-            className="p-5 rounded-xl text-left transition hover:scale-[1.02]"
-            style={{ background: a.gradient, border: `1px solid ${a.border}` }}
+            className="group p-5 rounded-2xl text-left transition hover:-translate-y-0.5"
+            style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
           >
-            <div className="text-xl mb-2">{a.icon}</div>
-            <div className="text-sm font-bold text-white">{a.title}</div>
-            <div className="text-xs text-gray-400">{a.desc}</div>
+            <div className="mb-3 inline-flex items-center justify-center rounded-xl transition" style={{ width: 40, height: 40, color: ACCENT, background: 'rgba(245,196,81,0.08)', border: `1px solid ${HAIR}` }}>
+              <VaultIcon name={a.icon} size={20} />
+            </div>
+            <div className="text-sm font-semibold" style={{ color: IVORY }}>{a.title}</div>
+            <div className="text-xs mt-0.5" style={{ color: MUTED }}>{a.desc}</div>
           </button>
         ))}
       </div>
 
-      {/* Consciousness Score */}
-      <div className="p-6 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+      {/* ── Consciousness Score ── */}
+      <div className="p-6 rounded-2xl" style={card}>
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm font-semibold text-white">Consciousness Completeness</span>
-          <span className="text-2xl font-black" style={{ color: ACCENT }}>{score}%</span>
+          <span className="text-sm font-semibold" style={{ color: IVORY }}>Consciousness Completeness</span>
+          <span className="text-2xl font-bold" style={{ color: ACCENT }}>{score}%</span>
         </div>
-        <div className="h-3 rounded-full overflow-hidden" style={{ background: '#1e1e2e' }}>
-          <div
-            className="h-full rounded-full transition-all duration-1000"
-            style={{ width: `${score}%`, background: `linear-gradient(90deg, #7c3aed, ${ACCENT}, ${GOLD})` }}
-          />
+        <div className="h-3 rounded-full overflow-hidden" style={{ background: BG_INSET, border: `1px solid ${HAIR}` }}>
+          <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${score}%`, background: `linear-gradient(90deg, ${GOLD_DEEP}, ${GOLD}, ${GOLD_BRIGHT})`, boxShadow: `0 0 16px -3px ${ACCENT}` }} />
         </div>
 
-        {/* Breakdown Bars */}
-        <div className="mt-4 space-y-2">
+        <div className="mt-5 space-y-3">
           {breakdownBars.map(b => (
             <div key={b.label}>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-gray-500">{b.label}</span>
-                <span className="text-xs font-mono" style={{ color: b.color }}>{Math.round(b.pct)}%</span>
+                <span className="text-xs" style={{ color: MUTED }}>{b.label}</span>
+                <span className="text-xs font-mono" style={{ color: ACCENT }}>{Math.round(b.pct)}%</span>
               </div>
-              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#1e1e2e' }}>
-                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${b.pct}%`, background: b.color }} />
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: BG_INSET }}>
+                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${b.pct}%`, background: `linear-gradient(90deg, ${GOLD_DEEP}, ${GOLD})` }} />
               </div>
             </div>
           ))}
         </div>
 
         {/* Consciousness State Controls */}
-        <div className="mt-5 pt-4" style={{ borderTop: `1px solid ${BORDER}` }}>
-          <div className="text-xs text-gray-500 mb-3">Consciousness State</div>
+        <div className="mt-6 pt-4" style={{ borderTop: `1px solid ${HAIR}` }}>
+          <div className="text-xs mb-3" style={{ color: MUTED }}>Consciousness State</div>
           <div className="flex flex-wrap gap-2">
             {([
-              { state: 'DORMANT' as const, icon: '\u{1F4A4}', label: 'Dormant', desc: 'Paused — not learning' },
-              { state: 'LEARNING' as const, icon: '\u{1F4D6}', label: 'Learning', desc: 'Absorbing new memories' },
-              { state: 'ACTIVE' as const, icon: '\u{26A1}', label: 'Active', desc: 'Full consciousness' },
-              { state: 'INTERVIEWING' as const, icon: '\u{1F399}\u{FE0F}', label: 'Interviewing', desc: 'Deep biography mode' },
-              { state: 'CONVERSING' as const, icon: '\u{1F4AC}', label: 'Conversing', desc: 'Live conversation' },
+              { state: 'DORMANT' as const, icon: 'clock', label: 'Dormant', desc: 'Paused — not learning' },
+              { state: 'LEARNING' as const, icon: 'education', label: 'Learning', desc: 'Absorbing new memories' },
+              { state: 'ACTIVE' as const, icon: 'spark', label: 'Active', desc: 'Full consciousness' },
+              { state: 'INTERVIEWING' as const, icon: 'interview', label: 'Interviewing', desc: 'Deep biography mode' },
+              { state: 'CONVERSING' as const, icon: 'chat', label: 'Conversing', desc: 'Live conversation' },
             ]).map(s => {
               const active = consciousness?.state === s.state;
               return (
@@ -162,15 +181,15 @@ export default function DashboardPanel({ userId, stats, onNavigate }: Props) {
                   key={s.state}
                   onClick={() => handleStateChange(s.state)}
                   disabled={stateChanging}
-                  className="px-3 py-1.5 rounded-lg text-xs transition hover:opacity-80 disabled:opacity-40"
+                  className="px-3 py-1.5 rounded-lg text-xs transition hover:brightness-110 disabled:opacity-40 inline-flex items-center gap-1.5"
                   style={{
-                    background: active ? `${ACCENT}25` : '#0a0a0f',
-                    border: `1px solid ${active ? ACCENT : BORDER}`,
-                    color: active ? ACCENT : '#94a3b8',
+                    background: active ? 'rgba(245,196,81,0.14)' : BG_INSET,
+                    border: `1px solid ${active ? 'rgba(245,196,81,0.4)' : BORDER}`,
+                    color: active ? ACCENT : MUTED,
                   }}
                   title={s.desc}
                 >
-                  {s.icon} {s.label}
+                  <VaultIcon name={s.icon} size={13} /> {s.label}
                 </button>
               );
             })}
@@ -178,32 +197,37 @@ export default function DashboardPanel({ userId, stats, onNavigate }: Props) {
         </div>
       </div>
 
-      {/* Achievements */}
+      {/* ── Achievements ── */}
       {gamification && gamification.available_achievements && gamification.available_achievements.length > 0 && (
-        <div className="p-6 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-          <h3 className="text-sm font-semibold text-white mb-4">Achievements</h3>
+        <div className="p-6 rounded-2xl" style={card}>
+          <h3 className="text-sm font-semibold mb-4" style={{ color: IVORY }}>Achievements</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {gamification.available_achievements.map(a => {
               const unlocked = gamification.achievements.some(u => u.achievement_type === a.type);
               return (
                 <div
                   key={a.type}
-                  className="p-3 rounded-lg text-center"
+                  className="p-3 rounded-xl text-center"
                   style={{
-                    background: unlocked ? `${GOLD}15` : '#0a0a0f',
-                    border: `1px solid ${unlocked ? `${GOLD}40` : BORDER}`,
-                    opacity: unlocked ? 1 : 0.5,
+                    background: unlocked ? 'rgba(245,196,81,0.09)' : BG_INSET,
+                    border: `1px solid ${unlocked ? 'rgba(245,196,81,0.34)' : BORDER}`,
+                    opacity: unlocked ? 1 : 0.55,
                   }}
                 >
-                  <div className="text-lg mb-1">{unlocked ? '\u{1F3C6}' : '\u{1F512}'}</div>
-                  <div className="text-xs font-bold" style={{ color: unlocked ? GOLD : '#64748b' }}>{a.title}</div>
-                  <div className="text-[10px] text-gray-500 mt-0.5">{a.points} XP</div>
+                  <div className="mb-1.5 flex justify-center" style={{ color: unlocked ? ACCENT : MUTED }}>
+                    <VaultIcon name={unlocked ? 'trophy' : 'lock'} size={20} />
+                  </div>
+                  <div className="text-xs font-semibold" style={{ color: unlocked ? ACCENT : MUTED }}>{a.title}</div>
+                  <div className="text-[10px] mt-0.5" style={{ color: MUTED }}>{a.points} XP</div>
                 </div>
               );
             })}
           </div>
         </div>
       )}
+
+      {/* ── More from Echo Prime (quiet, dismissible cross-promo) ── */}
+      <MoreFromEcho />
     </div>
   );
 }

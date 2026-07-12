@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { ACCENT, GOLD, BG_CARD, BORDER, BG_DARK } from '../lib/constants';
+import { ACCENT, GOLD, GOLD_BRIGHT, GOLD_DEEP, BG_CARD, BG_INSET, BORDER, HAIR, IVORY, MUTED, BG_DARK } from '../lib/constants';
 import { synthesizeSpeech, getVoiceProfiles, createVoiceProfile, getCloneStatus, type VoiceProfile } from '../lib/vault-api';
+import VaultIcon from './VaultIcon';
 import { startAudioStream, stopCamera, createMediaRecorder, createAnalyser, drawWaveform, formatDuration, playAudioBlob, type RecorderHandle } from '../lib/media';
 
 interface Props {
@@ -171,8 +172,8 @@ export default function VoicePanel({ userId }: Props) {
           <span className="text-sm text-white font-semibold">Progress</span>
           <span className="text-sm font-mono" style={{ color: ACCENT }}>{completedCount}/{VOICE_PROMPTS.length}</span>
         </div>
-        <div className="h-2 rounded-full overflow-hidden" style={{ background: '#1e1e2e' }}>
-          <div className="h-full rounded-full transition-all" style={{ width: `${(completedCount / VOICE_PROMPTS.length) * 100}%`, background: `linear-gradient(90deg, #7c3aed, ${ACCENT})` }} />
+        <div className="h-2 rounded-full overflow-hidden" style={{ background: BG_INSET }}>
+          <div className="h-full rounded-full transition-all" style={{ width: `${(completedCount / VOICE_PROMPTS.length) * 100}%`, background: `linear-gradient(90deg, ${GOLD_DEEP}, ${GOLD})` }} />
         </div>
         <div className="flex justify-between mt-2 text-[10px] text-gray-500">
           <span>{completedCount} samples recorded</span>
@@ -188,9 +189,9 @@ export default function VoicePanel({ userId }: Props) {
             onClick={() => !isRecording && setCurrentIdx(i)}
             className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition"
             style={{
-              background: samples.has(p.id) ? '#34d39930' : i === currentIdx ? '#7c3aed30' : '#1e1e2e',
-              border: `2px solid ${samples.has(p.id) ? '#34d399' : i === currentIdx ? '#7c3aed' : BORDER}`,
-              color: samples.has(p.id) ? '#34d399' : i === currentIdx ? ACCENT : '#64748b',
+              background: samples.has(p.id) ? 'rgba(52,211,153,0.19)' : i === currentIdx ? 'rgba(245,196,81,0.18)' : BG_INSET,
+              border: `2px solid ${samples.has(p.id) ? '#34d399' : i === currentIdx ? ACCENT : BORDER}`,
+              color: samples.has(p.id) ? '#34d399' : i === currentIdx ? ACCENT : MUTED,
             }}
           >
             {samples.has(p.id) ? '\u{2713}' : i + 1}
@@ -209,8 +210,8 @@ export default function VoicePanel({ userId }: Props) {
         <h3 className="text-base font-bold text-white mb-2">{prompt.label}</h3>
         <p className="text-sm text-gray-300 italic leading-relaxed">&ldquo;{prompt.text}&rdquo;</p>
         {samples.has(prompt.id) && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-green-400">
-            {'\u{2705}'} Recorded
+          <div className="mt-3 flex items-center gap-1.5 text-xs" style={{ color: '#34d399' }}>
+            <VaultIcon name="check" size={14} /> Recorded
           </div>
         )}
       </div>
@@ -228,7 +229,7 @@ export default function VoicePanel({ userId }: Props) {
           width={400}
           height={80}
           className="w-full rounded-lg"
-          style={{ background: '#0a0a0f', display: isRecording ? 'block' : 'none' }}
+          style={{ background: BG_INSET, display: isRecording ? 'block' : 'none' }}
         />
 
         {isRecording && (
@@ -239,18 +240,20 @@ export default function VoicePanel({ userId }: Props) {
           {!isRecording ? (
             <button
               onClick={startRecording}
-              className="w-16 h-16 rounded-full flex items-center justify-center text-2xl transition hover:scale-105"
-              style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)', boxShadow: '0 0 30px rgba(239,68,68,0.3)' }}
+              className="w-16 h-16 rounded-full flex items-center justify-center transition hover:scale-105"
+              style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a', boxShadow: `0 0 30px -4px ${ACCENT}` }}
+              aria-label="Start recording"
             >
-              {'\u{1F3A4}'}
+              <VaultIcon name="mic" size={26} />
             </button>
           ) : (
             <button
               onClick={stopRecording}
               className="w-16 h-16 rounded-full flex items-center justify-center transition hover:scale-105 animate-pulse"
-              style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)', boxShadow: '0 0 30px rgba(239,68,68,0.5)' }}
+              style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, boxShadow: `0 0 34px -2px ${ACCENT}` }}
+              aria-label="Stop recording"
             >
-              <div className="w-6 h-6 rounded-sm bg-white" />
+              <div className="w-5 h-5 rounded-sm" style={{ background: '#20160a' }} />
             </button>
           )}
         </div>
@@ -299,7 +302,7 @@ export default function VoicePanel({ userId }: Props) {
             onClick={submitSamples}
             disabled={uploading || cloneStatus?.status === 'processing' || cloneStatus?.status === 'active'}
             className="px-8 py-3 rounded-full text-sm font-bold text-white transition hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
-            style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})`, boxShadow: '0 0 20px rgba(124,58,237,0.3)' }}
+            style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a', boxShadow: `0 8px 26px -10px ${ACCENT}` }}
           >
             {uploading ? 'Uploading Samples...'
               : cloneStatus?.status === 'processing' ? 'Processing...'
@@ -312,18 +315,18 @@ export default function VoicePanel({ userId }: Props) {
       {/* Test Voice */}
       {completedCount >= 3 && (
         <div className="p-5 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-          <h3 className="text-sm font-bold text-white mb-3">{'\u{1F50A}'} Test Your Voice Clone</h3>
+          <h3 className="text-sm font-semibold mb-3 inline-flex items-center gap-2" style={{ color: IVORY }}><span style={{ color: ACCENT, display: 'flex' }}><VaultIcon name="speaker" size={16} /></span> Test Your Voice Clone</h3>
           <input
             value={testText}
             onChange={e => setTestText(e.target.value)}
-            className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none mb-3"
-            style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }}
+            className="w-full p-3 rounded-lg text-sm placeholder-gray-600 outline-none mb-3"
+            style={{ background: BG_INSET, border: `1px solid ${BORDER}`, color: IVORY }}
           />
           <button
             onClick={testVoice}
             disabled={testPlaying}
             className="px-5 py-2 rounded-full text-sm font-bold text-white disabled:opacity-40"
-            style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}
+            style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a' }}
           >
             {testPlaying ? 'Playing...' : 'Test Voice'}
           </button>
@@ -332,16 +335,16 @@ export default function VoicePanel({ userId }: Props) {
 
       {/* Recording Tips */}
       <div className="p-5 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-        <h3 className="text-sm font-bold text-white mb-3">Recording Tips</h3>
+        <h3 className="text-sm font-semibold mb-3" style={{ color: IVORY }}>Recording Tips</h3>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { icon: '\u{1F3A7}', tip: 'Use a quiet room with minimal echo' },
-            { icon: '\u{1F4CF}', tip: 'Hold device 6-8 inches from mouth' },
-            { icon: '\u{1F3AF}', tip: 'Speak naturally at your normal pace' },
-            { icon: '\u{1F504}', tip: 'Re-record any prompt you\'re unsure about' },
+            { icon: 'speaker', tip: 'Use a quiet room with minimal echo' },
+            { icon: 'device', tip: 'Hold device 6-8 inches from mouth' },
+            { icon: 'values', tip: 'Speak naturally at your normal pace' },
+            { icon: 'spark', tip: 'Re-record any prompt you\'re unsure about' },
           ].map(t => (
-            <div key={t.tip} className="flex items-start gap-2 text-xs text-gray-400">
-              <span className="text-sm">{t.icon}</span>
+            <div key={t.tip} className="flex items-start gap-2 text-xs" style={{ color: MUTED }}>
+              <span className="flex-shrink-0" style={{ color: ACCENT }}><VaultIcon name={t.icon} size={15} /></span>
               <span>{t.tip}</span>
             </div>
           ))}
@@ -356,10 +359,10 @@ export default function VoicePanel({ userId }: Props) {
             {profiles.map(p => (
               <div key={p.id} className="flex items-center justify-between p-3 rounded-lg" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
                 <div className="flex items-center gap-3">
-                  <div className="text-lg">{'\u{1F3A4}'}</div>
+                  <div style={{ color: ACCENT, display: 'flex' }}><VaultIcon name="voice" size={20} /></div>
                   <div>
-                    <div className="text-xs text-white">{p.sample_count} samples</div>
-                    <div className="text-[10px] text-gray-500">Quality: {Math.round(p.quality_score * 100)}%</div>
+                    <div className="text-xs" style={{ color: IVORY }}>{p.sample_count} samples</div>
+                    <div className="text-[10px]" style={{ color: MUTED }}>Quality: {Math.round(p.quality_score * 100)}%</div>
                   </div>
                 </div>
                 <span className="text-[10px] px-2 py-0.5 rounded-full" style={{

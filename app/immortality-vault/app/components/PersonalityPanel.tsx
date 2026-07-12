@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { ACCENT, GOLD, BG_CARD, BORDER } from '../lib/constants';
+import { ACCENT, GOLD, GOLD_DEEP, BG_CARD, BG_INSET, BORDER, HAIR, IVORY, MUTED } from '../lib/constants';
 import {
   getPersonalityProfile,
   getConsciousnessState,
@@ -10,20 +10,22 @@ import {
   type TraitCategory,
   type PersonalityTrait,
 } from '../lib/vault-api';
+import VaultIcon from './VaultIcon';
 
 interface Props {
   userId: string;
 }
 
+/* one gold family — distinct warm tints per category, never a rainbow */
 const CATEGORY_META: Record<TraitCategory, { label: string; icon: string; color: string }> = {
-  communication_style: { label: 'Communication', icon: '\u{1F4AC}', color: '#60a5fa' },
-  emotional_disposition: { label: 'Emotional', icon: '\u{2764}\u{FE0F}', color: '#f472b6' },
-  values_beliefs: { label: 'Values & Beliefs', icon: '\u{2B50}', color: '#fbbf24' },
-  humor_style: { label: 'Humor', icon: '\u{1F604}', color: '#34d399' },
-  decision_making: { label: 'Decisions', icon: '\u{1F9E0}', color: '#a78bfa' },
-  social_behavior: { label: 'Social', icon: '\u{1F465}', color: '#f97316' },
-  intellectual_traits: { label: 'Intellect', icon: '\u{1F4DA}', color: '#06b6d4' },
-  lifestyle_preferences: { label: 'Lifestyle', icon: '\u{2600}\u{FE0F}', color: '#84cc16' },
+  communication_style: { label: 'Communication', icon: 'chat', color: '#e6c060' },
+  emotional_disposition: { label: 'Emotional', icon: 'relationships', color: '#f0b46a' },
+  values_beliefs: { label: 'Values & Beliefs', icon: 'values', color: '#f5c451' },
+  humor_style: { label: 'Humor', icon: 'humor', color: '#d8b25a' },
+  decision_making: { label: 'Decisions', icon: 'wisdom', color: '#ecd29a' },
+  social_behavior: { label: 'Social', icon: 'family', color: '#e0b85a' },
+  intellectual_traits: { label: 'Intellect', icon: 'education', color: '#caa856' },
+  lifestyle_preferences: { label: 'Lifestyle', icon: 'daily_life', color: '#ffe08a' },
 };
 
 const CATEGORY_ORDER: TraitCategory[] = [
@@ -71,12 +73,12 @@ function RadarChart({ data }: { data: { label: string; value: number; color: str
     <svg viewBox="0 0 300 300" className="w-full max-w-xs mx-auto">
       {/* Grid */}
       {gridRings.map((ring, i) => (
-        <polygon key={i} points={ring} fill="none" stroke="#2a2a3a" strokeWidth={0.8} />
+        <polygon key={i} points={ring} fill="none" stroke="rgba(245,196,81,0.14)" strokeWidth={0.8} />
       ))}
 
       {/* Axes */}
       {axes.map((p, i) => (
-        <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="#2a2a3a" strokeWidth={0.5} />
+        <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="rgba(245,196,81,0.14)" strokeWidth={0.5} />
       ))}
 
       {/* Data fill */}
@@ -84,7 +86,7 @@ function RadarChart({ data }: { data: { label: string; value: number; color: str
 
       {/* Data dots */}
       {dataPoints.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={4} fill={data[i].color} stroke="#0a0a0f" strokeWidth={1.5} />
+        <circle key={i} cx={p.x} cy={p.y} r={4} fill={data[i].color} stroke="#0a0807" strokeWidth={1.5} />
       ))}
 
       {/* Labels */}
@@ -95,7 +97,7 @@ function RadarChart({ data }: { data: { label: string; value: number; color: str
         const ly = cy + labelR * Math.sin(a);
         const anchor = lx < cx - 5 ? 'end' : lx > cx + 5 ? 'start' : 'middle';
         return (
-          <text key={i} x={lx} y={ly} textAnchor={anchor} dominantBaseline="middle" fontSize={9} fill="#94a3b8">
+          <text key={i} x={lx} y={ly} textAnchor={anchor} dominantBaseline="middle" fontSize={9} fill="#a99e8b">
             {d.label}
           </text>
         );
@@ -114,7 +116,7 @@ function TraitBar({ trait, color }: { trait: PersonalityTrait; color: string }) 
           <span className="text-[10px] text-gray-600">{Math.round(trait.confidence * 100)}% conf</span>
         </div>
       </div>
-      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#1e1e2e' }}>
+      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: BG_INSET }}>
         <div className="h-full rounded-full transition-all duration-700" style={{ width: `${trait.value}%`, background: color, opacity: 0.6 + trait.confidence * 0.4 }} />
       </div>
     </div>
@@ -147,7 +149,7 @@ export default function PersonalityPanel({ userId }: Props) {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mx-auto" />
+        <div className="w-8 h-8 rounded-full animate-spin mx-auto" style={{ border: `2px solid ${HAIR}`, borderTopColor: ACCENT }} />
       </div>
     );
   }
@@ -157,21 +159,21 @@ export default function PersonalityPanel({ userId }: Props) {
   if (!hasTrait) {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-white">Personality Profile</h2>
+        <h2 className="text-2xl font-semibold" style={{ color: IVORY, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Personality Profile</h2>
         <div className="p-8 rounded-2xl text-center" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-          <div className="text-5xl mb-4">{'\u{1F9EC}'}</div>
-          <h3 className="text-lg font-bold text-white mb-2">No Traits Extracted Yet</h3>
-          <p className="text-sm text-gray-400 max-w-md mx-auto">
+          <div className="mb-4 flex justify-center" style={{ color: GOLD_DEEP }}><VaultIcon name="personality" size={44} /></div>
+          <h3 className="text-lg font-semibold mb-2" style={{ color: IVORY }}>No Traits Extracted Yet</h3>
+          <p className="text-sm max-w-md mx-auto" style={{ color: MUTED }}>
             Complete interviews and chat sessions to build your personality profile. Each interaction helps the AI understand who you are.
           </p>
           <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
             {CATEGORY_ORDER.map(cat => {
               const meta = CATEGORY_META[cat];
               return (
-                <div key={cat} className="p-3 rounded-lg" style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }}>
-                  <div className="text-lg mb-1">{meta.icon}</div>
-                  <div className="text-[10px] text-gray-500">{meta.label}</div>
-                  <div className="h-1 rounded-full mt-2" style={{ background: '#1e1e2e' }}>
+                <div key={cat} className="p-3 rounded-lg" style={{ background: BG_INSET, border: `1px solid ${BORDER}` }}>
+                  <div className="mb-1 flex justify-center" style={{ color: meta.color }}><VaultIcon name={meta.icon} size={19} /></div>
+                  <div className="text-[10px]" style={{ color: MUTED }}>{meta.label}</div>
+                  <div className="h-1 rounded-full mt-2" style={{ background: BG_INSET }}>
                     <div className="h-full rounded-full" style={{ width: '0%', background: meta.color }} />
                   </div>
                 </div>
@@ -186,9 +188,9 @@ export default function PersonalityPanel({ userId }: Props) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Personality Profile</h2>
+        <h2 className="text-2xl font-semibold" style={{ color: IVORY, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Personality Profile</h2>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500">{profile?.sample_count ?? 0} samples</span>
+          <span className="text-xs" style={{ color: MUTED }}>{profile?.sample_count ?? 0} samples</span>
           <span className="px-3 py-1 rounded-full text-xs font-bold" style={{ background: `${ACCENT}20`, color: ACCENT, border: `1px solid ${ACCENT}40` }}>
             {Math.round(profile?.confidence_score ?? 0)}% confidence
           </span>
@@ -219,14 +221,14 @@ export default function PersonalityPanel({ userId }: Props) {
                 className="w-full flex items-center justify-between p-4 transition hover:bg-white/5"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">{meta.icon}</span>
+                  <span style={{ color: meta.color, display: 'flex' }}><VaultIcon name={meta.icon} size={20} /></span>
                   <div className="text-left">
-                    <div className="text-sm font-semibold text-white">{meta.label}</div>
+                    <div className="text-sm font-semibold" style={{ color: IVORY }}>{meta.label}</div>
                     <div className="text-[10px] text-gray-500">{traits.length} trait{traits.length !== 1 ? 's' : ''} detected</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-16 h-2 rounded-full overflow-hidden" style={{ background: '#1e1e2e' }}>
+                  <div className="w-16 h-2 rounded-full overflow-hidden" style={{ background: BG_INSET }}>
                     <div className="h-full rounded-full" style={{ width: `${avg}%`, background: meta.color }} />
                   </div>
                   <span className="text-xs font-mono" style={{ color: meta.color }}>{avg}%</span>
@@ -248,7 +250,7 @@ export default function PersonalityPanel({ userId }: Props) {
       {/* Voice Pattern */}
       {profile?.voice_pattern && (
         <div className="p-5 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-          <h3 className="text-sm font-semibold text-white mb-4">{'\u{1F3A4}'} Voice Pattern</h3>
+          <h3 className="text-sm font-semibold mb-4 inline-flex items-center gap-2" style={{ color: IVORY }}><span style={{ color: ACCENT, display: 'flex' }}><VaultIcon name="voice" size={16} /></span> Voice Pattern</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <div className="text-[10px] text-gray-500">Formality</div>
@@ -299,7 +301,7 @@ export default function PersonalityPanel({ userId }: Props) {
       {/* Emotional Profile */}
       {profile?.emotional_profile && (
         <div className="p-5 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-          <h3 className="text-sm font-semibold text-white mb-4">{'\u{2764}\u{FE0F}'} Emotional Profile</h3>
+          <h3 className="text-sm font-semibold mb-4 inline-flex items-center gap-2" style={{ color: IVORY }}><span style={{ color: ACCENT, display: 'flex' }}><VaultIcon name="relationships" size={16} /></span> Emotional Profile</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <div className="text-[10px] text-gray-500">Baseline Mood</div>
@@ -308,10 +310,10 @@ export default function PersonalityPanel({ userId }: Props) {
             <div>
               <div className="text-[10px] text-gray-500">Emotional Range</div>
               <div className="flex items-center gap-2">
-                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: '#1e1e2e' }}>
-                  <div className="h-full rounded-full" style={{ width: `${profile.emotional_profile.emotional_range * 100}%`, background: '#f472b6' }} />
+                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: BG_INSET }}>
+                  <div className="h-full rounded-full" style={{ width: `${profile.emotional_profile.emotional_range * 100}%`, background: `linear-gradient(90deg, ${GOLD_DEEP}, ${GOLD})` }} />
                 </div>
-                <span className="text-xs font-mono text-pink-400">{Math.round(profile.emotional_profile.emotional_range * 100)}%</span>
+                <span className="text-xs font-mono" style={{ color: ACCENT }}>{Math.round(profile.emotional_profile.emotional_range * 100)}%</span>
               </div>
             </div>
             <div>
@@ -339,23 +341,23 @@ export default function PersonalityPanel({ userId }: Props) {
       {/* Consciousness State */}
       {consciousness && (
         <div className="p-5 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-          <h3 className="text-sm font-semibold text-white mb-3">{'\u{2728}'} Consciousness Summary</h3>
+          <h3 className="text-sm font-semibold mb-3 inline-flex items-center gap-2" style={{ color: IVORY }}><span style={{ color: ACCENT, display: 'flex' }}><VaultIcon name="spark" size={16} /></span> Consciousness Summary</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="p-3 rounded-lg text-center" style={{ background: '#0a0a0f' }}>
+            <div className="p-3 rounded-lg text-center" style={{ background: BG_INSET }}>
               <div className="text-lg font-bold" style={{ color: ACCENT }}>{consciousness.total_traits}</div>
-              <div className="text-[10px] text-gray-500">Total Traits</div>
+              <div className="text-[10px]" style={{ color: MUTED }}>Total Traits</div>
             </div>
-            <div className="p-3 rounded-lg text-center" style={{ background: '#0a0a0f' }}>
-              <div className="text-lg font-bold" style={{ color: '#60a5fa' }}>{consciousness.total_samples}</div>
-              <div className="text-[10px] text-gray-500">Samples</div>
+            <div className="p-3 rounded-lg text-center" style={{ background: BG_INSET }}>
+              <div className="text-lg font-bold" style={{ color: '#e6c060' }}>{consciousness.total_samples}</div>
+              <div className="text-[10px]" style={{ color: MUTED }}>Samples</div>
             </div>
-            <div className="p-3 rounded-lg text-center" style={{ background: '#0a0a0f' }}>
-              <div className="text-lg font-bold" style={{ color: '#34d399' }}>{consciousness.total_sessions}</div>
-              <div className="text-[10px] text-gray-500">Sessions</div>
+            <div className="p-3 rounded-lg text-center" style={{ background: BG_INSET }}>
+              <div className="text-lg font-bold" style={{ color: '#ecd29a' }}>{consciousness.total_sessions}</div>
+              <div className="text-[10px]" style={{ color: MUTED }}>Sessions</div>
             </div>
-            <div className="p-3 rounded-lg text-center" style={{ background: '#0a0a0f' }}>
+            <div className="p-3 rounded-lg text-center" style={{ background: BG_INSET }}>
               <div className="text-lg font-bold" style={{ color: GOLD }}>{Math.round(consciousness.personality_confidence * 100)}%</div>
-              <div className="text-[10px] text-gray-500">Confidence</div>
+              <div className="text-[10px]" style={{ color: MUTED }}>Confidence</div>
             </div>
           </div>
         </div>

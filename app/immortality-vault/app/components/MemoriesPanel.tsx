@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ACCENT, GOLD, BG_CARD, BORDER, CATEGORIES, EMOTION_ICONS } from '../lib/constants';
+import { ACCENT, GOLD, GOLD_BRIGHT, GOLD_DEEP, BG_CARD, BG_INSET, BORDER, HAIR, IVORY, MUTED, CATEGORIES, EMOTION_ICONS } from '../lib/constants';
 import { getTypedMemories, storeTypedMemory, consolidateMemories, type TypedMemory, type MemoryType } from '../lib/vault-api';
+import VaultIcon, { CATEGORY_ICON } from './VaultIcon';
+
+const goldBtn = `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`;
 
 interface Props {
   userId: string;
@@ -60,22 +63,22 @@ export default function MemoriesPanel({ userId }: Props) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Memories</h2>
+        <h2 className="text-2xl font-semibold" style={{ color: IVORY, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Memories</h2>
         <div className="flex items-center gap-2">
           <button
             onClick={async () => { setConsolidating(true); try { await consolidateMemories(userId); await loadMemories(); } catch {} setConsolidating(false); }}
             disabled={consolidating}
-            className="px-4 py-2 rounded-full text-sm font-semibold text-white transition hover:scale-[1.02] disabled:opacity-40"
-            style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
+            className="px-4 py-2 rounded-full text-sm font-semibold transition hover:brightness-110 disabled:opacity-40"
+            style={{ background: BG_CARD, border: `1px solid ${BORDER}`, color: IVORY }}
           >
             {consolidating ? 'Consolidating...' : 'Consolidate'}
           </button>
           <button
             onClick={() => setShowAdd(!showAdd)}
-            className="px-4 py-2 rounded-full text-sm font-semibold text-white transition hover:scale-[1.02]"
-            style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}
+            className="px-4 py-2 rounded-full text-sm font-semibold transition hover:brightness-110 inline-flex items-center gap-1.5"
+            style={{ background: goldBtn, color: '#20160a' }}
           >
-            + Add Memory
+            <VaultIcon name="plus" size={15} /> Add Memory
           </button>
         </div>
       </div>
@@ -87,53 +90,57 @@ export default function MemoriesPanel({ userId }: Props) {
             value={newContent}
             onChange={e => setNewContent(e.target.value)}
             placeholder="Write your memory... Include as many details as you remember."
-            className="w-full p-4 rounded-lg text-sm text-white placeholder-gray-600 resize-none outline-none focus:ring-1 focus:ring-purple-500"
-            style={{ background: '#0a0a0f', border: `1px solid ${BORDER}`, minHeight: 120 }}
+            className="w-full p-4 rounded-lg text-sm placeholder-gray-600 resize-none outline-none focus:ring-1 focus:ring-amber-400/40"
+            style={{ background: BG_INSET, border: `1px solid ${BORDER}`, minHeight: 120, color: IVORY }}
             rows={5}
           />
           <div className="flex flex-wrap gap-3">
             <select
               value={newCategory}
               onChange={e => setNewCategory(e.target.value)}
-              className="p-2 rounded-lg text-sm text-white outline-none"
-              style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }}
+              className="p-2 rounded-lg text-sm outline-none"
+              style={{ background: BG_INSET, border: `1px solid ${BORDER}`, color: IVORY }}
             >
               {CATEGORIES.map(c => (
-                <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
             <select
               value={newMemoryType}
               onChange={e => setNewMemoryType(e.target.value as MemoryType)}
-              className="p-2 rounded-lg text-sm text-white outline-none"
-              style={{ background: '#0a0a0f', border: `1px solid ${BORDER}` }}
+              className="p-2 rounded-lg text-sm outline-none"
+              style={{ background: BG_INSET, border: `1px solid ${BORDER}`, color: IVORY }}
             >
               {(['biography','conversation','event','emotion','wisdom','relationship','achievement'] as MemoryType[]).map(t => (
                 <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
               ))}
             </select>
             <div className="flex gap-1.5">
-              {emotions.map(e => (
-                <button
-                  key={e}
-                  onClick={() => setNewEmotion(newEmotion === e ? '' : e)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm transition"
-                  style={{
-                    background: newEmotion === e ? '#7c3aed30' : '#1e1e2e',
-                    border: `1px solid ${newEmotion === e ? '#7c3aed' : BORDER}`,
-                  }}
-                  title={e}
-                >
-                  {EMOTION_ICONS[e] || e[0]}
-                </button>
-              ))}
+              {emotions.map(e => {
+                const on = newEmotion === e;
+                return (
+                  <button
+                    key={e}
+                    onClick={() => setNewEmotion(on ? '' : e)}
+                    className="w-9 h-9 rounded-full flex items-center justify-center transition"
+                    style={{
+                      background: on ? 'rgba(245,196,81,0.16)' : BG_INSET,
+                      border: `1px solid ${on ? ACCENT : BORDER}`,
+                      color: on ? ACCENT : MUTED,
+                    }}
+                    title={e}
+                  >
+                    <VaultIcon name={EMOTION_ICONS[e] || 'spark'} size={16} />
+                  </button>
+                );
+              })}
             </div>
           </div>
           <button
             onClick={addMemory}
             disabled={!newContent.trim() || saving}
-            className="px-5 py-2 rounded-full text-sm font-bold text-white disabled:opacity-40"
-            style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}
+            className="px-5 py-2 rounded-full text-sm font-semibold disabled:opacity-40"
+            style={{ background: goldBtn, color: '#20160a' }}
           >
             {saving ? 'Saving...' : 'Save Memory'}
           </button>
@@ -146,17 +153,17 @@ export default function MemoriesPanel({ userId }: Props) {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search memories..."
-          className="w-full p-3 rounded-lg text-sm text-white placeholder-gray-600 outline-none focus:ring-1 focus:ring-purple-500"
-          style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
+          className="w-full p-3 rounded-lg text-sm placeholder-gray-600 outline-none focus:ring-1 focus:ring-amber-400/40"
+          style={{ background: BG_CARD, border: `1px solid ${BORDER}`, color: IVORY }}
         />
         <div className="flex gap-2 overflow-x-auto pb-1">
           <button
             onClick={() => setFilter(null)}
             className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition"
             style={{
-              background: !filter ? '#7c3aed30' : '#1e1e2e',
-              border: `1px solid ${!filter ? '#7c3aed' : BORDER}`,
-              color: !filter ? ACCENT : '#94a3b8',
+              background: !filter ? 'rgba(245,196,81,0.16)' : BG_INSET,
+              border: `1px solid ${!filter ? ACCENT : BORDER}`,
+              color: !filter ? ACCENT : MUTED,
             }}
           >
             All
@@ -165,14 +172,14 @@ export default function MemoriesPanel({ userId }: Props) {
             <button
               key={c.id}
               onClick={() => setFilter(filter === c.id ? null : c.id)}
-              className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap"
+              className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap inline-flex items-center gap-1.5"
               style={{
-                background: filter === c.id ? '#7c3aed30' : '#1e1e2e',
-                border: `1px solid ${filter === c.id ? '#7c3aed' : BORDER}`,
-                color: filter === c.id ? ACCENT : '#94a3b8',
+                background: filter === c.id ? 'rgba(245,196,81,0.16)' : BG_INSET,
+                border: `1px solid ${filter === c.id ? ACCENT : BORDER}`,
+                color: filter === c.id ? ACCENT : MUTED,
               }}
             >
-              {c.icon} {c.name}
+              <VaultIcon name={CATEGORY_ICON[c.id] || 'spark'} size={13} /> {c.name}
             </button>
           ))}
         </div>
@@ -181,12 +188,12 @@ export default function MemoriesPanel({ userId }: Props) {
       {/* Timeline */}
       {loading ? (
         <div className="text-center py-8">
-          <div className="w-6 h-6 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mx-auto" />
+          <div className="w-6 h-6 rounded-full animate-spin mx-auto" style={{ border: `2px solid ${HAIR}`, borderTopColor: ACCENT }} />
         </div>
       ) : Object.keys(grouped).length === 0 ? (
-        <div className="text-center py-12 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-          <div className="text-4xl mb-3">{'\u{1F4DD}'}</div>
-          <div className="text-sm text-gray-400">
+        <div className="text-center py-12 rounded-2xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+          <div className="mb-3 flex justify-center" style={{ color: GOLD }}><VaultIcon name="crystal" size={34} /></div>
+          <div className="text-sm" style={{ color: MUTED }}>
             {search ? 'No memories match your search.' : 'No memories yet. Start preserving your stories!'}
           </div>
         </div>
@@ -195,38 +202,38 @@ export default function MemoriesPanel({ userId }: Props) {
           {Object.entries(grouped).map(([month, mems]) => (
             <div key={month}>
               <div className="text-xs font-mono mb-3" style={{ color: ACCENT, letterSpacing: 2 }}>{month.toUpperCase()}</div>
-              <div className="space-y-2 border-l-2 pl-4" style={{ borderColor: '#1e1e2e' }}>
+              <div className="space-y-2 border-l-2 pl-4" style={{ borderColor: HAIR }}>
                 {mems.map(m => {
                   const cat = CATEGORIES.find(c => c.id === m.category);
                   return (
                     <div key={m.id} className="p-4 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
                       <div className="flex items-center gap-2 mb-2">
-                        {cat && <span className="text-sm">{cat.icon}</span>}
-                        <span className="text-[10px] text-gray-500">{cat?.name || m.category}</span>
+                        {cat && <span style={{ color: GOLD_DEEP, display: 'flex' }}><VaultIcon name={CATEGORY_ICON[cat.id] || 'spark'} size={14} /></span>}
+                        <span className="text-[10px]" style={{ color: MUTED }}>{cat?.name || m.category}</span>
                         {m.emotion && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: '#ffffff10' }}>
-                            {EMOTION_ICONS[m.emotion] || ''} {m.emotion}
+                          <span className="text-[10px] px-1.5 py-0.5 rounded inline-flex items-center gap-1" style={{ background: 'rgba(245,196,81,0.10)', color: MUTED }}>
+                            <VaultIcon name={EMOTION_ICONS[m.emotion] || 'spark'} size={11} /> {m.emotion}
                           </span>
                         )}
                         {'memory_type' in m && m.memory_type && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded font-mono" style={{ background: '#7c3aed20', color: ACCENT }}>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded font-mono" style={{ background: 'rgba(245,196,81,0.14)', color: ACCENT }}>
                             {m.memory_type}
                           </span>
                         )}
                         {'importance' in m && m.importance > 0 && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded font-mono" style={{ background: m.importance >= 8 ? '#fbbf2420' : '#ffffff10', color: m.importance >= 8 ? GOLD : '#94a3b8' }}>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded font-mono" style={{ background: m.importance >= 8 ? 'rgba(251,191,36,0.16)' : 'rgba(245,196,81,0.08)', color: m.importance >= 8 ? GOLD : MUTED }}>
                             imp:{m.importance}
                           </span>
                         )}
-                        <span className="text-[10px] text-gray-600 ml-auto">
+                        <span className="text-[10px] ml-auto" style={{ color: 'rgba(169,158,139,0.7)' }}>
                           {new Date(m.created_at).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-300 leading-relaxed">{m.content}</p>
+                      <p className="text-sm leading-relaxed" style={{ color: '#d6cbb6' }}>{m.content}</p>
                       {'keywords' in m && m.keywords && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {m.keywords.split(',').filter(Boolean).slice(0, 8).map((kw: string) => (
-                            <span key={kw} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: '#1e1e2e', color: '#94a3b8' }}>{kw.trim()}</span>
+                            <span key={kw} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: BG_INSET, color: MUTED }}>{kw.trim()}</span>
                           ))}
                         </div>
                       )}

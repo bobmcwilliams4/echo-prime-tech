@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ACCENT, BG_CARD, BORDER, EMOTION_ICONS } from '../lib/constants';
+import { ACCENT, GOLD, GOLD_BRIGHT, GOLD_DEEP, BG_CARD, BG_CARD2, BG_INSET, BORDER, HAIR, IVORY, MUTED, EMOTION_ICONS } from '../lib/constants';
 import { sendChat, synthesizeSpeech, getFamilyMembers, getVoiceProfiles, type ChatMessage, type FamilyMember } from '../lib/vault-api';
 import { playAudioBlob } from '../lib/media';
+import VaultIcon from './VaultIcon';
 
 interface Props {
   userId: string;
@@ -12,10 +13,12 @@ interface Props {
 type Mode = 'casual' | 'storytelling' | 'wisdom';
 
 const MODE_META: Record<Mode, { label: string; icon: string; desc: string }> = {
-  casual: { label: 'Casual', icon: '\u{1F4AC}', desc: 'Everyday conversation' },
-  storytelling: { label: 'Storytelling', icon: '\u{1F4D6}', desc: 'Hear their stories' },
-  wisdom: { label: 'Wisdom', icon: '\u{1F9E0}', desc: 'Life lessons & advice' },
+  casual: { label: 'Casual', icon: 'chat', desc: 'Everyday conversation' },
+  storytelling: { label: 'Storytelling', icon: 'education', desc: 'Hear their stories' },
+  wisdom: { label: 'Wisdom', icon: 'wisdom', desc: 'Life lessons & advice' },
 };
+
+function initials(name: string) { return name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
 
 export default function AncestorChatPanel({ userId }: Props) {
   const [members, setMembers] = useState<FamilyMember[]>([]);
@@ -95,17 +98,17 @@ export default function AncestorChatPanel({ userId }: Props) {
   if (!selected) {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-white">Ancestor Chat</h2>
-        <p className="text-sm text-gray-400">Choose a family member to have a conversation with their preserved consciousness.</p>
+        <h2 className="text-2xl font-semibold" style={{ color: IVORY, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Ancestor Chat</h2>
+        <p className="text-sm" style={{ color: MUTED }}>Choose a family member to have a conversation with their preserved consciousness.</p>
 
         {loadingMembers ? (
           <div className="text-center py-8">
-            <div className="w-6 h-6 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mx-auto" />
+            <div className="w-6 h-6 rounded-full animate-spin mx-auto" style={{ border: `2px solid ${HAIR}`, borderTopColor: ACCENT }} />
           </div>
         ) : members.length === 0 ? (
-          <div className="p-8 rounded-xl text-center" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-            <div className="text-4xl mb-3">{'\u{1F54A}\u{FE0F}'}</div>
-            <div className="text-sm text-gray-400 mb-4">No family members yet. Add members in the Family Vault first.</div>
+          <div className="p-8 rounded-2xl text-center" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+            <div className="mb-3 flex justify-center" style={{ color: GOLD_DEEP }}><VaultIcon name="ancestor" size={36} /></div>
+            <div className="text-sm mb-4" style={{ color: MUTED }}>No family members yet. Add members in the Family Vault first.</div>
           </div>
         ) : (
           <>
@@ -117,32 +120,36 @@ export default function AncestorChatPanel({ userId }: Props) {
                   onClick={() => startChat(m, mode)}
                   className="flex-shrink-0 w-24 text-center group"
                 >
-                  <div className="w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center text-2xl transition group-hover:ring-2 group-hover:ring-purple-500" style={{ background: '#1e1e2e', border: `2px solid ${BORDER}` }}>
-                    {'\u{1F464}'}
+                  <div className="w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center transition group-hover:brightness-110"
+                    style={{ background: BG_CARD2, border: `2px solid ${GOLD_DEEP}`, color: GOLD, fontSize: 18, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+                    {initials(m.name)}
                   </div>
-                  <div className="text-xs font-semibold text-white truncate">{m.name}</div>
-                  <div className="text-[10px] text-gray-500 truncate">{m.relationship}</div>
+                  <div className="text-xs font-semibold truncate" style={{ color: IVORY }}>{m.name}</div>
+                  <div className="text-[10px] truncate" style={{ color: MUTED }}>{m.relationship}</div>
                 </button>
               ))}
             </div>
 
             {/* Mode selector */}
             <div className="grid grid-cols-3 gap-3">
-              {(Object.keys(MODE_META) as Mode[]).map(m => (
-                <button
-                  key={m}
-                  onClick={() => setMode(m)}
-                  className="p-4 rounded-xl text-center transition"
-                  style={{
-                    background: mode === m ? '#7c3aed20' : BG_CARD,
-                    border: `1px solid ${mode === m ? '#7c3aed60' : BORDER}`,
-                  }}
-                >
-                  <div className="text-2xl mb-1">{MODE_META[m].icon}</div>
-                  <div className="text-xs font-bold text-white">{MODE_META[m].label}</div>
-                  <div className="text-[10px] text-gray-500">{MODE_META[m].desc}</div>
-                </button>
-              ))}
+              {(Object.keys(MODE_META) as Mode[]).map(m => {
+                const on = mode === m;
+                return (
+                  <button
+                    key={m}
+                    onClick={() => setMode(m)}
+                    className="p-4 rounded-2xl text-center transition"
+                    style={{
+                      background: on ? 'rgba(245,196,81,0.10)' : BG_CARD,
+                      border: `1px solid ${on ? 'rgba(245,196,81,0.4)' : BORDER}`,
+                    }}
+                  >
+                    <div className="mb-1.5 flex justify-center" style={{ color: on ? ACCENT : MUTED }}><VaultIcon name={MODE_META[m].icon} size={22} /></div>
+                    <div className="text-xs font-semibold" style={{ color: on ? ACCENT : IVORY }}>{MODE_META[m].label}</div>
+                    <div className="text-[10px]" style={{ color: MUTED }}>{MODE_META[m].desc}</div>
+                  </button>
+                );
+              })}
             </div>
           </>
         )}
@@ -153,23 +160,23 @@ export default function AncestorChatPanel({ userId }: Props) {
   // Chat interface
   return (
     <div className="flex flex-col h-[calc(100vh-120px)]">
-      <div className="rounded-t-xl overflow-hidden">
-        <div className="flex items-center gap-3 px-4 py-3" style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)' }}>
-          <button onClick={() => setSelected(null)} className="text-white/80 hover:text-white text-sm">&larr;</button>
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: '#ffffff20' }}>{'\u{1F464}'}</div>
+      <div className="rounded-t-2xl overflow-hidden">
+        <div className="flex items-center gap-3 px-4 py-3" style={{ background: `linear-gradient(135deg, ${BG_CARD2}, ${BG_INSET})`, border: `1px solid ${BORDER}`, borderBottom: 'none' }}>
+          <button onClick={() => setSelected(null)} className="text-sm flex items-center" style={{ color: MUTED }} aria-label="Back"><VaultIcon name="arrow_left" size={18} /></button>
+          <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: BG_CARD, border: `1.5px solid ${GOLD_DEEP}`, color: GOLD, fontSize: 12, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>{initials(selected.name)}</div>
           <div className="flex-1 min-w-0">
-            <div className="text-white font-semibold text-sm">{selected.name}</div>
-            <div className="text-white/60 text-[10px]">{selected.relationship} &middot; {MODE_META[mode].label} mode</div>
+            <div className="font-semibold text-sm" style={{ color: IVORY }}>{selected.name}</div>
+            <div className="text-[10px]" style={{ color: MUTED }}>{selected.relationship} &middot; {MODE_META[mode].label} mode</div>
           </div>
           {(selected.birth_date || selected.death_date) && (
-            <div className="text-white/50 text-[10px] text-right flex-shrink-0">
+            <div className="text-[10px] text-right flex-shrink-0" style={{ color: 'rgba(169,158,139,0.7)' }}>
               {selected.birth_date && <div>Born: {selected.birth_date}</div>}
               {selected.death_date && <div>Passed: {selected.death_date}</div>}
             </div>
           )}
         </div>
         {selected.bio && (
-          <div className="px-4 py-2 text-xs text-gray-400 italic" style={{ background: '#0c0c14', borderBottom: `1px solid ${BORDER}` }}>
+          <div className="px-4 py-2 text-xs italic" style={{ background: BG_INSET, color: MUTED, borderLeft: `1px solid ${BORDER}`, borderRight: `1px solid ${BORDER}`, borderBottom: `1px solid ${HAIR}` }}>
             {selected.bio.length > 150 ? selected.bio.slice(0, 150) + '...' : selected.bio}
           </div>
         )}
@@ -179,13 +186,15 @@ export default function AncestorChatPanel({ userId }: Props) {
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div
-              className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === 'user' ? 'bg-purple-600 text-white' : 'text-gray-200'}`}
-              style={m.role === 'assistant' ? { background: '#1e1e2e' } : undefined}
+              className="max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed"
+              style={m.role === 'user'
+                ? { background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a' }
+                : { background: BG_INSET, color: '#e6ddcc', border: `1px solid ${BORDER}` }}
             >
               <div className="flex items-start gap-2">
                 <div className="flex-1">
                   {m.role === 'assistant' && m.emotion && m.emotion !== 'neutral' && (
-                    <span className="mr-1">{EMOTION_ICONS[m.emotion] || '\u{1F4AC}'}</span>
+                    <span className="inline-flex align-middle mr-1.5" style={{ color: ACCENT }}><VaultIcon name={EMOTION_ICONS[m.emotion] || 'chat'} size={13} /></span>
                   )}
                   {m.content}
                 </div>
@@ -194,11 +203,12 @@ export default function AncestorChatPanel({ userId }: Props) {
                     onClick={() => speakMessage(m.content, m.emotion, i)}
                     disabled={playingIdx !== null}
                     className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/10"
+                    style={{ color: ACCENT }}
                   >
                     {playingIdx === i ? (
                       <span className="block w-3 h-3 rounded-sm animate-pulse" style={{ background: ACCENT }} />
                     ) : (
-                      <span className="text-xs">{'\u{1F50A}'}</span>
+                      <VaultIcon name="speaker" size={15} />
                     )}
                   </button>
                 )}
@@ -208,27 +218,27 @@ export default function AncestorChatPanel({ userId }: Props) {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="rounded-2xl px-4 py-2.5 text-sm text-gray-400" style={{ background: '#1e1e2e' }}>
+            <div className="rounded-2xl px-4 py-2.5 text-sm" style={{ background: BG_INSET, color: MUTED, border: `1px solid ${BORDER}` }}>
               <span className="animate-pulse">{selected.name} is thinking...</span>
             </div>
           </div>
         )}
       </div>
 
-      <div className="flex gap-2 p-3 rounded-b-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+      <div className="flex gap-2 p-3 rounded-b-2xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
         <input
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
           placeholder={`Talk to ${selected.name}...`}
-          className="flex-1 bg-transparent border rounded-full px-4 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-purple-500 transition"
-          style={{ borderColor: BORDER }}
+          className="flex-1 bg-transparent border rounded-full px-4 py-2 text-sm placeholder-gray-500 outline-none transition"
+          style={{ borderColor: BORDER, color: IVORY }}
         />
         <button
           onClick={send}
           disabled={loading || !input.trim()}
-          className="px-5 py-2 rounded-full text-sm font-semibold text-white transition disabled:opacity-40"
-          style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)' }}
+          className="px-5 py-2 rounded-full text-sm font-semibold transition disabled:opacity-40"
+          style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a' }}
         >
           Send
         </button>

@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { ACCENT, GOLD, BG_CARD, BORDER, BG_DARK } from '../lib/constants';
+import { ACCENT, GOLD, GOLD_BRIGHT, GOLD_DEEP, BG_CARD, BG_INSET, BORDER, HAIR, IVORY, MUTED, BG_DARK } from '../lib/constants';
 import { uploadVideo, getVideoList, submitBiometric, type VideoMeta } from '../lib/vault-api';
+import VaultIcon from './VaultIcon';
 import { startCamera, stopCamera, createMediaRecorder, createAnalyser, getAudioLevel, formatDuration, formatBytes, type RecorderHandle } from '../lib/media';
 
 interface Props {
@@ -114,8 +115,8 @@ export default function RecordPanel({ userId }: Props) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Record Video</h2>
-      <p className="text-sm text-gray-400">Record selfie videos to capture your facial expressions, mannerisms, and voice for FaceTime reconstruction.</p>
+      <h2 className="text-2xl font-semibold" style={{ color: IVORY, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Record Video</h2>
+      <p className="text-sm" style={{ color: MUTED }}>Record selfie videos to capture your facial expressions, mannerisms, and voice for FaceTime reconstruction.</p>
 
       {error && (
         <div className="p-3 rounded-lg text-sm text-red-400" style={{ background: '#7f1d1d20', border: '1px solid #7f1d1d40' }}>
@@ -124,7 +125,7 @@ export default function RecordPanel({ userId }: Props) {
       )}
 
       {/* Recording Area */}
-      <div className="p-1 rounded-2xl" style={{ background: state === 'recording' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}>
+      <div className="p-px rounded-2xl" style={{ background: state === 'recording' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : `linear-gradient(135deg, ${GOLD_DEEP}, ${GOLD_BRIGHT})` }}>
         <div className="rounded-[14px] overflow-hidden relative" style={{ background: BG_DARK, aspectRatio: '16/9' }}>
           {/* Camera preview */}
           <video
@@ -148,11 +149,11 @@ export default function RecordPanel({ userId }: Props) {
           {/* Idle state */}
           {state === 'idle' && (
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="text-5xl mb-4">{'\u{1F4F9}'}</div>
+              <div className="mb-4" style={{ color: GOLD_DEEP }}><VaultIcon name="record" size={44} /></div>
               <button
                 onClick={startPreview}
-                className="px-6 py-3 rounded-full text-sm font-bold text-white transition hover:scale-[1.03]"
-                style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}
+                className="px-6 py-3 rounded-full text-sm font-semibold transition hover:brightness-110"
+                style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a' }}
               >
                 Start Camera
               </button>
@@ -162,15 +163,15 @@ export default function RecordPanel({ userId }: Props) {
           {/* Uploading overlay */}
           {state === 'uploading' && (
             <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(0,0,0,0.7)' }}>
-              <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mb-3" />
-              <div className="text-sm text-white">Uploading to vault...</div>
+              <div className="w-8 h-8 rounded-full animate-spin mb-3" style={{ border: `2px solid ${HAIR}`, borderTopColor: ACCENT }} />
+              <div className="text-sm" style={{ color: IVORY }}>Uploading to vault...</div>
             </div>
           )}
 
           {/* Face guide overlay */}
           {(state === 'previewing' || state === 'recording') && (
             <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-              <ellipse cx="50" cy="42" rx="18" ry="24" fill="none" stroke="rgba(192,132,252,0.4)" strokeWidth="0.5" strokeDasharray="2,2" />
+              <ellipse cx="50" cy="42" rx="18" ry="24" fill="none" stroke="rgba(245,196,81,0.45)" strokeWidth="0.5" strokeDasharray="2,2" />
             </svg>
           )}
 
@@ -186,11 +187,11 @@ export default function RecordPanel({ userId }: Props) {
           {(state === 'previewing' || state === 'recording') && (
             <div className="absolute bottom-4 left-4 right-4">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-300">{'\u{1F3A4}'}</span>
-                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: '#1e1e2e' }}>
+                <span style={{ color: GOLD_BRIGHT, display: 'flex' }}><VaultIcon name="mic" size={14} /></span>
+                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(0,0,0,0.5)' }}>
                   <div
                     className="h-full rounded-full transition-all duration-100"
-                    style={{ width: `${audioLevel * 100}%`, background: audioLevel > 0.7 ? '#ef4444' : audioLevel > 0.3 ? '#34d399' : '#60a5fa' }}
+                    style={{ width: `${audioLevel * 100}%`, background: audioLevel > 0.7 ? '#ef4444' : audioLevel > 0.3 ? '#34d399' : GOLD }}
                   />
                 </div>
               </div>
@@ -203,25 +204,25 @@ export default function RecordPanel({ userId }: Props) {
       <div className="flex justify-center gap-4">
         {state === 'previewing' && (
           <>
-            <button onClick={() => { stopCamera(streamRef.current); streamRef.current = null; setState('idle'); }} className="px-5 py-2.5 rounded-full text-sm font-semibold" style={{ border: `1px solid ${BORDER}`, color: '#d4d4d8' }}>
+            <button onClick={() => { stopCamera(streamRef.current); streamRef.current = null; setState('idle'); }} className="px-5 py-2.5 rounded-full text-sm font-semibold" style={{ border: `1px solid ${BORDER}`, color: MUTED }}>
               Cancel
             </button>
-            <button onClick={startRecording} className="px-8 py-2.5 rounded-full text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
-              {'\u{23FA}'} Start Recording
+            <button onClick={startRecording} className="px-8 py-2.5 rounded-full text-sm font-bold text-white inline-flex items-center gap-2" style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
+              <span className="w-2.5 h-2.5 rounded-full bg-white" /> Start Recording
             </button>
           </>
         )}
         {state === 'recording' && (
-          <button onClick={stopRecording} className="px-8 py-2.5 rounded-full text-sm font-bold text-white animate-pulse" style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
-            {'\u{23F9}'} Stop Recording ({formatDuration(duration)})
+          <button onClick={stopRecording} className="px-8 py-2.5 rounded-full text-sm font-bold text-white animate-pulse inline-flex items-center gap-2" style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
+            <span className="w-2.5 h-2.5 rounded-sm bg-white" /> Stop Recording ({formatDuration(duration)})
           </button>
         )}
         {state === 'reviewing' && (
           <>
-            <button onClick={retake} className="px-5 py-2.5 rounded-full text-sm font-semibold" style={{ border: `1px solid ${BORDER}`, color: '#d4d4d8' }}>
+            <button onClick={retake} className="px-5 py-2.5 rounded-full text-sm font-semibold" style={{ border: `1px solid ${BORDER}`, color: MUTED }}>
               Retake
             </button>
-            <button onClick={upload} className="px-8 py-2.5 rounded-full text-sm font-bold text-white" style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}>
+            <button onClick={upload} className="px-8 py-2.5 rounded-full text-sm font-semibold" style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a' }}>
               Upload to Vault
             </button>
           </>
@@ -230,11 +231,11 @@ export default function RecordPanel({ userId }: Props) {
 
       {/* Recording History */}
       <div>
-        <h3 className="text-sm font-semibold text-white mb-3">Recording History</h3>
+        <h3 className="text-sm font-semibold mb-3" style={{ color: IVORY }}>Recording History</h3>
         {loadingVideos ? (
-          <div className="w-6 h-6 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mx-auto" />
+          <div className="w-6 h-6 rounded-full animate-spin mx-auto" style={{ border: `2px solid ${HAIR}`, borderTopColor: ACCENT }} />
         ) : videos.length === 0 ? (
-          <div className="text-center py-6 rounded-xl text-sm text-gray-500" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+          <div className="text-center py-6 rounded-xl text-sm" style={{ background: BG_CARD, border: `1px solid ${BORDER}`, color: MUTED }}>
             No recordings yet. Start recording to build your FaceTime profile.
           </div>
         ) : (
@@ -242,13 +243,13 @@ export default function RecordPanel({ userId }: Props) {
             {videos.map(v => (
               <div key={v.id} className="flex items-center justify-between p-3 rounded-lg" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
                 <div className="flex items-center gap-3">
-                  <div className="text-lg">{'\u{1F3AC}'}</div>
+                  <div style={{ color: ACCENT, display: 'flex' }}><VaultIcon name="record" size={20} /></div>
                   <div>
-                    <div className="text-xs text-white">{formatDuration(v.duration_seconds || 0)}</div>
-                    <div className="text-[10px] text-gray-500">{new Date(v.created_at).toLocaleDateString()}</div>
+                    <div className="text-xs" style={{ color: IVORY }}>{formatDuration(v.duration_seconds || 0)}</div>
+                    <div className="text-[10px]" style={{ color: MUTED }}>{new Date(v.created_at).toLocaleDateString()}</div>
                   </div>
                 </div>
-                <div className="text-[10px] text-gray-500">{formatBytes(v.file_size || 0)}</div>
+                <div className="text-[10px]" style={{ color: MUTED }}>{formatBytes(v.file_size || 0)}</div>
               </div>
             ))}
           </div>

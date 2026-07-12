@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ACCENT, GOLD, BG_CARD, BORDER } from '../lib/constants';
+import { ACCENT, GOLD, BG_CARD, BORDER, MUTED } from '../lib/constants';
+import VaultIcon from './VaultIcon';
 import {
   getUser,
   updateUser,
@@ -28,7 +29,7 @@ interface NotificationPrefs {
 type FeedbackState = { type: 'success' | 'error'; message: string } | null;
 
 const INPUT_STYLE: React.CSSProperties = {
-  background: '#0a0a0f',
+  background: '#0f0c09',
   border: `1px solid ${BORDER}`,
   borderRadius: 8,
   padding: '6px 10px',
@@ -334,9 +335,9 @@ export default function SettingsPanel({ userId, userEmail }: Props) {
           <div className="text-sm text-gray-400 mb-3">Voice Profiles</div>
           <div className="space-y-2">
             {profiles.map(p => (
-              <div key={p.id} className="flex items-center justify-between p-3 rounded-lg" style={{ background: '#0a0a0f' }}>
+              <div key={p.id} className="flex items-center justify-between p-3 rounded-lg" style={{ background: '#0f0c09' }}>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm">{'\u{1F3A4}'}</span>
+                  <span style={{ color: ACCENT, display: 'flex' }}><VaultIcon name="voice" size={16} /></span>
                   <div>
                     <div className="text-xs text-white">{p.sample_count} samples</div>
                     <div className="text-[10px] text-gray-500">Quality: {Math.round(p.quality_score * 100)}%</div>
@@ -361,10 +362,10 @@ export default function SettingsPanel({ userId, userEmail }: Props) {
         <button
           onClick={exportData}
           disabled={exporting}
-          className="px-4 py-2 rounded-lg text-xs font-semibold transition disabled:opacity-40"
-          style={{ border: `1px solid ${BORDER}`, color: '#d4d4d8' }}
+          className="px-4 py-2 rounded-lg text-xs font-semibold transition disabled:opacity-40 inline-flex items-center gap-1.5"
+          style={{ border: `1px solid ${BORDER}`, color: MUTED }}
         >
-          {exporting ? 'Exporting...' : '\u{1F4E6} Export Vault'}
+          <VaultIcon name="crystal" size={13} /> {exporting ? 'Exporting...' : 'Export Vault'}
         </button>
       </div>
 

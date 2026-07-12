@@ -91,7 +91,7 @@ export function createAnalyser(stream: MediaStream): { analyser: AnalyserNode; c
   return { analyser, ctx };
 }
 
-export function drawWaveform(analyser: AnalyserNode, canvas: HTMLCanvasElement, accentColor = '#c084fc'): void {
+export function drawWaveform(analyser: AnalyserNode, canvas: HTMLCanvasElement, accentColor = '#f5c451'): void {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 

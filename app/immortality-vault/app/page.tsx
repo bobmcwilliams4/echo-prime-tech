@@ -6,8 +6,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '../../../lib/theme-context';
 import { useAuth } from '../../../lib/auth-context';
-import { API, BG_DARK, BG_CARD, BORDER, NAV_ITEMS } from './lib/constants';
+import { API, BG_DARK, BG_CARD, BG_CARD2, BORDER, HAIR, ACCENT, GOLD, GOLD_BRIGHT, IVORY, MUTED, NAV_ITEMS } from './lib/constants';
 import { createUser, getStats, startCheckout, type VaultStats } from './lib/vault-api';
+import VaultIcon from './components/VaultIcon';
 
 const PLAN_SLUGS = ['keeper', 'legacy', 'dynasty'];
 import DashboardPanel from './components/DashboardPanel';
@@ -30,32 +31,34 @@ import PersonalityPanel from './components/PersonalityPanel';
 function OnboardingModal({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(0);
   const slides = [
-    { icon: '\u{1F3DB}\u{FE0F}', title: 'Welcome to Your Immortality Vault', text: 'Preserve your memories, voice, and wisdom for future generations. Your digital legacy starts here.' },
-    { icon: '\u{1F399}\u{FE0F}', title: 'Tell Your Story', text: 'Answer interview questions across 12 life categories. Each answer enriches your digital consciousness.' },
-    { icon: '\u{1F3A4}', title: 'Clone Your Voice', text: 'Record 10 voice prompts and we\'ll create an AI voice clone. Your loved ones will hear your actual voice.' },
+    { icon: 'crystal', title: 'Welcome to Your Immortality Vault', text: 'Preserve your memories, voice, and wisdom for future generations. Your digital legacy starts here.' },
+    { icon: 'interview', title: 'Tell Your Story', text: 'Answer interview questions across 12 life categories. Each answer enriches your digital consciousness.' },
+    { icon: 'voice', title: 'Clone Your Voice', text: 'Record 10 voice prompts and we\'ll create an AI voice clone. Your loved ones will hear your actual voice.' },
   ];
   const slide = slides[step];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.8)' }}>
-      <div className="w-full max-w-md p-8 rounded-2xl text-center" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-        <div className="text-5xl mb-4">{slide.icon}</div>
-        <h3 className="text-xl font-bold text-white mb-2">{slide.title}</h3>
-        <p className="text-sm text-gray-400 mb-6">{slide.text}</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(4px)' }}>
+      <div className="w-full max-w-md p-8 rounded-2xl text-center" style={{ background: `radial-gradient(120% 90% at 50% 0%, ${BG_CARD2}, ${BG_CARD})`, border: `1px solid ${BORDER}`, boxShadow: `0 24px 70px -20px rgba(0,0,0,0.8), 0 0 40px -24px ${ACCENT}` }}>
+        <div className="mb-5 flex justify-center">
+          <span className="flex items-center justify-center rounded-full" style={{ width: 74, height: 74, color: ACCENT, background: 'rgba(245,196,81,0.08)', border: `1px solid ${BORDER}`, boxShadow: `0 0 34px -10px ${ACCENT}` }}>
+            <VaultIcon name={slide.icon} size={34} />
+          </span>
+        </div>
+        <h3 className="text-xl font-semibold mb-2" style={{ color: IVORY }}>{slide.title}</h3>
+        <p className="text-sm mb-6" style={{ color: MUTED, lineHeight: 1.6 }}>{slide.text}</p>
         <div className="flex justify-center gap-2 mb-6">
           {slides.map((_, i) => (
-            <div key={i} className="w-2 h-2 rounded-full" style={{ background: i === step ? '#c084fc' : '#2a2a3a' }} />
+            <div key={i} className="rounded-full transition-all" style={{ width: i === step ? 20 : 8, height: 8, background: i === step ? ACCENT : 'rgba(245,196,81,0.2)' }} />
           ))}
         </div>
-        {step < slides.length - 1 ? (
-          <button onClick={() => setStep(step + 1)} className="px-6 py-2.5 rounded-full text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #7c3aed, #c084fc)' }}>
-            Next
-          </button>
-        ) : (
-          <button onClick={onComplete} className="px-6 py-2.5 rounded-full text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #7c3aed, #c084fc)' }}>
-            Get Started
-          </button>
-        )}
+        <button
+          onClick={() => (step < slides.length - 1 ? setStep(step + 1) : onComplete())}
+          className="px-7 py-2.5 rounded-full text-sm font-semibold transition hover:brightness-110"
+          style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a', boxShadow: `0 8px 26px -10px ${ACCENT}` }}
+        >
+          {step < slides.length - 1 ? 'Next' : 'Get Started'}
+        </button>
       </div>
     </div>
   );
@@ -155,46 +158,56 @@ export default function VaultAppPage() {
     }
   };
 
+  const activeNav = NAV_ITEMS.find(n => n.id === activePanel);
+
   return (
-    <div className="min-h-screen flex" style={{ background: BG_DARK, color: '#e4e4e7' }}>
+    <div className="min-h-screen flex" style={{ background: BG_DARK, color: IVORY }}>
       {/* Onboarding */}
       {showOnboarding && <OnboardingModal onComplete={completeOnboarding} />}
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-30 bg-black/50 md:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 z-30 bg-black/60 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* ─── Sidebar ────────────────────────────────────────────────────── */}
       <aside
-        className={`fixed md:sticky top-0 left-0 h-screen z-40 transition-all duration-300 flex-shrink-0 ${sidebarOpen ? 'w-56' : 'w-0 md:w-16'} overflow-hidden`}
-        style={{ background: BG_CARD, borderRight: `1px solid ${BORDER}` }}
+        className={`fixed md:sticky top-0 left-0 h-screen z-40 transition-all duration-300 flex-shrink-0 ${sidebarOpen ? 'w-60' : 'w-0 md:w-16'} overflow-hidden`}
+        style={{ background: `linear-gradient(180deg, ${BG_CARD2}, ${BG_CARD})`, borderRight: `1px solid ${BORDER}` }}
       >
-        <div className="p-4 flex items-center gap-2 border-b" style={{ borderColor: BORDER }}>
-          <Link href="/immortality-vault" className="flex items-center gap-2">
-            <Image src={isDark ? '/logo-sym-night.png' : '/logo-sym-day.png'} alt="EPT" width={24} height={24} />
-            {sidebarOpen && <span className="text-xs font-bold text-white whitespace-nowrap">Immortality Vault</span>}
+        <div className="px-4 h-14 flex items-center gap-2.5 border-b" style={{ borderColor: HAIR }}>
+          <Link href="/immortality-vault" className="flex items-center gap-2.5">
+            <Image src={isDark ? '/logo-sym-night.png' : '/logo-sym-day.png'} alt="Immortality Vault" width={24} height={24} />
+            {sidebarOpen && <span className="text-[13px] font-semibold whitespace-nowrap" style={{ color: IVORY, letterSpacing: '0.02em' }}>Immortality&nbsp;Vault</span>}
           </Link>
         </div>
-        <nav className="p-2 space-y-0.5 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 100px)' }}>
-          {NAV_ITEMS.map(item => (
-            <button
-              key={item.id}
-              onClick={() => handleNavigate(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${
-                activePanel === item.id ? 'text-white font-semibold' : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-              style={activePanel === item.id ? { background: '#7c3aed20' } : undefined}
-              title={item.label}
-            >
-              <span className="text-base flex-shrink-0">{item.icon}</span>
-              {sidebarOpen && <span className="whitespace-nowrap truncate">{item.label}</span>}
-            </button>
-          ))}
+        <nav className="p-2.5 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 108px)' }}>
+          {NAV_ITEMS.map(item => {
+            const active = activePanel === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNavigate(item.id)}
+                className="group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all"
+                style={{
+                  background: active ? 'rgba(245,196,81,0.10)' : 'transparent',
+                  border: `1px solid ${active ? 'rgba(245,196,81,0.28)' : 'transparent'}`,
+                  color: active ? ACCENT : MUTED,
+                  fontWeight: active ? 600 : 500,
+                }}
+                title={item.label}
+              >
+                <span className="flex-shrink-0 flex items-center transition-colors" style={{ color: active ? ACCENT : MUTED }}>
+                  <VaultIcon name={item.icon} size={19} strokeWidth={active ? 1.7 : 1.5} />
+                </span>
+                {sidebarOpen && <span className="whitespace-nowrap truncate">{item.label}</span>}
+              </button>
+            );
+          })}
         </nav>
         {sidebarOpen && (
           <div className="absolute bottom-4 left-4 right-4">
-            <div className="text-xs text-gray-600 text-center truncate">
+            <div className="text-[11px] text-center truncate" style={{ color: 'rgba(169,158,139,0.6)' }}>
               {user.email}
             </div>
           </div>
@@ -204,15 +217,16 @@ export default function VaultAppPage() {
       {/* ─── Main Content ───────────────────────────────────────────────── */}
       <main className="flex-1 min-h-screen min-w-0">
         {/* Top Bar */}
-        <header className="sticky top-0 z-20 backdrop-blur-lg border-b px-4 md:px-6 h-14 flex items-center justify-between" style={{ background: `${BG_DARK}cc`, borderColor: BORDER }}>
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-400 hover:text-white transition">
-            {sidebarOpen ? '\u{2715}' : '\u{2630}'}
+        <header className="sticky top-0 z-20 backdrop-blur-lg border-b px-4 md:px-6 h-14 flex items-center justify-between" style={{ background: `${BG_DARK}cc`, borderColor: HAIR }}>
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="transition-colors" style={{ color: MUTED }} aria-label="Toggle menu">
+            <VaultIcon name={sidebarOpen ? 'close' : 'menu'} size={20} />
           </button>
-          <div className="text-sm font-semibold text-white">
-            {NAV_ITEMS.find(n => n.id === activePanel)?.icon} {NAV_ITEMS.find(n => n.id === activePanel)?.label}
+          <div className="flex items-center gap-2 text-sm font-semibold" style={{ color: IVORY }}>
+            <span style={{ color: ACCENT, display: 'flex' }}><VaultIcon name={activeNav?.icon || 'spark'} size={17} /></span>
+            {activeNav?.label}
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/immortality-vault" className="text-xs text-gray-400 hover:text-white transition">
+            <Link href="/immortality-vault" className="text-xs transition-colors hover:brightness-125" style={{ color: MUTED }}>
               &larr; Product Page
             </Link>
           </div>

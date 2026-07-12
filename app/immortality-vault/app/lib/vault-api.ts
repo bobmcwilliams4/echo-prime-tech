@@ -484,6 +484,7 @@ export interface BloodlineNode {
   buried: string | null; bio: string | null;
   confidence: string; living: boolean; is_direct_line: boolean;
   persona_status: string; sources: BloodlineSource[];
+  photo_record_id?: string | null;   // portrait record → bloodlineRecordImageUrl(userId, id)
 }
 export interface BloodlineEdge {
   from_person: string; to_person: string; rel_type: string; confidence: string;
@@ -526,6 +527,19 @@ export async function uploadBloodlineRecord(
   if (opts.record_type) fd.append('record_type', opts.record_type);
   const res = await fetch(`${API}/bloodline/${userId}/record`, { method: 'POST', body: fd });
   if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+  return res.json();
+}
+
+/** Upload a portrait for a person in the tree (owner-only). Multipart `file`;
+ *  the backend stores it encrypted and returns the record id used as the node's
+ *  photo_record_id (served via bloodlineRecordImageUrl). */
+export async function uploadPersonPhoto(
+  userId: string, personKey: string, file: File
+): Promise<{ ok: boolean; record_id: string; photo_record_id?: string }> {
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await fetch(`${API}/bloodline/${userId}/person/${encodeURIComponent(personKey)}/photo`, { method: 'POST', body: fd });
+  if (!res.ok) throw new Error(`Photo upload failed (${res.status})`);
   return res.json();
 }
 

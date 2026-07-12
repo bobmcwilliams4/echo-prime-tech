@@ -563,7 +563,7 @@ export default function InterviewPanel({ userId }: Props) {
             <span style={iconLabel}><VaultIcon name="speaker" size={16} />{speaking ? 'Echo is speaking…' : needsTap ? 'Tap to hear Echo' : 'Hear it again'}</span>
           </button>
           {question.video_instructions && (
-            <div className="text-xs text-gray-500 mb-4 p-3 rounded-lg" style={{ background: '#0a0a0f' }}>
+            <div className="text-xs text-gray-500 mb-4 p-3 rounded-lg" style={{ background: '#0f0c09' }}>
               <span style={iconLabel}><VaultIcon name="camera" size={14} /> {question.video_instructions}</span>
             </div>
           )}
@@ -580,8 +580,8 @@ export default function InterviewPanel({ userId }: Props) {
                 placeholder={handsFree
                   ? 'Just talk — Echo is listening and writes your story here. Pause when you’re done and he’ll preserve it.'
                   : 'Speak or type your story... Take your time, every detail matters.'}
-                className="w-full p-4 rounded-lg text-sm text-white placeholder-gray-600 resize-none outline-none focus:ring-1 focus:ring-purple-500"
-                style={{ background: '#0a0a0f', border: `1px solid ${micActive ? '#ef4444' : BORDER}`, minHeight: 180 }}
+                className="w-full p-4 rounded-lg text-sm text-white placeholder-gray-600 resize-none outline-none focus:ring-1 focus:ring-amber-400/40"
+                style={{ background: '#0f0c09', border: `1px solid ${micActive ? '#ef4444' : BORDER}`, minHeight: 180 }}
                 rows={8}
               />
               <div className="flex items-center gap-3 mt-4 flex-wrap">
@@ -602,8 +602,8 @@ export default function InterviewPanel({ userId }: Props) {
                 <button
                   onClick={submitAnswer}
                   disabled={!answer.trim() || loading}
-                  className="px-6 py-2.5 rounded-full text-sm font-bold text-white transition hover:scale-[1.02] disabled:opacity-40"
-                  style={{ background: `linear-gradient(135deg, #7c3aed, ${ACCENT})` }}
+                  className="px-6 py-2.5 rounded-full text-sm font-semibold transition hover:brightness-110 disabled:opacity-40"
+                  style={{ background: `linear-gradient(135deg, ${GOLD}, #ffe08a)`, color: '#20160a' }}
                 >
                   {loading ? 'Saving...' : 'Preserve Memory \u{2192}'}
                 </button>
@@ -658,7 +658,7 @@ export default function InterviewPanel({ userId }: Props) {
                 key={cat.id}
                 onClick={() => startInterview(cat.id)}
                 disabled={loading}
-                className="p-4 rounded-xl text-left transition hover:scale-[1.03] hover:border-purple-500"
+                className="p-4 rounded-xl text-left transition hover:scale-[1.03] hover:border-amber-400"
                 style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
                 title={`${answered} of ${target} preserved — tap to focus this subject`}
               >
@@ -678,7 +678,7 @@ export default function InterviewPanel({ userId }: Props) {
 
       {loading && (
         <div className="text-center py-4">
-          <div className="w-6 h-6 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mx-auto" />
+          <div className="w-6 h-6 rounded-full animate-spin mx-auto" />
         </div>
       )}
 

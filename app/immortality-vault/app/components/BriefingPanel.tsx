@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ACCENT, GOLD, BG_CARD, BORDER, BG_DARK } from '../lib/constants';
+import { ACCENT, GOLD, GOLD_BRIGHT, BG_CARD, BG_INSET, BORDER, HAIR, IVORY, MUTED, BG_DARK } from '../lib/constants';
 import { getUser, getFamilyMembers, getMemories, synthesizeSpeech, getGamificationStats, getPersonalityProfile, getDailyBriefing, type Memory, type GamificationStats, type PersonalityProfileResponse, type DailyBriefing } from '../lib/vault-api';
 import { playAudioBlob } from '../lib/media';
+import VaultIcon from './VaultIcon';
 
 interface Props {
   userId: string;
@@ -84,7 +85,7 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
       const built: BriefingSection[] = [
         {
           id: 'greeting',
-          icon: '\u{2600}\u{FE0F}',
+          icon: 'briefing',
           title: `${getGreeting()}, ${name}`,
           content: serverBriefing?.greeting
             ? `${serverBriefing.greeting} Today is ${getDateStr()}.${serverBriefing.streak_days ? ` You've shared stories on ${serverBriefing.streak_days} day${serverBriefing.streak_days !== 1 ? 's' : ''} this month.` : ''}`
@@ -96,7 +97,7 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
       if (serverBriefing?.follow_up) {
         built.push({
           id: 'follow_up',
-          icon: '\u{1F4AD}',
+          icon: 'chat',
           title: 'Picking up where you left off',
           content: `Last time you talked about "${serverBriefing.follow_up.about.slice(0, 120)}". ${serverBriefing.follow_up.question}`,
         });
@@ -110,7 +111,7 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
         const level = gamification.level ?? 'Newcomer';
         built.push({
           id: 'progress',
-          icon: '\u{1F4CA}',
+          icon: 'progress',
           title: `Vault Progress \u2014 ${level}`,
           content: `Consciousness: ${score}% complete. ${gamification.total_memories ?? 0} memories preserved, ${gamification.total_interviews ?? 0} interviews recorded. ${unlocked}/${total} achievements unlocked, ${gamification.total_points ?? 0} XP earned. ${score < 50 ? 'Keep going \u2014 every story brings you closer to digital immortality!' : score < 80 ? 'Great progress! Your digital self is taking shape.' : 'Impressive! Your consciousness is richly preserved.'}`,
         });
@@ -135,7 +136,7 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
         const paceStr = pace ? `Speech style: ${pace} pace${personality.voice_pattern?.uses_contractions ? ', casual' : ', formal'}. ` : '';
         built.push({
           id: 'personality',
-          icon: '\u{1F9EC}',
+          icon: 'personality',
           title: 'Personality Snapshot',
           content: `${traitStr}${moodStr}${paceStr}Based on ${personality.sample_count} analyzed samples with ${Math.round(personality.confidence_score * 100)}% confidence.`,
         });
@@ -144,7 +145,7 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
       built.push(
         {
           id: 'family',
-          icon: '\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}',
+          icon: 'family_vault',
           title: 'Family Summary',
           content: familyCount > 0
             ? `You have ${familyCount} family member${familyCount !== 1 ? 's' : ''} in your vault. Consider adding more to enrich your legacy.`
@@ -152,7 +153,7 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
         },
         {
           id: 'memory',
-          icon: '\u{1F4D6}',
+          icon: 'education',
           title: 'Memory of the Day',
           content: memoryOfDay
             ? memoryOfDay.content.slice(0, 300) + (memoryOfDay.content.length > 300 ? '...' : '')
@@ -160,7 +161,7 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
         },
         {
           id: 'inspiring',
-          icon: '\u{2728}',
+          icon: 'spark',
           title: 'Daily Inspiration',
           content: serverBriefing?.care_note || INSPIRING[Math.floor(Math.random() * INSPIRING.length)],
         },
@@ -187,7 +188,7 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin mx-auto" />
+        <div className="w-8 h-8 rounded-full animate-spin mx-auto" style={{ border: `2px solid ${HAIR}`, borderTopColor: ACCENT }} />
       </div>
     );
   }
@@ -198,16 +199,20 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-3xl font-extrabold text-white mb-1">{getGreeting()}, {userName || 'Friend'}</h2>
-        <p className="text-sm text-gray-400">{getDateStr()}</p>
+        <h2 className="text-3xl font-semibold mb-1" style={{ color: IVORY, fontFamily: 'Cormorant Garamond, Georgia, serif' }}>{getGreeting()}, {userName || 'Friend'}</h2>
+        <p className="text-sm" style={{ color: MUTED }}>{getDateStr()}</p>
       </div>
 
       {/* Briefing Card */}
       {section && (
         <div className="p-8 rounded-2xl text-center" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-          <div className="text-4xl mb-4">{section.icon}</div>
-          <h3 className="text-lg font-bold text-white mb-3">{section.title}</h3>
-          <p className="text-base text-gray-300 leading-relaxed max-w-lg mx-auto">{section.content}</p>
+          <div className="mb-4 flex justify-center">
+            <span className="flex items-center justify-center rounded-full" style={{ width: 60, height: 60, color: ACCENT, background: 'rgba(245,196,81,0.08)', border: `1px solid ${HAIR}` }}>
+              <VaultIcon name={section.icon} size={28} />
+            </span>
+          </div>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: IVORY }}>{section.title}</h3>
+          <p className="text-base leading-relaxed max-w-lg mx-auto" style={{ color: '#d6cbb6' }}>{section.content}</p>
 
           {/* Section dots */}
           <div className="flex justify-center gap-2 mt-6">
@@ -215,8 +220,8 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
-                className="w-2.5 h-2.5 rounded-full transition"
-                style={{ background: i === current ? ACCENT : '#2a2a3a' }}
+                className="rounded-full transition-all"
+                style={{ width: i === current ? 20 : 10, height: 10, background: i === current ? ACCENT : 'rgba(245,196,81,0.22)' }}
               />
             ))}
           </div>
@@ -227,23 +232,23 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
               onClick={() => setCurrent(Math.max(0, current - 1))}
               disabled={current === 0}
               className="px-3 py-1.5 rounded-full text-xs font-semibold disabled:opacity-30"
-              style={{ border: `1px solid ${BORDER}`, color: '#d4d4d8' }}
+              style={{ border: `1px solid ${BORDER}`, color: MUTED }}
             >
               &larr; Prev
             </button>
             <button
               onClick={speakSection}
               disabled={playing}
-              className="px-5 py-2.5 rounded-full text-sm font-bold text-black"
-              style={{ background: `linear-gradient(135deg, ${GOLD}, #f59e0b)` }}
+              className="px-5 py-2.5 rounded-full text-sm font-semibold inline-flex items-center gap-2"
+              style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`, color: '#20160a' }}
             >
-              {playing ? '\u{1F50A} Playing...' : '\u{1F50A} Hear This Aloud'}
+              <VaultIcon name="speaker" size={15} /> {playing ? 'Playing...' : 'Hear This Aloud'}
             </button>
             <button
               onClick={() => setCurrent(Math.min(sections.length - 1, current + 1))}
               disabled={current === sections.length - 1}
               className="px-3 py-1.5 rounded-full text-xs font-semibold disabled:opacity-30"
-              style={{ border: `1px solid ${BORDER}`, color: '#d4d4d8' }}
+              style={{ border: `1px solid ${BORDER}`, color: MUTED }}
             >
               Next &rarr;
             </button>
@@ -255,18 +260,18 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
       {briefing && briefing.questions.length > 0 && (
         <div className="p-6 rounded-2xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-white">{'\u{1F399}\u{FE0F}'} Today&apos;s Questions</h3>
-            <span className="text-[10px] uppercase tracking-wider text-gray-500">picked for your story</span>
+            <h3 className="text-sm font-semibold inline-flex items-center gap-2" style={{ color: IVORY }}><span style={{ color: ACCENT, display: 'flex' }}><VaultIcon name="interview" size={16} /></span> Today&apos;s Questions</h3>
+            <span className="text-[10px] uppercase tracking-wider" style={{ color: MUTED }}>picked for your story</span>
           </div>
           <div className="space-y-3">
             {briefing.questions.map(q => (
               <button
                 key={q.question_id}
                 onClick={() => onNavigate('interview')}
-                className="w-full text-left p-4 rounded-xl transition hover:scale-[1.01]"
-                style={{ background: BG_DARK, border: `1px solid ${BORDER}` }}
+                className="w-full text-left p-4 rounded-xl transition hover:-translate-y-0.5"
+                style={{ background: BG_INSET, border: `1px solid ${BORDER}` }}
               >
-                <div className="text-sm text-gray-200">{q.question}</div>
+                <div className="text-sm" style={{ color: '#e6ddcc' }}>{q.question}</div>
                 <div className="text-[10px] mt-1" style={{ color: ACCENT }}>
                   {q.category.replace('_', ' ')} · tap to record your answer {'→'}
                 </div>
@@ -279,19 +284,19 @@ export default function BriefingPanel({ userId, onNavigate }: Props) {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { panel: 'memories', icon: '\u{1F4DD}', label: 'View Memories' },
-          { panel: 'ancestor', icon: '\u{1F54A}\u{FE0F}', label: 'Talk to Family' },
-          { panel: 'interview', icon: '\u{1F399}\u{FE0F}', label: 'Record Stories' },
-          { panel: 'chat', icon: '\u{1F4AC}', label: 'Chat with Self' },
+          { panel: 'memories', icon: 'crystal', label: 'View Memories' },
+          { panel: 'ancestor', icon: 'ancestor', label: 'Talk to Family' },
+          { panel: 'interview', icon: 'interview', label: 'Record Stories' },
+          { panel: 'chat', icon: 'chat', label: 'Chat with Self' },
         ].map(a => (
           <button
             key={a.panel}
             onClick={() => onNavigate(a.panel)}
-            className="p-4 rounded-xl text-center transition hover:scale-[1.02]"
+            className="p-4 rounded-xl text-center transition hover:-translate-y-0.5"
             style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}
           >
-            <div className="text-2xl mb-1">{a.icon}</div>
-            <div className="text-xs font-semibold text-white">{a.label}</div>
+            <div className="mb-1.5 flex justify-center" style={{ color: ACCENT }}><VaultIcon name={a.icon} size={22} /></div>
+            <div className="text-xs font-semibold" style={{ color: IVORY }}>{a.label}</div>
           </button>
         ))}
       </div>
