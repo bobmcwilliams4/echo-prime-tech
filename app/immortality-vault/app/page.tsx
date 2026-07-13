@@ -26,6 +26,7 @@ import FaceTimePanel from './components/FaceTimePanel';
 import SettingsPanel from './components/SettingsPanel';
 import PersonalityPanel from './components/PersonalityPanel';
 import FairySprite from './components/FairySprite';
+import EchoChatWidget from './components/EchoChatWidget';
 
 /* ─── Onboarding Modal ───────────────────────────────────────────────── */
 
@@ -165,6 +166,9 @@ export default function VaultAppPage() {
     <div className="min-h-screen flex" style={{ background: BG_DARK, color: IVORY }}>
       {/* Golden sprite from the intro film, drifting across now and then */}
       <FairySprite />
+
+      {/* Echo Prime AI — the floating Sentinel-Chat guide, on every panel */}
+      <EchoChatWidget />
 
       {/* Onboarding */}
       {showOnboarding && <OnboardingModal onComplete={completeOnboarding} />}

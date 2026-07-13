@@ -273,8 +273,26 @@ async function vaultFetch<T = unknown>(path: string, options: RequestInit = {}):
 
 async function vaultFetchRaw(path: string, options: RequestInit = {}): Promise<Response> {
   const res = await fetch(`${API}${path}`, options);
-  if (!res.ok) throw new Error(`API ${res.status}`);
+  if (!res.ok) throw new Error(await serverError(res, `API ${res.status}`));
   return res;
+}
+
+/** Pull the real, human-useful reason out of a failed response body so failures
+ *  self-explain (e.g. `consent_required`, a 402 upgrade message) instead of a
+ *  generic "upload failed". Diagnostics floor — falls back to a status message. */
+async function serverError(res: Response, fallback: string): Promise<string> {
+  try {
+    const text = await res.text();
+    if (!text) return fallback;
+    try {
+      const data = JSON.parse(text) as Record<string, unknown>;
+      const reason = (data.error || data.message || data.detail || data.reason) as string | undefined;
+      if (reason) return typeof reason === 'string' ? reason : JSON.stringify(reason);
+    } catch { /* not JSON */ }
+    return text.slice(0, 300);
+  } catch {
+    return fallback;
+  }
 }
 
 /* ─── User ───────────────────────────────────────────────────────────── */
@@ -526,7 +544,7 @@ export async function uploadBloodlineRecord(
   if (opts.person_key) fd.append('person_key', opts.person_key);
   if (opts.record_type) fd.append('record_type', opts.record_type);
   const res = await fetch(`${API}/bloodline/${userId}/record`, { method: 'POST', body: fd });
-  if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+  if (!res.ok) throw new Error(await serverError(res, `Upload failed (${res.status})`));
   return res.json();
 }
 
@@ -539,7 +557,7 @@ export async function uploadPersonPhoto(
   const fd = new FormData();
   fd.append('file', file);
   const res = await fetch(`${API}/bloodline/${userId}/person/${encodeURIComponent(personKey)}/photo`, { method: 'POST', body: fd });
-  if (!res.ok) throw new Error(`Photo upload failed (${res.status})`);
+  if (!res.ok) throw new Error(await serverError(res, `Photo upload failed (${res.status})`));
   return res.json();
 }
 
@@ -572,7 +590,7 @@ export async function transcribeAudio(audio: Blob, filename = 'answer.webm'): Pr
   const formData = new FormData();
   formData.append('audio', audio, filename);
   const res = await fetch(`${API}/voice/transcribe`, { method: 'POST', body: formData });
-  if (!res.ok) throw new Error(`Transcription failed: ${res.status}`);
+  if (!res.ok) throw new Error(await serverError(res, `Transcription failed: ${res.status}`));
   const data = (await res.json()) as { text?: string };
   return (data.text || '').trim();
 }
@@ -591,7 +609,7 @@ export async function createVoiceProfile(userId: string, samples: Blob[], prompt
     formData.append('prompt_ids', promptIds[i]);
   });
   const res = await fetch(`${API}/voice/profiles`, { method: 'POST', body: formData });
-  if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+  if (!res.ok) throw new Error(await serverError(res, `Upload failed: ${res.status}`));
   return res.json() as Promise<VoiceProfile>;
 }
 
@@ -617,7 +635,7 @@ export async function uploadVideo(userId: string, blob: Blob, questionId?: strin
   formData.append('video', blob, `recording_${Date.now()}.webm`);
   if (questionId) formData.append('question_id', questionId);
   const res = await fetch(`${API}/video/upload`, { method: 'POST', body: formData });
-  if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+  if (!res.ok) throw new Error(await serverError(res, `Upload failed: ${res.status}`));
   return res.json() as Promise<VideoMeta>;
 }
 

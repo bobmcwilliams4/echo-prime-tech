@@ -175,14 +175,19 @@ export default function InterviewPanel({ userId }: Props) {
     return audioCtxRef.current;
   };
 
-  const primeAudio = () => {
-    try { getAudioCtx()?.resume?.(); } catch { /* noop */ }
+  // MUST be called from within a user-gesture handler (the Start / "hear again"
+  // button click). Creates the AudioContext during the gesture and AWAITS its
+  // resume so the later TTS playback is already unlocked — the fix for the
+  // browser autoplay policy silently swallowing Echo's voice. Idempotent + reused.
+  const primeAudio = async () => {
+    const ctx = getAudioCtx();
+    try { if (ctx && ctx.state === 'suspended') await ctx.resume(); } catch { /* noop */ }
     if (audioPrimed.current) return;
     const a = getAudioEl();
     if (!a) return;
     a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
     a.volume = 0;
-    a.play().then(() => { audioPrimed.current = true; a.volume = 1; }).catch(() => { /* locked */ });
+    try { await a.play(); audioPrimed.current = true; a.volume = 1; } catch { /* still locked — element path retries under gesture */ }
   };
 
   // Plays a blob through the resumed AudioContext; resolves when PLAYBACK ENDS
@@ -325,7 +330,9 @@ export default function InterviewPanel({ userId }: Props) {
       streamRef.current = stream;
       const handle = createMediaRecorder(stream, !stream.getVideoTracks().length);
       recorderRef.current = handle;
-      handle.recorder.start();
+      // createMediaRecorder already started it; only (re)start if somehow idle,
+      // and never start an already-'recording' recorder (InvalidStateError).
+      if (handle.recorder.state === 'inactive') handle.recorder.start(1000);
       setRecording(true);
       if (auto) watchSilenceOnStream(stream, () => { void finishCapture(true); });
     }
@@ -429,7 +436,7 @@ export default function InterviewPanel({ userId }: Props) {
   };
 
   const startInterview = async (m: Exclude<Mode, null>) => {
-    primeAudio();
+    await primeAudio(); // unlock audio inside the click gesture BEFORE any async work
     setMode(m);
     modeRef.current = m;
     await fetchNext(m);
@@ -553,7 +560,7 @@ export default function InterviewPanel({ userId }: Props) {
             &ldquo;{question.question}&rdquo;
           </p>
           <button
-            onClick={() => { primeAudio(); if (question) void speakQuestion(question); }}
+            onClick={async () => { await primeAudio(); if (question) void speakQuestion(question); }}
             disabled={speaking}
             className="text-sm mb-4 px-4 py-2 rounded-full font-semibold disabled:opacity-40 transition hover:scale-[1.02]"
             style={needsTap

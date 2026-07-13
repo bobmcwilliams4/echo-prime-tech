@@ -45,6 +45,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsub = onAuthChange(async (u) => {
       setUser(u);
       if (u) {
+        // The Immortality Vault is a standalone product: it provisions its own
+        // users via vault-api and never uses EPT roles/subscriptions. Skip the
+        // EPT `user/sync` call there entirely — it hits a retired worker
+        // (ept-api…workers.dev → 500 + CORS) and only added console noise.
+        const onVaultRoute = typeof window !== 'undefined'
+          && window.location.pathname.startsWith('/immortality-vault');
+        if (onVaultRoute) {
+          const vaultRole = isSovereign(u.email) ? 'owner' : 'user';
+          setRole(vaultRole);
+          setTrustLevel(TRUST_LEVELS[vaultRole] || null);
+          setDisplayName(u.displayName || null);
+          setLoading(false);
+          return;
+        }
         try {
           const sync = await syncUser();
           const userRole = isSovereign(u.email) ? 'owner' : (sync.role as 'owner' | 'user');

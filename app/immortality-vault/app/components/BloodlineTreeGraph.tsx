@@ -33,6 +33,8 @@ interface Props {
   photoUrl: (photoRecordId: string) => string;
   onSelect: (personKey: string) => void;
   bgUrl?: string;                       // optional atmospheric backdrop image
+  directKeys?: Set<string>;             // keys on the DIRECT line (root + ancestors + descendants)
+  relLabel?: Map<string, string>;       // person_key → collateral role (sibling / aunt-uncle / cousin / niece-nephew)
 }
 
 const PALETTE = {
@@ -73,7 +75,7 @@ const MAX_K = 2.5;
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
 function yearOf(date: string | null | undefined): string | null {
-  const m = date ? date.match(/\d{4}/) : null;
+  const m = (date ?? '').match(/\d{4}/);
   return m ? m[0] : null;
 }
 
@@ -87,18 +89,19 @@ function lifespan(n: BloodlineNode): string {
   return 'dates unknown';
 }
 
-function monogram(name: string): string {
-  return name
+function monogram(name: string | null | undefined): string {
+  return (name ?? '')
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
     .map((w) => w[0])
     .join('')
-    .toUpperCase();
+    .toUpperCase() || '·';
 }
 
-function truncate(s: string, max = 14): string {
-  return s.length > max ? s.slice(0, max - 1).trimEnd() + '…' : s;
+function truncate(s: string | null | undefined, max = 14): string {
+  const v = s ?? '';
+  return v.length > max ? v.slice(0, max - 1).trimEnd() + '…' : v;
 }
 
 interface Placed {
@@ -126,7 +129,14 @@ export default function BloodlineTreeGraph({
   photoUrl,
   onSelect,
   bgUrl,
+  directKeys,
+  relLabel,
 }: Props) {
+  // A node is "collateral" when it's placed in the tree but NOT on the direct
+  // line (siblings, aunts/uncles, cousins, nieces/nephews, married-in spouses).
+  // Rendered smaller + dimmer so the direct bloodline still reads as the spine.
+  const isCollateral = (key: string) =>
+    key !== rootKey && !!directKeys && !directKeys.has(key);
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [t, setT] = useState<Transform>({ x: 0, y: 0, k: 1 });
   const [hoverKey, setHoverKey] = useState<string | null>(null);
@@ -162,7 +172,7 @@ export default function BloodlineTreeGraph({
     // Blood edges: every placed node rises from its top-center to each placed
     // parent's bottom-center. Because a parent always sits one row above its
     // child, this single routine draws BOTH ancestors-up and descendants-down.
-    const edges: { d: string }[] = [];
+    const edges: { d: string; collateral: boolean }[] = [];
     pos.forEach((child, key) => {
       (parentsOf.get(key) || []).forEach((pk) => {
         const parent = pos.get(pk);
@@ -172,7 +182,10 @@ export default function BloodlineTreeGraph({
         const px = parent.x + CARD_W / 2;
         const py = parent.y + CARD_H; // bottom edge of the parent card
         const midY = (cy + py) / 2;
-        edges.push({ d: `M ${cx} ${cy} C ${cx} ${midY}, ${px} ${midY}, ${px} ${py}` });
+        // An edge is "collateral" (subtler) unless BOTH ends are on the direct
+        // line — that keeps the ancestor↔root↔descendant spine visually primary.
+        const collateral = isCollateral(key) || isCollateral(pk);
+        edges.push({ d: `M ${cx} ${cy} C ${cx} ${midY}, ${px} ${midY}, ${px} ${py}`, collateral });
       });
     });
 
@@ -212,7 +225,8 @@ export default function BloodlineTreeGraph({
       maxY = Math.max(maxY, s.y + CARD_H);
     });
     return { pos, edges, steps, stepEdges, contentW: maxX + PAD, contentH: maxY + PAD };
-  }, [rows, rootKey, parentsOf, stepFamily]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows, rootKey, parentsOf, stepFamily, directKeys]);
 
   const layoutRef = useRef(layout);
   layoutRef.current = layout;
@@ -304,18 +318,26 @@ export default function BloodlineTreeGraph({
     const isRoot = node.person_key === rootKey;
     const hovered = hoverKey === node.person_key;
     const dot = CONFIDENCE_COLOR[node.confidence] || '#a99e8b';
-    const pillText = subtype ? subtype.toUpperCase() : null;
+    // Collateral kin (and step family) render slightly smaller within their slot
+    // so the direct bloodline reads as the primary spine. The label comes from
+    // the collateral role map (sibling/aunt/cousin/niece) or the step subtype.
+    const collateral = isCollateral(node.person_key);
+    const pillText = (subtype || relLabel?.get(node.person_key) || null)?.toUpperCase() || null;
     const pillW = pillText ? pillText.length * 6 + 16 : 0;
+    const s = collateral && !subtype ? 0.84 : subtype ? 0.9 : 1; // scale within the fixed slot
+    const ox = x + (CARD_W * (1 - s)) / 2;
+    const oy = y + (CARD_H * (1 - s)) / 2;
     return (
       <g
         key={idKey}
-        transform={`translate(${x},${y})`}
+        transform={`translate(${ox},${oy}) scale(${s})`}
         onClick={() => handleSelect(node.person_key)}
         onMouseEnter={() => setHoverKey(node.person_key)}
         onMouseLeave={() => setHoverKey(null)}
         style={{ cursor: 'pointer' }}
         role="button"
         aria-label={isRoot ? `${node.name} (you)` : node.name}
+        opacity={collateral && !hovered ? 0.9 : 1}
       >
         {isRoot && (
           // a soft aura ring marking the root ("You")
@@ -427,6 +449,16 @@ export default function BloodlineTreeGraph({
     );
   };
 
+  // Defensive: a single malformed node must degrade to nothing, never throw
+  // and take the whole tree (and the app) down with it.
+  const safeCard = (placed: Placed, idKey: string, subtype?: string) => {
+    try {
+      return renderCard(placed, idKey, subtype);
+    } catch {
+      return null;
+    }
+  };
+
   const btnStyle: React.CSSProperties = {
     minWidth: 28,
     height: 28,
@@ -519,14 +551,15 @@ export default function BloodlineTreeGraph({
             </defs>
 
             <g transform={`translate(${t.x},${t.y}) scale(${t.k})`}>
-              {/* Blood connectors */}
+              {/* Blood connectors — the direct spine is brighter, collateral subtler */}
               {layout.edges.map((e, i) => (
                 <path
                   key={`edge-${i}`}
                   d={e.d}
                   fill="none"
-                  stroke={PALETTE.hairline}
-                  strokeWidth={1.25}
+                  stroke={e.collateral ? 'rgba(198,151,73,0.28)' : PALETTE.gold}
+                  strokeOpacity={e.collateral ? 1 : 0.5}
+                  strokeWidth={e.collateral ? 1 : 1.4}
                 />
               ))}
               {/* Step-family connectors (dashed, never in the blood line) */}
@@ -545,11 +578,11 @@ export default function BloodlineTreeGraph({
               {rows.map((row, g) =>
                 row.map((node, i) => {
                   const placed = layout.pos.get(node.person_key);
-                  return placed ? renderCard(placed, `g${g}-${i}`) : null;
+                  return placed ? safeCard(placed, `g${g}-${i}`) : null;
                 })
               )}
               {/* Step-family cards */}
-              {layout.steps.map((s, i) => renderCard(s, `step-${i}`, s.subtype))}
+              {layout.steps.map((s, i) => safeCard(s, `step-${i}`, s.subtype))}
             </g>
           </svg>
 

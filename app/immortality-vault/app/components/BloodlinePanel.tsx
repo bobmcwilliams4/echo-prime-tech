@@ -18,11 +18,10 @@ import {
 import VaultIcon from './VaultIcon';
 import BloodlineTreeGraph from './BloodlineTreeGraph';
 
-/* Atmospheric gold-on-black backdrop behind the tree. When a Grok-generated
-   image is present at public/immortality-vault/tree-bg.jpg, point this at it;
-   undefined → the tree's built-in gold radial-gradient fallback (in use now, as
-   the ShadowGlass Chrome was signed out of grok.com at build time). */
-const TREE_BG: string | undefined = undefined;
+/* Atmospheric gold-on-black backdrop behind the tree — a gold-tree-roots-on-black
+   render, drawn behind the nodes at low opacity under a dark scrim (handled in
+   BloodlineTreeGraph) so the gold cards read clearly over it. */
+const TREE_BG: string | undefined = '/immortality-vault/tree-bg.jpg';
 
 /* confidence → label + colour (matches the API's confidence_legend ranking) */
 const CONF: Record<string, { label: string; color: string }> = {
@@ -41,8 +40,11 @@ function lifespan(n: BloodlineNode): string {
   if (!b && !d) return n.living ? 'living' : '';
   return `${b || '?'} – ${n.living ? 'living' : (d || '?')}`;
 }
-function monogram(name: string): string {
-  return name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+function monogram(name: string | null | undefined): string {
+  return ((name ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase()) || '·';
+}
+function firstName(name: string | null | undefined): string {
+  return (name ?? '').split(' ').filter(Boolean)[0] || 'them';
 }
 
 /* Circular gold-framed portrait, or a gold monogram placeholder. */
@@ -184,14 +186,86 @@ export default function BloodlinePanel({ userId }: { userId: string | null }) {
     downFrontier = downFrontier.flatMap(k => (childrenOf.get(k) || []).filter(c => !nonBioKeys.has(c)));
   }
 
-  /* Rows TOP → BOTTOM for the centered tree: oldest ancestors … parents, You, children … */
-  const rows: BloodlineNode[][] = [
-    ...generations.slice(1).reverse(),  // ancestors above the root, oldest first
-    ...(generations[0] ? [generations[0]] : []),  // You
-    ...descendants,                     // descendants below the root
-  ];
+  /* The DIRECT line: root + ancestors + descendants (everything walked above). */
+  const directKeys = new Set<string>(seen);
 
-  const offLine = tree.nodes.filter(n => !seen.has(n.person_key) && n.confidence !== 'REFUTED' && !nonBioKeys.has(n.person_key));
+  /* ── COLLATERAL-AWARE TREE ROWS ──────────────────────────────────────────
+     Place EVERY blood relative by a signed generation (root = 0, ancestors +,
+     descendants −), reached by walking parent edges up AND child edges down
+     from the root. This picks up siblings (gen 0), aunts/uncles (gen +1),
+     cousins (gen 0), nieces/nephews (gen −1) and married-in spouses — all with
+     their real parent edges, so the graph's edge routine connects each to its
+     own parent one row above, instead of dropping them into a leftover list. */
+  const generationOf = new Map<string, number>();
+  generationOf.set(tree.root, 0);
+  {
+    const q: string[] = [tree.root];
+    while (q.length) {
+      const k = q.shift()!;
+      const g = generationOf.get(k)!;
+      (parentsOf.get(k) || []).forEach(p => { if (byKey.has(p) && !generationOf.has(p)) { generationOf.set(p, g + 1); q.push(p); } });
+      (childrenOf.get(k) || []).forEach(c => { if (byKey.has(c) && !generationOf.has(c)) { generationOf.set(c, g - 1); q.push(c); } });
+    }
+  }
+
+  /* Order each generation top→bottom so children cluster under their parents
+     and married-in spouses sit beside their partner — while the direct-line
+     spine stays legible. `order` accumulates row-by-row from the top down. */
+  const order = new Map<string, number>();
+  const meanParentOrder = (k: string) => {
+    const ps = (parentsOf.get(k) || []).filter(p => order.has(p));
+    return ps.length ? ps.reduce((s, p) => s + order.get(p)!, 0) / ps.length : Number.POSITIVE_INFINITY;
+  };
+  const findPartner = (k: string, members: string[]) => {
+    for (const c of childrenOf.get(k) || []) {
+      for (const p of parentsOf.get(c) || []) {
+        if (p !== k && members.includes(p)) return p; // a co-parent in the same generation
+      }
+    }
+    return null;
+  };
+  const gensPresent = Array.from(new Set(generationOf.values())).sort((a, b) => b - a); // high (oldest) → low
+  const treeRows: BloodlineNode[][] = [];
+  for (const g of gensPresent) {
+    const members = Array.from(generationOf.entries()).filter(([, gg]) => gg === g).map(([k]) => k);
+    const withParents = members.filter(k => (parentsOf.get(k) || []).some(p => order.has(p)));
+    const withoutParents = members.filter(k => !(parentsOf.get(k) || []).some(p => order.has(p)));
+    withParents.sort((a, b) => (meanParentOrder(a) - meanParentOrder(b)) || a.localeCompare(b));
+    const seq: string[] = [...withParents];
+    // Splice married-in spouses in right beside their partner; true top
+    // ancestors (no partner in this row) append in stable order.
+    withoutParents.sort((a, b) => a.localeCompare(b));
+    for (const s of withoutParents) {
+      const partner = findPartner(s, members);
+      const idx = partner ? seq.indexOf(partner) : -1;
+      if (idx >= 0) seq.splice(idx + 1, 0, s); else seq.push(s);
+    }
+    seq.forEach((k, i) => order.set(k, i));
+    treeRows.push(seq.map(k => byKey.get(k)!).filter(Boolean));
+  }
+
+  /* Relation labels for the four named collateral categories (shown as pills). */
+  const relLabel = new Map<string, string>();
+  {
+    const rootParents = new Set(parentsOf.get(tree.root) || []);
+    const grandparents = new Set<string>();
+    rootParents.forEach(p => (parentsOf.get(p) || []).forEach(gp => grandparents.add(gp)));
+    const mark = (keys: Iterable<string>, label: string) => { for (const k of keys) if (!directKeys.has(k)) relLabel.set(k, label); };
+    const siblings = new Set<string>();
+    rootParents.forEach(p => (childrenOf.get(p) || []).forEach(c => { if (c !== tree.root) siblings.add(c); }));
+    const auntsUncles = new Set<string>();
+    grandparents.forEach(gp => (childrenOf.get(gp) || []).forEach(c => { if (!rootParents.has(c)) auntsUncles.add(c); }));
+    const cousins = new Set<string>();
+    auntsUncles.forEach(a => (childrenOf.get(a) || []).forEach(c => cousins.add(c)));
+    const niblings = new Set<string>();
+    siblings.forEach(s => (childrenOf.get(s) || []).forEach(c => niblings.add(c)));
+    mark(siblings, 'sibling');
+    mark(auntsUncles, 'aunt · uncle');
+    mark(cousins, 'cousin');
+    mark(niblings, 'niece · nephew');
+  }
+
+  const offLine = tree.nodes.filter(n => !seen.has(n.person_key) && !generationOf.has(n.person_key) && n.confidence !== 'REFUTED' && !nonBioKeys.has(n.person_key));
   const stepFamily = tree.nodes.filter(n => nonBioKeys.has(n.person_key));
   const refuted = tree.nodes.filter(n => n.confidence === 'REFUTED');
   const stepForGraph = stepFamily.map(n => ({ node: n, subtype: nonBioKeys.get(n.person_key) || 'step' }));
@@ -248,7 +322,7 @@ export default function BloodlinePanel({ userId }: { userId: string | null }) {
       {view === 'tree' && (
         <>
           <BloodlineTreeGraph
-            rows={rows}
+            rows={treeRows}
             rootKey={tree.root}
             parentsOf={parentsOf}
             stepFamily={stepForGraph}
@@ -256,9 +330,14 @@ export default function BloodlinePanel({ userId }: { userId: string | null }) {
             photoUrl={(id) => userId ? bloodlineRecordImageUrl(userId, id) : ''}
             onSelect={(k) => setDetailKey(k)}
             bgUrl={TREE_BG}
+            directKeys={directKeys}
+            relLabel={relLabel}
           />
           <div style={{ marginTop: 10, fontSize: 12, color: MUTED, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <span>Drag to pan · scroll to zoom · click a person for details.</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 14, height: 10, borderRadius: 3, border: `1px solid ${GOLD_DEEP}`, opacity: 0.7, transform: 'scale(0.85)' }} /> extended family — siblings, aunts &amp; uncles, cousins, nieces &amp; nephews
+            </span>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               <span style={{ width: 18, borderTop: `1px dashed ${GOLD_DEEP}` }} /> step / adoptive family (not bloodline)
             </span>
@@ -451,7 +530,7 @@ function PersonCard({ n, open, onToggle, userId, records, onUpload, onPhoto, upl
           )}
           {!n.living && n.persona_status === 'live' && (
             <div style={{ fontSize: 12.5, color: GOLD, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <VaultIcon name="spark" size={13} /> You can talk with {n.name.split(' ')[0]} in Ancestor Chat.
+              <VaultIcon name="spark" size={13} /> You can talk with {firstName(n.name)} in Ancestor Chat.
             </div>
           )}
         </div>

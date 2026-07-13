@@ -58,12 +58,15 @@ export function createMediaRecorder(stream: MediaStream, audioOnly = false): Rec
     recorder.onstop = () => resolve(new Blob(chunks, { type: mimeType }));
   });
 
-  recorder.start(1000); // collect chunks every second
+  // Guard against InvalidStateError: only start a fresh (inactive) recorder.
+  if (recorder.state === 'inactive') recorder.start(1000); // collect chunks every second
 
   return {
     recorder,
     mimeType,
     stop: async () => {
+      // Only stop a live recorder; a double-stop throws InvalidStateError.
+      if (recorder.state === 'inactive') return new Blob(chunks, { type: mimeType });
       recorder.stop();
       return blobPromise;
     },

@@ -18,7 +18,7 @@ const MODE_META: Record<Mode, { label: string; icon: string; desc: string }> = {
   wisdom: { label: 'Wisdom', icon: 'wisdom', desc: 'Life lessons & advice' },
 };
 
-function initials(name: string) { return name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
+function initials(name: string | null | undefined) { return ((name ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase()) || '·'; }
 
 export default function AncestorChatPanel({ userId }: Props) {
   const [members, setMembers] = useState<FamilyMember[]>([]);
