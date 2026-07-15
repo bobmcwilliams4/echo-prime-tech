@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '../../../lib/theme-context';
 import { useAuth } from '../../../lib/auth-context';
 import { API, BG_DARK, BG_CARD, BG_CARD2, BORDER, HAIR, ACCENT, GOLD, GOLD_BRIGHT, IVORY, MUTED, NAV_ITEMS } from './lib/constants';
-import { createUser, getStats, startCheckout, type VaultStats } from './lib/vault-api';
+import { createUser, getStats, startCheckout, type ConsentCaptureScope, type VaultStats } from './lib/vault-api';
 import VaultIcon from './components/VaultIcon';
 
 const PLAN_SLUGS = ['keeper', 'legacy', 'dynasty'];
@@ -27,6 +27,7 @@ import SettingsPanel from './components/SettingsPanel';
 import PersonalityPanel from './components/PersonalityPanel';
 import FairySprite from './components/FairySprite';
 import EchoChatWidget from './components/EchoChatWidget';
+import ConsentGate from './components/ConsentGate';
 
 /* ─── Onboarding Modal ───────────────────────────────────────────────── */
 
@@ -73,7 +74,7 @@ export default function VaultAppPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [activePanel, setActivePanel] = useState('dashboard');
-  const [vaultUserId, setVaultUserId] = useState<string | null>(null);
+  const [vaultProfileState, setVaultProfileState] = useState<{ userId: string; status: 'ready' | 'error' } | null>(null);
   const [stats, setStats] = useState<VaultStats | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -105,17 +106,25 @@ export default function VaultAppPage() {
 
   // Create or get vault user + load stats
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setVaultProfileState(null);
+      return;
+    }
+    let cancelled = false;
     const userId = user.uid;
-    setVaultUserId(userId);
+    setVaultProfileState(null);
 
-    createUser(userId, user.displayName || user.email || 'User', user.email || '').catch(() => {});
+    createUser(userId, user.displayName || user.email || 'User', user.email || '')
+      .then(() => { if (!cancelled) setVaultProfileState({ userId, status: 'ready' }); })
+      .catch(() => { if (!cancelled) setVaultProfileState({ userId, status: 'error' }); });
     getStats().then(setStats).catch(() => {});
 
     // Check onboarding
     if (typeof window !== 'undefined' && !localStorage.getItem('vault_onboarded')) {
       setShowOnboarding(true);
     }
+
+    return () => { cancelled = true; };
   }, [user]);
 
   const handleNavigate = (panel: string) => {
@@ -139,15 +148,29 @@ export default function VaultAppPage() {
     );
   }
 
+  const vaultUserId = user.uid;
+  const vaultProfileStatus = vaultProfileState?.userId === vaultUserId ? vaultProfileState.status : 'loading';
+
   const renderPanel = () => {
-    if (!vaultUserId) return null;
+    const gateCapture = (mediaScope: ConsentCaptureScope, panel: ReactNode) => (
+      <ConsentGate
+        key={`${vaultUserId}:${mediaScope}`}
+        userId={vaultUserId}
+        mediaScope={mediaScope}
+        consenterName={user.displayName || user.email || 'User'}
+        consenterEmail={user.email || ''}
+        profileStatus={vaultProfileStatus}
+      >
+        {panel}
+      </ConsentGate>
+    );
     switch (activePanel) {
       case 'dashboard': return <DashboardPanel userId={vaultUserId} stats={stats} onNavigate={handleNavigate} />;
-      case 'interview': return <InterviewPanel userId={vaultUserId} />;
+      case 'interview': return gateCapture('any', <InterviewPanel userId={vaultUserId} />);
       case 'chat': return <ChatPanel userId={vaultUserId} />;
       case 'ancestor': return <AncestorChatPanel userId={vaultUserId} />;
-      case 'record': return <RecordPanel userId={vaultUserId} />;
-      case 'voice': return <VoicePanel userId={vaultUserId} />;
+      case 'record': return gateCapture('any', <RecordPanel userId={vaultUserId} />);
+      case 'voice': return gateCapture('voice', <VoicePanel userId={vaultUserId} />);
       case 'memories': return <MemoriesPanel userId={vaultUserId} />;
       case 'progress': return <ProgressPanel userId={vaultUserId} onNavigate={handleNavigate} />;
       case 'personality': return <PersonalityPanel userId={vaultUserId} />;

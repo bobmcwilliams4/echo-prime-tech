@@ -147,6 +147,49 @@ export interface VideoMeta {
   created_at: string;
 }
 
+export type ConsentSubjectStatus = 'living' | 'deceased' | 'incapacitated';
+export type ConsentMediaType = 'voice' | 'video';
+export type ConsentCaptureScope = ConsentMediaType | 'any';
+
+export interface ConsentCaptureInput {
+  user_id: string;
+  subject_status: ConsentSubjectStatus;
+  media_type: ConsentCaptureScope;
+  consenter_name: string;
+  consenter_relationship: string;
+  consenter_email: string;
+  legal_authority_type?: string;
+}
+
+export interface ConsentMediaState {
+  allowed: boolean;
+  reason: string;
+}
+
+export interface ConsentPosture {
+  user_id: string;
+  media: {
+    voice: ConsentMediaState;
+    video: ConsentMediaState;
+  };
+  records: number;
+  deletion_requested: boolean;
+}
+
+export interface ConsentCaptureResponse {
+  ok: boolean;
+  consent: {
+    id: string;
+    subject_status: ConsentSubjectStatus;
+    method: 'self_attested' | 'guardian_attested' | 'legal_authority';
+    granted: boolean;
+    authority_verified: boolean;
+    pending_human_review: boolean;
+  };
+  active: boolean;
+  notice?: string;
+}
+
 export interface FaceTimeReadiness {
   user_id: string;
   ready: boolean;
@@ -293,6 +336,68 @@ async function serverError(res: Response, fallback: string): Promise<string> {
   } catch {
     return fallback;
   }
+}
+
+/** Consent endpoints are identity-bound even while the backend completes its
+ * server-side Firebase verification rollout. Never accept a caller-provided
+ * alternate identifier or fall back to email/local storage. */
+async function consentHeaders(userId: string): Promise<Record<string, string>> {
+  const { auth } = await import('@/lib/firebase');
+  const currentUser = auth.currentUser;
+  if (!currentUser || currentUser.uid !== userId) {
+    throw new Error('Your signed-in vault profile could not be verified. Capture remains unavailable.');
+  }
+  return {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${await currentUser.getIdToken()}`,
+  };
+}
+
+function assertConsentPosture(value: unknown, expectedUserId: string): ConsentPosture {
+  const posture = value as Partial<ConsentPosture> | null;
+  if (
+    !posture || typeof posture !== 'object' ||
+    posture.user_id !== expectedUserId ||
+    !posture.media ||
+    typeof posture.media.voice?.allowed !== 'boolean' ||
+    typeof posture.media.video?.allowed !== 'boolean' ||
+    typeof posture.records !== 'number' ||
+    typeof posture.deletion_requested !== 'boolean'
+  ) {
+    throw new Error('The consent service returned an invalid status. Capture remains unavailable.');
+  }
+  return posture as ConsentPosture;
+}
+
+/** Read the server's current authorization posture. This is the only source
+ * of truth used to mount camera, microphone, or biometric upload controls. */
+export async function getConsentStatus(userId: string, signal?: AbortSignal): Promise<ConsentPosture> {
+  const headers = await consentHeaders(userId);
+  const res = await fetch(`${API}/consent/${encodeURIComponent(userId)}`, { headers, signal });
+  if (!res.ok) throw new Error(await serverError(res, `Consent status unavailable: ${res.status}`));
+  return assertConsentPosture(await res.json(), userId);
+}
+
+/** Record a voice, video, or combined audiovisual consent scope. Callers must
+ * re-fetch getConsentStatus afterwards; POST success alone never unlocks capture. */
+export async function captureConsent(input: ConsentCaptureInput, signal?: AbortSignal): Promise<ConsentCaptureResponse> {
+  const headers = await consentHeaders(input.user_id);
+  const res = await fetch(`${API}/consent`, {
+    method: 'POST',
+    headers,
+    signal,
+    body: JSON.stringify(input),
+  });
+  if (!res.ok) throw new Error(await serverError(res, `Consent could not be recorded: ${res.status}`));
+  const data = await res.json() as Partial<ConsentCaptureResponse>;
+  if (!data.ok || !data.consent || typeof data.active !== 'boolean') {
+    throw new Error('The consent service returned an invalid confirmation. Capture remains unavailable.');
+  }
+  return data as ConsentCaptureResponse;
+}
+
+function notifyConsentInvalidated(): void {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('vault-consent-invalidated'));
 }
 
 /* ─── User ───────────────────────────────────────────────────────────── */
@@ -609,7 +714,10 @@ export async function createVoiceProfile(userId: string, samples: Blob[], prompt
     formData.append('prompt_ids', promptIds[i]);
   });
   const res = await fetch(`${API}/voice/profiles`, { method: 'POST', body: formData });
-  if (!res.ok) throw new Error(await serverError(res, `Upload failed: ${res.status}`));
+  if (!res.ok) {
+    if (res.status === 403) notifyConsentInvalidated();
+    throw new Error(await serverError(res, `Upload failed: ${res.status}`));
+  }
   return res.json() as Promise<VoiceProfile>;
 }
 
@@ -635,7 +743,10 @@ export async function uploadVideo(userId: string, blob: Blob, questionId?: strin
   formData.append('video', blob, `recording_${Date.now()}.webm`);
   if (questionId) formData.append('question_id', questionId);
   const res = await fetch(`${API}/video/upload`, { method: 'POST', body: formData });
-  if (!res.ok) throw new Error(await serverError(res, `Upload failed: ${res.status}`));
+  if (!res.ok) {
+    if (res.status === 403) notifyConsentInvalidated();
+    throw new Error(await serverError(res, `Upload failed: ${res.status}`));
+  }
   return res.json() as Promise<VideoMeta>;
 }
 

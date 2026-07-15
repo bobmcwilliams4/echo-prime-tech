@@ -6,6 +6,7 @@
     "prebuild": "node scripts/verify-site.js && node scripts/verify-vault-separation.js",
     "dev": "next dev",
     "build": "next build",
+    "test:immortality-consent": "node --test app/immortality-vault/app/lib/consent-policy.test.mjs",
     "start": "next start",
     "lint": "next lint",
     "deploy": "node scripts/deploy.mjs"
