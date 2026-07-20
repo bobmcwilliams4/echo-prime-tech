@@ -17,8 +17,9 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { onAuthChange, isAuthRedirectPending } from '../../lib/firebase';
 
-const SEEN_KEY = 'ivault_intro_seen_v1';
 const SRC = '/immortality-vault/intro.mp4';
 const POSTER = '/immortality-vault/intro-poster.jpg';
 const GOLD = '#d4b483';
@@ -29,19 +30,44 @@ export default function IntroSplash() {
   const [leaving, setLeaving] = useState(false);
   const [muted, setMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const pathname = usePathname();
 
-  // Decide on mount (client only). Play the intro on every startup (fresh page
-  // load), not just the first time — Commander directive. It does NOT replay during
-  // in-app SPA navigation (the vault layout stays mounted across child routes); it
-  // fires only on a real load/reload. Reduced-motion users are never ambushed.
+  // Decide on mount (client only). Plays on every fresh load of the MARKETING
+  // landing page (Commander directive), but is HARD-GATED so it can never play
+  // over authentication or the app itself — that was the "Google login restarts
+  // the intro" bug. Rules (root-cause fix, do not regress):
+  //   1. LANDING ONLY — never on /login, /app, /listen, or any other child
+  //      route. Sign-in and the vault app are working surfaces, not cinema.
+  //   2. NEVER over an OAuth roundtrip — if a sign-in redirect is in flight
+  //      (sessionStorage flag set by lib/firebase before signInWithRedirect),
+  //      the return load goes straight to auth resolution, no intro.
+  //   3. AUTH-RESOLVED ONLY — we wait for Firebase's first onAuthStateChanged
+  //      before deciding. A signed-in visitor skips the intro entirely and goes
+  //      straight in; only a genuinely signed-out visitor gets the film.
+  //   4. Reduced-motion users are never ambushed.
+  //   5. FRESH LOADS ONLY — the decision is made once per real page load; SPA
+  //      navigation back to the landing page never replays it (layout stays
+  //      mounted, decidedRef holds).
+  const decidedRef = useRef(false);
   useEffect(() => {
-    let skip = false;
+    if (decidedRef.current) { setShow(false); return; }
+    decidedRef.current = true;
+    const isLanding = pathname === '/immortality-vault' || pathname === '/immortality-vault/';
+    if (!isLanding || isAuthRedirectPending()) { setShow(false); return; }
+    let reduced = false;
     try {
-      skip = typeof window !== 'undefined' && !!window.matchMedia
+      reduced = typeof window !== 'undefined' && !!window.matchMedia
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     } catch { /* ignore */ }
-    setShow(!skip);
-  }, []);
+    if (reduced) { setShow(false); return; }
+    // Wait for the persisted session to resolve ONCE, then decide.
+    let cancelled = false;
+    const unsub = onAuthChange((user) => {
+      if (!cancelled) setShow(!user);
+      unsub();
+    });
+    return () => { cancelled = true; unsub(); };
+  }, [pathname]);
 
   // Attempt playback once the overlay is showing.
   useEffect(() => {

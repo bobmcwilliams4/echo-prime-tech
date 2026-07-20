@@ -16,6 +16,8 @@ import {
   onAuthStateChanged,
   sendPasswordResetEmail,
   sendEmailVerification,
+  setPersistence,
+  browserLocalPersistence,
   User,
   UserCredential,
 } from 'firebase/auth';
@@ -32,6 +34,12 @@ const firebaseConfig = {
 let app: FirebaseApp;
 let auth: Auth;
 
+// Session persistence guard. Firebase's default IS durable local persistence,
+// but we pin it explicitly so the signed-in session ALWAYS survives the OAuth
+// roundtrip and any page reload — this is awaited before every sign-in so a
+// login can never land in a session that evaporates on the next load.
+let persistenceReady: Promise<void> | null = null;
+
 function initFirebase() {
   if (!getApps().length) {
     app = initializeApp(firebaseConfig);
@@ -39,7 +47,26 @@ function initFirebase() {
     app = getApps()[0];
   }
   auth = getAuth(app);
+  if (!persistenceReady && typeof window !== 'undefined') {
+    persistenceReady = setPersistence(auth, browserLocalPersistence).catch(() => {});
+  }
   return { app, auth };
+}
+
+// Set (cleared in handleRedirectResult) so the app knows a full-page OAuth
+// roundtrip is in flight — the intro splash must never play over that return.
+const AUTH_REDIRECT_FLAG = 'ept_auth_redirect_pending';
+
+function markRedirectPending() {
+  try { sessionStorage.setItem(AUTH_REDIRECT_FLAG, '1'); } catch { /* ignore */ }
+}
+
+export function isAuthRedirectPending(): boolean {
+  try { return sessionStorage.getItem(AUTH_REDIRECT_FLAG) === '1'; } catch { return false; }
+}
+
+function clearRedirectPending() {
+  try { sessionStorage.removeItem(AUTH_REDIRECT_FLAG); } catch { /* ignore */ }
 }
 
 export interface EPTUser {
@@ -85,46 +112,54 @@ const appleProvider = new OAuthProvider('apple.com');
 appleProvider.addScope('email');
 appleProvider.addScope('name');
 
-export async function signInWithGoogle(): Promise<EPTUser | null> {
+/**
+ * OAuth sign-in: POPUP-FIRST ON EVERY DEVICE.
+ *
+ * ROOT-CAUSE NOTE (do not regress): our Firebase authDomain is
+ * echo-prime-ai.firebaseapp.com — a DIFFERENT origin from the sites that host
+ * the apps (immortalityvault.app, echo-ept.com, …). `signInWithRedirect`
+ * stashes its state in the authDomain's iframe storage, and every modern
+ * browser (Safari ITP, Chrome 115+ storage partitioning) blocks that
+ * third-party storage — so the redirect returns, getRedirectResult() finds
+ * NOTHING, and the user lands back signed-out. That was the recurring
+ * "Google login restarts the intro and doesn't log me in" bug: mobile UAs were
+ * hard-routed to signInWithRedirect. Firebase's own guidance for cross-origin
+ * authDomains on storage-partitioning browsers is: use signInWithPopup.
+ * Redirect remains ONLY as a last resort where popups are impossible, and it
+ * marks the roundtrip so the UI can react instead of playing the intro.
+ */
+async function oauthSignIn(provider: GoogleAuthProvider | OAuthProvider): Promise<EPTUser | null> {
   const { auth } = initFirebase();
-  const isMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (isMobile) {
-    await signInWithRedirect(auth, googleProvider);
-    return null;
-  }
+  if (persistenceReady) await persistenceReady;
   try {
-    const result = await signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, provider);
     return toEPTUser(result.user);
   } catch (error: any) {
-    if (error?.code === 'auth/popup-blocked' || error?.code === 'auth/popup-closed-by-user') {
-      await signInWithRedirect(auth, googleProvider);
+    if (error?.code === 'auth/popup-blocked' || error?.code === 'auth/operation-not-supported-in-this-environment') {
+      // Popup genuinely impossible (blocked / webview). Full-page redirect is
+      // the only path left; flag it so the intro splash stays out of the way.
+      markRedirectPending();
+      await signInWithRedirect(auth, provider);
       return null;
     }
+    // NOTE: 'auth/popup-closed-by-user' is deliberately NOT a redirect trigger —
+    // the user closed the window on purpose; yanking the whole page to Google
+    // after that was part of the old broken feel. It surfaces as a no-op.
     throw error;
   }
 }
 
+export async function signInWithGoogle(): Promise<EPTUser | null> {
+  return oauthSignIn(googleProvider);
+}
+
 export async function signInWithApple(): Promise<EPTUser | null> {
-  const { auth } = initFirebase();
-  const isMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (isMobile) {
-    await signInWithRedirect(auth, appleProvider);
-    return null;
-  }
-  try {
-    const result = await signInWithPopup(auth, appleProvider);
-    return toEPTUser(result.user);
-  } catch (error: any) {
-    if (error?.code === 'auth/popup-blocked' || error?.code === 'auth/popup-closed-by-user') {
-      await signInWithRedirect(auth, appleProvider);
-      return null;
-    }
-    throw error;
-  }
+  return oauthSignIn(appleProvider);
 }
 
 export async function signInWithEmail(email: string, password: string): Promise<EPTUser> {
   const { auth } = initFirebase();
+  if (persistenceReady) await persistenceReady;
   const result = await signInWithEmailAndPassword(auth, email, password);
   return toEPTUser(result.user);
 }
@@ -168,9 +203,14 @@ export async function verifySmsCode(code: string): Promise<EPTUser | null> {
 
 export async function handleRedirectResult(): Promise<EPTUser | null> {
   const { auth } = initFirebase();
-  const result = await getRedirectResult(auth);
-  if (result?.user) return toEPTUser(result.user);
-  return null;
+  if (persistenceReady) await persistenceReady;
+  try {
+    const result = await getRedirectResult(auth);
+    if (result?.user) return toEPTUser(result.user);
+    return null;
+  } finally {
+    clearRedirectPending();
+  }
 }
 
 export async function signOut(): Promise<void> {
