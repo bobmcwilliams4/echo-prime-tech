@@ -8,6 +8,7 @@ import {
   signInWithRedirect,
   getRedirectResult,
   GoogleAuthProvider,
+  GithubAuthProvider,
   OAuthProvider,
   RecaptchaVerifier,
   signInWithPhoneNumber,
@@ -84,6 +85,7 @@ function detectProvider(user: User): string {
   const map: Record<string, string> = {
     'google.com': 'google',
     'apple.com': 'apple',
+    'github.com': 'github',
     'password': 'email',
     'phone': 'phone',
   };
@@ -112,6 +114,13 @@ const appleProvider = new OAuthProvider('apple.com');
 appleProvider.addScope('email');
 appleProvider.addScope('name');
 
+// GitHub — provider must be enabled in Firebase Auth (project echo-prime-ai)
+// with a GitHub OAuth App whose callback is
+// https://echo-prime-ai.firebaseapp.com/__/auth/handler
+const githubProvider = new GithubAuthProvider();
+githubProvider.addScope('read:user');
+githubProvider.addScope('user:email');
+
 /**
  * OAuth sign-in: POPUP-FIRST ON EVERY DEVICE.
  *
@@ -128,7 +137,7 @@ appleProvider.addScope('name');
  * Redirect remains ONLY as a last resort where popups are impossible, and it
  * marks the roundtrip so the UI can react instead of playing the intro.
  */
-async function oauthSignIn(provider: GoogleAuthProvider | OAuthProvider): Promise<EPTUser | null> {
+async function oauthSignIn(provider: GoogleAuthProvider | GithubAuthProvider | OAuthProvider): Promise<EPTUser | null> {
   const { auth } = initFirebase();
   if (persistenceReady) await persistenceReady;
   try {
@@ -155,6 +164,10 @@ export async function signInWithGoogle(): Promise<EPTUser | null> {
 
 export async function signInWithApple(): Promise<EPTUser | null> {
   return oauthSignIn(appleProvider);
+}
+
+export async function signInWithGithub(): Promise<EPTUser | null> {
+  return oauthSignIn(githubProvider);
 }
 
 export async function signInWithEmail(email: string, password: string): Promise<EPTUser> {

@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Cormorant_Garamond } from 'next/font/google';
-import { signInWithGoogle, signInWithApple, signInWithEmail, resetPassword } from '../../../lib/firebase';
+import { signInWithGoogle, signInWithApple, signInWithGithub, signInWithEmail, resetPassword } from '../../../lib/firebase';
 import { useAuth } from '../../../lib/auth-context';
 
 const serif = Cormorant_Garamond({ subsets: ['latin'], weight: ['500', '600'], display: 'swap' });
@@ -23,6 +23,8 @@ function friendly(code: string): string {
   if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') return 'That email or password doesn’t match. Try again, or reset it below.';
   if (code === 'auth/too-many-requests') return 'Too many attempts. Please wait a moment and try again.';
   if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return '';
+  if (code === 'auth/account-exists-with-different-credential') return 'An account already exists for that email with a different sign-in method. Use the provider you originally signed up with.';
+  if (code === 'auth/operation-not-allowed') return 'That sign-in method isn’t enabled yet. Please use Google, Apple, or email.';
   return 'Something went wrong signing in. Please try again.';
 }
 
@@ -87,6 +89,10 @@ export default function VaultLoginPage() {
           </button>
           <button onClick={() => oauth(signInWithApple)} disabled={submitting} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: '13px', borderRadius: 12, background: 'transparent', color: C.ivory, border: `1px solid ${C.hair}`, fontSize: 15, fontWeight: 600, cursor: 'pointer', opacity: submitting ? 0.6 : 1 }}>
             Continue with Apple
+          </button>
+          <button onClick={() => oauth(signInWithGithub)} disabled={submitting} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: '13px', borderRadius: 12, background: 'transparent', color: C.ivory, border: `1px solid ${C.hair}`, fontSize: 15, fontWeight: 600, cursor: 'pointer', opacity: submitting ? 0.6 : 1 }}>
+            <svg aria-hidden viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+            Continue with GitHub
           </button>
         </div>
 
