@@ -18,6 +18,7 @@ import AncestorChatPanel from './components/AncestorChatPanel';
 import RecordPanel from './components/RecordPanel';
 import VoicePanel from './components/VoicePanel';
 import MemoriesPanel from './components/MemoriesPanel';
+import TimelinePanel from './components/TimelinePanel';
 import ProgressPanel from './components/ProgressPanel';
 import BriefingPanel from './components/BriefingPanel';
 import FamilyPanel from './components/FamilyPanel';
@@ -173,6 +174,7 @@ export default function VaultAppPage() {
       case 'record': return gateCapture('any', <RecordPanel userId={vaultUserId} />);
       case 'voice': return gateCapture('voice', <VoicePanel userId={vaultUserId} />);
       case 'memories': return <MemoriesPanel userId={vaultUserId} />;
+      case 'timeline': return <TimelinePanel userId={vaultUserId} onNavigate={handleNavigate} />;
       case 'progress': return <ProgressPanel userId={vaultUserId} onNavigate={handleNavigate} />;
       case 'personality': return <PersonalityPanel userId={vaultUserId} />;
       case 'briefing': return <BriefingPanel userId={vaultUserId} onNavigate={handleNavigate} />;

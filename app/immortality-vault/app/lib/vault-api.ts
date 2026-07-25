@@ -70,12 +70,19 @@ export interface FamilyMember {
 export interface Memory {
   id: string;
   user_id: string;
-  content: string;
+  content: string;           // latest content (the newest edit, if any)
   category: string;
   emotion?: string;
   importance?: number;
   source?: string;
   created_at: string;
+  /* ── P3 slice 3: owner edits ── the memory carries its edit history so the UI
+   *  can show the correction while still letting the owner see what they first
+   *  said. `content` is always the latest; `original_content` is the first
+   *  version, present only once an edit has been made. */
+  original_content?: string;
+  edited?: boolean;
+  edited_at?: string;
 }
 
 export interface VoiceProfile {
@@ -286,6 +293,10 @@ export interface TypedMemory {
   source: string;
   linked_memory_ids: string;
   created_at: string;
+  /* ── P3 slice 3: owner edits (see Memory) ── */
+  original_content?: string;
+  edited?: boolean;
+  edited_at?: string;
 }
 
 export interface TypedMemoryStoreResult {
@@ -510,6 +521,50 @@ export async function createMemory(userId: string, content: string, category: st
     method: 'POST',
     body: JSON.stringify({ user_id: userId, content, category, emotion }),
   });
+}
+
+export interface UpdateMemoryResult {
+  ok: boolean;
+  memory_id: string;
+  correction_id: string;
+  edited: boolean;
+}
+
+/** Owner-only edit of a memory's text (P3 slice 3). The backend keeps the
+ *  original as a correction record, so `getMemories`/`getTypedMemories` return
+ *  `content` (latest), `original_content`, `edited`, and `edited_at` afterwards.
+ *  Ownership is enforced server-side via the Firebase bearer token (403 on a
+ *  cross-user id, 404 if the memory is unknown, 400 if `content` is missing). */
+export async function updateMemory(userId: string, memoryId: string, content: string): Promise<UpdateMemoryResult> {
+  return vaultFetch(`/memories/${encodeURIComponent(memoryId)}`, {
+    method: 'PUT',
+    body: JSON.stringify({ user_id: userId, content }),
+  });
+}
+
+/* ─── Timeline (P3 slice 3) ──────────────────────────────────────────── */
+
+/** One derived life event on the timeline. `year` + `label` are inferred from
+ *  the memory (hence `derived`), `memory_id` links back to the source memory,
+ *  and `evidence_video_id` is present when a recorded answer backs the event. */
+export interface TimelineEvent {
+  year: number;
+  label: string;
+  memory_id: string;
+  category: string;
+  evidence_video_id?: string;
+  derived: boolean;
+}
+
+export interface TimelineResponse {
+  events: TimelineEvent[];
+  span: { from: number | null; to: number | null };
+  count: number;
+}
+
+/** The owner's life timeline — year-ordered events derived from their memories. */
+export async function getTimeline(userId: string): Promise<TimelineResponse> {
+  return vaultFetch(`/timeline/${encodeURIComponent(userId)}`);
 }
 
 /* ─── Interview ──────────────────────────────────────────────────────── */

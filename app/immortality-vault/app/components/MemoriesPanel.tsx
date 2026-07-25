@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ACCENT, GOLD, GOLD_BRIGHT, GOLD_DEEP, BG_CARD, BG_INSET, BORDER, HAIR, IVORY, MUTED, CATEGORIES, EMOTION_ICONS } from '../lib/constants';
-import { getTypedMemories, storeTypedMemory, consolidateMemories, type TypedMemory, type MemoryType } from '../lib/vault-api';
+import { getTypedMemories, storeTypedMemory, consolidateMemories, updateMemory, type TypedMemory, type MemoryType } from '../lib/vault-api';
 import VaultIcon, { CATEGORY_ICON } from './VaultIcon';
 
 const goldBtn = `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`;
@@ -24,6 +24,46 @@ export default function MemoriesPanel({ userId }: Props) {
   const [newMemoryType, setNewMemoryType] = useState<MemoryType>('biography');
   const [typeFilter, setTypeFilter] = useState<MemoryType | null>(null);
   const [consolidating, setConsolidating] = useState(false);
+
+  /* ── P3 slice 3: inline memory edit ── */
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [showOriginalId, setShowOriginalId] = useState<string | null>(null);
+
+  const beginEdit = (m: TypedMemory) => {
+    setEditingId(m.id);
+    setEditContent(m.content);
+    setEditError(null);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditContent('');
+    setEditError(null);
+  };
+
+  const saveEdit = async (m: TypedMemory) => {
+    const next = editContent.trim();
+    if (!next || next === m.content) { cancelEdit(); return; }
+    setEditSaving(true);
+    setEditError(null);
+    try {
+      await updateMemory(userId, m.id, next);
+      // Reflect the persisted edit locally so the correction shows immediately
+      // and the original stays available, independent of list-endpoint lag.
+      setMemories(prev => prev.map(x =>
+        x.id === m.id
+          ? { ...x, content: next, original_content: x.original_content ?? x.content, edited: true, edited_at: new Date().toISOString() }
+          : x,
+      ));
+      cancelEdit();
+    } catch (e) {
+      setEditError(e instanceof Error ? e.message : 'Could not save your edit. Please try again.');
+    }
+    setEditSaving(false);
+  };
 
   const loadMemories = async () => {
     setLoading(true);
@@ -225,11 +265,86 @@ export default function MemoriesPanel({ userId }: Props) {
                             imp:{m.importance}
                           </span>
                         )}
-                        <span className="text-[10px] ml-auto" style={{ color: 'rgba(169,158,139,0.7)' }}>
-                          {new Date(m.created_at).toLocaleDateString()}
-                        </span>
+                        <div className="ml-auto flex items-center gap-2">
+                          {m.edited && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded font-mono inline-flex items-center gap-1" style={{ background: 'rgba(245,196,81,0.10)', color: MUTED }} title={m.edited_at ? `Edited ${new Date(m.edited_at).toLocaleDateString()}` : 'Edited'}>
+                              <VaultIcon name="edit" size={10} /> edited
+                            </span>
+                          )}
+                          <span className="text-[10px]" style={{ color: 'rgba(169,158,139,0.7)' }}>
+                            {new Date(m.created_at).toLocaleDateString()}
+                          </span>
+                          {editingId !== m.id && (
+                            <button
+                              onClick={() => beginEdit(m)}
+                              className="flex items-center justify-center rounded-md transition hover:brightness-125"
+                              style={{ width: 24, height: 24, background: BG_INSET, border: `1px solid ${BORDER}`, color: MUTED }}
+                              title="Edit this memory"
+                              aria-label="Edit this memory"
+                            >
+                              <VaultIcon name="edit" size={13} />
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <p className="text-sm leading-relaxed" style={{ color: '#d6cbb6' }}>{m.content}</p>
+
+                      {editingId === m.id ? (
+                        <div className="space-y-2">
+                          <label htmlFor={`edit-${m.id}`} className="sr-only">Edit memory text</label>
+                          <textarea
+                            id={`edit-${m.id}`}
+                            value={editContent}
+                            onChange={e => setEditContent(e.target.value)}
+                            className="w-full p-3 rounded-lg text-sm leading-relaxed resize-none outline-none focus:ring-1 focus:ring-amber-400/40"
+                            style={{ background: BG_INSET, border: `1px solid ${BORDER}`, minHeight: 100, color: IVORY }}
+                            rows={4}
+                            autoFocus
+                          />
+                          {editError && (
+                            <p className="text-xs" role="alert" style={{ color: '#e6a07a' }}>{editError}</p>
+                          )}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => saveEdit(m)}
+                              disabled={editSaving || !editContent.trim() || editContent.trim() === m.content}
+                              className="px-4 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 disabled:opacity-40"
+                              style={{ background: goldBtn, color: '#20160a' }}
+                            >
+                              <VaultIcon name="check" size={13} /> {editSaving ? 'Saving...' : 'Save'}
+                            </button>
+                            <button
+                              onClick={cancelEdit}
+                              disabled={editSaving}
+                              className="px-4 py-1.5 rounded-full text-xs font-semibold transition hover:brightness-110 disabled:opacity-40"
+                              style={{ background: BG_INSET, border: `1px solid ${BORDER}`, color: MUTED }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-sm leading-relaxed" style={{ color: '#d6cbb6' }}>{m.content}</p>
+                          {m.edited && m.original_content && (
+                            <div className="mt-2">
+                              <button
+                                onClick={() => setShowOriginalId(showOriginalId === m.id ? null : m.id)}
+                                className="text-[11px] inline-flex items-center gap-1 transition hover:brightness-125"
+                                style={{ color: MUTED }}
+                                aria-expanded={showOriginalId === m.id}
+                              >
+                                <VaultIcon name="history" size={12} /> {showOriginalId === m.id ? 'Hide original' : 'View original'}
+                              </button>
+                              {showOriginalId === m.id && (
+                                <p className="text-xs leading-relaxed mt-1.5 pl-3 border-l" style={{ color: MUTED, borderColor: HAIR, fontStyle: 'italic' }}>
+                                  {m.original_content}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      )}
+
                       {'keywords' in m && m.keywords && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {m.keywords.split(',').filter(Boolean).slice(0, 8).map((kw: string) => (

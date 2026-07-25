@@ -43,6 +43,7 @@ export const NAV_ITEMS = [
   { id: 'record', label: 'Record Video', icon: 'record' },
   { id: 'voice', label: 'Voice Clone', icon: 'voice' },
   { id: 'memories', label: 'Memories', icon: 'memories' },
+  { id: 'timeline', label: 'Timeline', icon: 'timeline' },
   { id: 'progress', label: 'Progress', icon: 'progress' },
   { id: 'personality', label: 'Personality', icon: 'personality' },
   { id: 'briefing', label: 'Daily Briefing', icon: 'briefing' },
