@@ -16,3 +16,12 @@
 | C1 | Live public copy "family-controlled / never used to train anything" is untrue | Fix behavior (F1,F2) then correct copy: subject data trains only that subject's own authorized model with explicit consent | P4/P10 | OPEN | pending: copy matches proven behavior |
 
 **Legend:** OPEN → IN-PROGRESS → CLOSED (with evidence link). No row moves to CLOSED on a self-report.
+
+## P3 — capture & interview (progress)
+
+| ID | Item | Status | Evidence |
+|----|------|--------|----------|
+| P3-prov | Derived memories link to encrypted evidence (KEY acceptance) | **CLOSED 2026-07-25** | `answer_question` sets `memories.interview_id`+`evidence_video_id`, back-links `video_recordings.interview_id`; chain queryable both ways; 4 legacy backfilled, 0 unlinked; `test_provenance_dedup.py` 3/3 |
+| P3-dedup-be | Capture dedup infra (idempotency) | **CLOSED 2026-07-25** (server half) | `idempotency_key` + partial-unique idx on interviews/memories/video_recordings; `/answer` + `/video/upload` accept it → `ON CONFLICT DO NOTHING`, idempotent 200; client-key wiring = slice 2 |
+| P3-resumable | RAM-only recordings lost on interruption | **OPEN — Critical** | slice 2: IndexedDB chunk buffer + chunk-append endpoint + background retry uploader + service-worker Background Sync; client mints capture UUID (idempotency_key) |
+| P3-edit | No user edit/correction of memories (no PUT), transcripts not persisted, no timeline, no offline PWA | OPEN | slice 3: `PUT /memories` to append-only corrections (preserve encrypted evidence-of-record), persist `video_recordings.transcription`, timeline extraction, PWA |
