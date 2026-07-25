@@ -45,13 +45,25 @@ export interface RecorderHandle {
   mimeType: string;
 }
 
-export function createMediaRecorder(stream: MediaStream, audioOnly = false): RecorderHandle {
+export function createMediaRecorder(
+  stream: MediaStream,
+  audioOnly = false,
+  onChunk?: (blob: Blob, index: number) => void,
+): RecorderHandle {
   const mimeType = audioOnly ? pickAudioMime() : pickMimeType();
   const recorder = new MediaRecorder(stream, { mimeType });
   const chunks: Blob[] = [];
 
   recorder.ondataavailable = (e) => {
-    if (e.data.size > 0) chunks.push(e.data);
+    if (e.data.size > 0) {
+      const index = chunks.length;
+      chunks.push(e.data);
+      // Durable path: hand each timeslice to the caller (→ IndexedDB) as it
+      // arrives, so an interrupted recording is recoverable. Contiguous 0-based
+      // indexes match the resumable-upload server contract. Never let a chunk
+      // sink failure kill the recorder.
+      if (onChunk) { try { onChunk(e.data, index); } catch { /* non-fatal */ } }
+    }
   };
 
   const blobPromise = new Promise<Blob>((resolve) => {

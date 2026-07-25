@@ -5,6 +5,8 @@ import { ACCENT, GOLD, GOLD_BRIGHT, GOLD_DEEP, BG_CARD, BG_INSET, BORDER, HAIR, 
 import { uploadVideo, getVideoList, submitBiometric, type VideoMeta } from '../lib/vault-api';
 import VaultIcon from './VaultIcon';
 import { startCamera, stopCamera, createMediaRecorder, createAnalyser, getAudioLevel, formatDuration, formatBytes, type RecorderHandle } from '../lib/media';
+import { enqueueCapture, putChunk, markTotal, removeCapture, mintCaptureUuid, isUploadQueueSupported } from '../lib/upload-queue';
+import { uploadCapture, drainQueue } from '../lib/resumable-uploader';
 
 interface Props {
   userId: string;
@@ -28,10 +30,17 @@ export default function RecordPanel({ userId }: Props) {
   const analyserRef = useRef<{ analyser: AnalyserNode; ctx: AudioContext } | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const levelRef = useRef<ReturnType<typeof requestAnimationFrame> | null>(null);
+  // Durable resumable-capture bookkeeping (P3 slice 2).
+  const captureUuidRef = useRef<string | null>(null);
+  const chunkCountRef = useRef(0);
 
-  // Load video history
+  // Load video history; opportunistically drain any capture left queued from a
+  // prior interrupted session, then refresh the list once it lands.
   useEffect(() => {
     getVideoList(userId).then(d => setVideos(d.videos)).catch(() => {}).finally(() => setLoadingVideos(false));
+    drainQueue()
+      .then(() => getVideoList(userId).then(d => setVideos(d.videos)).catch(() => {}))
+      .catch(() => {});
   }, [userId]);
 
   // Cleanup on unmount
@@ -65,7 +74,25 @@ export default function RecordPanel({ userId }: Props) {
   const startRecording = () => {
     if (!streamRef.current) return;
     setDuration(0);
-    const handle = createMediaRecorder(streamRef.current);
+    // Start a durable capture: persist each timeslice to IndexedDB as it arrives
+    // so an interrupted recording survives a crash / offline period.
+    const useQueue = isUploadQueueSupported();
+    const captureUuid = useQueue ? mintCaptureUuid() : null;
+    captureUuidRef.current = captureUuid;
+    chunkCountRef.current = 0;
+    const handle = createMediaRecorder(
+      streamRef.current,
+      false,
+      captureUuid
+        ? (blob, index) => {
+            chunkCountRef.current = index + 1;
+            void putChunk(captureUuid, index, blob).catch(() => {});
+          }
+        : undefined,
+    );
+    if (captureUuid) {
+      void enqueueCapture({ capture_uuid: captureUuid, user_id: userId, mime_type: handle.mimeType }).catch(() => {});
+    }
     recorderRef.current = handle;
     setState('recording');
     timerRef.current = setInterval(() => setDuration(d => d + 1), 1000);
@@ -91,6 +118,10 @@ export default function RecordPanel({ userId }: Props) {
   };
 
   const retake = async () => {
+    // Discard the durable capture too, so it is never drained later.
+    const uuid = captureUuidRef.current;
+    captureUuidRef.current = null;
+    if (uuid) void removeCapture(uuid).catch(() => {});
     setRecordedBlob(null);
     setState('idle');
   };
@@ -98,10 +129,40 @@ export default function RecordPanel({ userId }: Props) {
   const upload = async () => {
     if (!recordedBlob) return;
     setState('uploading');
+    const uuid = captureUuidRef.current;
+    const total = chunkCountRef.current;
+
+    // Resumable path: mark the capture complete, then drive it up chunk-by-chunk
+    // with retry. If it fails, LEAVE it queued — drainQueue retries on next load
+    // / reconnect — instead of losing the recording.
+    if (uuid && total > 0) {
+      try {
+        await markTotal(uuid, total, { duration_seconds: duration, mime_type: recordedBlob.type });
+        const meta = await uploadCapture(uuid);
+        captureUuidRef.current = null;
+        if (meta) {
+          setVideos(prev => [meta, ...prev]);
+          submitBiometric(meta.id, [
+            { capture_type: 'facial_video', data_json: JSON.stringify({ duration: meta.duration_seconds, source: 'selfie_camera' }), confidence: 0.8 },
+          ]).catch(() => {});
+        }
+        setRecordedBlob(null);
+        setError(null);
+        setState('idle');
+        return;
+      } catch {
+        // Persisted + queued — it will finish uploading automatically later.
+        setError('Upload interrupted. Your recording is saved and will finish uploading automatically when the connection recovers.');
+        setState('idle');
+        setRecordedBlob(null);
+        return;
+      }
+    }
+
+    // Fallback single-shot path (no IndexedDB / no chunks captured).
     try {
       const meta = await uploadVideo(userId, recordedBlob);
       setVideos(prev => [meta, ...prev]);
-      // Fire-and-forget: trigger biometric analysis on the uploaded video
       submitBiometric(meta.id, [
         { capture_type: 'facial_video', data_json: JSON.stringify({ duration: meta.duration_seconds, source: 'selfie_camera' }), confidence: 0.8 },
       ]).catch(() => {});

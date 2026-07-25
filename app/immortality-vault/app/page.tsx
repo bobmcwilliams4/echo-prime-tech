@@ -28,6 +28,7 @@ import PersonalityPanel from './components/PersonalityPanel';
 import FairySprite from './components/FairySprite';
 import EchoChatWidget from './components/EchoChatWidget';
 import ConsentGate from './components/ConsentGate';
+import UploadSyncManager from './components/UploadSyncManager';
 
 /* ─── Onboarding Modal ───────────────────────────────────────────────── */
 
@@ -187,6 +188,9 @@ export default function VaultAppPage() {
 
   return (
     <div className="min-h-screen flex" style={{ background: BG_DARK, color: IVORY }}>
+      {/* Durable resumable-upload drain + Background Sync wiring (renders nothing) */}
+      <UploadSyncManager />
+
       {/* Golden sprite from the intro film, drifting across now and then */}
       <FairySprite />
 

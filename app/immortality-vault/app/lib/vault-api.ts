@@ -542,10 +542,17 @@ export async function selectQuestion(userId: string, category: string): Promise<
   return data as InterviewQuestion;
 }
 
-export async function answerQuestion(userId: string, questionId: string, answer: string, category?: string, videoId?: string): Promise<void> {
+export async function answerQuestion(userId: string, questionId: string, answer: string, category?: string, videoId?: string, idempotencyKey?: string): Promise<void> {
   await vaultFetch('/interview/questions/answer', {
     method: 'POST',
-    body: JSON.stringify({ user_id: userId, question_id: questionId, answer, category, ...(videoId && { video_id: videoId }) }),
+    body: JSON.stringify({
+      user_id: userId,
+      question_id: questionId,
+      answer,
+      category,
+      ...(videoId && { video_id: videoId }),
+      ...(idempotencyKey && { idempotency_key: idempotencyKey }),
+    }),
   });
 }
 
@@ -768,6 +775,97 @@ export async function uploadVideo(userId: string, blob: Blob, questionId?: strin
   if (!res.ok) {
     if (res.status === 403) notifyConsentInvalidated();
     throw new Error(await serverError(res, `Upload failed: ${res.status}`));
+  }
+  return res.json() as Promise<VideoMeta>;
+}
+
+/* ── Resumable chunked video upload (P3 slice 2) ──────────────────────
+ * Large recordings upload as 5 MB chunks against a client `capture_uuid`, so a
+ * dropped connection resumes instead of restarting. `uploadVideo` above stays
+ * the small-file fallback. See resumable-uploader.ts + upload-queue.ts. */
+
+export interface ChunkAck {
+  received: number[];
+  next_expected: number;
+}
+
+export interface UploadStatus {
+  received: number[];
+  finalized: boolean;
+  video_id?: string;
+}
+
+export interface FinalizeOpts {
+  total_chunks: number;
+  question_id?: string;
+  interview_id?: string;
+  duration_seconds?: number;
+  mime_type?: string;
+}
+
+/** Thrown on a 409 from finalize — the server is still missing some indexes.
+ *  The uploader catches this, re-sends `missing`, then finalizes again. */
+export class IncompleteUploadError extends Error {
+  missing: number[];
+  received: number[];
+  total_chunks: number;
+  constructor(missing: number[], received: number[], totalChunks: number) {
+    super(`incomplete_upload: missing ${missing.length} of ${totalChunks} chunks`);
+    this.name = 'IncompleteUploadError';
+    this.missing = missing;
+    this.received = received;
+    this.total_chunks = totalChunks;
+  }
+}
+
+/** POST one chunk. Idempotent: re-POSTing the same index is safe (retry path). */
+export async function uploadVideoChunk(
+  userId: string, captureUuid: string, index: number, chunk: Blob,
+): Promise<ChunkAck> {
+  const fd = new FormData();
+  fd.append('user_id', userId);
+  fd.append('index', String(index));
+  fd.append('chunk', chunk, `chunk_${index}`);
+  const res = await fetch(`${API}/video/upload/${encodeURIComponent(captureUuid)}/chunk`, {
+    method: 'POST', headers: await authHeader(), body: fd,
+  });
+  if (!res.ok) {
+    if (res.status === 403) notifyConsentInvalidated();
+    throw new Error(await serverError(res, `Chunk ${index} upload failed: ${res.status}`));
+  }
+  return res.json() as Promise<ChunkAck>;
+}
+
+/** Which indexes the server already holds, and whether it's already finalized. */
+export async function getUploadStatus(userId: string, captureUuid: string): Promise<UploadStatus> {
+  const res = await fetch(
+    `${API}/video/upload/${encodeURIComponent(captureUuid)}/status?user_id=${encodeURIComponent(userId)}`,
+    { headers: await authHeader() },
+  );
+  if (!res.ok) {
+    if (res.status === 403) notifyConsentInvalidated();
+    throw new Error(await serverError(res, `Upload status unavailable: ${res.status}`));
+  }
+  return res.json() as Promise<UploadStatus>;
+}
+
+/** Assemble the chunks into the final video record. Idempotent on 200; a 409
+ *  means chunks are still missing → throws IncompleteUploadError with `missing`. */
+export async function finalizeVideoUpload(
+  userId: string, captureUuid: string, opts: FinalizeOpts,
+): Promise<VideoMeta> {
+  const res = await fetch(`${API}/video/upload/${encodeURIComponent(captureUuid)}/finalize`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
+    body: JSON.stringify({ user_id: userId, ...opts }),
+  });
+  if (res.status === 409) {
+    const data = await res.json().catch(() => ({})) as { missing?: number[]; received?: number[]; total_chunks?: number };
+    throw new IncompleteUploadError(data.missing ?? [], data.received ?? [], data.total_chunks ?? opts.total_chunks);
+  }
+  if (!res.ok) {
+    if (res.status === 403) notifyConsentInvalidated();
+    throw new Error(await serverError(res, `Finalize failed: ${res.status}`));
   }
   return res.json() as Promise<VideoMeta>;
 }

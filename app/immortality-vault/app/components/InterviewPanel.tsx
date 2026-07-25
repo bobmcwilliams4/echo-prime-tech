@@ -7,6 +7,8 @@ import {
   uploadVideo, type InterviewQuestion, type CoverageCategory,
 } from '../lib/vault-api';
 import { playAudioBlob, createMediaRecorder, stopCamera, type RecorderHandle } from '../lib/media';
+import { enqueueCapture, putChunk, markTotal, removeCapture, mintCaptureUuid, isUploadQueueSupported } from '../lib/upload-queue';
+import { uploadCapture, drainQueue } from '../lib/resumable-uploader';
 import CameraPiP from './CameraPiP';
 import AskEcho from './AskEcho';
 import VaultIcon, { CATEGORY_ICON } from './VaultIcon';
@@ -69,6 +71,9 @@ export default function InterviewPanel({ userId }: Props) {
   const recognitionRef = useRef<any>(null);
   const recorderRef = useRef<RecorderHandle | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  // Durable resumable video-capture bookkeeping (P3 slice 2).
+  const captureUuidRef = useRef<string | null>(null);
+  const chunkCountRef = useRef(0);
   const audioPrimed = useRef(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<any>(null);
@@ -91,6 +96,9 @@ export default function InterviewPanel({ userId }: Props) {
   }, [userId]);
 
   useEffect(() => { loadCoverage(); }, [loadCoverage]);
+
+  // Resume any video capture left queued by a prior interrupted answer.
+  useEffect(() => { void drainQueue(); }, []);
 
   // ── Draft autosave: a half-told story must survive a reload ──────────────
   useEffect(() => {
@@ -328,7 +336,27 @@ export default function InterviewPanel({ userId }: Props) {
 
     if (stream) {
       streamRef.current = stream;
-      const handle = createMediaRecorder(stream, !stream.getVideoTracks().length);
+      const isVideo = !!stream.getVideoTracks().length;
+      // Video answers use the durable resumable path: persist each timeslice to
+      // IndexedDB so an interrupted answer's video is never silently lost.
+      let onChunk: ((blob: Blob, index: number) => void) | undefined;
+      if (isVideo && isUploadQueueSupported()) {
+        const capUuid = mintCaptureUuid();
+        captureUuidRef.current = capUuid;
+        chunkCountRef.current = 0;
+        void enqueueCapture({
+          capture_uuid: capUuid,
+          user_id: userId,
+          ...(question?.question_id && { question_id: question.question_id }),
+        }).catch(() => {});
+        onChunk = (blob, index) => {
+          chunkCountRef.current = index + 1;
+          void putChunk(capUuid, index, blob).catch(() => {});
+        };
+      } else {
+        captureUuidRef.current = null;
+      }
+      const handle = createMediaRecorder(stream, !isVideo, onChunk);
       recorderRef.current = handle;
       // createMediaRecorder already started it; only (re)start if somehow idle,
       // and never start an already-'recording' recorder (InvalidStateError).
@@ -369,6 +397,22 @@ export default function InterviewPanel({ userId }: Props) {
     stopCamera(streamRef.current);
     streamRef.current = null;
 
+    // Finalize the durable capture: mark the chunk count so drainQueue can
+    // resume it. If nothing usable was captured, discard the empty capture.
+    const capUuid = captureUuidRef.current;
+    if (capUuid) {
+      if (videoBlob && chunkCountRef.current > 0) {
+        const durationSec = Math.max(1, Math.round((Date.now() - captureStartRef.current) / 1000));
+        await markTotal(capUuid, chunkCountRef.current, {
+          duration_seconds: durationSec,
+          ...(handle?.mimeType && { mime_type: handle.mimeType }),
+        }).catch(() => {});
+      } else {
+        await removeCapture(capUuid).catch(() => {});
+        captureUuidRef.current = null;
+      }
+    }
+
     let text = answerRef.current.trim();
     if (sttMode === 'record' && recordedBlob) {
       setTranscribing(true);
@@ -383,8 +427,10 @@ export default function InterviewPanel({ userId }: Props) {
 
     if (auto && handsFreeRef.current && modeRef.current && text) {
       await submitWith(text, videoBlob);
-    } else if (videoBlob) {
-      pendingVideoRef.current = videoBlob; // manual flow — attach on Preserve
+    } else if (videoBlob && !captureUuidRef.current) {
+      // Manual flow, fallback (no durable capture) — attach the blob on Preserve.
+      // With a durable capture the uuid carries the video, so no blob is held.
+      pendingVideoRef.current = videoBlob;
     }
   };
 
@@ -456,15 +502,31 @@ export default function InterviewPanel({ userId }: Props) {
     setLoading(true);
     try {
       let videoId: string | undefined;
-      const vb = videoBlob ?? pendingVideoRef.current;
-      pendingVideoRef.current = null;
-      if (vb && vb.size > 20_000) {
+      const capUuid = captureUuidRef.current;
+      captureUuidRef.current = null;
+      // Stable dedup key so a retried submit never double-writes the answer.
+      const idempotencyKey = `answer:${q.question_id}:${capUuid ?? Date.now()}`;
+
+      if (capUuid) {
+        // Durable resumable path: try to finish the upload now to back-link a
+        // video_id. On failure LEAVE it queued — the words are never lost, and
+        // the backend back-links the video to this question on later finalize.
         try {
-          const meta = await uploadVideo(userId, vb, q.question_id);
-          videoId = (meta as any)?.id;
-        } catch { /* video is a bonus — never lose the words over it */ }
+          const meta = await uploadCapture(capUuid);
+          videoId = meta?.id;
+        } catch { /* stays queued; drainQueue finishes it later */ }
+      } else {
+        // Fallback single-shot path (no IndexedDB) — best-effort bonus video.
+        const vb = videoBlob ?? pendingVideoRef.current;
+        pendingVideoRef.current = null;
+        if (vb && vb.size > 20_000) {
+          try {
+            const meta = await uploadVideo(userId, vb, q.question_id);
+            videoId = (meta as unknown as { id?: string })?.id;
+          } catch { /* video is a bonus — never lose the words over it */ }
+        }
       }
-      await answerQuestion(userId, q.question_id, text.trim(), q.category || focus?.category, videoId);
+      await answerQuestion(userId, q.question_id, text.trim(), q.category || focus?.category, videoId, idempotencyKey);
       extractTraits(userId, text.trim(), 'interview').catch(() => {});
       try { localStorage.removeItem(`vault_draft_${q.question_id}`); } catch { /* noop */ }
       setSubmitted(true);
