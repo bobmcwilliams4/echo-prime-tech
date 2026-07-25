@@ -145,6 +145,7 @@ export interface VideoMeta {
   file_size: number;
   mime_type: string;
   created_at: string;
+  stream_url?: string;   // P1: owner-signed (?tok=) stream URL — prefer over getVideoStreamUrl
 }
 
 export type ConsentSubjectStatus = 'living' | 'deceased' | 'incapacitated';
@@ -301,9 +302,24 @@ export interface ConsolidationResult {
 
 /* ─── Fetch Wrapper ──────────────────────────────────────────────────── */
 
+/** Attach the signed-in user's Firebase ID token so the backend can enforce
+ *  ownership on every call (P1 — closes the cross-family IDOR). Safe on
+ *  static-export/SSR and when signed-out (returns no header; the app itself is
+ *  gated behind login, and public routes need no token). Never sets
+ *  Content-Type, so it composes with both JSON and multipart requests. */
+async function authHeader(): Promise<Record<string, string>> {
+  try {
+    const { auth } = await import('@/lib/firebase');
+    const u = auth.currentUser;
+    if (u) return { Authorization: `Bearer ${await u.getIdToken()}` };
+  } catch { /* firebase unavailable during build/SSR */ }
+  return {};
+}
+
 async function vaultFetch<T = unknown>(path: string, options: RequestInit = {}): Promise<T> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
+    ...(await authHeader()),
     ...(options.headers as Record<string, string> || {}),
   };
   const res = await fetch(`${API}${path}`, { ...options, headers });
@@ -315,7 +331,11 @@ async function vaultFetch<T = unknown>(path: string, options: RequestInit = {}):
 }
 
 async function vaultFetchRaw(path: string, options: RequestInit = {}): Promise<Response> {
-  const res = await fetch(`${API}${path}`, options);
+  const headers: Record<string, string> = {
+    ...(await authHeader()),
+    ...(options.headers as Record<string, string> || {}),
+  };
+  const res = await fetch(`${API}${path}`, { ...options, headers });
   if (!res.ok) throw new Error(await serverError(res, `API ${res.status}`));
   return res;
 }
@@ -608,6 +628,7 @@ export interface BloodlineNode {
   confidence: string; living: boolean; is_direct_line: boolean;
   persona_status: string; sources: BloodlineSource[];
   photo_record_id?: string | null;   // portrait record → bloodlineRecordImageUrl(userId, id)
+  photo_url?: string | null;          // P1: owner-signed (?tok=) image URL — prefer over bloodlineRecordImageUrl
 }
 export interface BloodlineEdge {
   from_person: string; to_person: string; rel_type: string; confidence: string;
@@ -629,6 +650,7 @@ export async function getBloodlineTree(userId: string): Promise<BloodlineTree> {
 export interface BloodlineRecord {
   id: string; person_key: string | null; record_type: string;
   file_name: string; storage_key: string; created_at: string;
+  image_url?: string;   // P1: owner-signed (?tok=) image URL — prefer over bloodlineRecordImageUrl
 }
 /** List the owner's held document records (metadata; images stay encrypted at rest). */
 export async function getBloodlineRecords(userId: string): Promise<{ records: BloodlineRecord[] }> {
@@ -648,7 +670,7 @@ export async function uploadBloodlineRecord(
   fd.append('file', file);
   if (opts.person_key) fd.append('person_key', opts.person_key);
   if (opts.record_type) fd.append('record_type', opts.record_type);
-  const res = await fetch(`${API}/bloodline/${userId}/record`, { method: 'POST', body: fd });
+  const res = await fetch(`${API}/bloodline/${userId}/record`, { method: 'POST', headers: await authHeader(), body: fd });
   if (!res.ok) throw new Error(await serverError(res, `Upload failed (${res.status})`));
   return res.json();
 }
@@ -661,7 +683,7 @@ export async function uploadPersonPhoto(
 ): Promise<{ ok: boolean; record_id: string; photo_record_id?: string }> {
   const fd = new FormData();
   fd.append('file', file);
-  const res = await fetch(`${API}/bloodline/${userId}/person/${encodeURIComponent(personKey)}/photo`, { method: 'POST', body: fd });
+  const res = await fetch(`${API}/bloodline/${userId}/person/${encodeURIComponent(personKey)}/photo`, { method: 'POST', headers: await authHeader(), body: fd });
   if (!res.ok) throw new Error(await serverError(res, `Photo upload failed (${res.status})`));
   return res.json();
 }
@@ -694,7 +716,7 @@ export async function synthesizeSpeech(text: string, emotion?: string, voiceId?:
 export async function transcribeAudio(audio: Blob, filename = 'answer.webm'): Promise<string> {
   const formData = new FormData();
   formData.append('audio', audio, filename);
-  const res = await fetch(`${API}/voice/transcribe`, { method: 'POST', body: formData });
+  const res = await fetch(`${API}/voice/transcribe`, { method: 'POST', headers: await authHeader(), body: formData });
   if (!res.ok) throw new Error(await serverError(res, `Transcription failed: ${res.status}`));
   const data = (await res.json()) as { text?: string };
   return (data.text || '').trim();
@@ -713,7 +735,7 @@ export async function createVoiceProfile(userId: string, samples: Blob[], prompt
     formData.append('samples', s, `sample_${promptIds[i]}.webm`);
     formData.append('prompt_ids', promptIds[i]);
   });
-  const res = await fetch(`${API}/voice/profiles`, { method: 'POST', body: formData });
+  const res = await fetch(`${API}/voice/profiles`, { method: 'POST', headers: await authHeader(), body: formData });
   if (!res.ok) {
     if (res.status === 403) notifyConsentInvalidated();
     throw new Error(await serverError(res, `Upload failed: ${res.status}`));
@@ -742,7 +764,7 @@ export async function uploadVideo(userId: string, blob: Blob, questionId?: strin
   formData.append('user_id', userId);
   formData.append('video', blob, `recording_${Date.now()}.webm`);
   if (questionId) formData.append('question_id', questionId);
-  const res = await fetch(`${API}/video/upload`, { method: 'POST', body: formData });
+  const res = await fetch(`${API}/video/upload`, { method: 'POST', headers: await authHeader(), body: formData });
   if (!res.ok) {
     if (res.status === 403) notifyConsentInvalidated();
     throw new Error(await serverError(res, `Upload failed: ${res.status}`));

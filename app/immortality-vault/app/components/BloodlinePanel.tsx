@@ -49,7 +49,7 @@ function firstName(name: string | null | undefined): string {
 
 /* Circular gold-framed portrait, or a gold monogram placeholder. */
 function Avatar({ n, userId, size = 46 }: { n: BloodlineNode; userId: string | null; size?: number }) {
-  const src = userId && n.photo_record_id ? bloodlineRecordImageUrl(userId, n.photo_record_id) : null;
+  const src = n.photo_url ?? (userId && n.photo_record_id ? bloodlineRecordImageUrl(userId, n.photo_record_id) : null);
   return (
     <div style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, position: 'relative',
       background: BG_CARD2, border: `1.5px solid ${GOLD_DEEP}`, boxShadow: `0 0 0 3px rgba(245,196,81,0.06)`,
@@ -327,7 +327,7 @@ export default function BloodlinePanel({ userId }: { userId: string | null }) {
             parentsOf={parentsOf}
             stepFamily={stepForGraph}
             userId={userId}
-            photoUrl={(id) => userId ? bloodlineRecordImageUrl(userId, id) : ''}
+            photoUrl={(id) => tree.nodes.find(n => n.photo_record_id === id)?.photo_url ?? (userId ? bloodlineRecordImageUrl(userId, id) : '')}
             onSelect={(k) => setDetailKey(k)}
             bgUrl={TREE_BG}
             directKeys={directKeys}
@@ -504,11 +504,11 @@ function PersonCard({ n, open, onToggle, userId, records, onUpload, onPhoto, upl
               <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: GOLD_DEEP, marginBottom: 6 }}>Documents</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {records.map(r => (
-                  <a key={r.id} href={bloodlineRecordImageUrl(userId, r.id)} target="_blank" rel="noopener noreferrer"
+                  <a key={r.id} href={(r.image_url ?? bloodlineRecordImageUrl(userId, r.id))} target="_blank" rel="noopener noreferrer"
                     title={`${r.record_type.replace(/_/g, ' ')} — ${r.file_name}`}
                     style={{ display: 'block', width: 60, height: 60, borderRadius: 8, overflow: 'hidden', border: `1px solid ${BORDER}`, background: '#000' }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={bloodlineRecordImageUrl(userId, r.id)} alt={r.record_type} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={(r.image_url ?? bloodlineRecordImageUrl(userId, r.id))} alt={r.record_type} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </a>
                 ))}
               </div>
