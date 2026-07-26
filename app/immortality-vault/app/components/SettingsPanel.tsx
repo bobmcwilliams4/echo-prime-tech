@@ -3,13 +3,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ACCENT, GOLD, GOLD_BRIGHT, GOLD_DEEP, BG_CARD, BG_INSET, BORDER, HAIR, IVORY, MUTED } from '../lib/constants';
 import VaultIcon from './VaultIcon';
+import PrivacyPanel from './PrivacyPanel';
 import {
   getUser,
   updateUser,
-  getStats,
   getVoiceProfiles,
-  getMemories,
-  getGamificationStats,
   getTrainingConsent,
   grantTrainingConsent,
   revokeTrainingConsent,
@@ -50,7 +48,6 @@ const INPUT_FOCUS_BORDER = ACCENT;
 export default function SettingsPanel({ userId, userEmail }: Props) {
   const [user, setUser] = useState<VaultUser | null>(null);
   const [profiles, setProfiles] = useState<VoiceProfile[]>([]);
-  const [exporting, setExporting] = useState(false);
 
   // Edit mode state
   const [editing, setEditing] = useState(false);
@@ -151,34 +148,6 @@ export default function SettingsPanel({ userId, userEmail }: Props) {
       return next;
     });
   }, [userId]);
-
-  const exportData = useCallback(async () => {
-    setExporting(true);
-    try {
-      const [userData, statsData, memoriesData, gamData] = await Promise.all([
-        getUser(userId).catch(() => null),
-        getStats().catch(() => null),
-        getMemories(userId, undefined, 1000).catch(() => ({ memories: [] })),
-        getGamificationStats(userId).catch(() => null),
-      ]);
-      const bundle = {
-        exported_at: new Date().toISOString(),
-        user: userData,
-        stats: statsData,
-        memories: memoriesData.memories,
-        gamification: gamData,
-        voice_profiles: profiles,
-      };
-      const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `immortality-vault-export-${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch { /* empty */ }
-    setExporting(false);
-  }, [userId, profiles]);
 
   /* ── P4: preservation-model governance ──
    * The subject's OWN model is trained only WITH recorded consent. The owner
@@ -599,19 +568,8 @@ export default function SettingsPanel({ userId, userEmail }: Props) {
         )}
       </div>
 
-      {/* Export */}
-      <div className="p-5 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-        <div className="text-sm text-gray-400 mb-3">Export Data</div>
-        <p className="text-xs text-gray-500 mb-3">Download your entire vault &mdash; memories, interviews, family tree, and voice profiles.</p>
-        <button
-          onClick={exportData}
-          disabled={exporting}
-          className="px-4 py-2 rounded-lg text-xs font-semibold transition disabled:opacity-40 inline-flex items-center gap-1.5"
-          style={{ border: `1px solid ${BORDER}`, color: MUTED }}
-        >
-          <VaultIcon name="crystal" size={13} /> {exporting ? 'Exporting...' : 'Export Vault'}
-        </button>
-      </div>
+      {/* Your data & privacy (P6) — data summary, full export, verifiable deletion */}
+      <PrivacyPanel userId={userId} />
 
       {/* Sync Status */}
       <div className="p-5 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>

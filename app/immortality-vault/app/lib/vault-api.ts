@@ -1238,3 +1238,130 @@ export async function setMemorialShare(uid: string, memoryId: string, shareable:
     body: JSON.stringify({ memory_id: memoryId, shareable }),
   });
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * P6 — Privacy lifecycle: portable export + verifiable account deletion
+ * ═══════════════════════════════════════════════════════════════════════
+ * Every call is owner-authenticated (Firebase ID token via vaultFetch). The
+ * owner can (a) see exactly what is held about the preserved person, (b) pull
+ * a complete machine-readable copy of everything, and (c) irreversibly delete
+ * the vault and receive a verifiable receipt of what was removed. Encrypted
+ * backups age out on rotation — the `backup_retention_notice` states this
+ * plainly so deletion is honest rather than instantaneous-everywhere theatre. */
+
+/** Full machine-readable export of a vault (`export_version:"p6-v1"`). `stores`
+ *  and `media` carry the raw preserved record; `inventory_validation.valid`
+ *  confirms nothing expected was missing from the bundle. */
+export interface VaultExport {
+  export_version: string;                       // "p6-v1"
+  stores: Record<string, unknown>;
+  media: Record<string, unknown>;
+  consent: unknown;
+  audit_history: unknown[];
+  backup_retention_notice: string;
+  inventory_validation: { valid: boolean; missing: string[] };
+  [k: string]: unknown;
+}
+
+/** A single consent grant and where it can be withdrawn. */
+export interface PrivacyConsentGrant {
+  scope: string;
+  granted: boolean;
+  granted_at?: string;
+  withdrawal_endpoint?: string;
+  label?: string;
+  [k: string]: unknown;
+}
+
+/** Per-store held-data count (e.g. memories, interviews, voice samples). */
+export interface PrivacyDataCount {
+  store: string;
+  label?: string;
+  count: number;
+  [k: string]: unknown;
+}
+
+/** The owner-facing privacy posture: what is held, what consent is on file,
+ *  whether export is available, and the exact deletion contract. */
+export interface PrivacySettings {
+  user_id?: string;
+  consent?: {
+    grants?: PrivacyConsentGrant[];
+    [k: string]: unknown;
+  };
+  model?: {
+    route?: string;
+    persona_active?: boolean;
+    [k: string]: unknown;
+  };
+  access_grants?: number;                        // people/services granted access
+  share_links?: number;                         // active memorial/share links
+  /** Per-store held-data counts. May arrive as an array or a keyed map — the
+   *  UI normalises both via `normalizeDataCounts`. */
+  data_counts?: PrivacyDataCount[] | Record<string, number>;
+  export_available?: boolean;
+  deletion_contract?: {
+    endpoint?: string;
+    confirm_token?: string;                     // the literal the owner must type ("DELETE")
+    irreversible?: boolean;
+    [k: string]: unknown;
+  };
+  backup_retention_notice?: string;
+  [k: string]: unknown;
+}
+
+/** One line of a deletion receipt: a store and how many rows/files it lost. */
+export interface AccountDeletionReceiptStore {
+  store: string;
+  rows_or_files_removed: number;
+}
+
+/** Verifiable proof of what an account deletion actually removed. */
+export interface AccountDeletionReceipt {
+  user_id: string;
+  deleted_at: string;
+  stores: AccountDeletionReceiptStore[];
+  media_removed: string[];
+  persona_removed: boolean;
+  cancelled_pending_training_jobs: number;
+  consent_withdrawn: boolean;
+  backup_retention_notice: string;
+  receipt_id: string;
+}
+
+export interface AccountDeletionResult {
+  ok: boolean;
+  receipt: AccountDeletionReceipt;
+}
+
+/** Normalise `PrivacySettings.data_counts` (array OR keyed map) into a stable
+ *  array so callers render one shape regardless of backend serialisation. */
+export function normalizeDataCounts(
+  raw: PrivacyDataCount[] | Record<string, number> | undefined,
+): PrivacyDataCount[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  return Object.entries(raw).map(([store, count]) => ({ store, count: Number(count) || 0 }));
+}
+
+/** Pull the entire vault as a portable JSON document. Owner-authenticated; the
+ *  caller triggers the client-side download. No server round-trip beyond this GET. */
+export async function exportVault(userId: string): Promise<VaultExport> {
+  return vaultFetch(`/export/${encodeURIComponent(userId)}`);
+}
+
+/** Read the owner-facing privacy posture — held-data counts, consent grants and
+ *  their withdrawal endpoints, model/persona state, and the deletion contract. */
+export async function getPrivacySettings(userId: string): Promise<PrivacySettings> {
+  return vaultFetch(`/privacy/settings/${encodeURIComponent(userId)}`);
+}
+
+/** Irreversibly delete the account/vault. Sends the required confirm token; the
+ *  backend rejects a wrong token (400), a cross-user request (403), or a missing
+ *  token (401). Returns a verifiable receipt of everything removed. */
+export async function deleteAccount(userId: string): Promise<AccountDeletionResult> {
+  return vaultFetch(`/account/${encodeURIComponent(userId)}/delete`, {
+    method: 'POST',
+    body: JSON.stringify({ confirm: 'DELETE', user_id: userId }),
+  });
+}
