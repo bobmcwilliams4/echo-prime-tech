@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ACCENT, GOLD, GOLD_BRIGHT, GOLD_DEEP, BG_CARD, BG_INSET, BORDER, HAIR, IVORY, MUTED, CATEGORIES, EMOTION_ICONS } from '../lib/constants';
-import { getTypedMemories, storeTypedMemory, consolidateMemories, updateMemory, type TypedMemory, type MemoryType } from '../lib/vault-api';
+import { ACCENT, GOLD, GOLD_BRIGHT, GOLD_DEEP, BG_CARD, BG_CARD2, BG_INSET, BORDER, HAIR, IVORY, MUTED, CATEGORIES, EMOTION_ICONS } from '../lib/constants';
+import { getTypedMemories, storeTypedMemory, consolidateMemories, updateMemory, getMemories, addMemoryAnnotation, type TypedMemory, type MemoryType, type MemoryAnnotation } from '../lib/vault-api';
 import VaultIcon, { CATEGORY_ICON } from './VaultIcon';
 
 const goldBtn = `linear-gradient(135deg, ${GOLD}, ${GOLD_BRIGHT})`;
@@ -31,6 +31,64 @@ export default function MemoriesPanel({ userId }: Props) {
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [showOriginalId, setShowOriginalId] = useState<string | null>(null);
+
+  /* ── P5: family recollections (annotations) ──
+   * Annotations arrive from GET /memories/{uid}; the typed-memory endpoint this
+   * panel reads may not carry them, so we fetch them once and key by memory id.
+   * A typed memory that already carries `annotations` is preferred over the map. */
+  const [annById, setAnnById] = useState<Record<string, MemoryAnnotation[]>>({});
+  const [annOpenId, setAnnOpenId] = useState<string | null>(null);   // which memory's add-form is open
+  const [annContent, setAnnContent] = useState('');
+  const [annAuthor, setAnnAuthor] = useState('');
+  const [annRelationship, setAnnRelationship] = useState('');
+  const [annSaving, setAnnSaving] = useState(false);
+  const [annError, setAnnError] = useState<string | null>(null);
+
+  const loadAnnotations = async () => {
+    try {
+      const data = await getMemories(userId, undefined, 200);
+      const map: Record<string, MemoryAnnotation[]> = {};
+      for (const m of data.memories || []) {
+        if (m.annotations && m.annotations.length) map[m.id] = m.annotations;
+      }
+      setAnnById(map);
+    } catch { /* recollections simply won't show if unavailable */ }
+  };
+
+  const beginAnnotate = (m: TypedMemory) => {
+    setAnnOpenId(m.id);
+    setAnnContent('');
+    setAnnAuthor('');
+    setAnnRelationship('');
+    setAnnError(null);
+  };
+
+  const cancelAnnotate = () => {
+    setAnnOpenId(null);
+    setAnnContent('');
+    setAnnError(null);
+  };
+
+  const saveAnnotation = async (m: TypedMemory) => {
+    const content = annContent.trim();
+    if (!content) return;
+    setAnnSaving(true);
+    setAnnError(null);
+    try {
+      const created = await addMemoryAnnotation(m.id, {
+        content,
+        ...(annAuthor.trim() && { author_name: annAuthor.trim() }),
+        ...(annRelationship.trim() && { relationship: annRelationship.trim() }),
+      });
+      // Reflect immediately, then re-sync from the server for canonical ordering.
+      setAnnById(prev => ({ ...prev, [m.id]: [...(prev[m.id] || []), created] }));
+      cancelAnnotate();
+      loadAnnotations();
+    } catch (e) {
+      setAnnError(e instanceof Error ? e.message : 'Could not save the recollection. Please try again.');
+    }
+    setAnnSaving(false);
+  };
 
   const beginEdit = (m: TypedMemory) => {
     setEditingId(m.id);
@@ -75,6 +133,7 @@ export default function MemoriesPanel({ userId }: Props) {
   };
 
   useEffect(() => { loadMemories(); }, [userId, filter, typeFilter]);
+  useEffect(() => { loadAnnotations(); }, [userId]);
 
   const addMemory = async () => {
     if (!newContent.trim()) return;
@@ -245,6 +304,7 @@ export default function MemoriesPanel({ userId }: Props) {
               <div className="space-y-2 border-l-2 pl-4" style={{ borderColor: HAIR }}>
                 {mems.map(m => {
                   const cat = CATEGORIES.find(c => c.id === m.category);
+                  const anns = m.annotations ?? annById[m.id] ?? [];
                   return (
                     <div key={m.id} className="p-4 rounded-xl" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
                       <div className="flex items-center gap-2 mb-2">
@@ -351,6 +411,86 @@ export default function MemoriesPanel({ userId }: Props) {
                             <span key={kw} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: BG_INSET, color: MUTED }}>{kw.trim()}</span>
                           ))}
                         </div>
+                      )}
+
+                      {/* ── P5: Family recollections ── loved ones' annotations on this memory */}
+                      {(anns.length > 0 || annOpenId === m.id) && (
+                        <div className="mt-3 pt-3 space-y-2" style={{ borderTop: `1px solid ${HAIR}` }}>
+                          <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase" style={{ color: GOLD_DEEP, letterSpacing: '0.12em' }}>
+                            <VaultIcon name="family" size={12} /> Family recollections
+                          </div>
+                          {anns.map(a => (
+                            <div key={a.annotation_id} className="rounded-lg px-3 py-2" style={{ background: BG_CARD2, border: `1px solid ${BORDER}` }}>
+                              <div className="flex items-center gap-1.5 mb-0.5 text-[11px]" style={{ color: GOLD_BRIGHT }}>
+                                <span className="font-semibold">{a.author || 'A loved one'}</span>
+                                {a.relationship && <span style={{ color: MUTED }}>· {a.relationship}</span>}
+                                {a.created_at && <span className="ml-auto text-[10px]" style={{ color: 'rgba(169,158,139,0.7)' }}>{new Date(a.created_at).toLocaleDateString()}</span>}
+                              </div>
+                              <p className="text-xs leading-relaxed" style={{ color: '#d6cbb6' }}>{a.content}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Add a recollection (owner) */}
+                      {annOpenId === m.id ? (
+                        <div className="mt-2 space-y-2 rounded-lg p-3" style={{ background: BG_INSET, border: `1px solid ${BORDER}` }}>
+                          <div className="flex flex-wrap gap-2">
+                            <input
+                              value={annAuthor}
+                              onChange={e => setAnnAuthor(e.target.value)}
+                              placeholder="Your name"
+                              aria-label="Your name"
+                              className="flex-1 min-w-[120px] px-2.5 py-1.5 rounded-lg text-xs placeholder-gray-600 outline-none focus:ring-1 focus:ring-amber-400/40"
+                              style={{ background: BG_CARD, border: `1px solid ${BORDER}`, color: IVORY }}
+                            />
+                            <input
+                              value={annRelationship}
+                              onChange={e => setAnnRelationship(e.target.value)}
+                              placeholder="Relationship (e.g. daughter)"
+                              aria-label="Your relationship to them"
+                              className="flex-1 min-w-[120px] px-2.5 py-1.5 rounded-lg text-xs placeholder-gray-600 outline-none focus:ring-1 focus:ring-amber-400/40"
+                              style={{ background: BG_CARD, border: `1px solid ${BORDER}`, color: IVORY }}
+                            />
+                          </div>
+                          <textarea
+                            value={annContent}
+                            onChange={e => setAnnContent(e.target.value)}
+                            placeholder="Share what you remember about this…"
+                            aria-label="Your recollection"
+                            rows={3}
+                            className="w-full p-2.5 rounded-lg text-xs leading-relaxed resize-none outline-none focus:ring-1 focus:ring-amber-400/40"
+                            style={{ background: BG_CARD, border: `1px solid ${BORDER}`, minHeight: 70, color: IVORY }}
+                            autoFocus
+                          />
+                          {annError && <p className="text-[11px]" role="alert" style={{ color: '#e6a07a' }}>{annError}</p>}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => saveAnnotation(m)}
+                              disabled={annSaving || !annContent.trim()}
+                              className="px-4 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 disabled:opacity-40"
+                              style={{ background: goldBtn, color: '#20160a' }}
+                            >
+                              <VaultIcon name="check" size={13} /> {annSaving ? 'Saving…' : 'Add recollection'}
+                            </button>
+                            <button
+                              onClick={cancelAnnotate}
+                              disabled={annSaving}
+                              className="px-4 py-1.5 rounded-full text-xs font-semibold transition hover:brightness-110 disabled:opacity-40"
+                              style={{ background: BG_CARD, border: `1px solid ${BORDER}`, color: MUTED }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => beginAnnotate(m)}
+                          className="mt-2 text-[11px] inline-flex items-center gap-1 transition hover:brightness-125"
+                          style={{ color: MUTED }}
+                        >
+                          <VaultIcon name="plus" size={12} /> Add a recollection
+                        </button>
                       )}
                     </div>
                   );

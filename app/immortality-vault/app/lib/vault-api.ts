@@ -83,6 +83,10 @@ export interface Memory {
   original_content?: string;
   edited?: boolean;
   edited_at?: string;
+  /* ── P5: family recollections attached to this memory (author + relationship). */
+  annotations?: MemoryAnnotation[];
+  /* ── P5: whether this memory may appear in a shared memorial. */
+  shareable?: boolean;
 }
 
 export interface VoiceProfile {
@@ -297,6 +301,10 @@ export interface TypedMemory {
   original_content?: string;
   edited?: boolean;
   edited_at?: string;
+  /* ── P5: family recollections attached to this memory (author + relationship). */
+  annotations?: MemoryAnnotation[];
+  /* ── P5: whether this memory may appear in a shared memorial. */
+  shareable?: boolean;
 }
 
 export interface TypedMemoryStoreResult {
@@ -1028,4 +1036,205 @@ export interface DailyBriefing {
 
 export async function getDailyBriefing(userId: string): Promise<DailyBriefing> {
   return vaultFetch(`/briefing/daily/${userId}`);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * P4 — Preservation-model governance (consent-gated, honest, reversible)
+ * ═══════════════════════════════════════════════════════════════════════
+ * A preserved person's OWN adapter is only ever trained WITH recorded consent.
+ * The owner can grant/revoke that consent, and disable or fully delete the
+ * model. When a subject's adapter exists but is disabled, `/chat` returns an
+ * honest refusal string rather than a fabricated answer. */
+
+export type TrainingSubjectStatus = 'living' | 'deceased' | 'incapacitated';
+
+export interface TrainingConsentStatus {
+  /** True only when a valid, unrevoked consent exists for this subject. */
+  training_allowed: boolean;
+  /** Plain-language reason for the current posture (shown verbatim to the owner). */
+  reason: string;
+  consent_version?: string;
+  model_version?: string;
+  subject_status?: TrainingSubjectStatus | string;
+  granted_at?: string;
+}
+
+export interface TrainingConsentInput {
+  granted_by?: string;
+  consent_version?: string;
+  model_version?: string;
+  subject_status?: TrainingSubjectStatus | string;
+  notes?: string;
+}
+
+export interface TrainingConsentResult {
+  ok?: boolean;
+  training_allowed?: boolean;
+  reason?: string;
+  [k: string]: unknown;
+}
+
+/** Current training-consent posture for this subject — the ONLY source of truth
+ *  for whether the preservation model may be trained. */
+export async function getTrainingConsent(uid: string): Promise<TrainingConsentStatus> {
+  return vaultFetch(`/training/consent/${encodeURIComponent(uid)}`);
+}
+
+/** Grant training consent for this subject's own model. Owner-authorized. */
+export async function grantTrainingConsent(uid: string, input: TrainingConsentInput = {}): Promise<TrainingConsentResult> {
+  return vaultFetch(`/training/consent/${encodeURIComponent(uid)}`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+/** Revoke training consent. After this the model may no longer be trained; a
+ *  subsequent disable/delete removes serving + artifacts. */
+export async function revokeTrainingConsent(uid: string): Promise<TrainingConsentResult> {
+  return vaultFetch(`/training/consent/${encodeURIComponent(uid)}/revoke`, { method: 'POST' });
+}
+
+export interface RegisterModelInput {
+  adapter_id: string;
+  model_version?: string;
+  [k: string]: unknown;
+}
+
+export async function registerModel(uid: string, input: RegisterModelInput): Promise<Record<string, unknown>> {
+  return vaultFetch(`/training/register/${encodeURIComponent(uid)}`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+/** Stop serving this subject's adapter. `/chat` then honestly refuses in the
+ *  subject's own voice rather than answering from the base model. Reversible. */
+export async function disableModel(uid: string): Promise<Record<string, unknown>> {
+  return vaultFetch(`/training/model/${encodeURIComponent(uid)}/disable`, { method: 'POST' });
+}
+
+export async function retrainModel(uid: string): Promise<Record<string, unknown>> {
+  return vaultFetch(`/training/model/${encodeURIComponent(uid)}/retrain`, { method: 'POST' });
+}
+
+export interface DeleteModelResult {
+  serving: string;              // "removed"
+  cancelled_jobs: number;
+  consent_revoked: boolean;
+  artifacts_removed: string[];
+}
+
+/** Irreversibly remove the preservation model: stops serving, cancels queued
+ *  training jobs, revokes consent, and deletes stored adapter artifacts. */
+export async function deleteModel(uid: string): Promise<DeleteModelResult> {
+  return vaultFetch(`/training/model/${encodeURIComponent(uid)}`, { method: 'DELETE' });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+ * P5 — Grounded memory-chat (honest, cited, never fabricated)
+ * ═══════════════════════════════════════════════════════════════════════
+ * Every answer is grounded in the preserved person's own record. Citations are
+ * grouped into three honest classes so the reader always knows the provenance:
+ *   • sourced_fact       — drawn from a stored memory (links memory_id)
+ *   • family_recollection — a family member's annotation (author + relationship)
+ *   • inference          — reasoning over the above, clearly flagged as such
+ * When `unsupported` is true the model gently declines instead of inventing. */
+
+export type MemoryCitationClass = 'sourced_fact' | 'family_recollection' | 'inference';
+
+export interface MemoryCitation {
+  class: MemoryCitationClass;
+  memory_id?: string;
+  snippet?: string;
+  category?: string;
+  created_at?: string;
+  annotation_id?: string;
+  author?: string;
+  relationship?: string;
+}
+
+export interface MemoryChatResponse {
+  answer: string;
+  citations: MemoryCitation[];
+  classes: { sourced_fact: number; family_recollection: number; inference: number };
+  confidence: number;           // 0..1
+  unsupported: boolean;         // true → gentle refusal, no fabricated answer
+  route_mode: string;
+}
+
+/** Ask the preserved person's grounded memory. Never fabricates: an
+ *  unsupported question returns `unsupported:true` with a gentle decline. */
+export async function memoryChat(uid: string, question: string, limit?: number): Promise<MemoryChatResponse> {
+  return vaultFetch(`/memory-chat/${encodeURIComponent(uid)}`, {
+    method: 'POST',
+    body: JSON.stringify({ question, ...(limit ? { limit } : {}) }),
+  });
+}
+
+/* ── P5 — Family recollections (annotations on a memory) ─────────────── */
+
+export interface MemoryAnnotation {
+  annotation_id: string;
+  author: string;
+  relationship?: string;
+  content: string;
+  created_at: string;
+  class: string;               // typically "family_recollection"
+}
+
+export interface AnnotationInput {
+  content: string;
+  relationship?: string;
+  author_name?: string;
+  invite_token?: string;       // set when a family member annotates via an invite link
+}
+
+/** Add a family recollection to a specific memory. */
+export async function addMemoryAnnotation(memoryId: string, input: AnnotationInput): Promise<MemoryAnnotation> {
+  return vaultFetch(`/memories/${encodeURIComponent(memoryId)}/annotation`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+/* ── P5 — Memorial (reverent, reproducible, consent-scoped) ──────────── */
+
+export interface MemorialResult {
+  memorial_id: string;
+  content: string;             // markdown
+  content_sha256: string;
+  source_manifest: Record<string, unknown>;
+  reproducible: boolean;
+  consent_scoped: boolean;
+  title?: string;
+  created_at?: string;
+}
+
+/** Compose a memorial from the preserved person's consented record. The result
+ *  is reproducible (content hashed + a source manifest) and consent-scoped. */
+export async function createMemorial(uid: string, title?: string): Promise<MemorialResult> {
+  return vaultFetch(`/memorial/${encodeURIComponent(uid)}`, {
+    method: 'POST',
+    body: JSON.stringify(title ? { title } : {}),
+  });
+}
+
+/** Re-open a previously composed memorial by id. */
+export async function getMemorial(uid: string, memorialId: string): Promise<MemorialResult> {
+  return vaultFetch(`/memorial/${encodeURIComponent(uid)}/${encodeURIComponent(memorialId)}`);
+}
+
+export interface MemorialShareResult {
+  ok?: boolean;
+  memory_id?: string;
+  shareable?: boolean;
+  [k: string]: unknown;
+}
+
+/** Toggle whether a specific memory may appear in a shared memorial. */
+export async function setMemorialShare(uid: string, memoryId: string, shareable: boolean): Promise<MemorialShareResult> {
+  return vaultFetch(`/memorial/${encodeURIComponent(uid)}/share`, {
+    method: 'POST',
+    body: JSON.stringify({ memory_id: memoryId, shareable }),
+  });
 }

@@ -26,6 +26,8 @@ const P: Record<string, ReactNode> = {
   interview: <><path d="M12 3a2.6 2.6 0 0 0-2.6 2.6v5.8a2.6 2.6 0 0 0 5.2 0V5.6A2.6 2.6 0 0 0 12 3Z" /><path d="M5.5 11a6.5 6.5 0 0 0 13 0" /><path d="M12 17.5V21" /></>,
   chat: <path d="M4 5h16v11H9l-4.5 3.5V5Z" />,
   ancestor: <><path d="M4 5h11v7H7l-3 2.4V5Z" /><path d="M9.5 12.4V14a1.8 1.8 0 0 0 1.8 1.8H16l4 3v-8.4A1.8 1.8 0 0 0 18.2 8.6H16" /></>,
+  memory_chat: <><path d="M4 5h16v11H9l-4.5 3.5V5Z" /><path d="M12 7.6l.85 2.05L15 10.5l-2.15.85L12 13.4l-.85-2.05L9 10.5l2.15-.85L12 7.6Z" /></>,
+  memorial: <><path d="M12 3c2.6 3 4 5.1 4 7.6a4 4 0 0 1-8 0C8 8.1 9.4 6 12 3Z" /><path d="M6.5 20.5h11" /></>,
   record: <><rect x="3" y="6.5" width="13" height="11" rx="2" /><path d="M16 10.4l5-2.8v8.8l-5-2.8" /></>,
   voice: <><path d="M4 10v4M8 6.5v11M12 4v16M16 8v8M20 10.5v3" /></>,
   memories: <><path d="M12 2.6l6.5 3.8v7.2L12 21.4 5.5 13.6V6.4L12 2.6Z" /><path d="M5.8 6.6 12 10l6.2-3.4M12 10v11" /></>,

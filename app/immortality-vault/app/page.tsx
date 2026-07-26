@@ -14,6 +14,7 @@ const PLAN_SLUGS = ['keeper', 'legacy', 'dynasty'];
 import DashboardPanel from './components/DashboardPanel';
 import InterviewPanel from './components/InterviewPanel';
 import ChatPanel from './components/ChatPanel';
+import MemoryChatPanel from './components/MemoryChatPanel';
 import AncestorChatPanel from './components/AncestorChatPanel';
 import RecordPanel from './components/RecordPanel';
 import VoicePanel from './components/VoicePanel';
@@ -24,6 +25,7 @@ import BriefingPanel from './components/BriefingPanel';
 import FamilyPanel from './components/FamilyPanel';
 import BloodlinePanel from './components/BloodlinePanel';
 import FaceTimePanel from './components/FaceTimePanel';
+import MemorialPanel from './components/MemorialPanel';
 import SettingsPanel from './components/SettingsPanel';
 import PersonalityPanel from './components/PersonalityPanel';
 import FairySprite from './components/FairySprite';
@@ -170,6 +172,7 @@ export default function VaultAppPage() {
       case 'dashboard': return <DashboardPanel userId={vaultUserId} stats={stats} onNavigate={handleNavigate} />;
       case 'interview': return gateCapture('any', <InterviewPanel userId={vaultUserId} />);
       case 'chat': return <ChatPanel userId={vaultUserId} />;
+      case 'memory_chat': return <MemoryChatPanel userId={vaultUserId} />;
       case 'ancestor': return <AncestorChatPanel userId={vaultUserId} />;
       case 'record': return gateCapture('any', <RecordPanel userId={vaultUserId} />);
       case 'voice': return gateCapture('voice', <VoicePanel userId={vaultUserId} />);
@@ -181,6 +184,7 @@ export default function VaultAppPage() {
       case 'family': return <FamilyPanel userId={vaultUserId} />;
       case 'bloodline': return <BloodlinePanel userId={vaultUserId} />;
       case 'facetime': return <FaceTimePanel userId={vaultUserId} onNavigate={handleNavigate} />;
+      case 'memorial': return <MemorialPanel userId={vaultUserId} />;
       case 'settings': return <SettingsPanel userId={vaultUserId} userEmail={user.email || ''} />;
       default: return <DashboardPanel userId={vaultUserId} stats={stats} onNavigate={handleNavigate} />;
     }

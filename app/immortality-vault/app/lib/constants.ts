@@ -39,6 +39,7 @@ export const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
   { id: 'interview', label: 'Interview', icon: 'interview' },
   { id: 'chat', label: 'Chat', icon: 'chat' },
+  { id: 'memory_chat', label: 'Memory Chat', icon: 'memory_chat' },
   { id: 'ancestor', label: 'Ancestor Chat', icon: 'ancestor' },
   { id: 'record', label: 'Record Video', icon: 'record' },
   { id: 'voice', label: 'Voice Clone', icon: 'voice' },
@@ -50,6 +51,7 @@ export const NAV_ITEMS = [
   { id: 'family', label: 'Family Vault', icon: 'family_vault' },
   { id: 'bloodline', label: 'Bloodline', icon: 'bloodline' },
   { id: 'facetime', label: 'FaceTime', icon: 'facetime' },
+  { id: 'memorial', label: 'Memorial', icon: 'memorial' },
   { id: 'settings', label: 'Settings', icon: 'settings' },
 ] as const;
 
