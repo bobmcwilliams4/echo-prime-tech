@@ -48,7 +48,7 @@ const FEATURES = [
   { t: 'Echo Interviews for You', d: 'A couple of gentle questions arrive each day. No interviewer needed — the vault fills itself, one memory at a time, without pressure.' },
   { t: 'Talk With Them Again', d: 'Family can speak with the preserved person — in words and in their own voice — and, in time, face to face. The ultimate promise of the Vault.' },
   { t: 'A Memorial in Their Voice', d: 'When the time comes, the Vault can create a memorial — narrated in their own voice, set to their photos and their stories.' },
-  { t: 'Yours Alone, Protected', d: 'Every recording and memory is encrypted and family-controlled. These belong to your family — never sold, never used to train anything, never shared.' },
+  { t: 'Yours Alone, Protected', d: 'Every recording and memory is encrypted and family-controlled. These belong to your family — never sold, never shared, and used only to build this person’s own AI likeness, with your explicit consent — never to train any other model.' },
   { t: 'Their Whole Bloodline', d: 'Trace the family line back through the generations — every ancestor, every name, each fact carried with the record that proves it. And, in time, sit and talk with the ones who came long before.' },
 ];
 
@@ -69,7 +69,7 @@ const FAQS = [
   { q: 'Can you preserve someone who is already gone — or losing their memory?', a: 'Yes. If you have any recordings — voicemails, home videos, interviews — we can re-create their voice from them. And if a loved one is living with Alzheimer’s or illness, this is exactly why the Vault exists: to hold onto them now, gently, while there is still time. Even a few minutes a day preserves what matters.' },
   { q: 'How much audio do you need to keep a voice?', a: 'As little as 30 seconds creates a recognizable voice. A few minutes of natural conversation makes it warmer and more true. The more they speak, the more themselves it becomes.' },
   { q: 'Does Echo really talk with them — out loud?', a: 'Yes. Echo speaks each question aloud, listens to the answer, and can talk with you — answer your questions, follow what moves you, and take its time. It’s a conversation, not a form.' },
-  { q: 'Is my family’s data private?', a: 'Completely. Everything is encrypted and controlled by your family. We never sell it, never share it, and never use it to train anything. These memories are yours.' },
+  { q: 'Is my family’s data private?', a: 'Completely. Everything is encrypted and controlled by your family. We never sell your memories and never share them. They are used only to build this person’s own AI likeness — and only with your explicit consent — never to train any other AI. These memories are yours.' },
   { q: 'Who made the Immortality Vault?', a: 'It was built by Bobby Don McWilliams II, founder of Echo Prime, for his own father after an Alzheimer’s diagnosis — to keep him before the disease could take his memories. It was made by a son, for his dad, so that no one has to lose the sound of the person who shaped them.' },
 ];
 
