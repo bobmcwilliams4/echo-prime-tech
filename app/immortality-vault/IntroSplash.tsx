@@ -12,8 +12,9 @@
  * dismisses itself when the film ends.
  *
  * Mounted in app/immortality-vault/layout.tsx so it wraps the marketing page
- * AND the /app entry (immortalityvault.app redirects the apex straight to /app,
- * so mounting only on the landing page would miss those visitors).
+ * AND the /app entry. immortalityvault.app apex is host-rewritten to this
+ * landing at / (HTTP 200 via prepare-host-roots + vercel.json) — not a 307 —
+ * so the film still plays for brand-domain visitors.
  */
 
 import { useEffect, useRef, useState } from 'react';

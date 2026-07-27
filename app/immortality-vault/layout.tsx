@@ -18,7 +18,9 @@ export const metadata: Metadata = {
     title: 'Immortality Vault — Preserve Your Legacy Forever',
     description: 'Capture voice, memories, personality, and wisdom. Then talk with your loved ones anytime.',
   },
-  alternates: { canonical: 'https://immortalityvault.app/immortality-vault' },
+  // Apex is host-rewritten to this landing on immortalityvault.app (see
+  // scripts/prepare-host-roots.mjs + vercel.json rewrites). Canonical is the brand domain root.
+  alternates: { canonical: 'https://immortalityvault.app/' },
 };
 
 export default function IVLayout({ children }: { children: React.ReactNode }) {

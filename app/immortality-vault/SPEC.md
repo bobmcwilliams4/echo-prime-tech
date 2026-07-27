@@ -24,6 +24,10 @@ corporate-tech. Always dark/cinematic (no light mode).
 1. **Landing** `/immortality-vault` (`page.tsx`) — hero, how-it-works/features, pricing, FAQ, CTA, footer.
    All CTAs → `/immortality-vault/app` (begin) or `#pricing` or `/immortality-vault/login`. Pricing "choose a
    plan" → Vault checkout (NOT `/pricing`). Remove stale tech brags (Cloudflare/D1/ElevenLabs — all migrated).
+   **Brand-domain apex:** `immortalityvault.app/` is **HTTP 200** serving this same landing (not a 307).
+   Static-export host split: `scripts/prepare-host-roots.mjs` moves EPT `index.html` → `ept-home.html` so `/`
+   has no filesystem file; `vercel.json` host-rewrites vault hosts → `/immortality-vault` and everyone else
+   → `/ept-home`. Verify with `npm run smoke:vault`.
 2. **Login** `/immortality-vault/login` (`login/page.tsx`) — Vault-branded, uses the shared Firebase auth
    (`lib/firebase` signInWithGoogle/Email/Apple) so accounts work; redirects to `/immortality-vault/app`.
 3. **App** `/immortality-vault/app` — already self-contained; its only outward hop is auth → repoint to the

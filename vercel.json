@@ -1,4 +1,5 @@
 {
+  "buildCommand": "npm run build",
   "headers": [
     {
       "source": "/(.*)",
@@ -51,15 +52,23 @@
     {
       "source": "/api/sg/:path*",
       "destination": "https://shadowglass-v8-warpspeed.bmcii1976.workers.dev/:path*"
-    }
-  ],
-  "redirects": [
+    },
     {
       "source": "/",
       "has": [{ "type": "host", "value": "immortalityvault.app" }],
-      "destination": "/immortality-vault",
-      "permanent": false
+      "destination": "/immortality-vault"
     },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.immortalityvault.app" }],
+      "destination": "/immortality-vault"
+    },
+    {
+      "source": "/",
+      "destination": "/ept-home"
+    }
+  ],
+  "redirects": [
     {
       "source": "/",
       "has": [{ "type": "host", "value": "hephaestion.echo-op.com" }],
@@ -76,12 +85,6 @@
       "source": "/",
       "has": [{ "type": "host", "value": "echocad.echo-op.com" }],
       "destination": "/daedalus-forge",
-      "permanent": false
-    },
-    {
-      "source": "/",
-      "has": [{ "type": "host", "value": "www.immortalityvault.app" }],
-      "destination": "/immortality-vault",
       "permanent": false
     },
     {
