@@ -5,7 +5,7 @@
  * stories, read-only, no account needed. Self-contained: no EPT links. */
 
 import { useEffect, useState } from 'react';
-import { getListenStories, synthesizeSpeech, type ListenStory } from '../app/lib/vault-api';
+import { getListenStories, synthesizeListenSpeech, type ListenStory } from '../app/lib/vault-api';
 import { playAudioBlob } from '../app/lib/media';
 
 const GOLD = '#d4b483';
@@ -19,22 +19,30 @@ export default function ListenPage() {
   const [listener, setListener] = useState<string | undefined>();
   const [state, setState] = useState<'loading' | 'ready' | 'invalid'>('loading');
   const [playingIdx, setPlayingIdx] = useState<number | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = new URLSearchParams(window.location.search).get('token');
-    if (!token) { setState('invalid'); return; }
-    getListenStories(token)
+    const t = new URLSearchParams(window.location.search).get('token');
+    if (!t) { setState('invalid'); return; }
+    setToken(t);
+    getListenStories(t)
       .then(d => { setStories(d.stories || []); setPerson(d.person); setListener(d.listener); setState('ready'); })
       .catch(() => setState('invalid'));
   }, []);
 
   const speak = async (s: ListenStory, idx: number) => {
-    if (playingIdx !== null) return;
+    if (playingIdx !== null || !token) return;
     setPlayingIdx(idx);
+    setVoiceError(null);
     try {
-      const blob = await synthesizeSpeech(s.answer.slice(0, 1200));
+      // Share-link gated TTS (no Firebase account required for family listeners).
+      // Always requests wav_44100 so browsers never get silent raw PCM.
+      const blob = await synthesizeListenSpeech(token, s.answer.slice(0, 1200));
       await playAudioBlob(blob);
-    } catch { /* voice offline — the words remain */ }
+    } catch {
+      setVoiceError('Voice playback is temporarily unavailable. The written story is still here.');
+    }
     setPlayingIdx(null);
   };
 
@@ -71,6 +79,12 @@ export default function ListenPage() {
           <div className="text-center py-16 rounded-2xl" style={{ background: CARD, border: `1px solid ${BORDER}` }}>
             <p className="text-white mb-1">The first stories are still being told.</p>
             <p className="text-sm" style={{ color: '#a1a1aa' }}>Check back soon — every interview adds more.</p>
+          </div>
+        )}
+
+        {voiceError && (
+          <div className="mb-5 p-3 rounded-xl text-sm" style={{ background: CARD, border: `1px solid ${BORDER}`, color: '#e0a08a' }}>
+            {voiceError}
           </div>
         )}
 

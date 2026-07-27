@@ -771,11 +771,30 @@ export async function chatWithAncestor(
 /* ─── Voice ──────────────────────────────────────────────────────────── */
 
 export async function synthesizeSpeech(text: string, emotion?: string, voiceId?: string): Promise<Blob> {
+  // Always request wav_44100 from the vault. Raw PCM (the old default on some
+  // TTS backends) decodes as silence in the browser; the vault still may return
+  // audio/mpeg from ElevenLabs interviewer fallback, which playAudioBlob handles.
   const res = await vaultFetchRaw('/voice/synthesize', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, ...(emotion && { emotion }), ...(voiceId && { voice_id: voiceId }) }),
+    body: JSON.stringify({
+      text,
+      output_format: 'wav_44100',
+      ...(emotion && { emotion }),
+      ...(voiceId && { voice_id: voiceId }),
+    }),
   });
+  return res.blob();
+}
+
+/** Family listen-room TTS. Gated by the share-link token (no Firebase account). */
+export async function synthesizeListenSpeech(token: string, text: string): Promise<Blob> {
+  const res = await fetch(`${API}/listen/${encodeURIComponent(token)}/speak`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, output_format: 'wav_44100' }),
+  });
+  if (!res.ok) throw new Error(await serverError(res, `Listen speech failed: ${res.status}`));
   return res.blob();
 }
 
@@ -941,6 +960,15 @@ export async function getVideoList(userId: string, limit = 20): Promise<{ videos
 
 export function getVideoStreamUrl(videoId: string): string {
   return `${API}/video/stream/${videoId}`;
+}
+
+/** Resolve a playable absolute stream URL. Prefer the owner-signed `stream_url`
+ *  from `/video/list` (media elements cannot send Authorization headers). */
+export function resolveVideoStreamUrl(video: Pick<VideoMeta, 'id' | 'stream_url'>): string {
+  const raw = (video.stream_url || '').trim();
+  if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+  if (raw.startsWith('/')) return `${API}${raw}`;
+  return getVideoStreamUrl(video.id);
 }
 
 export async function submitBiometric(videoId: string, captures: { capture_type: string; data_json: string; confidence: number }[]): Promise<void> {

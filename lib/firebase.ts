@@ -24,12 +24,13 @@ import {
 } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  // Trim: Vercel/env values sometimes ship a trailing newline which invalidates the key.
+  apiKey: (process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '').trim(),
   authDomain: 'echo-prime-ai.firebaseapp.com',
   projectId: 'echo-prime-ai',
   storageBucket: 'echo-prime-ai.appspot.com',
   messagingSenderId: '249995513427',
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  appId: (process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '').trim(),
 };
 
 let app: FirebaseApp;

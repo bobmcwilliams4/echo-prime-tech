@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ACCENT, GOLD, GOLD_BRIGHT, GOLD_DEEP, BG_CARD, BG_INSET, BORDER, HAIR, IVORY, MUTED, BG_DARK } from '../lib/constants';
-import { uploadVideo, getVideoList, submitBiometric, type VideoMeta } from '../lib/vault-api';
+import { uploadVideo, getVideoList, submitBiometric, resolveVideoStreamUrl, type VideoMeta } from '../lib/vault-api';
 import VaultIcon from './VaultIcon';
 import { startCamera, stopCamera, createMediaRecorder, createAnalyser, getAudioLevel, formatDuration, formatBytes, type RecorderHandle } from '../lib/media';
 import { enqueueCapture, putChunk, markTotal, removeCapture, mintCaptureUuid, isUploadQueueSupported } from '../lib/upload-queue';
@@ -22,6 +22,8 @@ export default function RecordPanel({ userId }: Props) {
   const [videos, setVideos] = useState<VideoMeta[]>([]);
   const [loadingVideos, setLoadingVideos] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const historyVideoRef = useRef<HTMLVideoElement>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const reviewVideoRef = useRef<HTMLVideoElement>(null);
@@ -290,7 +292,7 @@ export default function RecordPanel({ userId }: Props) {
         )}
       </div>
 
-      {/* Recording History */}
+      {/* Recording History + encrypted-at-rest stream playback */}
       <div>
         <h3 className="text-sm font-semibold mb-3" style={{ color: IVORY }}>Recording History</h3>
         {loadingVideos ? (
@@ -302,17 +304,43 @@ export default function RecordPanel({ userId }: Props) {
         ) : (
           <div className="space-y-2">
             {videos.map(v => (
-              <div key={v.id} className="flex items-center justify-between p-3 rounded-lg" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-                <div className="flex items-center gap-3">
+              <div key={v.id} className="flex items-center justify-between p-3 rounded-lg gap-3" style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
+                <div className="flex items-center gap-3 min-w-0">
                   <div style={{ color: ACCENT, display: 'flex' }}><VaultIcon name="record" size={20} /></div>
-                  <div>
+                  <div className="min-w-0">
                     <div className="text-xs" style={{ color: IVORY }}>{formatDuration(v.duration_seconds || 0)}</div>
                     <div className="text-[10px]" style={{ color: MUTED }}>{new Date(v.created_at).toLocaleDateString()}</div>
                   </div>
                 </div>
-                <div className="text-[10px]" style={{ color: MUTED }}>{formatBytes(v.file_size || 0)}</div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <div className="text-[10px]" style={{ color: MUTED }}>{formatBytes(v.file_size || 0)}</div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = resolveVideoStreamUrl(v);
+                      setPlayingId(v.id);
+                      if (historyVideoRef.current) {
+                        historyVideoRef.current.src = url;
+                        void historyVideoRef.current.play().catch(() => setError('Playback failed. The vault may need a moment to decrypt this recording.'));
+                      }
+                    }}
+                    className="px-3 py-1 rounded-full text-[11px] font-semibold"
+                    style={{ border: `1px solid ${BORDER}`, color: playingId === v.id ? GOLD_BRIGHT : GOLD }}
+                  >
+                    {playingId === v.id ? 'Playing' : 'Play'}
+                  </button>
+                </div>
               </div>
             ))}
+            <video
+              ref={historyVideoRef}
+              controls
+              playsInline
+              className="w-full rounded-xl mt-2"
+              style={{ background: BG_DARK, maxHeight: 280, display: playingId ? 'block' : 'none' }}
+              onEnded={() => setPlayingId(null)}
+              onError={() => setError('Stream playback failed (check network / signed media URL).')}
+            />
           </div>
         )}
       </div>
