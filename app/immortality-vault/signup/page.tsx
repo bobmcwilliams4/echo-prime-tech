@@ -45,19 +45,24 @@ export default function VaultSignupPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  /* This page is statically exported, so anything computed during render
+     sees no `window` and bakes in a bare path -- which silently dropped the
+     ?redirect (and with it the chosen plan), landing a paying buyer in a free
+     vault. Resolve it after mount instead. */
+  const [signinHrefState, setSigninHrefState] = useState('/immortality-vault/login');
+  useEffect(() => {
+    const r = new URLSearchParams(window.location.search).get('redirect');
+    if (r && r.startsWith('/immortality-vault')) setSigninHrefState(`/immortality-vault/login?redirect=${encodeURIComponent(r)}`);
+  }, []);
+
   /* Carry the chosen plan through. /app reads ?plan and opens checkout for the
      signed-in buyer, so losing it here would silently drop them into a free
-     vault after they had already picked a paid one. */
+     vault after they had already picked a paid one. Safe to read window here:
+     this only runs from event handlers and effects, never during render. */
   function redirectTarget(): string {
     if (typeof window === 'undefined') return APP;
     const r = new URLSearchParams(window.location.search).get('redirect');
     return r && r.startsWith('/immortality-vault') ? r : APP;
-  }
-
-  function signinHref(): string {
-    if (typeof window === 'undefined') return '/immortality-vault/login';
-    const r = new URLSearchParams(window.location.search).get('redirect');
-    return r ? `/immortality-vault/login?redirect=${encodeURIComponent(r)}` : '/immortality-vault/login';
   }
 
   useEffect(() => { if (!loading && user) router.push(redirectTarget()); }, [user, loading, router]);
@@ -124,7 +129,7 @@ export default function VaultSignupPage() {
 
         <p style={{ textAlign: 'center', color: C.muted, fontSize: 13, margin: '18px 0 0' }}>
           Already have a vault?{' '}
-          <Link href={signinHref()} style={{ color: C.gold, textDecoration: 'underline' }}>Sign in</Link>
+          <Link href={signinHrefState} style={{ color: C.gold, textDecoration: 'underline' }}>Sign in</Link>
         </p>
       </div>
 

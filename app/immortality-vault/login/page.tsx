@@ -38,18 +38,20 @@ export default function VaultLoginPage() {
   const [resetSent, setResetSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  /* This page is statically exported, so anything computed during render
+     sees no `window` and bakes in a bare path -- which silently dropped the
+     ?redirect (and with it the chosen plan), landing a paying buyer in a free
+     vault. Resolve it after mount instead. */
+  const [signupHrefState, setSignupHrefState] = useState('/immortality-vault/signup');
+  useEffect(() => {
+    const r = new URLSearchParams(window.location.search).get('redirect');
+    if (r && r.startsWith('/immortality-vault')) setSignupHrefState(`/immortality-vault/signup?redirect=${encodeURIComponent(r)}`);
+  }, []);
+
   function redirectTarget(): string {
     if (typeof window === 'undefined') return APP;
     const r = new URLSearchParams(window.location.search).get('redirect');
     return r && r.startsWith('/immortality-vault') ? r : APP;
-  }
-
-  /* Hand the chosen plan to signup too, so a buyer who clicked a paid tier and
-     turns out to be new still lands back on checkout instead of a free vault. */
-  function signupHref(): string {
-    if (typeof window === 'undefined') return '/immortality-vault/signup';
-    const r = new URLSearchParams(window.location.search).get('redirect');
-    return r ? `/immortality-vault/signup?redirect=${encodeURIComponent(r)}` : '/immortality-vault/signup';
   }
 
   useEffect(() => { if (!loading && user) router.push(redirectTarget()); }, [user, loading, router]);
@@ -122,7 +124,7 @@ export default function VaultLoginPage() {
 
         <p style={{ textAlign: 'center', color: C.muted, fontSize: 13, margin: '16px 0 0' }}>
           New here?{' '}
-          <Link href={signupHref()} style={{ color: C.gold, textDecoration: 'underline' }}>Begin their vault</Link>
+          <Link href={signupHrefState} style={{ color: C.gold, textDecoration: 'underline' }}>Begin their vault</Link>
         </p>
       </div>
 
