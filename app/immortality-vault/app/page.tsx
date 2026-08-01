@@ -123,12 +123,19 @@ export default function VaultAppPage() {
       .catch(() => { if (!cancelled) setVaultProfileState({ userId, status: 'error' }); });
     getStats().then(setStats).catch(() => {});
 
+    // Panels are held until the profile resolves (see below), so a request that
+    // never settles would leave a new customer staring at a spinner. Fall through
+    // to a degraded render instead — two 404s beat a blank app.
+    const profileTimeout = setTimeout(() => {
+      if (!cancelled) setVaultProfileState(s => s ?? { userId, status: 'error' });
+    }, 8000);
+
     // Check onboarding
     if (typeof window !== 'undefined' && !localStorage.getItem('vault_onboarded')) {
       setShowOnboarding(true);
     }
 
-    return () => { cancelled = true; };
+    return () => { cancelled = true; clearTimeout(profileTimeout); };
   }, [user]);
 
   const handleNavigate = (panel: string) => {
@@ -143,7 +150,19 @@ export default function VaultAppPage() {
     setShowOnboarding(false);
   };
 
-  if (authLoading || !user || checkingOut) {
+  /* Every panel below is handed the raw Firebase uid, so mounting them before
+     POST /users has written the row makes the very first dashboard of every new
+     customer fire /gamification/check and /consciousness against a user that
+     does not exist yet -- two 404s, a 0% consciousness reading and unevaluated
+     achievements on the first screen they ever see. It self-heals on reload,
+     which is exactly why it survived. Hold the panels until the profile
+     resolves; 'error' still renders (degraded) so a backend hiccup can never
+     white-screen the app. */
+  const vaultProfileStatus = user && vaultProfileState?.userId === user.uid
+    ? vaultProfileState.status
+    : 'loading';
+
+  if (authLoading || !user || checkingOut || vaultProfileStatus === 'loading') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: BG_DARK }}>
         <div className="w-8 h-8 rounded-full animate-spin" style={{ border: '2px solid #d4b48355', borderTopColor: '#d4b483' }} />
@@ -153,7 +172,6 @@ export default function VaultAppPage() {
   }
 
   const vaultUserId = user.uid;
-  const vaultProfileStatus = vaultProfileState?.userId === vaultUserId ? vaultProfileState.status : 'loading';
 
   const renderPanel = () => {
     const gateCapture = (mediaScope: ConsentCaptureScope, panel: ReactNode) => (
