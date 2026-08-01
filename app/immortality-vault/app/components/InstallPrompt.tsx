@@ -52,6 +52,22 @@ export default function InstallPrompt() {
     return () => window.removeEventListener('beforeinstallprompt', onPrompt);
   }, []);
 
+  /* This banner is position:fixed at the bottom with nothing reserving space
+     beneath it, so on a short viewport it sits on top of whatever the page ends
+     with. On the biometric consent gate that is the consent checkbox and its
+     submit button — measured covering both at a 577px-tall viewport, and consent
+     is what unlocks Interview, Record Video and Voice Clone. The click lands on
+     the banner and nothing happens, with no error; scrolling clears it, but a
+     customer who clicks once and sees nothing may simply leave.
+     Reserve the banner's height so page content can always scroll past it. */
+  useEffect(() => {
+    const showing = visible && !dismissed && !isStandalone();
+    if (!showing || typeof document === 'undefined') return;
+    const prev = document.body.style.paddingBottom;
+    document.body.style.paddingBottom = '96px';
+    return () => { document.body.style.paddingBottom = prev; };
+  }, [visible, dismissed]);
+
   if (!visible || dismissed || isStandalone()) return null;
 
   const install = async () => {
