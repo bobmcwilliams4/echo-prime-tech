@@ -1,63 +1,74 @@
 'use client';
 
 /* ==============================================================================
-   IMMORTALITY VAULT — sign in.
-   Vault-branded (gold/black), on the shared ECHO/Firebase auth so accounts work
-   everywhere — but this is a VAULT page, never EPT's /login. Redirects into the
-   Vault app. See SPEC.md + scripts/verify-vault-separation.js.
+   IMMORTALITY VAULT — create an account.
+   The landing pricing sends a buyer to /app?plan=<slug>, which bounces to
+   /login?redirect=... when they are signed out. Until this page existed the
+   funnel dead-ended there: the login card offered no way to register, so every
+   NEW customer who clicked "Choose Keeper" hit a wall and could never reach
+   checkout. Same identity store as the login page (lib/firebase) so an account
+   created here signs in there; same gold/black Vault chrome, never EPT's.
+   See SPEC.md + scripts/verify-vault-separation.js.
    ============================================================================== */
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Cormorant_Garamond } from 'next/font/google';
-import { signInWithGoogle, signInWithApple, signInWithGithub, signInWithEmail, resetPassword } from '../../../lib/firebase';
+import { signInWithGoogle, signInWithApple, signInWithGithub, signUpWithEmail } from '../../../lib/firebase';
 import { useAuth } from '../../../lib/auth-context';
 
 const serif = Cormorant_Garamond({ subsets: ['latin'], weight: ['500', '600'], display: 'swap' });
 
 const C = { bg: '#0a0807', card: '#14100c', gold: '#d4b483', goldDeep: '#b8934f', ivory: '#ece3d2', muted: '#9c9081', hair: 'rgba(212,180,131,0.16)', err: '#e0a08a' };
 const APP = '/immortality-vault/app';
+const MIN_PASSWORD = 8;
 
 function friendly(code: string): string {
-  if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') return 'That email or password doesn’t match. Try again, or reset it below.';
+  if (code === 'auth/email-already-in-use') return 'There is already a vault for that email. Sign in instead.';
+  if (code === 'auth/invalid-email') return 'That email address doesn’t look right.';
+  if (code === 'auth/weak-password') return `Please choose a password of at least ${MIN_PASSWORD} characters.`;
   if (code === 'auth/too-many-requests') return 'Too many attempts. Please wait a moment and try again.';
   if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') return '';
   if (code === 'auth/account-exists-with-different-credential') return 'An account already exists for that email with a different sign-in method. Use the provider you originally signed up with.';
-  if (code === 'auth/operation-not-allowed') return 'That sign-in method isn’t enabled yet. Please use Google, Apple, or email.';
-  return 'Something went wrong signing in. Please try again.';
+  if (code === 'auth/operation-not-allowed') return 'That sign-up method isn’t enabled yet. Please use Google, Apple, or email.';
+  return 'Something went wrong creating your vault. Please try again.';
 }
 
-export default function VaultLoginPage() {
+export default function VaultSignupPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
-  const [resetSent, setResetSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  /* Carry the chosen plan through. /app reads ?plan and opens checkout for the
+     signed-in buyer, so losing it here would silently drop them into a free
+     vault after they had already picked a paid one. */
   function redirectTarget(): string {
     if (typeof window === 'undefined') return APP;
     const r = new URLSearchParams(window.location.search).get('redirect');
     return r && r.startsWith('/immortality-vault') ? r : APP;
   }
 
-  /* Hand the chosen plan to signup too, so a buyer who clicked a paid tier and
-     turns out to be new still lands back on checkout instead of a free vault. */
-  function signupHref(): string {
-    if (typeof window === 'undefined') return '/immortality-vault/signup';
+  function signinHref(): string {
+    if (typeof window === 'undefined') return '/immortality-vault/login';
     const r = new URLSearchParams(window.location.search).get('redirect');
-    return r ? `/immortality-vault/signup?redirect=${encodeURIComponent(r)}` : '/immortality-vault/signup';
+    return r ? `/immortality-vault/login?redirect=${encodeURIComponent(r)}` : '/immortality-vault/login';
   }
 
   useEffect(() => { if (!loading && user) router.push(redirectTarget()); }, [user, loading, router]);
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
-    setError(''); setSubmitting(true);
-    try { await signInWithEmail(email, password); router.push(redirectTarget()); }
+    setError('');
+    if (password.length < MIN_PASSWORD) { setError(`Please choose a password of at least ${MIN_PASSWORD} characters.`); return; }
+    if (password !== confirm) { setError('Those passwords don’t match.'); return; }
+    setSubmitting(true);
+    try { await signUpWithEmail(email, password); router.push(redirectTarget()); }
     catch (err: any) { setError(friendly(err?.code || '')); }
     finally { setSubmitting(false); }
   }
@@ -67,13 +78,6 @@ export default function VaultLoginPage() {
     try { const u = await fn(); if (u) router.push(redirectTarget()); }
     catch (err: any) { const m = friendly(err?.code || ''); if (m) setError(m); }
     finally { setSubmitting(false); }
-  }
-
-  async function handleReset() {
-    if (!email) { setError('Enter your email above first, then reset.'); return; }
-    setError('');
-    try { await resetPassword(email); setResetSent(true); }
-    catch { setError('Couldn’t send a reset email. Check the address and try again.'); }
   }
 
   const inputStyle: React.CSSProperties = { width: '100%', padding: '13px 15px', borderRadius: 12, background: '#0e0b09', border: `1px solid ${C.hair}`, color: C.ivory, fontSize: 15, outline: 'none' };
@@ -88,8 +92,8 @@ export default function VaultLoginPage() {
       </Link>
 
       <div style={{ position: 'relative', width: '100%', maxWidth: 400, background: C.card, border: `1px solid ${C.hair}`, borderRadius: 20, padding: '34px 30px' }}>
-        <h1 className={serif.className} style={{ fontSize: 28, fontWeight: 600, textAlign: 'center', margin: '0 0 6px', color: C.ivory }}>Welcome back</h1>
-        <p style={{ textAlign: 'center', color: C.muted, fontSize: 14.5, margin: '0 0 26px' }}>Sign in to continue preserving the ones you love.</p>
+        <h1 className={serif.className} style={{ fontSize: 28, fontWeight: 600, textAlign: 'center', margin: '0 0 6px', color: C.ivory }}>Begin their vault</h1>
+        <p style={{ textAlign: 'center', color: C.muted, fontSize: 14.5, margin: '0 0 26px' }}>Create your account and start preserving them today.</p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           <button onClick={() => oauth(signInWithGoogle)} disabled={submitting} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: '13px', borderRadius: 12, background: C.gold, color: C.bg, border: 'none', fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: submitting ? 0.6 : 1 }}>
@@ -110,19 +114,17 @@ export default function VaultLoginPage() {
 
         <form onSubmit={handleEmail} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <input type="email" required placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} autoComplete="email" />
-          <input type="password" required placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} style={inputStyle} autoComplete="current-password" />
+          <input type="password" required placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} style={inputStyle} autoComplete="new-password" minLength={MIN_PASSWORD} />
+          <input type="password" required placeholder="Confirm password" value={confirm} onChange={(e) => setConfirm(e.target.value)} style={inputStyle} autoComplete="new-password" minLength={MIN_PASSWORD} />
           {error && <div style={{ color: C.err, fontSize: 13.5, lineHeight: 1.5 }}>{error}</div>}
-          {resetSent && <div style={{ color: C.gold, fontSize: 13.5 }}>Reset email sent — check your inbox.</div>}
           <button type="submit" disabled={submitting} style={{ width: '100%', padding: '13px', borderRadius: 12, background: 'transparent', color: C.gold, border: `1px solid ${C.gold}`, fontSize: 15, fontWeight: 700, cursor: 'pointer', opacity: submitting ? 0.6 : 1 }}>
-            {submitting ? 'Signing in…' : 'Sign in'}
+            {submitting ? 'Creating your vault…' : 'Create my vault'}
           </button>
         </form>
 
-        <button onClick={handleReset} style={{ display: 'block', margin: '16px auto 0', background: 'none', border: 'none', color: C.muted, fontSize: 13, cursor: 'pointer', textDecoration: 'underline' }}>Forgot your password?</button>
-
-        <p style={{ textAlign: 'center', color: C.muted, fontSize: 13, margin: '16px 0 0' }}>
-          New here?{' '}
-          <Link href={signupHref()} style={{ color: C.gold, textDecoration: 'underline' }}>Begin their vault</Link>
+        <p style={{ textAlign: 'center', color: C.muted, fontSize: 13, margin: '18px 0 0' }}>
+          Already have a vault?{' '}
+          <Link href={signinHref()} style={{ color: C.gold, textDecoration: 'underline' }}>Sign in</Link>
         </p>
       </div>
 
